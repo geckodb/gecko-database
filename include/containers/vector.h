@@ -1,32 +1,64 @@
+// An implementation of the vector data structure
+// Copyright (C) 2017 Marcus Pinnecke
+//
+// This program is free software: you can redistribute it and/or modify it under the terms of the
+// GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with this program.
+// If not, see <http://www.gnu.org/licenses/>.
+
 #pragma once
+
+// ---------------------------------------------------------------------------------------------------------------------
+// I N C L U D E S
+// ---------------------------------------------------------------------------------------------------------------------
 
 #include <defs.h>
 
+// ---------------------------------------------------------------------------------------------------------------------
+// C O N F I G
+// ---------------------------------------------------------------------------------------------------------------------
+
 #define GROW_FACTOR 1.7
 
-struct vector;
+// ---------------------------------------------------------------------------------------------------------------------
+// D A T A   T Y P E S
+// ---------------------------------------------------------------------------------------------------------------------
 
 enum vector_flags {
     VF_ZERO_MEMORY = 1 << 0,
     VF_AUTO_RESIZE = 1 << 1,
 };
 
-struct vector *vector_create(size_t element_size, size_t capacity);
+typedef struct
+{
+    void *data;
+    size_t sizeof_element, num_elements, element_capacity;
+    enum vector_flags flags;
+    float grow_factor;
+} mdb_vector;
 
-struct vector *vector_create_ex(size_t element_size, size_t capacity, enum vector_flags flags, float grow_factor);
+// ---------------------------------------------------------------------------------------------------------------------
+// I N T E R F A C E   F U N C T I O N S
+// ---------------------------------------------------------------------------------------------------------------------
 
-const void *vector_get_data(struct vector *vec);
+mdb_vector *mdb_vector_alloc(size_t element_size, size_t capacity);
 
-bool vector_set(struct vector *vec, size_t idx, size_t num_elements, const void *data);
+mdb_vector *mdb_vector_alloc_ex(size_t element_size, size_t capacity, enum vector_flags flags, float grow_factor);
 
-size_t vector_get_num_elements(struct vector *vec);
+bool mdb_vector_free(mdb_vector *vec);
 
-size_t vector_get_elements_size(struct vector *vec);
+const void *mdb_vector_get(mdb_vector *vec);
 
-bool vector_push_back(struct vector *vec, size_t num_elements, const void *data);
+bool mdb_vector_set(mdb_vector *vec, size_t idx, size_t num_elements, const void *data);
 
-bool vector_delete(struct vector *vec);
+bool mdb_vector_add(mdb_vector *vec, size_t num_elements, const void *data);
 
-bool vector_equals(const struct vector *lhs, const struct vector *rhs, bool (*comp)(const void *a, const void *b));
+bool mdb_vector_comp(const mdb_vector *lhs, const mdb_vector *rhs, bool (*comp)(const void *a, const void *b));
 
-bool vector_foreach(struct vector *vec, bool (*consumer)(void *begin, void *end));
+bool mdb_vector_foreach(mdb_vector *vec, void *capture, bool (*func)(void *capture, void *begin, void *end));

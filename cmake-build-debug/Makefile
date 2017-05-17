@@ -285,6 +285,33 @@ storage/schema.c.s:
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/storage/schema.c.s
 .PHONY : storage/schema.c.s
 
+types.o: types.c.o
+
+.PHONY : types.o
+
+# target to build an object file
+types.c.o:
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/types.c.o
+.PHONY : types.c.o
+
+types.i: types.c.i
+
+.PHONY : types.i
+
+# target to preprocess a source file
+types.c.i:
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/types.c.i
+.PHONY : types.c.i
+
+types.s: types.c.s
+
+.PHONY : types.s
+
+# target to generate assembly for a file
+types.c.s:
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/types.c.s
+.PHONY : types.c.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -312,6 +339,9 @@ help:
 	@echo "... storage/schema.o"
 	@echo "... storage/schema.i"
 	@echo "... storage/schema.s"
+	@echo "... types.o"
+	@echo "... types.i"
+	@echo "... types.s"
 .PHONY : help
 
 

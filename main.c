@@ -2,33 +2,47 @@
 #include <containers/vector.h>
 #include <error.h>
 #include <storage/schema.h>
+#include <storage/attribute.h>
 
 int main(void)
 {
     for (int i = 0; i < 1000; i++) {
-        struct vector *p;
-        if ((p = vector_create(sizeof(char), 3)) == NULL) {
+        mdb_vector *p;
+        if ((p = mdb_vector_alloc(sizeof(char), 3)) == NULL) {
             error_print();
         };
-        if (!vector_push_back(p, 16, "Eine Kleine Maus")) {
+        if (!mdb_vector_add(p, 16, "Eine Kleine Maus")) {
             error_print();
         }
 
-        size_t size = vector_get_elements_size(p);
-        size_t num = vector_get_num_elements(p);
-        const void *data = vector_get_data(p);
+        size_t size = p->sizeof_element;
+        size_t num = p->num_elements;
+        const void *data = mdb_vector_get(p);
 
         for (int i = 0; i < num; i++) {
             printf("%d: %c\n", i, *((char *) data + (i * size)));
         }
 
-        struct schema *s = schema_create(5);
-        struct attribute *a1 = attribute_create(DT_BOOLEAN, "A1");
-        schema_set_attribute(s, 0, a1);
-        printf("NUM attributes: %zu\n", schema_get_num_of_attributes(s));
-        attribute_delete(a1);
+        mdb_schema *s = mdb_schema_alloc(2);
+        mdb_attribute *a1 = mdb_attribute_alloc(TYPE_INTEGER, 1, "A1", 0);
+        mdb_schema_add(s, a1);
+        printf("NUM attributes: %zu\n", s->attributes->num_elements);
+        mdb_attribute_free(a1);
 
-        schema_delete(s);
+        mdb_attribute *a2 = mdb_attribute_alloc(TYPE_FIX_STRING, 200, "A2", 0);
+        mdb_schema_add(s, a2);
+        printf("NUM attributes: %zu\n", s->attributes->num_elements);
+        mdb_attribute_free(a2);
+
+        mdb_attribute *a3 = mdb_attribute_alloc(TYPE_BYTE, 1, "A3", 0);
+        mdb_schema_add(s, a3);
+        printf("NUM attributes: %zu\n", s->attributes->num_elements);
+        mdb_attribute_free(a3);
+
+        const mdb_attribute *cursor = mdb_schema_get_attr_by_name(s, "A0");
+        printf("FOUND 'A3'?: %d, name = %s", (cursor != NULL), (cursor != NULL ? cursor->name : "n/a"));
+
+        mdb_schema_free(s);
     }
 
 

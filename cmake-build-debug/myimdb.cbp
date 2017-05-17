@@ -109,6 +109,9 @@
 		<Unit filename="/Users/marcus/git/myimdb/include/storage/schema.h">
 			<Option target="myimdb"/>
 		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/include/types.h">
+			<Option target="myimdb"/>
+		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/main.c">
 			<Option target="myimdb"/>
 		</Unit>
@@ -119,6 +122,9 @@
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/storage/schema.c">
+			<Option target="myimdb"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/types.c">
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/CMakeLists.txt">

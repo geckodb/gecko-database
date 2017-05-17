@@ -16,6 +16,8 @@ set(SOURCE_FILES main.c
         containers/vector.c
         error.c
         require.c
+        types.c
+        include/types.h
         storage/attribute.c
         storage/schema.c)
 

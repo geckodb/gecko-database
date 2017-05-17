@@ -1,4 +1,4 @@
-// An implementation of a tables attribute data structure
+// Column data types
 // Copyright (C) 2017 Marcus Pinnecke
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -19,41 +19,29 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <defs.h>
-#include <types.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 // D A T A   T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-enum mdb_attr_flags
-{
-    AF_AUTOINC     = 1 << 1,
-    AF_PRIMARY_KEY = 1 << 2,
-    AF_NON_NULL    = 1 << 3,
-    AF_UNIQUE      = 1 << 4
+enum mdb_type {
+    TYPE_UNDEFINED,
+    TYPE_CHAR,
+    TYPE_VAR_STRING,
+    TYPE_FIX_STRING,
+    TYPE_BOOLEAN,
+    TYPE_BYTE,
+    TYPE_SHORT,
+    TYPE_INTEGER,
+    TYPE_LONG,
+    TYPE_FLOAT,
+    TYPE_DOUBLE,
+    TYPE_TID
 };
-
-typedef struct
-{
-    enum mdb_type type;
-    size_t length;
-    const char *name;
-    struct {
-        short non_null    : 1;
-        short primary_key : 1;
-        short auto_inc    : 1;
-        short unique      : 1;
-    } flags;
-} mdb_attribute;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-mdb_attribute *mdb_attribute_alloc(enum mdb_type type, size_t length, const char *name, enum mdb_attr_flags flags);
+size_t mdb_type_sizeof(enum mdb_type type);
 
-bool mdb_attribute_free(mdb_attribute *attr);
-
-bool mdb_attribute_comp(const mdb_attribute *lhs, const mdb_attribute *rhs);
-
-mdb_attribute *mdb_attribute_cpy(const mdb_attribute *proto);

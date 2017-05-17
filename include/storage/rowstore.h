@@ -1,7 +1,6 @@
 #pragma once
 
-struct row_store_handle
+typedef struct
 {
-    const char *name;
 
-};
+} mdb_plain_rowstore;
