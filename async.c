@@ -1,6 +1,34 @@
+// Asynchronous program execution
+// Copyright (C) 2017 Marcus Pinnecke
+//
+// This program is free software: you can redistribute it and/or modify it under the terms of the
+// GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with this program.
+// If not, see <http://www.gnu.org/licenses/>.
+
+// ---------------------------------------------------------------------------------------------------------------------
+// I N C L U D E S
+// ---------------------------------------------------------------------------------------------------------------------
+
 #include <async.h>
 #include <require.h>
 #include <error.h>
+
+// ---------------------------------------------------------------------------------------------------------------------
+// H E L P E R   P R O T O T Y P E S
+// ---------------------------------------------------------------------------------------------------------------------
+
+static bool _this_thread(void *call_result, mdb_async_future *future, enum mdb_async_promise_return return_value);
+
+// ---------------------------------------------------------------------------------------------------------------------
+// I N T E R F A C E  I M P L E M E N T A T I O N
+// ---------------------------------------------------------------------------------------------------------------------
 
 mdb_async_future *mdb_async_future_alloc(const void *capture, promise func)
 {
@@ -27,24 +55,7 @@ bool mdb_async_future_invoke(mdb_async_future *future, enum mdb_async_eval_polic
             case AEP_LAZY:
                 return true;
             case AEP_PARENT_THREAD:
-                call_result = future->promise_func(&return_value, future->capture);
-                future->promise_settled = true;
-                switch (return_value) {
-                    case APR_UNDEFINED:
-                        error_set_last(EC_INTERNALERROR);
-                        return false;
-                    case APR_REJECTED:
-                        future->promise_state = APS_REJECTED;
-                        break;
-                    case APR_RESOLVED:
-                        future->promise_state = APS_FULFILLED;
-                        break;
-                    default:
-                        error_set_last(EC_INTERNALERROR);
-                        return false;
-                }
-                future->call_result = call_result;
-                return true;
+                return _this_thread(call_result, future, return_value);
             default:
                 error_set_last(EC_INTERNALERROR);
                 return false;
@@ -94,4 +105,30 @@ bool mdb_async_future_free(mdb_async_future *future)
         free (future);
     }
     return is_non_null;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// H E L P E R  I M P L E M E N T A T I O N
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool _this_thread(void *call_result, mdb_async_future *future, enum mdb_async_promise_return return_value)
+{
+    call_result = future->promise_func(&return_value, future->capture);
+    future->promise_settled = true;
+    switch (return_value) {
+        case APR_UNDEFINED:
+            error_set_last(EC_INTERNALERROR);
+            return false;
+        case APR_REJECTED:
+            future->promise_state = APS_REJECTED;
+            break;
+        case APR_RESOLVED:
+            future->promise_state = APS_FULFILLED;
+            break;
+        default:
+            error_set_last(EC_INTERNALERROR);
+            return false;
+    }
+    future->call_result = call_result;
+    return true;
 }
