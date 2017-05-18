@@ -1,4 +1,4 @@
-#include <table_space.h>
+#include <area.h>
 #include <require.h>
 
 struct {

@@ -12,7 +12,9 @@ enum error_code
     EC_ILLEGALOPP,
     EC_UNKNOWNTYPE,
     EC_OUTOFBOUNDS,
-    EC_CORRUPTEDORDER
+    EC_CORRUPTEDORDER,
+    EC_INTERNALERROR,
+    EC_RELATIONVIOLATED
 };
 
 void error_set_last(enum error_code code);

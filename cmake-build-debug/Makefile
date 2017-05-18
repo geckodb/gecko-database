@@ -123,6 +123,33 @@ myimdb/fast:
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/build
 .PHONY : myimdb/fast
 
+async.o: async.c.o
+
+.PHONY : async.o
+
+# target to build an object file
+async.c.o:
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/async.c.o
+.PHONY : async.c.o
+
+async.i: async.c.i
+
+.PHONY : async.i
+
+# target to preprocess a source file
+async.c.i:
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/async.c.i
+.PHONY : async.c.i
+
+async.s: async.c.s
+
+.PHONY : async.s
+
+# target to generate assembly for a file
+async.c.s:
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/async.c.s
+.PHONY : async.c.s
+
 containers/vector.o: containers/vector.c.o
 
 .PHONY : containers/vector.o
@@ -321,6 +348,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... myimdb"
+	@echo "... async.o"
+	@echo "... async.i"
+	@echo "... async.s"
 	@echo "... containers/vector.o"
 	@echo "... containers/vector.i"
 	@echo "... containers/vector.s"

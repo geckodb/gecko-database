@@ -82,10 +82,16 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="/Users/marcus/git/myimdb/async.c">
+			<Option target="myimdb"/>
+		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/containers/vector.c">
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/error.c">
+			<Option target="myimdb"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/include/async.h">
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/containers/vector.h">

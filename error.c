@@ -21,15 +21,17 @@ enum error_code error_get_last()
 const char *error_to_str(enum error_code code)
 {
     switch (code) {
-        case EC_ILLEGALARG:     return "Illegal argument";
-        case EC_BADMALLOC:      return "Host memory allocation failed";
-        case EC_NULLPOINTER:    return "Pointer to null";
-        case EC_BADREALLOC:     return "Host memory reallocation failed";
-        case EC_ILLEGALOPP:     return "Illegal operation";
-        case EC_UNKNOWNTYPE:    return "Unknown internal type";
-        case EC_OUTOFBOUNDS:    return "Out of bounds";
-        case EC_NOERR:          return "No error description";
-        case EC_CORRUPTEDORDER: return "Corrupted order";
+        case EC_ILLEGALARG:       return "Illegal argument";
+        case EC_BADMALLOC:        return "Host memory allocation failed";
+        case EC_NULLPOINTER:      return "Pointer to null";
+        case EC_BADREALLOC:       return "Host memory reallocation failed";
+        case EC_ILLEGALOPP:       return "Illegal operation";
+        case EC_UNKNOWNTYPE:      return "Unknown internal type";
+        case EC_OUTOFBOUNDS:      return "Out of bounds";
+        case EC_NOERR:            return "No error description";
+        case EC_CORRUPTEDORDER:   return "Corrupted order";
+        case EC_INTERNALERROR:    return "Internal error";
+        case EC_RELATIONVIOLATED: return "Relation violated";
         default: return "Unknown";
     }
 }

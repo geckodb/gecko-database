@@ -14,6 +14,8 @@ set(SOURCE_FILES main.c
         include/error.h
         include/require.h
         containers/vector.c
+        async.c
+        include/async.h
         error.c
         require.c
         types.c
