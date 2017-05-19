@@ -26,34 +26,44 @@
 // D A T A   T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-enum mdb_async_eval_policy { AEP_EAGER, AEP_LAZY, AEP_PARENT_THREAD };
+typedef enum {
+    future_eager,
+    future_lazy,
+    future_sync
+} future_eval_policy;
 
-enum mdb_async_promise_state { APS_PENDING, APS_FULFILLED, APS_REJECTED };
+typedef enum {
+    promise_pending,
+    promise_fulfilled,
+    promise_rejected
+} promise_state;
 
-enum mdb_async_promise_return { APR_RESOLVED, APR_REJECTED, APR_UNDEFINED };
+typedef enum {
+    resolved,
+    rejected
+} promise_result;
 
-typedef void *(*promise)(enum mdb_async_promise_return *return_value, const void *capture);
+typedef void *(*promise_t)(promise_result *return_value, const void *capture);
 
-typedef struct
-{
+struct _future_t {
     const void *capture;
-    promise promise_func;
-    enum mdb_async_promise_state promise_state;
+    promise_t func;
+    promise_state promise_state;
     atomic_bool promise_settled;
     thrd_t *thread;
     void *thread_args;
-    enum mdb_async_eval_policy eval_policy;
+    future_eval_policy eval_policy;
     void *call_result;
-} mdb_async_future;
+};
+
+typedef struct _future_t *future_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-mdb_async_future *mdb_async_future_alloc(const void *capture, promise func, enum mdb_async_eval_policy policy);
+future_t future_create(const void *capture, promise_t func, future_eval_policy policy);
 
-void mdb_async_future_wait_for(mdb_async_future *future);
+void future_wait_for(future_t future);
 
-const void *mdb_async_future_resolve(enum mdb_async_promise_return *return_type, mdb_async_future *future);
-
-bool mdb_async_future_free(mdb_async_future *future);
+const void *future_resolve(promise_result *return_type, future_t future);
