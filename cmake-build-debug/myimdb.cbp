@@ -94,6 +94,9 @@
 		<Unit filename="/Users/marcus/git/myimdb/include/async.h">
 			<Option target="myimdb"/>
 		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/include/c11threads.h">
+			<Option target="myimdb"/>
+		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/containers/vector.h">
 			<Option target="myimdb"/>
 		</Unit>

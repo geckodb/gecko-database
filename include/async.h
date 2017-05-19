@@ -19,6 +19,8 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <defs.h>
+#include <stdatomic.h>
+#include "c11threads.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 // D A T A   T Y P E S
@@ -37,7 +39,10 @@ typedef struct
     const void *capture;
     promise promise_func;
     enum mdb_async_promise_state promise_state;
-    bool promise_settled;
+    atomic_bool promise_settled;
+    thrd_t *thread;
+    void *thread_args;
+    enum mdb_async_eval_policy eval_policy;
     void *call_result;
 } mdb_async_future;
 
@@ -45,9 +50,7 @@ typedef struct
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-mdb_async_future *mdb_async_future_alloc(const void *capture, promise func);
-
-bool mdb_async_future_invoke(mdb_async_future *future, enum mdb_async_eval_policy policy);
+mdb_async_future *mdb_async_future_alloc(const void *capture, promise func, enum mdb_async_eval_policy policy);
 
 void mdb_async_future_wait_for(mdb_async_future *future);
 

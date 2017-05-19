@@ -3,7 +3,7 @@ project(myimdb)
 
 include_directories("include")
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Werror")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -Wall -Werror")
 
 set(SOURCE_FILES main.c
         include/containers/vector.h
@@ -15,6 +15,7 @@ set(SOURCE_FILES main.c
         include/require.h
         containers/vector.c
         async.c
+        include/c11threads.h
         include/async.h
         error.c
         require.c

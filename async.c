@@ -19,18 +19,25 @@
 #include <async.h>
 #include <require.h>
 #include <error.h>
+#include <c11threads.h>
+#include <assert.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 // H E L P E R   P R O T O T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-static bool _this_thread(void *call_result, mdb_async_future *future, enum mdb_async_promise_return return_value);
+static bool mdb_async_future_invoke(mdb_async_future *future, enum mdb_async_eval_policy policy);
+static bool _this_exec(void *, mdb_async_future *, enum mdb_async_promise_return);
+static bool _lazy_exec(void *, mdb_async_future *, enum mdb_async_promise_return);
+static bool _eager_exec(void *, mdb_async_future *, enum mdb_async_promise_return);
+static int _thrd_start_this_exec_wrapper(void *);
+static void _start_thread(mdb_async_future *future);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E  I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-mdb_async_future *mdb_async_future_alloc(const void *capture, promise func)
+mdb_async_future *mdb_async_future_alloc(const void *capture, promise func, enum mdb_async_eval_policy policy)
 {
     mdb_async_future *future = NULL;
     if (mdb_require_non_null(capture) && mdb_require_non_null(func) &&
@@ -38,34 +45,20 @@ mdb_async_future *mdb_async_future_alloc(const void *capture, promise func)
             future->call_result = NULL;
             future->capture = capture;
             future->promise_func = func;
-            future->promise_settled = false;
             future->promise_state = APS_PENDING;
+            future->eval_policy = AEP_PARENT_THREAD;
+            future->thread = future->thread_args = NULL;
+            atomic_store(&future->promise_settled, false);
     }
-    return future;
-}
-
-bool mdb_async_future_invoke(mdb_async_future *future, enum mdb_async_eval_policy policy) {
-    enum mdb_async_promise_return return_value = APR_UNDEFINED;
-    void *call_result = NULL;
-
-    if (mdb_require_non_null(future) && mdb_require_non_null(future->promise_func)) {
-        switch (policy) {
-            case AEP_EAGER:
-                return true;
-            case AEP_LAZY:
-                return true;
-            case AEP_PARENT_THREAD:
-                return _this_thread(call_result, future, return_value);
-            default:
-                error_set_last(EC_INTERNALERROR);
-                return false;
-        }
-    } else return false;
+    return (future != NULL ? (mdb_async_future_invoke(future, policy) ? future : NULL) : NULL);
 }
 
 void mdb_async_future_wait_for(mdb_async_future *future)
 {
     if (mdb_require_non_null(future)) {
+        if (future->eval_policy == AEP_LAZY) {
+            _start_thread(future);
+        }
         while (!future->promise_settled);
     }
 }
@@ -75,7 +68,7 @@ const void *mdb_async_future_resolve(enum mdb_async_promise_return *return_type,
     void *result = NULL;
 
     if (mdb_require_non_null(future)) {
-        if (!future->promise_settled)
+        if (!atomic_load(&future->promise_settled))
             mdb_async_future_wait_for(future);
 
         if (return_type != NULL) {
@@ -111,10 +104,34 @@ bool mdb_async_future_free(mdb_async_future *future)
 // H E L P E R  I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool _this_thread(void *call_result, mdb_async_future *future, enum mdb_async_promise_return return_value)
+bool mdb_async_future_invoke(mdb_async_future *future, enum mdb_async_eval_policy policy)
+{
+    enum mdb_async_promise_return return_value = APR_UNDEFINED;
+    void *call_result = NULL;
+
+    if (mdb_require_non_null(future) && mdb_require_non_null(future->promise_func)) {
+        future->eval_policy = policy;
+
+        switch (policy) {
+            case AEP_EAGER:
+                _eager_exec(call_result, future, return_value);
+                return true;
+            case AEP_LAZY:
+                _lazy_exec(call_result, future, return_value);
+                return true;
+            case AEP_PARENT_THREAD:
+                return _this_exec(call_result, future, return_value);
+            default:
+                error_set_last(EC_INTERNALERROR);
+                return false;
+        }
+    } else return false;
+}
+
+bool _this_exec(void *call_result, mdb_async_future *future, enum mdb_async_promise_return return_value)
 {
     call_result = future->promise_func(&return_value, future->capture);
-    future->promise_settled = true;
+    atomic_store(&future->promise_settled, true);
     switch (return_value) {
         case APR_UNDEFINED:
             error_set_last(EC_INTERNALERROR);
@@ -131,4 +148,51 @@ bool _this_thread(void *call_result, mdb_async_future *future, enum mdb_async_pr
     }
     future->call_result = call_result;
     return true;
+}
+
+typedef struct
+{
+    void *call_result;
+    mdb_async_future *future;
+    enum mdb_async_promise_return return_value;
+} _this_exec_args;
+
+static int _thrd_start_this_exec_wrapper(void * args)
+{
+    assert (args != NULL);
+    _this_exec_args *exec_args = (_this_exec_args *) args;
+    bool result = _this_exec(exec_args->call_result, exec_args->future, exec_args->return_value);
+    assert (result);
+    return 0;
+}
+
+bool _lazy_exec(void *call_result, mdb_async_future *future, enum mdb_async_promise_return return_value)
+{
+    thrd_t *thread;
+    _this_exec_args* args;
+
+    if (mdb_require_non_null(future) &&
+       (args = mdb_require_malloc(sizeof(_this_exec_args))) && (thread = mdb_require_malloc(sizeof(thrd_t)))) {
+        args->call_result = call_result;
+        args->future = future;
+        args->return_value = return_value;
+        future->thread = thread;
+        future->thread_args = args;
+        return true;
+    } else return false;
+}
+
+bool _eager_exec(void *call_result, mdb_async_future *future, enum mdb_async_promise_return return_value)
+{
+    if (_lazy_exec(call_result, future, return_value)) {
+        _start_thread(future);
+        return true;
+    } else return false;
+}
+
+void _start_thread(mdb_async_future *future)
+{
+    assert (future->thread != NULL && future->thread_args != NULL);
+    thrd_create(future->thread, &_thrd_start_this_exec_wrapper, future->thread_args);
+    thrd_detach(*future->thread);
 }
