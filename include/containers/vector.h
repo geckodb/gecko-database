@@ -30,35 +30,34 @@
 // D A T A   T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-enum vector_flags {
-    VF_ZERO_MEMORY = 1 << 0,
-    VF_AUTO_RESIZE = 1 << 1,
-};
+typedef enum {
+    zero_memory = 1 << 0,
+    auto_resize = 1 << 1,
+} vector_flags;
 
-typedef struct
-{
+typedef struct {
     void *data;
     size_t sizeof_element, num_elements, element_capacity;
-    enum vector_flags flags;
+    vector_flags flags;
     float grow_factor;
-} mdb_vector;
+} vector_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-mdb_vector *mdb_vector_alloc(size_t element_size, size_t capacity);
+vector_t *vector_create(size_t element_size, size_t capacity);
 
-mdb_vector *mdb_vector_alloc_ex(size_t element_size, size_t capacity, enum vector_flags flags, float grow_factor);
+vector_t *vector_create_ex(size_t element_size, size_t capacity, vector_flags flags, float grow_factor);
 
-bool mdb_vector_free(mdb_vector *vec);
+bool vector_free(vector_t *vec);
 
-const void *mdb_vector_get(mdb_vector *vec);
+const void *vector_get(vector_t *vec);
 
-bool mdb_vector_set(mdb_vector *vec, size_t idx, size_t num_elements, const void *data);
+bool vector_set(vector_t *vec, size_t idx, size_t num_elements, const void *data);
 
-bool mdb_vector_add(mdb_vector *vec, size_t num_elements, const void *data);
+bool vector_add(vector_t *vec, size_t num_elements, const void *data);
 
-bool mdb_vector_comp(const mdb_vector *lhs, const mdb_vector *rhs, bool (*comp)(const void *a, const void *b));
+bool vector_comp(const vector_t *lhs, const vector_t *rhs, bool (*comp)(const void *a, const void *b));
 
-bool mdb_vector_foreach(mdb_vector *vec, void *capture, bool (*func)(void *capture, void *begin, void *end));
+bool vector_foreach(vector_t *vec, void *capture, bool (*func)(void *capture, void *begin, void *end));

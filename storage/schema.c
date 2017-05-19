@@ -26,34 +26,34 @@
 // H E L P E R   P R O T O T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-static bool check_valid_schema(const mdb_schema *);
-static bool check_attribute_idx_in_bounds(const mdb_schema *, size_t);
-static bool free_attribute_ptr(void *capture, void *, void *);
+static bool _check_valid_schema(const schema_t *);
+static bool _check_in_bounds(const schema_t *, size_t);
+static bool _free_attribute(void *capture, void *, void *);
 static bool _comp_attribute(const void *a, const void *b);
-static bool _find_attr(void *capture, void *from, void *to);
+static bool _find_attribute(void *capture, void *from, void *to);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E  I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-mdb_schema *mdb_schema_alloc(size_t attribute_capacity)
+schema_t *schema_create(size_t attribute_capacity)
 {
-    mdb_schema *result;
-    if ((result = malloc (sizeof(mdb_schema))) == NULL) {
-        error_set_last(EC_BADMALLOC);
+    schema_t *result;
+    if ((result = malloc (sizeof(schema_t))) == NULL) {
+        error(err_bad_malloc);
     } else {
-        result->attributes = mdb_vector_alloc(sizeof(mdb_attribute *), attribute_capacity);
+        result->attributes = vector_create(sizeof(attribute_t *), attribute_capacity);
     }
     return result;
 }
 
-bool mdb_schema_free(mdb_schema *schema)
+bool schema_free(schema_t *schema)
 {
-    bool result = check_valid_schema(schema);
+    bool result = _check_valid_schema(schema);
     if (result) {
         if (schema->attributes != NULL) {
-            mdb_vector_foreach(NULL, schema->attributes, free_attribute_ptr);
-            mdb_vector_free(schema->attributes);
+            vector_foreach(NULL, schema->attributes, _free_attribute);
+            vector_free(schema->attributes);
             schema->attributes = NULL;
         }
         free (schema);
@@ -61,58 +61,58 @@ bool mdb_schema_free(mdb_schema *schema)
     return result;
 }
 
-bool mdb_schema_comp(const mdb_schema *lhs, const mdb_schema *rhs)
+bool schema_comp(const schema_t *lhs, const schema_t *rhs)
 {
-    return (check_valid_schema(lhs) && check_valid_schema(rhs) &&
-            mdb_vector_comp(lhs->attributes, rhs->attributes, _comp_attribute));
+    return (_check_valid_schema(lhs) && _check_valid_schema(rhs) &&
+            vector_comp(lhs->attributes, rhs->attributes, _comp_attribute));
 }
 
-bool mdb_schema_add(const mdb_schema *schema, const mdb_attribute *attr)
+bool schema_add(const schema_t *schema, const attribute_t *attr)
 {
-    return mdb_require_non_null(schema) ? mdb_schema_set(schema, schema->attributes->num_elements, attr) : false;
+    return require_non_null(schema) ? schema_set(schema, schema->attributes->num_elements, attr) : false;
 }
 
-bool mdb_schema_set(const mdb_schema *schema, size_t attr_idx, const mdb_attribute *attr)
+bool schema_set(const schema_t *schema, size_t attr_idx, const attribute_t *attr)
 {
-    bool result = (check_valid_schema(schema) && mdb_require_non_null(attr));
+    bool result = (_check_valid_schema(schema) && require_non_null(attr));
     if (result) {
-        mdb_attribute *cpy = mdb_attribute_cpy(attr);
-        mdb_vector_set(schema->attributes, attr_idx, 1, &cpy);
+        attribute_t *cpy = attribute_cpy(attr);
+        vector_set(schema->attributes, attr_idx, 1, &cpy);
     }
     return result;
 }
 
-enum mdb_type mdb_schema_get_type(const mdb_schema *schema, size_t attr_idx)
+data_type schema_get(const schema_t *schema, size_t attr_idx)
 {
-    if (check_valid_schema(schema) && check_attribute_idx_in_bounds(schema, attr_idx)) {
-        return ((const mdb_attribute*) mdb_vector_get(schema->attributes))->type;
-    } else return TYPE_UNDEFINED;
+    if (_check_valid_schema(schema) && _check_in_bounds(schema, attr_idx)) {
+        return ((const attribute_t*) vector_get(schema->attributes))->type;
+    } else return type_undef;
 }
 
 typedef struct
 {
     const char *needle;
-    mdb_attribute *result;
+    attribute_t *result;
 } _attr_by_name_params;
 
-const mdb_attribute *mdb_schema_get_attr_by_name(const mdb_schema *schema, const char *name)
+const attribute_t *schema_get_by_name(const schema_t *schema, const char *name)
 {
-    if (mdb_require_non_null(schema) && mdb_require_non_null(name)) {
+    if (require_non_null(schema) && require_non_null(name)) {
         _attr_by_name_params capture = {
             .needle = name,
             .result = NULL
         };
-        if (!mdb_vector_foreach(schema->attributes, &capture, _find_attr)) {
+        if (!vector_foreach(schema->attributes, &capture, _find_attribute)) {
             error_print();
         }
         return capture.result;
     } return NULL;
 }
 
-const char *mdb_schema_get_attribute_name(const mdb_schema *schema, const size_t attr_idx)
+const char *schema_get_attr_name(const schema_t *schema, const size_t attr_idx)
 {
-    if (check_valid_schema(schema) && check_attribute_idx_in_bounds(schema, attr_idx)) {
-        return ((const mdb_attribute *) mdb_vector_get(schema->attributes))->name;
+    if (_check_valid_schema(schema) && _check_in_bounds(schema, attr_idx)) {
+        return ((const attribute_t *) vector_get(schema->attributes))->name;
     } else return NULL;
 }
 
@@ -120,43 +120,43 @@ const char *mdb_schema_get_attribute_name(const mdb_schema *schema, const size_t
 // H E L P E R  I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool check_valid_schema(const mdb_schema *s)
+bool _check_valid_schema(const schema_t *s)
 {
     bool result = ((s != NULL) && (s->attributes != NULL));
-    error_set_last_if(!result, EC_ILLEGALARG);
+    error_if(!result, err_illegal_args);
     return result;
 }
 
-bool check_attribute_idx_in_bounds(const mdb_schema *s, size_t attribute_idx)
+bool _check_in_bounds(const schema_t *s, size_t attribute_idx)
 {
     bool result = (attribute_idx < s->attributes->num_elements);
-    error_set_last_if(!result, EC_OUTOFBOUNDS);
+    error_if(!result, err_out_of_bounds);
     return result;
 }
 
-bool free_attribute_ptr(void *capture, void *begin, void *end)
+bool _free_attribute(void *capture, void *begin, void *end)
 {
-    bool result = mdb_require_non_null(begin) && mdb_require_non_null(end) && mdb_require_less_than(begin, end);
-    for (mdb_attribute **it = (mdb_attribute **) begin; it < (mdb_attribute **) end; it++)
-        result &= mdb_attribute_free(*it);
+    bool result = require_non_null(begin) && require_non_null(end) && require_less_than(begin, end);
+    for (attribute_t **it = (attribute_t **) begin; it < (attribute_t **) end; it++)
+        result &= attribute_free(*it);
     return result;
 }
 
 bool _comp_attribute(const void *a, const void *b)
 {
-    return mdb_attribute_comp((mdb_attribute *) a, (mdb_attribute *) b);
+    return attribute_comp((attribute_t *) a, (attribute_t *) b);
 }
 
-bool _find_attr(void *capture, void *from, void *to)
+bool _find_attribute(void *capture, void *from, void *to)
 {
-    bool result = (mdb_require_non_null(capture) && mdb_require_non_null(from) && mdb_require_non_null(to));
+    bool result = (require_non_null(capture) && require_non_null(from) && require_non_null(to));
     if (result) {
-        mdb_attribute **begin = (mdb_attribute **) from, **end = (mdb_attribute **) to;
+        attribute_t **begin = (attribute_t **) from, **end = (attribute_t **) to;
         _attr_by_name_params *args = (_attr_by_name_params *) capture;
 
-        for (mdb_attribute **it = begin; it < end; it++) {
+        for (attribute_t **it = begin; it < end; it++) {
             const char *it_name = (*it)->name;
-            if (!mdb_require_non_null(it_name))
+            if (!require_non_null(it_name))
                 return false;
             else {
                 if (strcmp(it_name, args->needle) == 0) {

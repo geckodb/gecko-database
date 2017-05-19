@@ -25,56 +25,55 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 static int _comp_size_t(const void *lhs, const void *rhs);
-static int _comp_bool(const void *lhs, const void *rhs);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E  I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool mdb_require_non_null(const void *ptr)
+bool require_non_null(const void *ptr)
 {
     bool is_non_null = (ptr != NULL);
-    error_set_last_if(!is_non_null, EC_NULLPOINTER);
+    error_if(!is_non_null, err_null_ptr);
     return is_non_null;
 }
 
-void *mdb_require_malloc(size_t size)
+void *require_malloc(size_t size)
 {
-    if (mdb_require_relation_size_t(size, RR_GREATER, 0)) {
+    if (require_constraint_size_t(size, constraint_greater, 0)) {
         void *block = malloc(size);
-        error_set_last_if(block == NULL, EC_BADMALLOC);
+        error_if(block == NULL, err_bad_malloc);
         return block;
     } else return NULL;
 }
 
-bool mdb_require_less_than(const void *lhs, const void *rhs)
+bool require_less_than(const void *lhs, const void *rhs)
 {
     bool is_less_than = (lhs < rhs);
-    error_set_last_if(!is_less_than, EC_CORRUPTEDORDER);
+    error_if(!is_less_than, err_corrupted);
     return is_less_than;
 }
 
 bool _check_expected_true(bool expr)
 {
     if (!expr) {
-        error_set_last(EC_RELATIONVIOLATED);
+        error(err_constraint_violated);
     }
     return expr;
 }
 
-bool mdb_require_relation(const void *lhs, enum mdb_require_relation relation, const void *rhs,
-                          int (*comp)(const void *, const void *))
+bool require_constraint(const void *lhs, relation_constraint constraint, const void *rhs,
+                        int (*comp)(const void *, const void *))
 {
-    if (mdb_require_non_null(lhs) && mdb_require_non_null(rhs) && mdb_require_non_null(comp)) {
+    if (require_non_null(lhs) && require_non_null(rhs) && require_non_null(comp)) {
         int result = comp(lhs, rhs);
-        switch (relation) {
-            case RR_LESS_THAN:     return _check_expected_true(result < 0);
-            case RR_LESS_EQUAL:    return _check_expected_true(result <= 0);
-            case RR_EQUAL:         return _check_expected_true(result == 0);
-            case RR_GREATER_EQUAL: return _check_expected_true(result >= 0);
-            case RR_GREATER:       return _check_expected_true(result > 0);
+        switch (constraint) {
+            case constraint_less_than:     return _check_expected_true(result < 0);
+            case constraint_less_equal:    return _check_expected_true(result <= 0);
+            case constraint_equal:         return _check_expected_true(result == 0);
+            case constraint_greater_equal: return _check_expected_true(result >= 0);
+            case constraint_greater:       return _check_expected_true(result > 0);
             default: {
-                error_set_last(EC_INTERNALERROR);
+                error(err_internal);
                 return false;
             }
         }
@@ -82,15 +81,9 @@ bool mdb_require_relation(const void *lhs, enum mdb_require_relation relation, c
     return false;
 }
 
-bool mdb_require_relation_size_t(size_t lhs, enum mdb_require_relation relation, size_t rhs)
+bool require_constraint_size_t(size_t lhs, relation_constraint constraint, size_t rhs)
 {
-    return mdb_require_relation(&lhs, relation, &rhs, _comp_size_t);
-}
-
-bool mdb_require_true(bool value)
-{
-    bool true_val = true;
-    return mdb_require_relation(&value, RR_EQUAL, &true_val, _comp_bool);
+    return require_constraint(&lhs, constraint, &rhs, _comp_size_t);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -103,12 +96,4 @@ int _comp_size_t(const void *lhs, const void *rhs)
     size_t a = *((size_t *) lhs);
     size_t b = *((size_t *) rhs);
     return (a < b ? - 1 : (a > b ? 1 : 0));
-}
-
-int _comp_bool(const void *lhs, const void *rhs)
-{
-    assert(lhs != NULL && rhs != NULL);
-    bool a = *((bool *) lhs);
-    bool b = *((bool *) rhs);
-    return (a == b ? 0 : 1);
 }

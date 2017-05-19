@@ -24,51 +24,51 @@
 // H E L P E R   P R O T O T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-static bool _check_alloc_args(size_t, enum vector_flags, float);
-static mdb_vector *_new_vec();
-static mdb_vector * _new_vec_data(mdb_vector *, enum vector_flags, size_t, size_t);
-static void _init_vec(mdb_vector *, enum vector_flags, size_t, size_t, float);
-static bool _check_add_args(mdb_vector *, size_t, const void *);
-static bool _check_auto_resize(mdb_vector *, size_t);
-static bool check_vector_set_args(mdb_vector *, size_t, const void *);
-static bool check_set_outside_bounds_enabled(mdb_vector *, size_t, size_t);
-static bool vector_realloc(mdb_vector *, size_t);
-static bool advance(mdb_vector *, size_t, size_t);
+static bool      _check_create_args(size_t, vector_flags, float);
+static vector_t *_alloc_vector();
+static vector_t *_alloc_data(vector_t *, vector_flags, size_t, size_t);
+static void      _init_vector(vector_t *, vector_flags, size_t, size_t, float);
+static bool      _check_add_args(vector_t *, size_t, const void *);
+static bool      _check_auto_resize(vector_t *, size_t);
+static bool      _check_set_args(vector_t *, size_t, const void *);
+static bool      _outside_bounds_enabled(vector_t *, size_t, size_t);
+static bool      _realloc_vector(vector_t *, size_t);
+static bool      _advance(vector_t *, size_t, size_t);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E  I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-mdb_vector *mdb_vector_alloc(size_t element_size, size_t capacity)
+vector_t *vector_create(size_t element_size, size_t capacity)
 {
-    return mdb_vector_alloc_ex(element_size, capacity, VF_AUTO_RESIZE, GROW_FACTOR);
+    return vector_create_ex(element_size, capacity, auto_resize, GROW_FACTOR);
 }
 
-mdb_vector *mdb_vector_alloc_ex(size_t element_size, size_t capacity, enum vector_flags flags, float grow_factor)
+vector_t *vector_create_ex(size_t element_size, size_t capacity, vector_flags flags, float grow_factor)
 {
-    mdb_vector *result = NULL;
-    if (_check_alloc_args(element_size, flags, grow_factor)) {
-        result = _new_vec();
-        _init_vec(result, flags, capacity, element_size, grow_factor);
-        result = _new_vec_data(result, flags, capacity, element_size);
+    vector_t *result = NULL;
+    if (_check_create_args(element_size, flags, grow_factor)) {
+        result = _alloc_vector();
+        _init_vector(result, flags, capacity, element_size, grow_factor);
+        result = _alloc_data(result, flags, capacity, element_size);
     }
     return result;
 }
 
-bool mdb_vector_free(mdb_vector *vec)
+bool vector_free(vector_t *vec)
 {
-    bool non_null = mdb_require_non_null(vec);
+    bool non_null = require_non_null(vec);
     if (non_null) {
         free (vec->data);
     }
     return non_null;
 }
 
-bool mdb_vector_add(mdb_vector *vec, size_t num_elements, const void *data)
+bool vector_add(vector_t *vec, size_t num_elements, const void *data)
 {
     if (_check_add_args(vec, num_elements, data) && _check_auto_resize(vec, num_elements)) {
         size_t new_num_elements = vec->num_elements + num_elements;
-        if (!vector_realloc(vec, new_num_elements))
+        if (!_realloc_vector(vec, new_num_elements))
             return false;
         void *base = vec->data + vec->num_elements * vec->sizeof_element;
         memcpy(base, data, num_elements * vec->sizeof_element);
@@ -77,45 +77,45 @@ bool mdb_vector_add(mdb_vector *vec, size_t num_elements, const void *data)
     } else return false;
 }
 
-const void *mdb_vector_get(mdb_vector *vec)
+const void *vector_get(vector_t *vec)
 {
-    return mdb_require_non_null(vec) ? vec->data : NULL;
+    return require_non_null(vec) ? vec->data : NULL;
 }
 
-bool mdb_vector_set(mdb_vector *vec, size_t idx, size_t num_elements, const void *data)
+bool vector_set(vector_t *vec, size_t idx, size_t num_elements, const void *data)
 {
-    if (mdb_require_non_null(vec) && check_vector_set_args(vec, num_elements, data)) {
+    if (require_non_null(vec) && _check_set_args(vec, num_elements, data)) {
         size_t last_idx = idx + num_elements;
         if (last_idx < vec->element_capacity) {
             memcpy(vec->data + idx * vec->sizeof_element, data, num_elements * vec->sizeof_element);
-            vec->num_elements = MAX(vec->num_elements, last_idx);
+            vec->num_elements = min(vec->num_elements, last_idx);
             return true;
-        } else if (advance(vec, idx, num_elements))
-            return mdb_vector_set(vec, idx, num_elements, data);
+        } else if (_advance(vec, idx, num_elements))
+            return vector_set(vec, idx, num_elements, data);
     }
     return false;
 }
 
-size_t vector_get_num_elements(mdb_vector *vec)
+size_t vector_get_num_elements(vector_t *vec)
 {
-    return mdb_require_non_null(vec) ? vec->num_elements : 0;
+    return require_non_null(vec) ? vec->num_elements : 0;
 }
 
-size_t vector_get_elements_size(mdb_vector *vec)
+size_t vector_get_elements_size(vector_t *vec)
 {
-    return mdb_require_non_null(vec) ? vec->sizeof_element : 0;
+    return require_non_null(vec) ? vec->sizeof_element : 0;
 }
 
-bool mdb_vector_foreach(mdb_vector *vec, void *capture, bool (*func)(void *capture, void *begin, void *end))
+bool vector_foreach(vector_t *vec, void *capture, bool (*func)(void *capture, void *begin, void *end))
 {
-    if (!mdb_require_non_null(vec) || !mdb_require_non_null(vec))
+    if (!require_non_null(vec) || !require_non_null(vec))
         return false;
     return func(capture, vec->data, vec->data + vec->num_elements * vec->sizeof_element);
 }
 
-bool mdb_vector_comp(const mdb_vector *lhs, const mdb_vector *rhs, bool (*comp)(const void *a, const void *b))
+bool vector_comp(const vector_t *lhs, const vector_t *rhs, bool (*comp)(const void *a, const void *b))
 {
-    if (!mdb_require_non_null(lhs) || !mdb_require_non_null(rhs))
+    if (!require_non_null(lhs) || !require_non_null(rhs))
         return false;
     if ((lhs->num_elements == rhs->num_elements) && (lhs->sizeof_element == rhs->sizeof_element)) {
         size_t step = lhs->sizeof_element;
@@ -142,32 +142,32 @@ break_inner_loop:
 // H E L P E R  I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool _check_alloc_args(size_t size, enum vector_flags flags, float grow_factor)
+bool _check_create_args(size_t size, vector_flags flags, float grow_factor)
 {
-    bool result = (size > 0) && (((flags & VF_AUTO_RESIZE) != VF_AUTO_RESIZE) || (grow_factor > 1));
-    error_set_last_if(result, EC_ILLEGALARG);
+    bool result = (size > 0) && (((flags & auto_resize) != auto_resize) || (grow_factor > 1));
+    error_if(result, err_illegal_args);
     return result;
 }
 
-mdb_vector *_new_vec()
+vector_t *_alloc_vector()
 {
-    mdb_vector *result = malloc (sizeof(mdb_vector));
-    error_set_last_if((result == NULL), EC_BADMALLOC);
+    vector_t *result = malloc (sizeof(vector_t));
+    error_if((result == NULL), err_bad_malloc);
     return result;
 }
 
-mdb_vector * _new_vec_data(mdb_vector *vec, enum vector_flags flags, size_t capacity, size_t size)
+vector_t *_alloc_data(vector_t *vec, vector_flags flags, size_t capacity, size_t size)
 {
-    if (__builtin_expect((vec != NULL) && (vec->data = ((flags & VF_ZERO_MEMORY) == VF_ZERO_MEMORY) ?
+    if (__builtin_expect((vec != NULL) && (vec->data = ((flags & zero_memory) == zero_memory) ?
                                                        calloc(capacity, size) :
                                                        malloc(capacity * size)) == NULL, false)) {
-        error_set_last(EC_BADMALLOC);
+        error(err_bad_malloc);
         free(vec);
         return NULL;
     } else return vec;
 }
 
-void _init_vec(mdb_vector *vec, enum vector_flags flags, size_t capacity, size_t size, float factor)
+void _init_vector(vector_t *vec, vector_flags flags, size_t capacity, size_t size, float factor)
 {
     if (__builtin_expect(vec != NULL, true)) {
         vec->flags = flags;
@@ -178,46 +178,46 @@ void _init_vec(mdb_vector *vec, enum vector_flags flags, size_t capacity, size_t
     }
 }
 
-bool _check_add_args(mdb_vector *vec, size_t num_elements, const void *data)
+bool _check_add_args(vector_t *vec, size_t num_elements, const void *data)
 {
     bool result = ((vec != NULL) && (num_elements > 0) && (data != NULL));
-    error_set_last_if(!result, EC_ILLEGALARG);
+    error_if(!result, err_illegal_args);
     return result;
 }
 
-bool _check_auto_resize(mdb_vector *vec, size_t num_elements)
+bool _check_auto_resize(vector_t *vec, size_t num_elements)
 {
     bool result = ((vec->sizeof_element + num_elements < vec->element_capacity) ||
-                   (vec->flags & VF_AUTO_RESIZE) == VF_AUTO_RESIZE);
-    error_set_last_if(!result, EC_ILLEGALOPP);
+                   (vec->flags & auto_resize) == auto_resize);
+    error_if(!result, err_illegal_opp);
     return result;
 }
 
-bool check_vector_set_args(mdb_vector *vec, size_t num_elements, const void *data)
+bool _check_set_args(vector_t *vec, size_t num_elements, const void *data)
 {
     bool result = (vec != NULL && num_elements > 0 && data != NULL);
-    error_set_last_if(!result, EC_ILLEGALARG);
+    error_if(!result, err_illegal_args);
     return result;
 }
 
-static bool check_set_outside_bounds_enabled(mdb_vector *vec, size_t idx, size_t num_elements)
+static bool _outside_bounds_enabled(vector_t *vec, size_t idx, size_t num_elements)
 {
     bool result = (vec != NULL &&
-                   ((idx + num_elements < vec->num_elements) || ((vec->flags & VF_AUTO_RESIZE) == VF_AUTO_RESIZE)));
-    error_set_last_if(!result, EC_ILLEGALARG);
+                   ((idx + num_elements < vec->num_elements) || ((vec->flags & auto_resize) == auto_resize)));
+    error_if(!result, err_illegal_args);
     return result;
 }
 
-bool vector_realloc(mdb_vector *vec, size_t new_num_elements)
+bool _realloc_vector(vector_t *vec, size_t new_num_elements)
 {
     while (new_num_elements >= vec->element_capacity)
         vec->element_capacity *= vec->grow_factor;
 
     if ((vec->data = realloc(vec->data, vec->element_capacity * vec->sizeof_element)) == NULL) {
-        error_set_last(EC_BADREALLOC);
+        error(err_bad_realloc);
         return false;
     } else {
-        if (vec->flags & VF_ZERO_MEMORY) {
+        if ((vec->flags & zero_memory) == zero_memory) {
             void *base = vec->data + vec->num_elements * vec->sizeof_element;
             memset(base, 0, (vec->element_capacity - vec->num_elements) * vec->sizeof_element);
         }
@@ -225,14 +225,14 @@ bool vector_realloc(mdb_vector *vec, size_t new_num_elements)
     }
 }
 
-static bool advance(mdb_vector *vec, size_t idx, size_t num_elements)
+static bool _advance(vector_t *vec, size_t idx, size_t num_elements)
 {
     if ((idx + num_elements) < vec->num_elements) {
         return true;
-    } else if (check_set_outside_bounds_enabled(vec, idx, num_elements)) {
+    } else if (_outside_bounds_enabled(vec, idx, num_elements)) {
         if (idx < vec->num_elements)
-            return advance(vec, vec->num_elements, num_elements - vec->num_elements);
-        else return vector_realloc(vec, idx + num_elements);
+            return _advance(vec, vec->num_elements, num_elements - vec->num_elements);
+        else return _realloc_vector(vec, idx + num_elements);
     }
     return false;
 }

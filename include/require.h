@@ -24,21 +24,26 @@
 // D A T A   T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-enum mdb_require_relation { RR_LESS_THAN, RR_LESS_EQUAL, RR_EQUAL, RR_GREATER_EQUAL, RR_GREATER };
+typedef enum {
+    constraint_less_than,
+    constraint_less,
+    constraint_less_equal,
+    constraint_equal,
+    constraint_greater_equal,
+    constraint_greater
+} relation_constraint;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool mdb_require_non_null(const void *ptr);
+bool require_non_null(const void *ptr);
 
-void *mdb_require_malloc(size_t size);
+void *require_malloc(size_t size);
 
-bool mdb_require_less_than(const void *lhs, const void *rhs);
+bool require_less_than(const void *lhs, const void *rhs);
 
-bool mdb_require_relation(const void *lhs, enum mdb_require_relation relation, const void *rhs,
-                          int (*comp)(const void *lhs, const void *rhs));
+bool require_constraint(const void *lhs, relation_constraint constraint, const void *rhs,
+                        int (*comp)(const void *lhs, const void *rhs));
 
-bool mdb_require_relation_size_t(size_t lhs, enum mdb_require_relation relation, size_t rhs);
-
-bool mdb_require_true(bool value);
+bool require_constraint_size_t(size_t lhs, relation_constraint constraint, size_t rhs);

@@ -1,43 +1,43 @@
 #include <error.h>
 
-enum error_code last_error;
+error_code last_error;
 
-void error_set_last(enum error_code code)
+void error(error_code code)
 {
     last_error = code;
 }
 
-void error_set_last_if(bool expr, enum error_code code)
+void error_if(bool expr, error_code code)
 {
     if (__builtin_expect(expr, false))
-        error_set_last(code);
+        error(code);
 }
 
-enum error_code error_get_last()
+error_code error_last()
 {
     return last_error;
 }
 
-const char *error_to_str(enum error_code code)
+const char *error_str(error_code code)
 {
     switch (code) {
-        case EC_ILLEGALARG:       return "Illegal argument";
-        case EC_BADMALLOC:        return "Host memory allocation failed";
-        case EC_NULLPOINTER:      return "Pointer to null";
-        case EC_BADREALLOC:       return "Host memory reallocation failed";
-        case EC_ILLEGALOPP:       return "Illegal operation";
-        case EC_UNKNOWNTYPE:      return "Unknown internal type";
-        case EC_OUTOFBOUNDS:      return "Out of bounds";
-        case EC_NOERR:            return "No error description";
-        case EC_CORRUPTEDORDER:   return "Corrupted order";
-        case EC_INTERNALERROR:    return "Internal error";
-        case EC_RELATIONVIOLATED: return "Relation violated";
+        case err_illegal_args:        return "Illegal argument";
+        case err_bad_malloc:          return "Host memory allocation failed";
+        case err_null_ptr:            return "Pointer to null";
+        case err_bad_realloc:         return "Host memory reallocation failed";
+        case err_illegal_opp:         return "Illegal operation";
+        case err_bad_type:            return "Unknown internal type";
+        case err_out_of_bounds:       return "Out of bounds";
+        case err_no_error:            return "No error description";
+        case err_corrupted:           return "Corrupted order";
+        case err_internal:            return "Internal error";
+        case err_constraint_violated: return "Constraint violated";
         default: return "Unknown";
     }
 }
 
 void error_print()
 {
-    int last = error_get_last();
-    fprintf(stderr, "ERROR 0x%08x: %s\n", last, error_to_str(last));
+    int last = error_last();
+    fprintf(stderr, "ERROR 0x%08x: %s\n", last, error_str(last));
 }

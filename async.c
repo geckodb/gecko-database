@@ -41,8 +41,8 @@ static void _future_free(future_t future);
 future_t future_create(const void *capture, promise_t func, future_eval_policy policy)
 {
     future_t future = NULL;
-    if (mdb_require_non_null(capture) && mdb_require_non_null(func) &&
-        (future = mdb_require_malloc(sizeof(struct _future_t)))) {
+    if (require_non_null(capture) && require_non_null(func) &&
+        (future = require_malloc(sizeof(struct _future_t)))) {
             future->call_result = NULL;
             future->capture = capture;
             future->func = func;
@@ -56,7 +56,7 @@ future_t future_create(const void *capture, promise_t func, future_eval_policy p
 
 void future_wait_for(future_t future)
 {
-    if (mdb_require_non_null(future)) {
+    if (require_non_null(future)) {
         if (future->eval_policy == future_lazy) {
             _start_thread(future);
         }
@@ -68,7 +68,7 @@ const void *future_resolve(promise_result *return_type, future_t future)
 {
     void *result = NULL;
 
-    if (mdb_require_non_null(future) && (mdb_require_non_null(future->thread_args))) {
+    if (require_non_null(future) && (require_non_null(future->thread_args))) {
         if (!atomic_load(&future->promise_settled))
             future_wait_for(future);
 
@@ -81,7 +81,7 @@ const void *future_resolve(promise_result *return_type, future_t future)
                     *return_type = rejected;
                     break;
                 default:
-                    error_set_last(EC_INTERNALERROR);
+                    error(err_internal);
                     return NULL;
             }
         }
@@ -100,7 +100,7 @@ bool _eval(future_t future, future_eval_policy policy)
     promise_result return_value = rejected;
     void *call_result = NULL;
 
-    if (mdb_require_non_null(future) && mdb_require_non_null(future->func)) {
+    if (require_non_null(future) && require_non_null(future->func)) {
         future->eval_policy = policy;
 
         switch (policy) {
@@ -113,7 +113,7 @@ bool _eval(future_t future, future_eval_policy policy)
             case future_sync:
                 return _sync_exec(call_result, future, return_value);
             default:
-                error_set_last(EC_INTERNALERROR);
+                error(err_internal);
                 return false;
         }
     } else return false;
@@ -131,7 +131,7 @@ bool _sync_exec(void *call_result, future_t future, promise_result return_value)
             future->promise_state = promise_fulfilled;
             break;
         default:
-            error_set_last(EC_INTERNALERROR);
+            error(err_internal);
             return false;
     }
     future->call_result = call_result;
@@ -159,8 +159,8 @@ bool _lazy_exec(void *call_result, future_t future, promise_result return_value)
     thrd_t *thread;
     _this_exec_args* args;
 
-    if (mdb_require_non_null(future) &&
-       (args = mdb_require_malloc(sizeof(_this_exec_args))) && (thread = mdb_require_malloc(sizeof(thrd_t)))) {
+    if (require_non_null(future) &&
+       (args = require_malloc(sizeof(_this_exec_args))) && (thread = require_malloc(sizeof(thrd_t)))) {
         args->call_result = call_result;
         args->future = future;
         args->return_value = return_value;
@@ -187,7 +187,7 @@ void _start_thread(future_t future)
 
 void _future_free(future_t future)
 {
-    if (mdb_require_non_null(future)) {
+    if (require_non_null(future)) {
         if (future->call_result != NULL)
             free(future->call_result);
         if (future->thread_args)

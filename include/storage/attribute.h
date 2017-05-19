@@ -25,17 +25,15 @@
 // D A T A   T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-enum mdb_attr_flags
-{
-    AF_AUTOINC     = 1 << 1,
-    AF_PRIMARY_KEY = 1 << 2,
-    AF_NON_NULL    = 1 << 3,
-    AF_UNIQUE      = 1 << 4
-};
+typedef enum {
+    attribute_autoinc = 1 << 1,
+    attribute_primary = 1 << 2,
+    attribute_nonnull = 1 << 3,
+    attribute_unique  = 1 << 4
+} attribute_flags;
 
-typedef struct
-{
-    enum mdb_type type;
+typedef struct {
+    data_type type;
     size_t length;
     const char *name;
     struct {
@@ -44,16 +42,17 @@ typedef struct
         short auto_inc    : 1;
         short unique      : 1;
     } flags;
-} mdb_attribute;
+} attribute_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-mdb_attribute *mdb_attribute_alloc(enum mdb_type type, size_t length, const char *name, enum mdb_attr_flags flags);
+attribute_t *attribute_create(data_type type, size_t length, const char *name, attribute_flags flags);
 
-bool mdb_attribute_free(mdb_attribute *attr);
+attribute_t *attribute_cpy(const attribute_t *proto);
 
-bool mdb_attribute_comp(const mdb_attribute *lhs, const mdb_attribute *rhs);
+bool attribute_free(attribute_t *attr);
 
-mdb_attribute *mdb_attribute_cpy(const mdb_attribute *proto);
+bool attribute_comp(const attribute_t *lhs, const attribute_t *rhs);
+

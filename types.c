@@ -23,15 +23,15 @@
 // I N T E R F A C E  I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t mdb_type_sizeof(enum mdb_type type)
+size_t type_sizeof(data_type type)
 {
     switch (type) {
-        case TYPE_BOOLEAN: case TYPE_BYTE: case TYPE_CHAR: case TYPE_VAR_STRING: case TYPE_FIX_STRING: return 1;
-        case TYPE_SHORT:                                                                               return 2;
-        case TYPE_INTEGER: case TYPE_FLOAT:                                                            return 4;
-        case TYPE_LONG: case TYPE_DOUBLE: case TYPE_TID:                                               return 8;
+        case type_bool: case type_byte: case type_char: case type_var_string: case type_fix_string: return 1;
+        case type_short:                                                                            return 2;
+        case type_int: case type_float:                                                             return 4;
+        case type_long: case type_double: case type_tuple_id:                                       return 8;
         default: {
-            error_set_last(EC_UNKNOWNTYPE);
+            error(err_bad_type);
             return 0;
         }
     }

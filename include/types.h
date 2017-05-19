@@ -24,24 +24,24 @@
 // D A T A   T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-enum mdb_type {
-    TYPE_UNDEFINED,
-    TYPE_CHAR,
-    TYPE_VAR_STRING,
-    TYPE_FIX_STRING,
-    TYPE_BOOLEAN,
-    TYPE_BYTE,
-    TYPE_SHORT,
-    TYPE_INTEGER,
-    TYPE_LONG,
-    TYPE_FLOAT,
-    TYPE_DOUBLE,
-    TYPE_TID
-};
+typedef enum {
+    type_undef,
+    type_char,
+    type_var_string,
+    type_fix_string,
+    type_bool,
+    type_byte,
+    type_short,
+    type_int,
+    type_long,
+    type_float,
+    type_double,
+    type_tuple_id
+} data_type;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t mdb_type_sizeof(enum mdb_type type);
+size_t type_sizeof(data_type type);
 

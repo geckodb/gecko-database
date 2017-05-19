@@ -28,25 +28,25 @@
 
 typedef struct
 {
-    mdb_vector *attributes;
-} mdb_schema;
+    vector_t *attributes;
+} schema_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-mdb_schema *mdb_schema_alloc(size_t attribute_capacity);
+schema_t *schema_create(size_t attribute_capacity);
 
-bool mdb_schema_free(mdb_schema *schema);
+bool schema_free(schema_t *schema);
 
-bool mdb_schema_comp(const mdb_schema *lhs, const mdb_schema *rhs);
+bool schema_comp(const schema_t *lhs, const schema_t *rhs);
 
-bool mdb_schema_add(const mdb_schema *schema, const mdb_attribute *attr);
+bool schema_add(const schema_t *schema, const attribute_t *attr);
 
-bool mdb_schema_set(const mdb_schema *schema, size_t attr_idx, const mdb_attribute *attr);
+bool schema_set(const schema_t *schema, size_t attr_idx, const attribute_t *attr);
 
-enum mdb_type mdb_schema_get_type(const mdb_schema *schema, size_t attr_idx);
+data_type schema_get(const schema_t *schema, size_t attr_idx);
 
-const mdb_attribute *mdb_schema_get_attr_by_name(const mdb_schema *schema, const char *name);
+const attribute_t *schema_get_by_name(const schema_t *schema, const char *name);
 
-const char *mdb_schema_get_attribute_name(const mdb_schema *schema, const size_t attr_idx);
+const char *schema_get_attr_name(const schema_t *schema, const size_t attr_idx);

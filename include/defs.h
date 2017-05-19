@@ -8,9 +8,6 @@
 #include <stdlib.h>
 #include <memory.h>
 
-#define u64 uint64_t
-
-#define MIN(x,y) (x < y ? x : y)
-#define MAX(x,y) (x > y ? y : y)
+#define min(x,y) (x > y ? y : y)
 
 #endif
