@@ -43,6 +43,29 @@ schema_t *schema_create(size_t attribute_capacity)
         error(err_bad_malloc);
     } else {
         result->attributes = vector_create(sizeof(attribute_t *), attribute_capacity);
+        result->is_fixed_size = true;
+    }
+    return result;
+}
+
+bool schema_is_fixed_size(schema_t *schema)
+{
+    size_t attr_idx = schema_num_attributes(schema);
+    while (attr_idx--) {
+        data_type type = schema_get(schema, attr_idx);
+        if (!type_is_fixed_size(type))
+            return false;
+    }
+    return true;
+}
+
+schema_t *schema_cpy(schema_t *proto)
+{
+    schema_t *result = NULL;
+    if ((require_non_null(proto)) && (require_non_null(proto->attributes)) &&
+       ((result = require_malloc(sizeof(schema_t))))) {
+        result->attributes = vector_cpy(proto->attributes);
+        result->is_fixed_size = proto->is_fixed_size;
     }
     return result;
 }
@@ -64,20 +87,30 @@ bool schema_free(schema_t *schema)
 bool schema_comp(const schema_t *lhs, const schema_t *rhs)
 {
     return (_check_valid_schema(lhs) && _check_valid_schema(rhs) &&
-            vector_comp(lhs->attributes, rhs->attributes, _comp_attribute));
+            vector_comp(lhs->attributes, rhs->attributes, _comp_attribute) && lhs->is_fixed_size == rhs->is_fixed_size);
 }
 
-bool schema_add(const schema_t *schema, const attribute_t *attr)
+bool schema_add(schema_t *schema, const attribute_t *attr)
 {
     return require_non_null(schema) ? schema_set(schema, schema->attributes->num_elements, attr) : false;
 }
 
-bool schema_set(const schema_t *schema, size_t attr_idx, const attribute_t *attr)
+bool schema_set(schema_t *schema, size_t attr_idx, const attribute_t *attr)
 {
     bool result = (_check_valid_schema(schema) && require_non_null(attr));
     if (result) {
         attribute_t *cpy = attribute_cpy(attr);
+        schema->is_fixed_size &= type_is_fixed_size(attr->type);
         vector_set(schema->attributes, attr_idx, 1, &cpy);
+    }
+    return result;
+}
+
+size_t schema_num_attributes(const schema_t *schema)
+{
+    size_t result = require_non_null(schema);
+    if (result) {
+        return (schema->attributes->num_elements);
     }
     return result;
 }
@@ -85,8 +118,8 @@ bool schema_set(const schema_t *schema, size_t attr_idx, const attribute_t *attr
 data_type schema_get(const schema_t *schema, size_t attr_idx)
 {
     if (_check_valid_schema(schema) && _check_in_bounds(schema, attr_idx)) {
-        return ((const attribute_t*) vector_get(schema->attributes))->type;
-    } else return type_undef;
+        return (((const attribute_t*) vector_get(schema->attributes)) + attr_idx)->type;
+    } else return type_internal_undef;
 }
 
 typedef struct

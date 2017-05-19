@@ -55,6 +55,24 @@ vector_t *vector_create_ex(size_t element_size, size_t capacity, vector_flags fl
     return result;
 }
 
+bool vector_resize(vector_t *vec, size_t num_elements)
+{
+    if (require_non_null(vec) && require_non_zero(num_elements) && _advance(vec, 0, num_elements)) {
+        vec->num_elements = num_elements;
+        return true;
+    } else return false;
+}
+
+vector_t *vector_cpy(vector_t *proto)
+{
+    vector_t *result = NULL;
+    if ((require_non_null(proto)) && (require_non_null(proto->data)) &&
+        ((result = vector_create_ex(proto->sizeof_element, proto->element_capacity, proto->flags, proto->grow_factor)))) {
+        vector_set(result, 0, proto->num_elements, proto->data);
+    }
+    return result;
+}
+
 bool vector_free(vector_t *vec)
 {
     bool non_null = require_non_null(vec);
@@ -62,6 +80,11 @@ bool vector_free(vector_t *vec)
         free (vec->data);
     }
     return non_null;
+}
+
+bool vector_free_ex(vector_t *vec, void *capture, bool (*func)(void *capture, void *begin, void *end))
+{
+    return vector_foreach(vec, capture, func) && vector_free(vec);
 }
 
 bool vector_add(vector_t *vec, size_t num_elements, const void *data)
@@ -111,6 +134,27 @@ bool vector_foreach(vector_t *vec, void *capture, bool (*func)(void *capture, vo
     if (!require_non_null(vec) || !require_non_null(vec))
         return false;
     return func(capture, vec->data, vec->data + vec->num_elements * vec->sizeof_element);
+}
+
+bool vector_contains(vector_t *vec, void *needle)
+{
+    if (require_non_null(vec) && require_non_null(needle)) {
+        void *end = (vec->data + vec->num_elements * vec->sizeof_element);
+        for (void *chunk_start = vec->data; chunk_start < end; chunk_start += vec->sizeof_element) {
+            void *chunk_end = (chunk_start + vec->sizeof_element);
+            bool is_equal = true;
+            for (void *byte = chunk_start; byte < chunk_end; byte++) {
+                size_t byte_num = (byte - chunk_start);
+                if (*(char *) byte != *((char *) needle + byte_num)) {
+                    is_equal = false;
+                    break;
+                }
+            }
+            if (is_equal)
+                return true;
+        }
+    }
+    return false;
 }
 
 bool vector_comp(const vector_t *lhs, const vector_t *rhs, bool (*comp)(const void *a, const void *b))

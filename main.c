@@ -5,6 +5,7 @@
 #include <storage/attribute.h>
 #include <async.h>
 #include <assert.h>
+#include <storage/slotted_page.h>
 
 void test_promise_on_main_thread(const char *string, future_eval_policy policy);
 
@@ -47,17 +48,17 @@ int main(void)
         }
 
         schema_t *s = schema_create(2);
-        attribute_t *a1 = attribute_create(type_int, 1, "A1", 0);
+        attribute_t *a1 = attribute_create(type_single_int16, 1, "A1", 0);
         schema_add(s, a1);
         printf("NUM attributes: %zu\n", s->attributes->num_elements);
         attribute_free(a1);
 
-        attribute_t *a2 = attribute_create(type_fix_string, 200, "A2", 0);
+        attribute_t *a2 = attribute_create(type_single_int16, 200, "A2", 0);
         schema_add(s, a2);
         printf("NUM attributes: %zu\n", s->attributes->num_elements);
         attribute_free(a2);
 
-        attribute_t *a3 = attribute_create(type_byte, 1, "A3", 0);
+        attribute_t *a3 = attribute_create(type_single_int16, 1, "A3", 0);
         schema_add(s, a3);
         printf("NUM attributes: %zu\n", s->attributes->num_elements);
         attribute_free(a3);
@@ -68,7 +69,23 @@ int main(void)
         schema_free(s);
 
         test_promise_on_main_thread("Hello World", future_lazy);
-        test_promise_on_main_thread("Bonjour World", future_lazy);
+        test_promise_on_main_thread("Bonjour World", future_eager);
+
+        schema_t *fixed_schmea = schema_create(3);
+        attribute_t *attr1 = attribute_create(type_single_int16, 1, "A1", 0);
+        attribute_t *attr2 = attribute_create(type_single_int32, 1, "A2", 0);
+        attribute_t *attr3 = attribute_create(type_single_int64, 1, "A3", 0);
+        schema_add(fixed_schmea, attr1);
+        schema_add(fixed_schmea, attr2);
+        schema_add(fixed_schmea, attr3);
+        attribute_free(attr1);
+        attribute_free(attr2);
+        attribute_free(attr3);
+
+        slotted_page_file_t *file = slotted_page_file_create(fixed_schmea, 1024, 20);
+        slotted_page_file_free(file);
+
+        schema_free(fixed_schmea);
     }
 
 

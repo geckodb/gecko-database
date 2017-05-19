@@ -118,6 +118,12 @@
 		<Unit filename="/Users/marcus/git/myimdb/include/storage/schema.h">
 			<Option target="myimdb"/>
 		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/include/storage/slotted_page.h">
+			<Option target="myimdb"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/include/storage/table.h">
+			<Option target="myimdb"/>
+		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/types.h">
 			<Option target="myimdb"/>
 		</Unit>
@@ -131,6 +137,12 @@
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/storage/schema.c">
+			<Option target="myimdb"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/storage/slotted_page.c">
+			<Option target="myimdb"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/storage/table.c">
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/types.c">

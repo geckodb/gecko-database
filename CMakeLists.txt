@@ -16,7 +16,11 @@ set(SOURCE_FILES main.c
         containers/vector.c
         async.c
         include/c11threads.h
+        include/storage/table.h
         include/async.h
+        include/storage/slotted_page.h
+        storage/slotted_page.c
+        storage/table.c
         error.c
         require.c
         types.c

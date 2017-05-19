@@ -29,6 +29,7 @@
 typedef struct
 {
     vector_t *attributes;
+    bool is_fixed_size;
 } schema_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -37,13 +38,19 @@ typedef struct
 
 schema_t *schema_create(size_t attribute_capacity);
 
+bool schema_is_fixed_size(schema_t *schema);
+
+schema_t *schema_cpy(schema_t *proto);
+
 bool schema_free(schema_t *schema);
 
 bool schema_comp(const schema_t *lhs, const schema_t *rhs);
 
-bool schema_add(const schema_t *schema, const attribute_t *attr);
+bool schema_add(schema_t *schema, const attribute_t *attr);
 
-bool schema_set(const schema_t *schema, size_t attr_idx, const attribute_t *attr);
+bool schema_set(schema_t *schema, size_t attr_idx, const attribute_t *attr);
+
+size_t schema_num_attributes(const schema_t *schema);
 
 data_type schema_get(const schema_t *schema, size_t attr_idx);
 

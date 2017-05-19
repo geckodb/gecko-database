@@ -26,13 +26,30 @@
 size_t type_sizeof(data_type type)
 {
     switch (type) {
-        case type_bool: case type_byte: case type_char: case type_var_string: case type_fix_string: return 1;
-        case type_short:                                                                            return 2;
-        case type_int: case type_float:                                                             return 4;
-        case type_long: case type_double: case type_tuple_id:                                       return 8;
+        case type_single_char:
+        case type_single_bool:
+        case type_single_uint8:
+        case type_single_int8:
+        case type_multi_fixed:
+        case type_multi_variable:       return 1;
+        case type_single_uint16:
+        case type_single_int16:         return 2;
+        case type_single_uint32:
+        case type_single_int32:
+        case type_single_float:         return 4;
+        case type_internal_undef:
+        case type_internal_tuple_id:
+        case type_single_uint64:
+        case type_single_int64:
+        case type_single_double:        return 8;
         default: {
             error(err_bad_type);
             return 0;
         }
     }
+}
+
+bool type_is_fixed_size(data_type type)
+{
+    return (type != type_multi_variable);
 }

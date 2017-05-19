@@ -25,18 +25,23 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 typedef enum {
-    type_undef,
-    type_char,
-    type_var_string,
-    type_fix_string,
-    type_bool,
-    type_byte,
-    type_short,
-    type_int,
-    type_long,
-    type_float,
-    type_double,
-    type_tuple_id
+    type_internal_undef,
+    type_internal_tuple_id,
+
+    type_single_char,
+    type_single_bool,
+    type_single_uint8,
+    type_single_uint16,
+    type_single_uint32,
+    type_single_uint64,
+    type_single_int8,
+    type_single_int16,
+    type_single_int32,
+    type_single_int64,
+    type_single_float,
+    type_single_double,
+    type_multi_fixed,
+    type_multi_variable
 } data_type;
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -44,4 +49,6 @@ typedef enum {
 // ---------------------------------------------------------------------------------------------------------------------
 
 size_t type_sizeof(data_type type);
+
+bool type_is_fixed_size(data_type type);
 

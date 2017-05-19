@@ -39,6 +39,8 @@ typedef enum {
 
 bool require_non_null(const void *ptr);
 
+bool require_non_zero(int64_t value);
+
 void *require_malloc(size_t size);
 
 bool require_less_than(const void *lhs, const void *rhs);

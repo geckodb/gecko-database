@@ -312,6 +312,60 @@ storage/schema.c.s:
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/storage/schema.c.s
 .PHONY : storage/schema.c.s
 
+storage/slotted_page.o: storage/slotted_page.c.o
+
+.PHONY : storage/slotted_page.o
+
+# target to build an object file
+storage/slotted_page.c.o:
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/storage/slotted_page.c.o
+.PHONY : storage/slotted_page.c.o
+
+storage/slotted_page.i: storage/slotted_page.c.i
+
+.PHONY : storage/slotted_page.i
+
+# target to preprocess a source file
+storage/slotted_page.c.i:
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/storage/slotted_page.c.i
+.PHONY : storage/slotted_page.c.i
+
+storage/slotted_page.s: storage/slotted_page.c.s
+
+.PHONY : storage/slotted_page.s
+
+# target to generate assembly for a file
+storage/slotted_page.c.s:
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/storage/slotted_page.c.s
+.PHONY : storage/slotted_page.c.s
+
+storage/table.o: storage/table.c.o
+
+.PHONY : storage/table.o
+
+# target to build an object file
+storage/table.c.o:
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/storage/table.c.o
+.PHONY : storage/table.c.o
+
+storage/table.i: storage/table.c.i
+
+.PHONY : storage/table.i
+
+# target to preprocess a source file
+storage/table.c.i:
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/storage/table.c.i
+.PHONY : storage/table.c.i
+
+storage/table.s: storage/table.c.s
+
+.PHONY : storage/table.s
+
+# target to generate assembly for a file
+storage/table.c.s:
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/storage/table.c.s
+.PHONY : storage/table.c.s
+
 types.o: types.c.o
 
 .PHONY : types.o
@@ -369,6 +423,12 @@ help:
 	@echo "... storage/schema.o"
 	@echo "... storage/schema.i"
 	@echo "... storage/schema.s"
+	@echo "... storage/slotted_page.o"
+	@echo "... storage/slotted_page.i"
+	@echo "... storage/slotted_page.s"
+	@echo "... storage/table.o"
+	@echo "... storage/table.i"
+	@echo "... storage/table.s"
 	@echo "... types.o"
 	@echo "... types.i"
 	@echo "... types.s"

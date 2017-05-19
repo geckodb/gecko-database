@@ -36,10 +36,10 @@ typedef enum {
 } vector_flags;
 
 typedef struct {
-    void *data;
     size_t sizeof_element, num_elements, element_capacity;
     vector_flags flags;
     float grow_factor;
+    void *data;
 } vector_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -50,7 +50,13 @@ vector_t *vector_create(size_t element_size, size_t capacity);
 
 vector_t *vector_create_ex(size_t element_size, size_t capacity, vector_flags flags, float grow_factor);
 
+bool vector_resize(vector_t *vec, size_t num_elements);
+
+vector_t *vector_cpy(vector_t *proto);
+
 bool vector_free(vector_t *vec);
+
+bool vector_free_ex(vector_t *vec, void *capture, bool (*func)(void *capture, void *begin, void *end));
 
 const void *vector_get(vector_t *vec);
 
@@ -61,3 +67,5 @@ bool vector_add(vector_t *vec, size_t num_elements, const void *data);
 bool vector_comp(const vector_t *lhs, const vector_t *rhs, bool (*comp)(const void *a, const void *b));
 
 bool vector_foreach(vector_t *vec, void *capture, bool (*func)(void *capture, void *begin, void *end));
+
+bool vector_contains(vector_t *vec, void *needle);

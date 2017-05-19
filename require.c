@@ -37,6 +37,13 @@ bool require_non_null(const void *ptr)
     return is_non_null;
 }
 
+bool require_non_zero(int64_t value)
+{
+    bool is_non_zero = (value > 0);
+    error_if(!is_non_zero, err_constraint_violated);
+    return is_non_zero;
+}
+
 void *require_malloc(size_t size)
 {
     if (require_constraint_size_t(size, constraint_greater, 0)) {

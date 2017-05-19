@@ -93,7 +93,7 @@ attribute_t *attribute_cpy(const attribute_t *proto)
 bool _check_create_args(const char *name, data_type type, size_t length)
 {
     bool result = (((name != NULL) && (strlen(name)) > 0) &&
-                   ((type == type_fix_string) || (length == 1)));
+                   ((type == type_multi_fixed) || (length == 1)));
     error_if(result, err_illegal_args);
     return result;
 }
