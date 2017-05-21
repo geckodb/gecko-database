@@ -27,6 +27,8 @@
 typedef enum {
     type_internal_undef,
     type_internal_tuple_id,
+    type_internal_strlen,
+    type_internal_pointer,
 
     type_single_char,
     type_single_bool,
@@ -51,4 +53,6 @@ typedef enum {
 size_t type_sizeof(data_type type);
 
 bool type_is_fixed_size(data_type type);
+
+const char *type_to_string(data_type type);
 

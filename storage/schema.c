@@ -44,11 +44,12 @@ schema_t *schema_create(size_t attribute_capacity)
     } else {
         result->attributes = vector_create(sizeof(attribute_t *), attribute_capacity);
         result->is_fixed_size = true;
+        result->varseq_length = 0;
     }
     return result;
 }
 
-bool schema_is_fixed_size(schema_t *schema)
+bool schema_is_fixed_size(const schema_t *schema)
 {
     size_t attr_idx = schema_num_attributes(schema);
     while (attr_idx--) {
@@ -59,7 +60,7 @@ bool schema_is_fixed_size(schema_t *schema)
     return true;
 }
 
-schema_t *schema_cpy(schema_t *proto)
+schema_t *schema_cpy(const schema_t *proto)
 {
     schema_t *result = NULL;
     if ((require_non_null(proto)) && (require_non_null(proto->attributes)) &&
@@ -118,7 +119,7 @@ size_t schema_num_attributes(const schema_t *schema)
 data_type schema_get(const schema_t *schema, size_t attr_idx)
 {
     if (_check_valid_schema(schema) && _check_in_bounds(schema, attr_idx)) {
-        return (((const attribute_t*) vector_get(schema->attributes)) + attr_idx)->type;
+        return (*(((const attribute_t**) vector_get(schema->attributes)) + attr_idx))->type;
     } else return type_internal_undef;
 }
 
@@ -145,8 +146,67 @@ const attribute_t *schema_get_by_name(const schema_t *schema, const char *name)
 const char *schema_get_attr_name(const schema_t *schema, const size_t attr_idx)
 {
     if (_check_valid_schema(schema) && _check_in_bounds(schema, attr_idx)) {
-        return ((const attribute_t *) vector_get(schema->attributes))->name;
+        return (*(((const attribute_t **) vector_get(schema->attributes)) + attr_idx))->name;
     } else return NULL;
+}
+
+attribute_flags_t schema_get_attr_flags(const schema_t *schema, const size_t attr_idx)
+{
+    attribute_flags_t default_flags = attribute_default_flags();
+    if (_check_valid_schema(schema) && _check_in_bounds(schema, attr_idx)) {
+        return ((const attribute_t *) vector_get(schema->attributes))->flags;
+    } else return default_flags;
+}
+
+void schema_print(FILE *file, const schema_t *schema)
+{
+    if (require_non_null(file) && require_non_null(schema)) {
+        size_t attr_idx = schema->attributes->num_elements;
+        fprintf(file, "schema (fixed_size=%d, num_attributes=%zu, attributes=[", schema->is_fixed_size, attr_idx);
+        while (attr_idx--) {
+            const attribute_t *attr = schema_get_by_id(schema, attr_idx);
+            attribute_print(file, attr);
+            if (attr_idx > 0)
+                fprintf(file, ", ");
+        }
+        fprintf(file, "]");
+    }
+}
+
+const attribute_t *schema_get_by_id(const schema_t *schema, size_t attr_idx)
+{
+    if (_check_valid_schema(schema) && _check_in_bounds(schema, attr_idx)) {
+        return *(((const attribute_t **) vector_get(schema->attributes)) + attr_idx);
+    } else return NULL;
+}
+
+bool _is_fixed_schema(const schema_t *fixed_schema)
+{
+    bool is_fixed = fixed_schema->is_fixed_size;
+    error_if(!is_fixed, err_illegal_args);
+    return is_fixed;
+}
+
+size_t schema_get_tuple_size(const schema_t *fixed_schema)
+{
+    size_t total_size = 0;
+    if (require_non_null(fixed_schema) && _is_fixed_schema(fixed_schema)) {
+        size_t attr_idx = schema_num_attributes(fixed_schema);
+        while (attr_idx--) {
+            const attribute_t *attr = schema_get_by_id(fixed_schema, attr_idx);
+            total_size += type_sizeof(attr->type) * attr->length;
+        }
+    }
+    return total_size;
+}
+
+size_t schema_get_varseq_size(const schema_t *fixed_schema)
+{
+    size_t total_size = 0;
+    if (require_non_null(fixed_schema) && _is_fixed_schema(fixed_schema)) {
+        total_size = fixed_schema->varseq_length;
+    }
+    return total_size;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

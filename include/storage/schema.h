@@ -30,6 +30,7 @@ typedef struct
 {
     vector_t *attributes;
     bool is_fixed_size;
+    size_t varseq_length;
 } schema_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -38,9 +39,9 @@ typedef struct
 
 schema_t *schema_create(size_t attribute_capacity);
 
-bool schema_is_fixed_size(schema_t *schema);
+bool schema_is_fixed_size(const schema_t *schema);
 
-schema_t *schema_cpy(schema_t *proto);
+schema_t *schema_cpy(const schema_t *proto);
 
 bool schema_free(schema_t *schema);
 
@@ -57,3 +58,13 @@ data_type schema_get(const schema_t *schema, size_t attr_idx);
 const attribute_t *schema_get_by_name(const schema_t *schema, const char *name);
 
 const char *schema_get_attr_name(const schema_t *schema, const size_t attr_idx);
+
+attribute_flags_t schema_get_attr_flags(const schema_t *schema, const size_t attr_idx);
+
+void schema_print(FILE *file, const schema_t *schema);
+
+const attribute_t *schema_get_by_id(const schema_t *schema, size_t attr_idx);
+
+size_t schema_get_tuple_size(const schema_t *fixed_schema);
+
+size_t schema_get_varseq_size(const schema_t *fixed_schema);

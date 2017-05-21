@@ -150,6 +150,33 @@ async.c.s:
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/async.c.s
 .PHONY : async.c.s
 
+containers/list.o: containers/list.c.o
+
+.PHONY : containers/list.o
+
+# target to build an object file
+containers/list.c.o:
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/containers/list.c.o
+.PHONY : containers/list.c.o
+
+containers/list.i: containers/list.c.i
+
+.PHONY : containers/list.i
+
+# target to preprocess a source file
+containers/list.c.i:
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/containers/list.c.i
+.PHONY : containers/list.c.i
+
+containers/list.s: containers/list.c.s
+
+.PHONY : containers/list.s
+
+# target to generate assembly for a file
+containers/list.c.s:
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/containers/list.c.s
+.PHONY : containers/list.c.s
+
 containers/vector.o: containers/vector.c.o
 
 .PHONY : containers/vector.o
@@ -285,6 +312,33 @@ storage/attribute.c.s:
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/storage/attribute.c.s
 .PHONY : storage/attribute.c.s
 
+storage/memory.o: storage/memory.c.o
+
+.PHONY : storage/memory.o
+
+# target to build an object file
+storage/memory.c.o:
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/storage/memory.c.o
+.PHONY : storage/memory.c.o
+
+storage/memory.i: storage/memory.c.i
+
+.PHONY : storage/memory.i
+
+# target to preprocess a source file
+storage/memory.c.i:
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/storage/memory.c.i
+.PHONY : storage/memory.c.i
+
+storage/memory.s: storage/memory.c.s
+
+.PHONY : storage/memory.s
+
+# target to generate assembly for a file
+storage/memory.c.s:
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/storage/memory.c.s
+.PHONY : storage/memory.c.s
+
 storage/schema.o: storage/schema.c.o
 
 .PHONY : storage/schema.o
@@ -311,33 +365,6 @@ storage/schema.s: storage/schema.c.s
 storage/schema.c.s:
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/storage/schema.c.s
 .PHONY : storage/schema.c.s
-
-storage/slotted_page.o: storage/slotted_page.c.o
-
-.PHONY : storage/slotted_page.o
-
-# target to build an object file
-storage/slotted_page.c.o:
-	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/storage/slotted_page.c.o
-.PHONY : storage/slotted_page.c.o
-
-storage/slotted_page.i: storage/slotted_page.c.i
-
-.PHONY : storage/slotted_page.i
-
-# target to preprocess a source file
-storage/slotted_page.c.i:
-	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/storage/slotted_page.c.i
-.PHONY : storage/slotted_page.c.i
-
-storage/slotted_page.s: storage/slotted_page.c.s
-
-.PHONY : storage/slotted_page.s
-
-# target to generate assembly for a file
-storage/slotted_page.c.s:
-	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/storage/slotted_page.c.s
-.PHONY : storage/slotted_page.c.s
 
 storage/table.o: storage/table.c.o
 
@@ -405,6 +432,9 @@ help:
 	@echo "... async.o"
 	@echo "... async.i"
 	@echo "... async.s"
+	@echo "... containers/list.o"
+	@echo "... containers/list.i"
+	@echo "... containers/list.s"
 	@echo "... containers/vector.o"
 	@echo "... containers/vector.i"
 	@echo "... containers/vector.s"
@@ -420,12 +450,12 @@ help:
 	@echo "... storage/attribute.o"
 	@echo "... storage/attribute.i"
 	@echo "... storage/attribute.s"
+	@echo "... storage/memory.o"
+	@echo "... storage/memory.i"
+	@echo "... storage/memory.s"
 	@echo "... storage/schema.o"
 	@echo "... storage/schema.i"
 	@echo "... storage/schema.s"
-	@echo "... storage/slotted_page.o"
-	@echo "... storage/slotted_page.i"
-	@echo "... storage/slotted_page.s"
 	@echo "... storage/table.o"
 	@echo "... storage/table.i"
 	@echo "... storage/table.s"

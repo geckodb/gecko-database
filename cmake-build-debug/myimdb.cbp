@@ -85,6 +85,9 @@
 		<Unit filename="/Users/marcus/git/myimdb/async.c">
 			<Option target="myimdb"/>
 		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/containers/list.c">
+			<Option target="myimdb"/>
+		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/containers/vector.c">
 			<Option target="myimdb"/>
 		</Unit>
@@ -95,6 +98,9 @@
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/c11threads.h">
+			<Option target="myimdb"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/include/containers/list.h">
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/containers/vector.h">
@@ -112,13 +118,13 @@
 		<Unit filename="/Users/marcus/git/myimdb/include/storage/attribute.h">
 			<Option target="myimdb"/>
 		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/include/storage/memory.h">
+			<Option target="myimdb"/>
+		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/storage/rowstore.h">
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/storage/schema.h">
-			<Option target="myimdb"/>
-		</Unit>
-		<Unit filename="/Users/marcus/git/myimdb/include/storage/slotted_page.h">
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/storage/table.h">
@@ -136,10 +142,10 @@
 		<Unit filename="/Users/marcus/git/myimdb/storage/attribute.c">
 			<Option target="myimdb"/>
 		</Unit>
-		<Unit filename="/Users/marcus/git/myimdb/storage/schema.c">
+		<Unit filename="/Users/marcus/git/myimdb/storage/memory.c">
 			<Option target="myimdb"/>
 		</Unit>
-		<Unit filename="/Users/marcus/git/myimdb/storage/slotted_page.c">
+		<Unit filename="/Users/marcus/git/myimdb/storage/schema.c">
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/storage/table.c">

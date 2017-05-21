@@ -33,15 +33,17 @@ typedef enum {
 } attribute_flags;
 
 typedef struct {
+    unsigned short non_null    : 1;
+    unsigned short primary_key : 1;
+    unsigned short auto_inc    : 1;
+    unsigned short unique      : 1;
+} attribute_flags_t;
+
+typedef struct {
     data_type type;
     size_t length;
     const char *name;
-    struct {
-        short non_null    : 1;
-        short primary_key : 1;
-        short auto_inc    : 1;
-        short unique      : 1;
-    } flags;
+    attribute_flags_t flags;
 } attribute_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -52,7 +54,16 @@ attribute_t *attribute_create(data_type type, size_t length, const char *name, a
 
 attribute_t *attribute_cpy(const attribute_t *proto);
 
+attribute_flags_t attribute_default_flags();
+
+attribute_flags attribute_flags_t_to_flag(attribute_flags_t flags);
+
+attribute_flags_t attribute_flags_to_flag_t(attribute_flags flags);
+
 bool attribute_free(attribute_t *attr);
 
 bool attribute_comp(const attribute_t *lhs, const attribute_t *rhs);
 
+void attribute_print(FILE *file, const attribute_t *attr);
+
+void attribute_flags_print(FILE *file, attribute_flags_t flags);

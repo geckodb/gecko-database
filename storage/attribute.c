@@ -40,11 +40,7 @@ attribute_t *attribute_create(data_type type, size_t length, const char *name, a
             result->name = strdup(name);
             result->type = type;
             result->length = length;
-            result->flags.auto_inc    = ((flags & attribute_autoinc)     == attribute_autoinc);
-            result->flags.non_null    = ((flags & attribute_nonnull)    == attribute_nonnull);
-            result->flags.primary_key = ((flags & attribute_primary) == attribute_primary);
-            result->flags.unique      = ((flags & attribute_unique)      == attribute_unique);
-
+            result->flags = attribute_flags_to_flag_t(flags);
             result->type = type;
         }
     }
@@ -84,6 +80,66 @@ attribute_t *attribute_cpy(const attribute_t *proto)
         cpy->flags.primary_key = proto->flags.primary_key;
         return cpy;
     } else return NULL;
+}
+
+attribute_flags_t attribute_default_flags()
+{
+    attribute_flags_t flags = {
+        .non_null = false,
+        .primary_key = false,
+        .auto_inc = false,
+        .unique = false
+    };
+    return flags;
+}
+
+attribute_flags attribute_flags_t_to_flag(attribute_flags_t flags)
+{
+    attribute_flags result = 0;
+    if (flags.auto_inc)
+        result |= attribute_autoinc;
+    if (flags.non_null)
+        result |= attribute_nonnull;
+    if (flags.primary_key)
+        result |= attribute_primary;
+    if (flags.unique)
+        result |= attribute_unique;
+    return result;
+}
+
+attribute_flags_t attribute_flags_to_flag_t(attribute_flags flags)
+{
+    attribute_flags_t result = {
+            .auto_inc    = ((flags & attribute_autoinc) == attribute_autoinc),
+            .non_null    = ((flags & attribute_nonnull) == attribute_nonnull),
+            .primary_key = ((flags & attribute_primary) == attribute_primary),
+            .unique      = ((flags & attribute_unique)  == attribute_unique)
+    };
+    return result;
+}
+
+void attribute_print(FILE *file, const attribute_t *attr)
+{
+    if (require_non_null(file) && require_non_null(attr)) {
+        fprintf(file, "attribute(name='%s', type='%s', length=%zu, flags='",
+                attr->name, type_to_string(attr->type), attr->length);
+        attribute_flags_print(file, attr->flags);
+        fprintf(file, "')");
+    }
+}
+
+void attribute_flags_print(FILE *file, attribute_flags_t flags)
+{
+    if (require_non_null(file)) {
+        if (flags.auto_inc)
+            fprintf(file, "attribute_autoinc ");
+        if (flags.non_null)
+            fprintf(file, "attribute_nonnull ");
+        if (flags.primary_key)
+            fprintf(file, "attribute_primary ");
+        if (flags.unique)
+            fprintf(file, "attribute_unique ");
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

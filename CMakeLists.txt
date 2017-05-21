@@ -18,8 +18,12 @@ set(SOURCE_FILES main.c
         include/c11threads.h
         include/storage/table.h
         include/async.h
-        include/storage/slotted_page.h
-        storage/slotted_page.c
+        include/containers/list.h
+        containers/list.c
+        #include/storage/slotted_page.h
+        #storage/slotted_page.c
+        storage/memory.c
+        include/storage/memory.h
         storage/table.c
         error.c
         require.c
