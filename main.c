@@ -122,11 +122,11 @@ int main(void)
         op_result = list_push(my_int_list, &int_data);
         assert (op_result);
         const void *node_data = list_begin(my_int_list);
-        assert (*((uint64_t *) data) == 23);
+        assert (*((uint64_t *) node_data) == 23);
         const void *node_data2 = list_next(node_data);
         assert (node_data2 == NULL);
         assert (list_num_elements(my_int_list) == 1);
-        op_result = list_remove(my_int_list, node_data);
+        op_result = list_remove(node_data);
         assert (op_result);
         assert (list_num_elements(my_int_list) == 0);
         op_result = list_push(my_int_list, &int_data);
@@ -141,11 +141,11 @@ int main(void)
         const void *data1 = list_begin(my_int_list);
         assert (data1 != NULL && *(uint64_t *) data1 == 23);
         const void *data2 = list_next(data1);
-        assert (data2 != NULL && *(uint64_t *) data1 == 42);
+        assert (data2 != NULL && *(uint64_t *) data2 == 42);
         const void *data3 = list_next(data2);
-        assert (data3 != NULL && *(uint64_t *) data1 == 1986);
+        assert (data3 != NULL && *(uint64_t *) data3 == 1986);
         assert (list_next(data3) == NULL);
-        list_remove(my_int_list, data1);
+        list_remove(data1);
         assert (list_num_elements(my_int_list) == 2);
 
         const void *data4 = list_begin(my_int_list);
@@ -154,10 +154,10 @@ int main(void)
         assert (data5 != NULL && *(uint64_t *) data5 == 1986);
         assert (list_next(data5) == NULL);
 
-        list_remove(my_int_list, data5);
+        list_remove(data5);
         assert (list_num_elements(my_int_list) == 1);
         const void *data6 = list_begin(my_int_list);
-        assert (data6 != NULL && *(uint64_t *) data6 == 1986);
+        assert (data6 != NULL && *(uint64_t *) data6 == 42);
         assert (list_next(data6) == NULL);
 
         int_data = 2010;
@@ -168,18 +168,18 @@ int main(void)
         assert (op_result);
 
         const void *data7 = list_begin(my_int_list);
-        assert (data7 != NULL && *(uint64_t *) data7 == 1986);
+        assert (data7 != NULL && *(uint64_t *) data7 == 42);
         const void *data8 = list_next(data7);
         assert (data8 != NULL && *(uint64_t *) data8 == 2010);
         const void *data9 = list_next(data8);
         assert (data9 != NULL && *(uint64_t *) data9 == 2017);
         assert (list_next(data9) == NULL);
 
-        op_result = list_remove(my_int_list, data8);
+        op_result = list_remove(data7);
         assert (op_result);
 
         const void *data10 = list_begin(my_int_list);
-        assert (data10 != NULL && *(uint64_t *) data10 == 1986);
+        assert (data10 != NULL && *(uint64_t *) data10 == 2010);
         const void *data11 = list_next(data10);
         assert (data11 != NULL && *(uint64_t *) data11 == 2017);
         assert (list_next(data11) == NULL);
