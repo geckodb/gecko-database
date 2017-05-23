@@ -5,9 +5,8 @@
 #include <storage/attribute.h>
 #include <async.h>
 #include <assert.h>
-#include <storage/slotted_page.h>
-#include <storage/memory.h>
 #include <containers/list.h>
+#include <storage/memory.h>
 
 void test_promise_on_main_thread(const char *string, future_eval_policy policy);
 
@@ -89,27 +88,6 @@ int main(void)
         schema_add(fixed_schmea, attr6);
 
 
-      //  slotted_page_file_t *file = slotted_page_file_create(fixed_schmea, 1024, 20);
-        //  slotted_page_file_free(file);
-
-        //schema_free(fixed_schmea);
-
-        page_file_t *file = page_file_create();
-        page_t *page = page_create(file, 1024);
-
-        void *tuple_data = malloc(sizeof(uint16_t) + sizeof(int32_t) + sizeof(uint64_t));
-        uint16_t val_a1 = 23;
-        memcpy(tuple_data, &val_a1, sizeof(uint16_t));
-        uint32_t val_a2 = 42;
-        memcpy(tuple_data + sizeof(uint16_t), &val_a2, sizeof(uint32_t));
-        uint64_t val_a3 = 1986;
-        memcpy(tuple_data + sizeof(uint16_t) + sizeof(uint32_t), &val_a3, sizeof(uint64_t));
-
-        page_write_tuple(page, fixed_schmea, tuple_data);
-        page_free(page);
-
-        page_file_free(file);
-
         attribute_free(attr1);
         attribute_free(attr2);
         attribute_free(attr3);
@@ -185,6 +163,11 @@ int main(void)
         assert (list_next(data11) == NULL);
 
         list_free(my_int_list);
+
+        printf("%zu\n", sizeof(page_t));
+        fflush(stdout);
+        page_t *page = page_create(42, 1024 * 1024 * 10 /* 10 MiB */, page_flag_fixed, 1024, 1024);
+        printf("%p\n",page);
     }
 
 

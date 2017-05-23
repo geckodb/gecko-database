@@ -20,10 +20,8 @@ set(SOURCE_FILES main.c
         include/async.h
         include/containers/list.h
         containers/list.c
-        #include/storage/slotted_page.h
-        #storage/slotted_page.c
-        storage/memory.c
         include/storage/memory.h
+        storage/memory.c
         storage/table.c
         error.c
         require.c

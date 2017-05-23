@@ -1,58 +1,86 @@
+// Copyright (C) 2017 Marcus Pinnecke
+//
+// This program is free software: you can redistribute it and/or modify it under the terms of the
+// GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with this program.
+// If not, see <http://www.gnu.org/licenses/>.
+
 #pragma once
 
-#include <storage/schema.h>
+// ---------------------------------------------------------------------------------------------------------------------
+// I N C L U D E S
+// ---------------------------------------------------------------------------------------------------------------------
 
-typedef unsigned schema_id_t;
-#define NULL_TUPLE_ID UINT_MAX
+#include <defs.h>
+
+// ---------------------------------------------------------------------------------------------------------------------
+// D A T A   T Y P E S
+// ---------------------------------------------------------------------------------------------------------------------
+
+typedef uint8_t  u8;
+typedef size_t offset_t;
+typedef uint32_t page_id_t;
 
 typedef struct {
-    schema_id_t schema_id;
-    schema_t *schema;
-} slot_schema_t;
+    offset_t begin, end;
+} memory_range_t;
 
 typedef struct {
     struct {
-        unsigned short is_forward_tuple : 1;
-        unsigned short is_free          : 1;
-        unsigned short schema_id        : 14;
-    } header;
-} fixed_tuple_slot_t;
+        page_id_t is_far_ptr    : 1;
+        page_id_t page_id       : 31;
+    };
+    offset_t offset;
+} zone_ptr;
+
+typedef enum {
+    page_flag_dirty = 1 << 1,
+    page_flag_fixed = 1 << 2,
+    page_flag_locked = 1 << 3
+} page_flags;
 
 typedef struct {
+    page_id_t page_id;
+    size_t free_space;
     struct {
-        vector_t *schemas;
-        vector_t *free_list_schema_ids;
-    } schema_register;
-    vector_t *pages;
-} page_file_t;
+        u8 is_dirty  : 1;
+        u8 is_fixed  : 1;
+        u8 is_locked : 1;
+    } flags;
+} page_header_t;
 
 typedef struct {
-    void *begin, *end;
-} free_space_entry_t;
+    size_t list_max, list_len;
+} stack_header_t;
 
 typedef struct {
-
-} slot_handle_t;
+    zone_ptr start;
+    size_t elem_size;
+    size_t elem_capacity;
+} vframe_t;
 
 typedef struct {
-    page_file_t *file;
-    vector_t *slot_free_list;
-    unsigned num_tuples;
-    void *data_begin, *data_end, *first_tuple, *var_data_end;
+    zone_ptr prev, next;
+} zone_header_t;
+
+typedef struct {
+    page_header_t page_header;
+    stack_header_t free_space_register, frame_register;
 } page_t;
 
-typedef struct {
-    page_t *page;
-    unsigned slot;
-} paged_tuple_handle_t;
+// ---------------------------------------------------------------------------------------------------------------------
+// I N T E R F A C E   F U N C T I O N S
+// ---------------------------------------------------------------------------------------------------------------------
 
-
-page_file_t *page_file_create();
-
-bool page_file_free(page_file_t *file);
-
-page_t *page_create(page_file_t *file, size_t page_size);
+page_t *page_create(page_id_t id, size_t size, page_flags flags, size_t free_space, size_t frame_reg);
 
 bool page_free(page_t *page);
 
-paged_tuple_handle_t page_write_tuple(page_t *page, const schema_t *schema, const void *data);
+
+
