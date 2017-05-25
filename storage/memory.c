@@ -23,29 +23,29 @@
 // M A C R O S
 // ---------------------------------------------------------------------------------------------------------------------
 
-#define output_error(code)                                                                          \
-    {                                                                                               \
-        error(code);                                                                                \
-        error_print();                                                                              \
-        fprintf(stderr, "\t> occurred here: '%s:%d'\n", __FILE__, __LINE__);                        \
-        fflush(stderr);                                                                             \
-        exit(1);                                                                                    \
+#define output_error(code)                                                                                             \
+    {                                                                                                                  \
+        error(code);                                                                                                   \
+        error_print();                                                                                                 \
+        fprintf(stderr, "\t> occurred here: '%s:%d'\n", __FILE__, __LINE__);                                           \
+        fflush(stderr);                                                                                                \
+        exit(1);                                                                                                       \
     }
 
-#define return_if(expr, error_code, retval)                                                         \
-    if (expr) {                                                                                     \
-        output_error(error_code);                                                                   \
-        return retval;                                                                              \
+#define return_if(expr, error_code, retval)                                                                            \
+    if (expr) {                                                                                                        \
+        output_error(error_code);                                                                                      \
+        return retval;                                                                                                 \
     }
 
-#define warn_if(expr, msg, args...)                                                                 \
-    if (expr) {                                                                                     \
-        fprintf(stderr, "WARNING (%s:%d): ", __FILE__, __LINE__);                                   \
-        fprintf(stderr, msg, args);                                                                 \
-        fflush(stderr);                                                                             \
+#define warn_if(expr, msg, args...)                                                                                    \
+    if (expr) {                                                                                                        \
+        fprintf(stderr, "WARNING (%s:%d): ", __FILE__, __LINE__);                                                      \
+        fprintf(stderr, msg, args);                                                                                    \
+        fflush(stderr);                                                                                                \
     }
 
-#define debug_var(type, name, value)                                                                \
+#define debug_var(type, name, value)                                                                                   \
     type name = value;
 
 
@@ -53,8 +53,10 @@
 #define expect_greater(val, lower_bound, retval)  return_if((val <= lower_bound), err_illegal_args, retval)
 #define expect_good_malloc(obj, retval)           return_if((obj == NULL), err_bad_malloc, retval)
 
+#define ptr_distance(a, b)                                                                                             \
+    ((void *)b > (void *)a ? ((void *)b - (void *)a) : ((void *)a - (void *)b))
 
-#define has_flag(val, flag)                                                                         \
+#define has_flag(val, flag)                                                                                            \
     ((val & flag) == flag)
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -98,13 +100,13 @@ page_t *page_create(page_id_t id, size_t size, page_flags flags, size_t free_spa
 
     warn_if((size < min_page_size), "requested page size %zu bytes is too small. Must be at least %zu bytes.\n",
             size, min_page_size)
-    expect_greater (size, min_page_size, NULL)
-    expect_greater (flags, 0, NULL)
-    expect_greater (free_space, 0, NULL)
-    expect_greater (frame_reg, 0, NULL)
+    expect_greater(size, min_page_size, NULL)
+    expect_greater(flags, 0, NULL)
+    expect_greater(free_space, 0, NULL)
+    expect_greater(frame_reg, 0, NULL)
     expect_greater(free_space_size, 1, NULL)
 
-    page_t *page = malloc (size);
+    page_t *page = malloc(size);
     expect_good_malloc(page, NULL);
     page->page_header.page_id = id;
     page->page_header.page_size = size;
@@ -148,13 +150,13 @@ void page_dump(FILE *out, const page_t *page)
         printf("#\n");
         printf("# Segments:\n");
         printf("# 0x%08x header\n", 0);
-        printf("# %#010lx free space register\n", ((void *) _free_space_reg_in(page) - (void *)page));
-        printf("# %#010lx frame register\n", ((void *) _frame_reg_in(page) - (void *)page));
-        printf("# %#010lx free space data\n", ((void *) _free_space_reg_get(page, 0) - (void *)page));
-        printf("# %#010lx frame register data\n", ((void *) _frame_reg_inuse_get(page, 0) - (void *)page));
-        printf("# %#010lx frame register free-list\n", ((void *) _frame_reg_freelist_get(page, 0) - (void *)page));
-        printf("# %#010lx payload\n", (__seek_free_space_begin(page) - (void *)page));
-        printf("# %#010lx end\n", page->page_header.page_size);
+        printf("# %#010lx free space register\n",       ptr_distance(page, _free_space_reg_in(page)));
+        printf("# %#010lx frame register\n",            ptr_distance(page, _frame_reg_in(page)));
+        printf("# %#010lx free space data\n",           ptr_distance(page, _free_space_reg_get(page, 0)));
+        printf("# %#010lx frame register data\n",       ptr_distance(page, _frame_reg_inuse_get(page, 0)));
+        printf("# %#010lx frame register free-list\n",  ptr_distance(page, _frame_reg_freelist_get(page, 0)));
+        printf("# %#010lx payload\n",                   ptr_distance(page, __seek_free_space_begin(page)));
+        printf("# %#010lx end\n",                       page->page_header.page_size);
 
     } else {
         printf("# ERR_NULL_POINTER: The system was unable to fetch details: null pointer to page.\n");
