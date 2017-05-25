@@ -19,11 +19,15 @@
 
 #include <defs.h>
 
+#define FORCE_PACKING        __attribute__((__packed__))
+
 // ---------------------------------------------------------------------------------------------------------------------
 // D A T A   T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-typedef uint8_t  u8;
+typedef uint8_t   u8;
+typedef uint16_t  u16;
+typedef uint32_t  u32;
 typedef size_t offset_t;
 typedef uint32_t page_id_t;
 
@@ -45,9 +49,9 @@ typedef enum {
     page_flag_locked = 1 << 3
 } page_flags;
 
-typedef struct {
+typedef struct FORCE_PACKING {
     page_id_t page_id;
-    size_t free_space;
+    size_t page_size, free_space;
     struct {
         u8 is_dirty  : 1;
         u8 is_fixed  : 1;
@@ -55,9 +59,13 @@ typedef struct {
     } flags;
 } page_header_t;
 
-typedef struct {
-    size_t list_max, list_len;
-} stack_header_t;
+typedef struct FORCE_PACKING {
+    u32 list_max, list_len;
+} free_space_register_header_t;
+
+typedef struct FORCE_PACKING {
+    u32 max_num_frames, in_use_num, free_list_len;
+} frame_register_header_t;
 
 typedef struct {
     zone_ptr start;
@@ -71,7 +79,8 @@ typedef struct {
 
 typedef struct {
     page_header_t page_header;
-    stack_header_t free_space_register, frame_register;
+    free_space_register_header_t free_space_register;
+    frame_register_header_t frame_register;
 } page_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -79,6 +88,8 @@ typedef struct {
 // ---------------------------------------------------------------------------------------------------------------------
 
 page_t *page_create(page_id_t id, size_t size, page_flags flags, size_t free_space, size_t frame_reg);
+
+void page_dump(FILE *out, const page_t *page);
 
 bool page_free(page_t *page);
 
