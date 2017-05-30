@@ -34,6 +34,19 @@
 #define MINPAYLOAD_SIZE (sizeof(zone_header_t) + sizeof(zone_ptr))
 
 // ---------------------------------------------------------------------------------------------------------------------
+// T Y P E S
+// ---------------------------------------------------------------------------------------------------------------------
+
+typedef enum {
+    target_free_space_reg,
+    target_frame_reg,
+    target_free_space_data,
+    target_frame_reg_inuse_data,
+    target_frame_reg_freelist_data,
+    target_free_space_begin
+} seek_target;
+
+// ---------------------------------------------------------------------------------------------------------------------
 // M A C R O S
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -83,12 +96,7 @@
 static inline size_t _ext_header_size(size_t free_space_cap, size_t frame_reg_cap);
 static inline size_t _total_header_size(size_t free_space_cap, size_t frame_reg_cap);
 
-static inline void *__seek_free_space_reg(const page_t *page);
-static inline void *__seek_frame_reg(const page_t *page);
-static inline void *__seek_free_space_data(const page_t *page);
-static inline void *__seek_frame_reg_inuse_data(const page_t *page);
-static inline void *__seek_frame_reg_freelist_data(const page_t *page);
-static inline void *__seek_free_space_begin(const page_t *page);
+static inline void *_seek(const page_t *page, seek_target target);
 
 static inline free_space_register_header_t *_free_space_reg_in(const page_t *page);
 static inline memory_range_t *_free_space_reg_get(const page_t *page, size_t pos);
@@ -277,7 +285,7 @@ void page_dump(FILE *out, const page_t *page)
             printf("# %#010lx    pos=%05zu: (unset)\n", ptr_distance(page, frame), idx);
         }
 
-        printf("# %#010lx [PAYLOAD]\n",                   ptr_distance(page, __seek_free_space_begin(page)));
+        printf("# %#010lx [PAYLOAD]\n",                   ptr_distance(page, _seek(page, target_free_space_begin)));
         printf("# %#010lx end\n",                       page->page_header.page_size);
 
     } else {
@@ -300,38 +308,28 @@ static inline size_t _total_header_size(size_t free_space_cap, size_t frame_reg_
     return CORE_HDR_SIZE + _ext_header_size(free_space_cap, frame_reg_cap);
 }
 
-static inline void *__seek_free_space_reg(const page_t *page)
+static inline void *_seek(const page_t *page, seek_target target)
 {
-    return (void *) page + sizeof(page_header_t);
-}
-
-static inline void *__seek_frame_reg(const page_t *page)
-{
-    return __seek_free_space_reg(page) + sizeof(free_space_register_header_t);
-}
-
-static inline void *__seek_free_space_data(const page_t *page)
-{
-    return __seek_frame_reg(page) + sizeof(frame_register_header_t);
-}
-
-static inline void *__seek_frame_reg_inuse_data(const page_t *page)
-{
-    free_space_register_header_t *free_reg = _free_space_reg_in(page);
-    size_t free_register_size = free_reg->list_max;
-    return __seek_free_space_data(page) + sizeof(memory_range_t) * free_register_size;
-}
-
-static inline void *__seek_frame_reg_freelist_data(const page_t *page)
-{
-    frame_register_header_t *frame_reg = _frame_reg_in(page);
-    size_t inuse_size = frame_reg->max_num_frames;
-    return __seek_frame_reg_inuse_data(page) + inuse_size * sizeof(offset_t);
+    switch (target) {
+        case target_free_space_reg:
+            return (void *) page + sizeof(page_header_t);
+        case target_frame_reg:
+            return _seek(page, target_free_space_reg) + sizeof(free_space_register_header_t);
+        case target_free_space_data:
+            return _seek(page, target_frame_reg) + sizeof(frame_register_header_t);
+        case target_frame_reg_inuse_data:
+            return _seek(page, target_free_space_data) + sizeof(memory_range_t) * _free_space_reg_in(page)->list_max;
+        case target_frame_reg_freelist_data:
+            return _seek(page, target_frame_reg_inuse_data) + _frame_reg_in(page)->max_num_frames * sizeof(offset_t);
+        case target_free_space_begin:
+            return _seek(page, target_frame_reg_freelist_data) + _frame_reg_in(page)->max_num_frames * sizeof(frame_id_t);
+        default: panic("Unknown seek target '%d'", target);
+    }
 }
 
 static inline free_space_register_header_t *_free_space_reg_in(const page_t *page)
 {
-    return (free_space_register_header_t *) __seek_free_space_reg(page);
+    return (free_space_register_header_t *) _seek(page, target_free_space_reg);
 }
 
 static inline void _frame_reg_init(page_t *page, size_t num_frames)
@@ -351,14 +349,14 @@ static inline void _frame_reg_init(page_t *page, size_t num_frames)
 
 static inline frame_register_header_t *_frame_reg_in(const page_t *page)
 {
-    return (frame_register_header_t *) __seek_frame_reg(page);
+    return (frame_register_header_t *) _seek(page, target_frame_reg);
 }
 
 static inline memory_range_t *_free_space_reg_get(const page_t *page, size_t pos)
 {
     free_space_register_header_t *free_space_reg = _free_space_reg_in(page);
     assert (pos < free_space_reg->list_max);
-    return __seek_free_space_data(page) + sizeof(memory_range_t) * pos;
+    return _seek(page, target_free_space_data) + sizeof(memory_range_t) * pos;
 }
 
 static inline size_t _free_space_reg_len(const page_t *page)
@@ -384,14 +382,14 @@ static inline offset_t *_frame_reg_inuse_get(const page_t *page, frame_id_t fram
 {
     frame_register_header_t *frame_reg = _frame_reg_in(page);
     assert (frame_id < frame_reg->max_num_frames);
-    return __seek_frame_reg_inuse_data(page) + frame_id * sizeof(offset_t);
+    return _seek(page, target_frame_reg_inuse_data) + frame_id * sizeof(offset_t);
 }
 
 static inline frame_id_t *_frame_reg_freelist_get(const page_t *page, size_t pos)
 {
     frame_register_header_t *frame_reg = _frame_reg_in(page);
     assert (pos < frame_reg->max_num_frames);
-    return __seek_frame_reg_inuse_data(page) + frame_reg->max_num_frames * sizeof(offset_t) +
+    return _seek(page, target_frame_reg_inuse_data) + frame_reg->max_num_frames * sizeof(offset_t) +
             pos * sizeof(frame_id_t);
 }
 
@@ -438,7 +436,7 @@ static inline void _frame_reg_link(page_t *page, frame_id_t frame_id, offset_t f
     assert(page);
     frame_register_header_t *frame_reg = _frame_reg_in(page);
     assert(frame_id < frame_reg->max_num_frames);
-    *(offset_t *)(__seek_frame_reg_inuse_data(page) + frame_id * sizeof(offset_t)) = frame_offset;
+    *(offset_t *)(_seek(page, target_frame_reg_inuse_data) + frame_id * sizeof(offset_t)) = frame_offset;
 }
 
 static inline memory_range_t *_free_space_reg_push(const page_t *page)
@@ -606,7 +604,7 @@ static inline void _free_space_reg_merge_ranges(page_t *page)
 static inline void _payload_store(page_t *page, offset_t offset, const void *data, size_t size)
 {
     assert (page);
-    assert (offset >= ptr_distance(page, __seek_free_space_begin(page)));
+    assert (offset >= ptr_distance(page, _seek(page, target_free_space_begin)));
     assert (data);
     assert (size > 0);
 
@@ -629,11 +627,4 @@ static inline bool _free_space_reg_add(page_t *page, offset_t begin, offset_t en
         entry->end = end;
     }
     return (entry != NULL);
-}
-
-static inline void *__seek_free_space_begin(const page_t *page)
-{
-    frame_register_header_t *frame_reg = _frame_reg_in(page);
-    size_t inuse_size = frame_reg->max_num_frames;
-    return __seek_frame_reg_freelist_data(page) + inuse_size * sizeof(frame_id_t);
 }
