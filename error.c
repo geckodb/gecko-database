@@ -7,6 +7,20 @@ void error(error_code code)
     last_error = code;
 }
 
+void trace_print(FILE *file)
+{
+    fflush(stdout);
+    fflush(stderr);
+    void *array[10];
+    size_t size = backtrace (array, 10);
+    char **strings = backtrace_symbols (array, size);
+    fprintf (file, "# Trace %zd stack frames:\n", size);
+    for (size_t i = 1; i < size - 1; i++)
+    fprintf (file, "# [%s]\n", strings[i]);
+    free (strings);
+    fflush(file);
+}
+
 void error_if(bool expr, error_code code)
 {
     if (__builtin_expect(expr, false))
@@ -32,6 +46,8 @@ const char *error_str(error_code code)
         case err_corrupted:           return "Corrupted order";
         case err_internal:            return "Internal error";
         case err_constraint_violated: return "Constraint violated";
+        case err_limitreached:        return "Limit reached";
+        case err_no_free_space:       return "No space available";
         default: return "Unknown";
     }
 }

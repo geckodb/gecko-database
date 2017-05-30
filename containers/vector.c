@@ -100,9 +100,20 @@ bool vector_add(vector_t *vec, size_t num_elements, const void *data)
     } else return false;
 }
 
-const void *vector_get(vector_t *vec)
+void *vector_get(vector_t *vec)
 {
     return require_non_null(vec) ? vec->data : NULL;
+}
+
+void *vector_at(const vector_t *vec, size_t pos)
+{
+    return require_non_null(vec) && require_constraint_size_t(pos, constraint_less, vec->num_elements) ?
+           (vec->data + pos * vec->sizeof_element) : NULL;
+}
+
+void *vector_peek(const vector_t *vec)
+{
+    return require_non_null(vec) && require_non_zero(vec->num_elements) ? vector_at(vec, vec->num_elements - 1) : NULL;
 }
 
 bool vector_set(vector_t *vec, size_t idx, size_t num_elements, const void *data)

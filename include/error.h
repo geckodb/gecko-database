@@ -1,6 +1,7 @@
 #pragma once
 
 #include <defs.h>
+#include <execinfo.h>
 
 typedef enum {
     err_no_error,
@@ -13,10 +14,27 @@ typedef enum {
     err_out_of_bounds,
     err_corrupted,
     err_internal,
-    err_constraint_violated
+    err_constraint_violated,
+    err_limitreached,
+    err_no_free_space
 } error_code;
 
 void error(error_code code);
+
+void trace_print(FILE *file);
+
+#define panic(msg, args...)                                                                                            \
+    {                                                                                                                  \
+        fflush(stdout);                                                                                                \
+        fflush(stderr);                                                                                                \
+        fprintf(stderr, "# \n");                                                                                       \
+        trace_print(stderr);                                                                                           \
+        fprintf(stderr, "# \n");                                                                                       \
+        fprintf(stderr, "# Core panic (%s:%d): ", __FILE__, __LINE__);                                                 \
+        fprintf(stderr, msg, args);                                                                                    \
+        fflush(stderr);                                                                                                \
+        exit(1);                                                                                                       \
+    }
 
 void error_if(bool expr, error_code code);
 

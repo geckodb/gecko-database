@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <memory.h>
 
-#define min(x,y) (x > y ? y : y)
+#define min(x,y) (x > y ? y : x)
+#define max(x,y) (x > y ? x : y)
 
 #endif

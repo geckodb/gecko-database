@@ -28,14 +28,17 @@
 typedef uint8_t   u8;
 typedef uint16_t  u16;
 typedef uint32_t  u32;
+
+typedef u32 page_id_t;
+typedef u32 frame_id_t;
+
 typedef size_t offset_t;
-typedef uint32_t page_id_t;
 
 typedef struct {
     offset_t begin, end;
 } memory_range_t;
 
-typedef struct {
+typedef struct FORCE_PACKING {
     struct {
         page_id_t is_far_ptr    : 1;
         page_id_t page_id       : 31;
@@ -67,13 +70,13 @@ typedef struct FORCE_PACKING {
     u32 max_num_frames, in_use_num, free_list_len;
 } frame_register_header_t;
 
-typedef struct {
+typedef struct FORCE_PACKING {
     zone_ptr start;
     size_t elem_size;
     size_t elem_capacity;
 } vframe_t;
 
-typedef struct {
+typedef struct FORCE_PACKING {
     zone_ptr prev, next;
 } zone_header_t;
 
@@ -83,11 +86,29 @@ typedef struct {
     frame_register_header_t frame_register;
 } page_t;
 
+typedef struct {
+    page_id_t page_id;
+    frame_id_t frame_id;
+} fid_t;
+
+typedef enum {
+    positioning_first_nomerge,
+    positioning_first_merge,
+    positioning_smallest_nomerge,
+    positioning_smallest_merge,
+    positioning_largest_nomerge,
+    positioning_largest_merge
+} block_positioning;
+
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
 page_t *page_create(page_id_t id, size_t size, page_flags flags, size_t free_space, size_t frame_reg);
+
+fid_t *frame_create(page_t *page, block_positioning strategy, size_t element_size, size_t element_capacity);
+
+bool frame_delete(fid_t *frame);
 
 void page_dump(FILE *out, const page_t *page);
 

@@ -58,7 +58,11 @@ bool vector_free(vector_t *vec);
 
 bool vector_free_ex(vector_t *vec, void *capture, bool (*func)(void *capture, void *begin, void *end));
 
-const void *vector_get(vector_t *vec);
+void *vector_get(vector_t *vec);
+
+void *vector_at(const vector_t *vec, size_t pos);
+
+void *vector_peek(const vector_t *vec);
 
 bool vector_set(vector_t *vec, size_t idx, size_t num_elements, const void *data);
 
