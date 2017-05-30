@@ -36,7 +36,7 @@ typedef size_t offset_t;
 
 typedef struct {
     offset_t begin, end;
-} memory_range_t;
+} range_t;
 
 typedef struct FORCE_PACKING {
     struct {
@@ -64,26 +64,26 @@ typedef struct FORCE_PACKING {
 
 typedef struct FORCE_PACKING {
     u32 list_max, list_len;
-} free_space_register_header_t;
+} free_store_t;
 
 typedef struct FORCE_PACKING {
     u32 max_num_frames, in_use_num, free_list_len;
-} frame_register_header_t;
+} frame_store_t;
 
 typedef struct FORCE_PACKING {
     zone_ptr start;
     size_t elem_size;
     size_t elem_capacity;
-} vframe_t;
+} frame_t;
 
 typedef struct FORCE_PACKING {
     zone_ptr prev, next;
-} zone_header_t;
+} zone_t;
 
 typedef struct {
     page_header_t page_header;
-    free_space_register_header_t free_space_register;
-    frame_register_header_t frame_register;
+    free_store_t free_space_register;
+    frame_store_t frame_register;
 } page_t;
 
 typedef struct {
