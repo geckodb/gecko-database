@@ -100,6 +100,11 @@ typedef enum {
     positioning_largest_merge
 } block_positioning;
 
+typedef enum {
+    frame_inuse,
+    frame_free
+} frame_state;
+
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
@@ -107,6 +112,8 @@ typedef enum {
 page_t *page_create(page_id_t id, size_t size, page_flags flags, size_t free_space, size_t frame_reg);
 
 fid_t *frame_create(page_t *page, block_positioning strategy, size_t element_size, size_t element_capacity);
+
+void zone_create(fid_t *frame_handle, size_t num_of_zones);
 
 bool frame_delete(fid_t *frame);
 

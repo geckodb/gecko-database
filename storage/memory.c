@@ -108,19 +108,22 @@ static inline range_t free_store_splitoff(page_t *page, size_t pos, size_t size)
 static inline void free_store_rebuild(page_t *page);
 static inline void free_store_unempty(page_t *page);
 static inline void free_store_merge(page_t *page);
+static inline frame_id_t frame_store_scan(const page_t *page, frame_state state);
 
 static inline int comp_range_start(const void *lhs, const void *rhs);
 
 
 static inline void frame_store_init(page_t *page, size_t num_frames);
 static inline frame_store_t *frame_store_in(const page_t *page);
-static inline offset_t *frame_store_get(const page_t *page, frame_id_t frame_id);
+static inline offset_t *frame_store_offset_of(const page_t *page, frame_id_t frame_id);
+static inline frame_t *frame_store_frame_by_id(const page_t *page, frame_id_t frame_id);
 static inline frame_id_t *frame_store_recycle(const page_t *page, size_t pos);
 static inline bool frame_store_is_full(const page_t *page);
 static inline frame_id_t frame_store_create(page_t *page, block_positioning strategy, size_t size, size_t capacity);
 static inline void frame_store_link(page_t *page, frame_id_t frame_id, offset_t frame_offset);
 
 static inline void data_store_write(page_t *page, offset_t offset, const void *data, size_t size);
+static inline void *data_store_at(const page_t *page, offset_t offset);
 
 static inline bool range_do_overlap(range_t *lhs, range_t *rhs);
 
@@ -202,6 +205,11 @@ fid_t *frame_create(page_t *page, block_positioning strategy, size_t element_siz
     return handle;
 }
 
+void zone_create(fid_t *frame_handle, size_t num_of_zones)
+{
+
+}
+
 bool frame_delete(fid_t *frame_handle)
 {
     panic("Function is not implemented yet: '%s'", "frame_delete");
@@ -263,9 +271,9 @@ void page_dump(FILE *out, const page_t *page)
                    ptr_distance(page, free_store_at(page, free_space_reg->list_max - 1)));
         }
 
-        printf("# %#010lx  [frame register in-use list]\n",       ptr_distance(page, frame_store_get(page, 0)));
+        printf("# %#010lx  [frame register in-use list]\n",       ptr_distance(page, frame_store_offset_of(page, 0)));
         for (frame_id_t frame_id = 0; frame_id < frame_reg_len; frame_id++) {
-            offset_t *offset = frame_store_get(page, frame_id);
+            offset_t *offset = frame_store_offset_of(page, frame_id);
             printf("# %#010lx    fid=%05u: offset=", ptr_distance(page, offset), frame_id);
             if (*offset != NULL_OFFSET) {
                 printf("%#010lx\n", *offset);
@@ -285,6 +293,20 @@ void page_dump(FILE *out, const page_t *page)
         }
 
         printf("# %#010lx [PAYLOAD]\n",                   ptr_distance(page, seek(page, target_free_space_begin)));
+
+        printf("# ---------- [FRAMES IN USE]\n");
+        for (frame_id_t frame_id = frame_store_scan(page, frame_inuse); frame_id != NULL_FID;
+             frame_id = frame_store_scan(NULL, frame_inuse))
+        {
+            frame_t *frame = frame_store_frame_by_id(page, frame_id);
+            assert (frame);
+
+            offset_t frame_offset = *frame_store_offset_of(page, frame_id);
+            printf("# %#010lx    elem_size:%zu, elem_cap:%zu, far_ptr:%d, pid=%d, offset=%#010lx\n",
+                       frame_offset, frame->elem_size, frame->elem_capacity, frame->start.is_far_ptr,
+                       frame->start.page_id, frame->start.offset);
+        }
+
         printf("# %#010lx end\n",                       page->page_header.page_size);
 
     } else {
@@ -343,7 +365,7 @@ static inline void frame_store_init(page_t *page, size_t num_frames)
 
     frame_reg->in_use_num = 0;
     for (size_t idx = 0; idx < frame_reg->max_num_frames; idx++) {
-        *frame_store_get(page, idx) = NULL_OFFSET;
+        *frame_store_offset_of(page, idx) = NULL_OFFSET;
     }
 }
 
@@ -378,11 +400,21 @@ static inline bool free_store_pop(range_t *range, page_t *page)
     } else return false;
 }
 
-static inline offset_t *frame_store_get(const page_t *page, frame_id_t frame_id)
+static inline offset_t *frame_store_offset_of(const page_t *page, frame_id_t frame_id)
 {
+    assert (page);
     frame_store_t *frame_reg = frame_store_in(page);
     assert (frame_id < frame_reg->max_num_frames);
     return seek(page, target_frame_reg_inuse_data) + frame_id * sizeof(offset_t);
+}
+
+static inline frame_t *frame_store_frame_by_id(const page_t *page, frame_id_t frame_id)
+{
+    assert (page);
+    offset_t offset = *frame_store_offset_of(page, frame_id);
+    void *data = data_store_at(page, offset);
+    expect_non_null(data, NULL);
+    return data;
 }
 
 static inline frame_id_t *frame_store_recycle(const page_t *page, size_t pos)
@@ -525,6 +557,7 @@ static inline range_t free_store_splitoff(page_t *page, size_t pos, size_t size)
         .end = range->begin + size
     };
     range->begin = result.end;
+    page->page_header.free_space -= size;
     return result;
 }
 
@@ -595,6 +628,23 @@ static inline void free_store_merge(page_t *page)
     vector_free(stack);
 }
 
+static inline frame_id_t frame_store_scan(const page_t *page, frame_state state)
+{
+    static size_t frame_id;
+    if (page != NULL) {
+        frame_id = frame_store_in(page)->max_num_frames;
+    }
+
+    while (frame_id--) {
+        offset_t frame_offset = *frame_store_offset_of(page, frame_id);
+        if ((state == frame_inuse && frame_offset != NULL_OFFSET) ||
+            (state == frame_free  && frame_offset == NULL_OFFSET))
+            return frame_id;
+    }
+
+    return NULL_FID;
+}
+
 static inline void data_store_write(page_t *page, offset_t offset, const void *data, size_t size)
 {
     assert (page);
@@ -604,6 +654,13 @@ static inline void data_store_write(page_t *page, offset_t offset, const void *d
 
     void *base = (void *) page;
     memcpy(base + offset, data, size);
+}
+
+static inline void *data_store_at(const page_t *page, offset_t offset)
+{
+    assert (page);
+    assert (offset >= ptr_distance(page, seek(page, target_free_space_begin)));
+    return offset != NULL_OFFSET ? (void *) page + offset : NULL;
 }
 
 static inline bool range_do_overlap(range_t *lhs, range_t *rhs)
