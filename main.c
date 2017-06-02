@@ -167,7 +167,7 @@ int main(void)
         printf("%zu\n", sizeof(page_t));
         fflush(stdout);
         page_t *page = page_create(42, 1024 * 1024 /* 1 MiB */, page_flag_fixed, 10, 10);
-        frame_create(page, positioning_first_nomerge, 1024 /* 1 KiB */, 5);
+        frame_create(page, positioning_first_nomerge, 1024 /* 1 KiB */);
         page_dump(stdout, page);
 
 

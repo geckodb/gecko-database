@@ -119,7 +119,7 @@ static inline offset_t *frame_store_offset_of(const page_t *page, frame_id_t fra
 static inline frame_t *frame_store_frame_by_id(const page_t *page, frame_id_t frame_id);
 static inline frame_id_t *frame_store_recycle(const page_t *page, size_t pos);
 static inline bool frame_store_is_full(const page_t *page);
-static inline frame_id_t frame_store_create(page_t *page, block_positioning strategy, size_t size, size_t capacity);
+static inline frame_id_t frame_store_create(page_t *page, block_positioning strategy, size_t size);
 static inline void frame_store_link(page_t *page, frame_id_t frame_id, offset_t frame_offset);
 
 static inline void data_store_write(page_t *page, offset_t offset, const void *data, size_t size);
@@ -183,21 +183,19 @@ page_t *page_create(page_id_t id, size_t size, page_flags flags, size_t free_spa
  * In case an error occurred, the function returns <code>NULL</code>. Otherwise it returns a <code>fid_t</code>.
  * @param page
  * @param element_size
- * @param element_capacity
  * @return
  */
-fid_t *frame_create(page_t *page, block_positioning strategy, size_t element_size, size_t element_capacity)
+fid_t *frame_create(page_t *page, block_positioning strategy, size_t element_size)
 {
     fid_t *handle = NULL;
 
     expect_non_null(page, NULL);
     expect_greater(element_size, 0, NULL);
-    expect_greater(element_capacity, 0, NULL);
 
     if (!frame_store_is_full(page)) {
         handle = malloc (sizeof(frame_store_t));
         expect_good_malloc(handle, NULL);
-        if ((handle->frame_id = frame_store_create(page, strategy, element_size, element_capacity)) == NULL_FID) {
+        if ((handle->frame_id = frame_store_create(page, strategy, element_size)) == NULL_FID) {
             return NULL;
         }
     } else error(err_limitreached);
@@ -302,8 +300,8 @@ void page_dump(FILE *out, const page_t *page)
             assert (frame);
 
             offset_t frame_offset = *frame_store_offset_of(page, frame_id);
-            printf("# %#010lx    elem_size:%zu, elem_cap:%zu, far_ptr:%d, pid=%d, offset=%#010lx\n",
-                       frame_offset, frame->elem_size, frame->elem_capacity, frame->start.is_far_ptr,
+            printf("# %#010lx    elem_size:%zu, far_ptr:%d, pid=%d, offset=%#010lx\n",
+                       frame_offset, frame->elem_size, frame->start.is_far_ptr,
                        frame->start.page_id, frame->start.offset);
         }
 
@@ -431,7 +429,7 @@ static inline bool frame_store_is_full(const page_t *page)
     return (frame_reg->free_list_len == 0);
 }
 
-static inline frame_id_t frame_store_create(page_t *page, block_positioning strategy, size_t size, size_t capacity)
+static inline frame_id_t frame_store_create(page_t *page, block_positioning strategy, size_t size)
 {
     assert (!frame_store_is_full(page));
 
@@ -446,7 +444,6 @@ static inline frame_id_t frame_store_create(page_t *page, block_positioning stra
                 .is_far_ptr = false,
                 .page_id = page->page_header.page_id
             },
-            .elem_capacity = capacity,
             .elem_size = size
         };
         offset_t frame_offset = free_range.begin;

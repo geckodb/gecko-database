@@ -73,7 +73,6 @@ typedef struct FORCE_PACKING {
 typedef struct FORCE_PACKING {
     zone_ptr start;
     size_t elem_size;
-    size_t elem_capacity;
 } frame_t;
 
 typedef struct FORCE_PACKING {
@@ -111,7 +110,7 @@ typedef enum {
 
 page_t *page_create(page_id_t id, size_t size, page_flags flags, size_t free_space, size_t frame_reg);
 
-fid_t *frame_create(page_t *page, block_positioning strategy, size_t element_size, size_t element_capacity);
+fid_t *frame_create(page_t *page, block_positioning strategy, size_t element_size);
 
 void zone_create(fid_t *frame_handle, size_t num_of_zones);
 
