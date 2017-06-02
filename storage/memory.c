@@ -628,12 +628,14 @@ static inline void free_store_merge(page_t *page)
 static inline frame_id_t frame_store_scan(const page_t *page, frame_state state)
 {
     static size_t frame_id;
+    static page_t *last_page = NULL;
     if (page != NULL) {
-        frame_id = frame_store_in(page)->max_num_frames;
+        last_page = (page_t *) page;
+        frame_id = frame_store_in(last_page)->max_num_frames;
     }
 
     while (frame_id--) {
-        offset_t frame_offset = *frame_store_offset_of(page, frame_id);
+        offset_t frame_offset = *frame_store_offset_of(last_page, frame_id);
         if ((state == frame_inuse && frame_offset != NULL_OFFSET) ||
             (state == frame_free  && frame_offset == NULL_OFFSET))
             return frame_id;
