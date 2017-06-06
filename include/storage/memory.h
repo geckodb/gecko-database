@@ -39,12 +39,24 @@ typedef struct {
 } range_t;
 
 typedef struct FORCE_PACKING {
-    struct {
+    struct FORCE_PACKING {
         page_id_t is_far_ptr    : 1;
         page_id_t page_id       : 31;
     };
-    offset_t offset;
-} zone_ptr;
+    struct FORCE_PACKING {
+        offset_t target_type_bit_0    : 1;
+        offset_t target_type_bit_1    : 1;
+        offset_t offset               : 62;
+    };
+} persistent_ptr;
+
+typedef enum
+{
+    ptr_target_frame,
+    ptr_target_zone,
+    ptr_target_userdata,
+    ptr_target_corrupted,
+} ptr_target_type;
 
 typedef enum {
     page_flag_dirty = 1 << 1,
@@ -71,12 +83,12 @@ typedef struct FORCE_PACKING {
 } frame_store_t;
 
 typedef struct FORCE_PACKING {
-    zone_ptr start;
+    persistent_ptr first, last;
     size_t elem_size;
 } frame_t;
 
 typedef struct FORCE_PACKING {
-    zone_ptr prev, next;
+    persistent_ptr prev, next;
 } zone_t;
 
 typedef struct {
@@ -104,6 +116,11 @@ typedef enum {
     frame_free
 } frame_state;
 
+typedef enum {
+    type_far_ptr,
+    type_near_ptr
+} ptr_scope_type;
+
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
@@ -112,7 +129,11 @@ page_t *page_create(page_id_t id, size_t size, page_flags flags, size_t free_spa
 
 fid_t *frame_create(page_t *page, block_positioning strategy, size_t element_size);
 
-void zone_create(fid_t *frame_handle, size_t num_of_zones);
+zone_t *zone_create(page_t *page, fid_t *frame_handle, block_positioning strategy);
+
+bool zone_memcpy(page_t *page, zone_t *zone, const void *data, size_t size);
+
+bool zone_remove(page_t *page, const zone_t *zone);
 
 bool frame_delete(fid_t *frame);
 

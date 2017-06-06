@@ -36,6 +36,11 @@ void trace_print(FILE *file);
         exit(1);                                                                                                       \
     }
 
+#define panic_if(expr, msg, args...)                                                                                   \
+    {                                                                                                                  \
+        if (expr) { panic(msg, args); }                                                                                \
+    }
+
 void error_if(bool expr, error_code code);
 
 error_code error_last();

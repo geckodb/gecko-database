@@ -30,7 +30,9 @@
 #define NULL_OFFSET     0
 #define CORE_HDR_SIZE   (sizeof(page_header_t) + sizeof(free_store_t) + sizeof(frame_store_t))
 #define FRAME_HDR_SIZE  (sizeof(frame_t))
-#define MIN_DATA_SIZE   (sizeof(zone_t) + sizeof(zone_ptr))
+#define MIN_DATA_SIZE   (sizeof(zone_t) + sizeof(persistent_ptr))
+
+#define MSG_BADCAST     "Unsupported cast request for persistent ptr %p."
 
 // ---------------------------------------------------------------------------------------------------------------------
 // T Y P E S
@@ -76,7 +78,9 @@ typedef enum {
 
 
 #define expect_non_null(obj, retval)              return_if((obj == NULL), err_null_ptr, retval)
+#define expect_equals(obj, val, retval)           return_if((obj != val), err_illegal_args, retval)
 #define expect_greater(val, lower_bound, retval)  return_if((val <= lower_bound), err_illegal_args, retval)
+#define expect_less(val, upper_bound, retval)     return_if((val >= upper_bound), err_illegal_args, retval)
 #define expect_good_malloc(obj, retval)           return_if((obj == NULL), err_bad_malloc, retval)
 
 #define ptr_distance(a, b)                                                                                             \
@@ -87,6 +91,15 @@ typedef enum {
 
 #define has_flag(val, flag)                                                                                            \
     ((val & flag) == flag)
+
+#define null_zone_ptr()                                                                                                \
+    {                                                                                                                  \
+        .offset = NULL_OFFSET,                                                                                         \
+        .target_type_bit_0 = 1,                                                                                        \
+        .target_type_bit_1 = 1,                                                                                        \
+        .is_far_ptr = false,                                                                                           \
+        .page_id = 0                                                                                                   \
+    }
 
 // ---------------------------------------------------------------------------------------------------------------------
 // H E L P E R   P R O T O T Y P E S
@@ -110,8 +123,16 @@ static inline void free_store_unempty(page_t *page);
 static inline void free_store_merge(page_t *page);
 static inline frame_id_t frame_store_scan(const page_t *page, frame_state state);
 
-static inline int comp_range_start(const void *lhs, const void *rhs);
+static inline bool persistent_ptr_is_null(persistent_ptr *ptr);
+static inline bool persistent_ptr_has_scope(persistent_ptr *ptr, ptr_scope_type type);
+static inline void persistent_ptr_make_near(persistent_ptr *ptr, page_t *page, ptr_target_type type, offset_t offset);
+static inline ptr_target_type persistent_ptr_get_type(persistent_ptr *ptr);
+static inline zone_t *persistent_ptr_cast_zone(const page_t *page, persistent_ptr *ptr);
+//static inline frame_t *persistent_ptr_cast_frame(const page_t *page, persistent_ptr *ptr);
+//static inline void *persistent_ptr_cast_userdata(const page_t *page, persistent_ptr *ptr);
 
+
+static inline int comp_range_start(const void *lhs, const void *rhs);
 
 static inline void frame_store_init(page_t *page, size_t num_frames);
 static inline frame_store_t *frame_store_in(const page_t *page);
@@ -123,7 +144,7 @@ static inline frame_id_t frame_store_create(page_t *page, block_positioning stra
 static inline void frame_store_link(page_t *page, frame_id_t frame_id, offset_t frame_offset);
 
 static inline void data_store_write(page_t *page, offset_t offset, const void *data, size_t size);
-static inline void *data_store_at(const page_t *page, offset_t offset);
+static inline void *data_store_at_unsafe(const page_t *page, offset_t offset);
 
 static inline bool range_do_overlap(range_t *lhs, range_t *rhs);
 
@@ -198,14 +219,70 @@ fid_t *frame_create(page_t *page, block_positioning strategy, size_t element_siz
         if ((handle->frame_id = frame_store_create(page, strategy, element_size)) == NULL_FID) {
             return NULL;
         }
+        handle->page_id = page->page_header.page_id;
     } else error(err_limitreached);
 
     return handle;
 }
 
-void zone_create(fid_t *frame_handle, size_t num_of_zones)
+zone_t *zone_create(page_t *page, fid_t *frame_handle, block_positioning strategy)
 {
+    expect_non_null(frame_handle, NULL);
+    expect_non_null(page, NULL);
+    expect_equals(frame_handle->page_id, page->page_header.page_id, NULL);
 
+    frame_t *frame = frame_store_frame_by_id(page, frame_handle->frame_id);
+    const size_t block_size = (sizeof(zone_t) + frame->elem_size);
+    range_t free_range;
+
+    zone_t *return_val = NULL;
+
+    if ((free_store_bind(&free_range, page, block_size, strategy))) {
+        const offset_t zone_offset = free_range.begin;
+        assert (ptr_distance(free_range.begin, free_range.end) >= block_size);
+
+        zone_t zone = {
+                .next = null_zone_ptr(),
+        };
+
+        if (persistent_ptr_is_null(&frame->first)) {
+            assert (persistent_ptr_is_null(&frame->last));
+            persistent_ptr_make_near(&zone.prev, page, ptr_target_frame, ptr_distance(page, frame));
+            persistent_ptr_make_near(&frame->first, page, ptr_target_zone, zone_offset);
+        } else {
+            assert (!persistent_ptr_is_null(&frame->last));
+            assert (persistent_ptr_has_scope(&frame->last, type_near_ptr));
+            persistent_ptr_make_near(&zone.prev, page, ptr_target_zone, frame->last.offset);
+            zone_t *last_zone = persistent_ptr_cast_zone(page, &frame->last);
+            persistent_ptr_make_near(&last_zone->next, page, ptr_target_zone, zone_offset);
+        }
+
+        persistent_ptr_make_near(&frame->last, page, ptr_target_zone, zone_offset);
+        data_store_write(page, zone_offset, &zone, sizeof(zone_t));
+        memset(data_store_at_unsafe(page, zone_offset + sizeof(zone_t)), 'X',
+               frame->elem_size);   // TODO: Remove this line; its just for debugging purposes
+        return_val = data_store_at_unsafe(page, zone_offset);
+
+    } error(err_limitreached);
+
+    return return_val;
+}
+
+bool zone_memcpy(page_t *page, zone_t *zone, const void *data, size_t size)
+{
+    expect_non_null(page, false);
+    expect_non_null(zone, false);
+    expect_non_null(data, false);
+    expect_greater(size, 0, false);
+
+    memcpy(zone + 1, data, size);
+    return true;
+}
+
+bool zone_remove(page_t *page, const zone_t *zone)
+{
+    // TODO
+    return true;
 }
 
 bool frame_delete(fid_t *frame_handle)
@@ -300,10 +377,80 @@ void page_dump(FILE *out, const page_t *page)
             assert (frame);
 
             offset_t frame_offset = *frame_store_offset_of(page, frame_id);
-            printf("# %#010lx    elem_size:%zu, far_ptr:%d, pid=%d, offset=%#010lx\n",
-                       frame_offset, frame->elem_size, frame->start.is_far_ptr,
-                       frame->start.page_id, frame->start.offset);
+            printf("# %#010lx    elem_size:%zu, first:(far_ptr:%d, pid=%d, offset=%#010lx), "
+                   "last:(far_ptr:%d, pid=%d, offset=%#010lx) \n",
+                       frame_offset, frame->elem_size, frame->first.is_far_ptr,
+                       frame->first.page_id, frame->first.offset, frame->last.is_far_ptr,
+                       frame->last.page_id, frame->last.offset);
         }
+
+        printf("# ---------- [ZONES]\n");
+        for (frame_id_t frame_id = frame_store_scan(page, frame_inuse); frame_id != NULL_FID;
+             frame_id = frame_store_scan(NULL, frame_inuse)) {
+
+            frame_t *frame = frame_store_frame_by_id(page, frame_id);
+            persistent_ptr ptr = frame_store_frame_by_id(page, frame_id)->first;
+            while (!persistent_ptr_is_null(&ptr) && persistent_ptr_has_scope(&ptr, type_near_ptr)) {
+                assert(ptr.page_id == page->page_header.page_id);
+
+                const zone_t *zone = persistent_ptr_cast_zone(page, &ptr);
+
+                printf("# %#010lx    prev:(far_ptr:%d, pid=%d, offset=%#010lx), prev:(far_ptr:%d, pid=%d, offset=%#010lx)\n",
+                       ptr_distance(page, zone), zone->prev.is_far_ptr, zone->prev.page_id, zone->prev.offset,
+                        zone->next.is_far_ptr, zone->next.page_id, zone->next.offset);
+
+                printf("# zone content  ");
+                for (unsigned i = 0; i < 16; i++) {
+                    printf("%02x ", i);
+                }
+                printf("\n");
+
+                const void* data = (zone + 1);
+                char *puffer = malloc(16);
+                size_t block_end = 16;
+
+                for (; block_end < frame->elem_size; block_end += 16) {
+                    memset(puffer, 0, 16);
+                    memcpy(puffer, data + block_end - 16, 16);
+                    printf("# %#010lx    ", ptr_distance(page, data + block_end));
+                    for (unsigned i = 0; i < 16; i++) {
+                        printf("%02X ", (unsigned char) puffer[i]);
+                    }
+                    for (unsigned i = 0; i < 16; i++) {
+                        printf("%c ", puffer[i]);
+                    }
+                    printf("\n");
+                }
+
+                unsigned bytes_remain = 16 - (block_end - frame->elem_size);
+                if (bytes_remain > 0) {
+                    memset(puffer, 0, 16);
+                    memcpy(puffer, data + (block_end - 16), bytes_remain);
+                    printf("# %#010lx    ", ptr_distance(page, data + block_end + 1));
+                    for (unsigned i = 0; i < bytes_remain; i++) {
+                        printf("%02X ", (unsigned char) puffer[i]);
+                    }
+                    for (unsigned i = bytes_remain; i < 16; i++) {
+                        printf("   ");
+                    }
+
+                    for (unsigned i = 0; i < bytes_remain; i++) {
+                        printf("%c ", puffer[i]);
+                    }
+                    for (unsigned i = bytes_remain; i < 16; i++) {
+                        printf("   ");
+                    }
+
+                }
+                printf("\n");
+
+
+                free(puffer);
+
+                ptr = zone->next;
+            }
+        }
+
 
         printf("# %#010lx end\n",                       page->page_header.page_size);
 
@@ -410,7 +557,7 @@ static inline frame_t *frame_store_frame_by_id(const page_t *page, frame_id_t fr
 {
     assert (page);
     offset_t offset = *frame_store_offset_of(page, frame_id);
-    void *data = data_store_at(page, offset);
+    void *data = data_store_at_unsafe(page, offset);
     expect_non_null(data, NULL);
     return data;
 }
@@ -439,11 +586,8 @@ static inline frame_id_t frame_store_create(page_t *page, block_positioning stra
         frame_id = *frame_store_recycle(page, --(frame_store_in(page))->free_list_len);
 
         frame_t frame = {
-            .start = {
-                .offset = MAX_OFFSET,
-                .is_far_ptr = false,
-                .page_id = page->page_header.page_id
-            },
+            .first = null_zone_ptr(),
+            .last = null_zone_ptr(),
             .elem_size = size
         };
         offset_t frame_offset = free_range.begin;
@@ -644,6 +788,89 @@ static inline frame_id_t frame_store_scan(const page_t *page, frame_state state)
     return NULL_FID;
 }
 
+static inline bool persistent_ptr_is_null(persistent_ptr *ptr)
+{
+    assert(ptr);
+    return (ptr->offset == NULL_OFFSET);
+}
+
+static inline bool persistent_ptr_has_scope(persistent_ptr *ptr, ptr_scope_type type)
+{
+    assert (ptr);
+    switch (type) {
+        case type_far_ptr: return (ptr->is_far_ptr);
+        case type_near_ptr: return (!ptr->is_far_ptr);
+        default:
+            error(err_internal);
+            return false;
+    }
+}
+
+static inline void persistent_ptr_make_near(persistent_ptr *ptr, page_t *page, ptr_target_type type, offset_t offset)
+{
+    assert(ptr);
+    assert(page);
+    assert(offset != NULL_OFFSET);
+    ptr->page_id = page->page_header.page_id;
+    ptr->is_far_ptr = false;
+    ptr->offset = offset;
+    switch (type) {
+        case ptr_target_frame:
+            ptr->target_type_bit_0 = ptr->target_type_bit_1 = 0;
+            break;
+        case ptr_target_zone:
+            ptr->target_type_bit_0 = 0;
+            ptr->target_type_bit_1 = 1;
+            break;
+        case ptr_target_userdata:
+            ptr->target_type_bit_0 = 1;
+            ptr->target_type_bit_1 = 0;
+            break;
+        case ptr_target_corrupted:
+            ptr->target_type_bit_0 = 1;
+            ptr->target_type_bit_1 = 1;
+            break;
+        default:
+            panic("Unknown pointer target type '%d'", type);
+    }
+}
+
+static inline ptr_target_type persistent_ptr_get_type(persistent_ptr *ptr)
+{
+    assert (ptr);
+    if (ptr->target_type_bit_0 == 0) {
+        if (ptr->target_type_bit_1 == 0) {
+            return ptr_target_frame;
+        } else {
+            return ptr_target_zone;
+        }
+    } else {
+        if (ptr->target_type_bit_1 == 0) {
+            return ptr_target_userdata;
+        } else {
+            return ptr_target_corrupted;
+        }
+    }
+}
+
+static inline zone_t *persistent_ptr_cast_zone(const page_t *page, persistent_ptr *ptr)
+{
+    panic_if(persistent_ptr_get_type(ptr) != ptr_target_zone, MSG_BADCAST, ptr);
+    return (zone_t *) data_store_at_unsafe(page, ptr->offset);
+}
+
+/*static inline frame_t *persistent_ptr_cast_frame(const page_t *page, persistent_ptr *ptr)
+{
+    panic_if(persistent_ptr_get_type(ptr) != ptr_target_zone, MSG_BADCAST, ptr);
+    return (frame_t *) data_store_at_unsafe(page, ptr->offset);
+}*/
+
+/*static inline void *persistent_ptr_cast_userdata(const page_t *page, persistent_ptr *ptr)
+{
+    panic_if(persistent_ptr_get_type(ptr) != ptr_target_zone, MSG_BADCAST, ptr);
+    return (void *) data_store_at_unsafe(page, ptr->offset);
+}*/
+
 static inline void data_store_write(page_t *page, offset_t offset, const void *data, size_t size)
 {
     assert (page);
@@ -655,7 +882,7 @@ static inline void data_store_write(page_t *page, offset_t offset, const void *d
     memcpy(base + offset, data, size);
 }
 
-static inline void *data_store_at(const page_t *page, offset_t offset)
+static inline void *data_store_at_unsafe(const page_t *page, offset_t offset)
 {
     assert (page);
     assert (offset >= ptr_distance(page, seek(page, target_free_space_begin)));

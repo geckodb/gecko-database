@@ -167,8 +167,18 @@ int main(void)
         printf("%zu\n", sizeof(page_t));
         fflush(stdout);
         page_t *page = page_create(42, 1024 * 1024 /* 1 MiB */, page_flag_fixed, 10, 10);
-        frame_create(page, positioning_first_nomerge, 1024 /* 1 KiB */);
-        frame_create(page, positioning_first_nomerge, 2048 /* 1 KiB */);
+        fid_t *frame_handle = frame_create(page, positioning_first_nomerge, 20 /* 40 B */);
+        frame_create(page, positioning_first_nomerge, 2048 /* 2 KiB */);
+
+
+        zone_t *zone_1 = zone_create(page, frame_handle, positioning_first_nomerge);
+        zone_memcpy(page, zone_1, "Hello Zone!", sizeof(char) * strlen("Hello Zone!"));
+        zone_t *zone_2 = zone_create(page, frame_handle, positioning_first_nomerge);
+        zone_memcpy(page, zone_2, "Hello Zone 2!", sizeof(char) * strlen("Hello Zone 2!"));
+        zone_t *zone_3 = zone_create(page, frame_handle, positioning_first_nomerge);
+        zone_memcpy(page, zone_3, "Hello Zone 3!", sizeof(char) * strlen("Hello Zone 3!"));
+
+        zone_remove(page, zone_1);
 
         page_dump(stdout, page);
 
