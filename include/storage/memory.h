@@ -19,7 +19,7 @@
 
 #include <defs.h>
 
-#define FORCE_PACKING        __attribute__((__packed__))
+#define __force_packing__        __attribute__((__packed__))
 
 // ---------------------------------------------------------------------------------------------------------------------
 // D A T A   T Y P E S
@@ -28,6 +28,7 @@
 typedef uint8_t   u8;
 typedef uint16_t  u16;
 typedef uint32_t  u32;
+typedef uint64_t  u64;
 
 typedef u32 page_id_t;
 typedef u32 frame_id_t;
@@ -38,12 +39,12 @@ typedef struct {
     offset_t begin, end;
 } range_t;
 
-typedef struct FORCE_PACKING {
-    struct FORCE_PACKING {
+typedef struct __force_packing__ {
+    struct __force_packing__ {
         page_id_t is_far_ptr    : 1;
         page_id_t page_id       : 31;
     };
-    struct FORCE_PACKING {
+    struct __force_packing__ {
         offset_t target_type_bit_0    : 1;
         offset_t target_type_bit_1    : 1;
         offset_t offset               : 62;
@@ -52,11 +53,11 @@ typedef struct FORCE_PACKING {
 
 typedef enum
 {
-    ptr_target_frame,
-    ptr_target_zone,
-    ptr_target_userdata,
-    ptr_target_corrupted,
-} ptr_target_type;
+    target_frame,
+    target_zone,
+    target_userdata,
+    target_corrupted,
+} ptr_target;
 
 typedef enum {
     page_flag_dirty = 1 << 1,
@@ -64,9 +65,15 @@ typedef enum {
     page_flag_locked = 1 << 3
 } page_flags;
 
-typedef struct FORCE_PACKING {
+typedef struct __force_packing__ {
+    u64 time_created, time_last_read, time_last_write;
+    u64 num_reads, num_writes;
+} access_stats_t;
+
+typedef struct __force_packing__ {
     page_id_t page_id;
     size_t page_size, free_space;
+    access_stats_t statistics;
     struct {
         u8 is_dirty  : 1;
         u8 is_fixed  : 1;
@@ -74,21 +81,22 @@ typedef struct FORCE_PACKING {
     } flags;
 } page_header_t;
 
-typedef struct FORCE_PACKING {
+typedef struct __force_packing__ {
     u32 list_max, list_len;
 } free_store_t;
 
-typedef struct FORCE_PACKING {
+typedef struct __force_packing__ {
     u32 max_num_frames, in_use_num, free_list_len;
 } frame_store_t;
 
-typedef struct FORCE_PACKING {
+typedef struct __force_packing__ {
     persistent_ptr first, last;
     size_t elem_size;
 } frame_t;
 
-typedef struct FORCE_PACKING {
+typedef struct __force_packing__ {
     persistent_ptr prev, next;
+    access_stats_t statistics;
 } zone_t;
 
 typedef struct {
@@ -120,6 +128,8 @@ typedef enum {
     type_far_ptr,
     type_near_ptr
 } ptr_scope_type;
+
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S

@@ -16,10 +16,15 @@ typedef enum {
     err_internal,
     err_constraint_violated,
     err_limitreached,
-    err_no_free_space
+    err_no_free_space,
+    err_notincharge
 } error_code;
 
 void error(error_code code);
+
+void error_reset();
+
+error_code error_get();
 
 void trace_print(FILE *file);
 

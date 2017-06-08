@@ -179,6 +179,8 @@ int main(void)
         zone_memcpy(page, zone_3, "Hello Zone 3!", sizeof(char) * strlen("Hello Zone 3!"));
 
         zone_remove(page, zone_1);
+        zone_remove(page, zone_2);
+        zone_remove(page, zone_3);
 
         page_dump(stdout, page);
 

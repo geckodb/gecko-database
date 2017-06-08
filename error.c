@@ -7,6 +7,16 @@ void error(error_code code)
     last_error = code;
 }
 
+void error_reset()
+{
+    last_error = err_no_error;
+}
+
+error_code error_get()
+{
+    return last_error;
+}
+
 void trace_print(FILE *file)
 {
     fflush(stdout);
@@ -48,6 +58,7 @@ const char *error_str(error_code code)
         case err_constraint_violated: return "Constraint violated";
         case err_limitreached:        return "Limit reached";
         case err_no_free_space:       return "No space available";
+        case err_notincharge:         return "Request was rejected: not in charge";
         default: return "Unknown";
     }
 }
