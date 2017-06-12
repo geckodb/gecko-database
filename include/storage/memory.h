@@ -31,6 +31,8 @@ typedef uint16_t  u16;
 typedef uint32_t  u32;
 typedef uint64_t  u64;
 
+typedef unsigned char byte_t;
+
 typedef u32 page_id_t;
 typedef u32 frame_id_t;
 
@@ -165,15 +167,15 @@ page_t *page_create(buffer_manager_t *manager, page_id_t id, size_t size, page_f
 
 fid_t *frame_create(page_t *page, block_positioning strategy, size_t element_size);
 
-zone_t *zone_create(page_t *page, fid_t *frame_handle, block_positioning strategy);
+zone_t *zone_create(buffer_manager_t *manager, page_t *page, fid_t *frame_handle, block_positioning strategy);
 
 bool zone_memcpy(page_t *page, zone_t *zone, const void *data, size_t size);
 
-bool zone_remove(page_t *page, const zone_t *zone);
+bool zone_remove(buffer_manager_t *manager, page_t *page, const zone_t *zone);
 
 bool frame_delete(fid_t *frame);
 
-void page_dump(FILE *out, const page_t *page);
+void page_dump(FILE *out, buffer_manager_t *manager, const page_t *page);
 
 bool page_free(page_t *page);
 

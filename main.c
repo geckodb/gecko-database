@@ -172,18 +172,18 @@ int main(void)
         frame_create(page, positioning_first_nomerge, 2048 /* 2 KiB */);
 
 
-        zone_t *zone_1 = zone_create(page, frame_handle, positioning_first_nomerge);
+        zone_t *zone_1 = zone_create(manager, page, frame_handle, positioning_first_nomerge);
         zone_memcpy(page, zone_1, "Hello Zone!", sizeof(char) * strlen("Hello Zone!"));
-        zone_t *zone_2 = zone_create(page, frame_handle, positioning_first_nomerge);
+        zone_t *zone_2 = zone_create(manager, page, frame_handle, positioning_first_nomerge);
         zone_memcpy(page, zone_2, "Hello Zone 2!", sizeof(char) * strlen("Hello Zone 2!"));
-        zone_t *zone_3 = zone_create(page, frame_handle, positioning_first_nomerge);
+        zone_t *zone_3 = zone_create(manager, page, frame_handle, positioning_first_nomerge);
         zone_memcpy(page, zone_3, "Hello Zone 3!", sizeof(char) * strlen("Hello Zone 3!"));
 
-        zone_remove(page, zone_1);
-        zone_remove(page, zone_2);
-        zone_remove(page, zone_3);
+        zone_remove(manager, page, zone_1);
+        zone_remove(manager, page, zone_2);
+        zone_remove(manager, page, zone_3);
 
-        page_dump(stdout, page);
+        page_dump(stdout, manager, page);
 
 
         fid_t x;

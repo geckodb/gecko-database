@@ -63,6 +63,8 @@ typedef enum {
 // M A C R O S
 // ---------------------------------------------------------------------------------------------------------------------
 
+#define to_string(x)    #x
+
 #define output_error(code)                                                                                             \
     {                                                                                                                  \
         error(code);                                                                                                   \
@@ -149,12 +151,13 @@ static inline void free_store_unempty(page_t *page);
 static inline void free_store_merge(page_t *page);
 static inline frame_id_t frame_store_scan(const page_t *page, frame_state state);
 
-static inline bool ptr_is_null(const in_page_ptr *ptr);
-static inline bool ptr_has_scope(const in_page_ptr *ptr, ptr_scope_type type);
-static inline void ptr_make_near(in_page_ptr *ptr, page_t *page, ptr_target type, offset_t offset);
-static inline ptr_target ptr_get_type(const in_page_ptr *ptr);
-static inline zone_t *ptr_cast_zone(const page_t *page, const in_page_ptr *ptr);
-static inline frame_t *ptr_cast_frame(const page_t *page, const in_page_ptr *ptr);
+static inline bool in_page_ptr_is_null(const in_page_ptr *ptr);
+static inline bool in_page_ptr_has_scope(const in_page_ptr *ptr, ptr_scope_type type);
+static inline void in_page_ptr_make_near(in_page_ptr *ptr, page_t *page, ptr_target type, offset_t offset);
+static inline ptr_target in_page_ptr_get_type(const in_page_ptr *ptr);
+static inline void *in_page_ptr_deref(buffer_manager_t *buffer_manager, const in_page_ptr *ptr);
+static inline zone_t *ptr_cast_zone(buffer_manager_t *buffer_manager, const in_page_ptr *ptr);
+static inline frame_t *ptr_cast_frame(buffer_manager_t *buffer_manager, const in_page_ptr *ptr);
 //static inline void *persistent_ptr_cast_userdata(const page_t *page, in_page_ptr *ptr);
 
 
@@ -216,14 +219,14 @@ static bool _init_page_pool_entry(void *capture, void *from, void *to)
 
 static bool _count_nulls(void *capture, void *it)
 {
-    panic_if((it == NULL), BADARGNULL, "it");
+    panic_if((it == NULL), BADARGNULL, to_string(it));
     return (*((void **) it) == NULL);
 }
 
 bool page_pool_init(buffer_manager_t *manager, size_t num_pages)
 {
-    panic_if((manager == NULL), BADARGNULL, "manager");
-    panic_if((manager == NULL), BADARGZERO, "num_pages");
+    panic_if((manager == NULL), BADARGNULL, to_string(manager));
+    panic_if((manager == NULL), BADARGZERO, to_string(num_pages));
     panic_if(manager->page_register->num_elements != 0, BADPOOLINIT, manager);
     vector_resize(manager->page_register, num_pages);
     panic_if(manager->page_register->num_elements != num_pages, UNEXPECTED, "vector was not resized as expected");
@@ -234,7 +237,7 @@ bool page_pool_init(buffer_manager_t *manager, size_t num_pages)
 
 bool page_pool_set(buffer_manager_t *manager, page_id_t id, void *ptr)
 {
-    panic_if((manager == NULL), BADARGNULL, "manager");
+    panic_if((manager == NULL), BADARGNULL, to_string(manager));
     panic_if((manager->page_register == NULL), UNEXPECTED, "page register in manager");
     panic_if(((size_t) id >= manager->page_register->num_elements), BADPAGEID, id);
     panic_if((page_pool_is_loaded(manager, id)), UNEXPECTED, "already set");
@@ -248,7 +251,7 @@ bool page_pool_is_loaded(buffer_manager_t *manager, page_id_t id)
 
 bool page_pool_remove(buffer_manager_t *manager, page_id_t id)
 {
-    panic_if((manager == NULL), BADARGNULL, "manager");
+    panic_if((manager == NULL), BADARGNULL, to_string(manager));
     panic_if((manager->page_register == NULL), UNEXPECTED, "page register in manager");
     panic_if (id >= manager->page_register->num_elements, BADPAGEID, id);
     void *null_value = NULL;
@@ -257,10 +260,11 @@ bool page_pool_remove(buffer_manager_t *manager, page_id_t id)
 
 void *page_pool_get(buffer_manager_t *manager, page_id_t id)
 {
-    panic_if((manager == NULL), BADARGNULL, "manager");
+    panic_if((manager == NULL), BADARGNULL, to_string(manager));
     panic_if((manager->page_register == NULL), UNEXPECTED, "page register in manager");
     panic_if (id >= manager->page_register->num_elements, BADPAGEID, id);
-    return vector_at(manager->page_register, id);
+    void **element = (void **)manager->page_register->data + id;
+    return (element != NULL ? *element : NULL);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -343,7 +347,7 @@ fid_t *frame_create(page_t *page, block_positioning strategy, size_t element_siz
     return handle;
 }
 
-zone_t *zone_create(page_t *page, fid_t *frame_handle, block_positioning strategy)
+zone_t *zone_create(buffer_manager_t *manager, page_t *page, fid_t *frame_handle, block_positioning strategy)
 {
     expect_non_null(frame_handle, NULL);
     expect_non_null(page, NULL);
@@ -363,25 +367,25 @@ zone_t *zone_create(page_t *page, fid_t *frame_handle, block_positioning strateg
                 .next = null_ptr(),
         };
 
-        if (ptr_is_null(&frame->first)) {
-            assert (ptr_is_null(&frame->last));
-            ptr_make_near(&zone.prev, page, target_frame, ptr_distance(page, frame));
-            ptr_make_near(&frame->first, page, target_zone, zone_offset);
+        if (in_page_ptr_is_null(&frame->first)) {
+            assert (in_page_ptr_is_null(&frame->last));
+            in_page_ptr_make_near(&zone.prev, page, target_frame, ptr_distance(page, frame));
+            in_page_ptr_make_near(&frame->first, page, target_zone, zone_offset);
         } else {
-            assert (!ptr_is_null(&frame->last));
-            assert (ptr_has_scope(&frame->last, type_near_ptr));
-            ptr_make_near(&zone.prev, page, target_zone, frame->last.offset);
-            zone_t *last_zone = ptr_cast_zone(page, &frame->last);
-            ptr_make_near(&last_zone->next, page, target_zone, zone_offset);
+            assert (!in_page_ptr_is_null(&frame->last));
+            assert (in_page_ptr_has_scope(&frame->last, type_near_ptr));
+            in_page_ptr_make_near(&zone.prev, page, target_zone, frame->last.offset);
+            zone_t *last_zone = ptr_cast_zone(manager, &frame->last);
+            in_page_ptr_make_near(&last_zone->next, page, target_zone, zone_offset);
         }
 
-        ptr_make_near(&frame->last, page, target_zone, zone_offset);
+        in_page_ptr_make_near(&frame->last, page, target_zone, zone_offset);
         data_store_write(page, zone_offset, &zone, sizeof(zone_t));
         memset(data_store_at_unsafe(page, zone_offset + sizeof(zone_t)), 'X',
                frame->elem_size);   // TODO: Remove this line; its just for debugging purposes
         return_val = data_store_at_unsafe(page, zone_offset);
 
-    } error(err_limitreached);
+    } else error(err_limitreached);
 
     return return_val;
 }
@@ -397,11 +401,10 @@ bool zone_memcpy(page_t *page, zone_t *zone, const void *data, size_t size)
     return true;
 }
 
-bool zone_remove(page_t *page, const zone_t *zone)
+bool zone_remove(buffer_manager_t *manager, page_t *page, const zone_t *zone)
 {
     expect_non_null(page, false);
     expect_non_null(page, zone);
-
     /*
      *  Case | IN-NULL | OUT-NULL | IN	 | OUT  | Scope	  | Note
      *  -----+---------+----------+------+------+---------+-------------------------
@@ -419,15 +422,15 @@ bool zone_remove(page_t *page, const zone_t *zone)
      *  11   | NO	   | NO		  | FAR	 | FAR  | 3 Pages | Handled outside this page
      */
 
-    panic_if(ptr_is_null(&zone->prev), MSG_BADBACKLINK, zone);
-    panic_if((!ptr_is_null(&zone->next) && !(ptr_get_type(&zone->next) == target_zone)), MSG_BADFRWDLINK, zone);
-    panic_if(!in_range(ptr_target, ptr_get_type(&zone->prev), target_frame, target_zone), MSG_BADTYPE, &zone->prev);
+    panic_if(in_page_ptr_is_null(&zone->prev), MSG_BADBACKLINK, zone);
+    panic_if((!in_page_ptr_is_null(&zone->next) && !(in_page_ptr_get_type(&zone->next) == target_zone)), MSG_BADFRWDLINK, zone);
+    panic_if(!in_range(ptr_target, in_page_ptr_get_type(&zone->prev), target_frame, target_zone), MSG_BADTYPE, &zone->prev);
 
-    bool prev_is_near  = (ptr_has_scope(&zone->prev, type_near_ptr));
-    bool next_is_near  = (ptr_has_scope(&zone->next, type_near_ptr));
-    bool prev_is_frame = (ptr_get_type(&zone->prev) == target_frame);
-    bool prev_is_zone  = (ptr_get_type(&zone->prev) == target_zone);
-    bool next_is_null  = (ptr_is_null(&zone->next));
+    bool prev_is_near  = (in_page_ptr_has_scope(&zone->prev, type_near_ptr));
+    bool next_is_near  = (in_page_ptr_has_scope(&zone->next, type_near_ptr));
+    bool prev_is_frame = (in_page_ptr_get_type(&zone->prev) == target_frame);
+    bool prev_is_zone  = (in_page_ptr_get_type(&zone->prev) == target_zone);
+    bool next_is_null  = (in_page_ptr_is_null(&zone->next));
 
     bool in_page_zone_is_lonely = (prev_is_frame && prev_is_near && next_is_null);
     bool in_page_zone_is_head   = (prev_is_frame && !next_is_null && prev_is_near && next_is_near);
@@ -448,7 +451,8 @@ bool zone_remove(page_t *page, const zone_t *zone)
          *  |     |-------- last -------^               |       |     |------- last -------^                |
          *  +-------------------------------------------+       +-------------------------------------------+
          */
-            frame_t *frame = ptr_cast_frame(page, &zone->prev);
+            frame_t *frame = ptr_cast_frame(manager, &zone->prev);
+            free_store_push(page, ptr_distance(page, zone), ptr_distance(page, zone + frame->elem_size));
             frame->first = null_ptr();
             frame->last = null_ptr();
 
@@ -462,14 +466,14 @@ bool zone_remove(page_t *page, const zone_t *zone)
          *  |     |------- last -----------------------^?-------^   |       |     |------- last --------^?-------^   |
          *  +-------------------------------------------------------+       +----------------------------------------+
          */
-            frame_t *frame = ptr_cast_frame(page, &zone->prev);
-            zone_t *next_zone = ptr_cast_zone(page, &zone->next);
+            frame_t *frame = ptr_cast_frame(manager, &zone->prev);
+            zone_t *next_zone = ptr_cast_zone(manager, &zone->next);
             size_t next_zone_offset = ptr_distance(page, next_zone);
 
             frame->first = zone->next;
-            ptr_make_near(&next_zone->prev, page, target_frame, ptr_distance(page, frame));
+            in_page_ptr_make_near(&next_zone->prev, page, target_frame, ptr_distance(page, frame));
             if (frame->last.offset == next_zone_offset) {
-                ptr_make_near(&frame->last, page, target_zone, next_zone_offset);
+                in_page_ptr_make_near(&frame->last, page, target_zone, next_zone_offset);
             }
             
         } else if (in_page_zone_is_tail) {
@@ -509,7 +513,7 @@ bool page_free(page_t *page)
     return true;
 }
 
-void page_dump(FILE *out, const page_t *page)
+void page_dump(FILE *out, buffer_manager_t *manager, const page_t *page)
 {
     assert (out);
     printf("\n#\n");
@@ -603,10 +607,10 @@ void page_dump(FILE *out, const page_t *page)
 
             frame_t *frame = frame_store_frame_by_id(page, frame_id);
             in_page_ptr ptr = frame_store_frame_by_id(page, frame_id)->first;
-            while (!ptr_is_null(&ptr) && ptr_has_scope(&ptr, type_near_ptr)) {
+            while (!in_page_ptr_is_null(&ptr) && in_page_ptr_has_scope(&ptr, type_near_ptr)) {
                 assert(ptr.page_id == page->page_header.page_id);
 
-                const zone_t *zone = ptr_cast_zone(page, &ptr);
+                const zone_t *zone = ptr_cast_zone(manager, &ptr);
 
                 printf("# %#010lx    prev:(far_ptr:%d, pid=%d, offset=%#010lx), prev:(far_ptr:%d, pid=%d, offset=%#010lx)\n",
                        ptr_distance(page, zone), zone->prev.is_far_ptr, zone->prev.page_id, zone->prev.offset,
@@ -1001,13 +1005,13 @@ static inline frame_id_t frame_store_scan(const page_t *page, frame_state state)
     return NULL_FID;
 }
 
-static inline bool ptr_is_null(const in_page_ptr *ptr)
+static inline bool in_page_ptr_is_null(const in_page_ptr *ptr)
 {
     assert(ptr);
     return (ptr->offset == NULL_OFFSET);
 }
 
-static inline bool ptr_has_scope(const in_page_ptr *ptr, ptr_scope_type type)
+static inline bool in_page_ptr_has_scope(const in_page_ptr *ptr, ptr_scope_type type)
 {
     assert (ptr);
     switch (type) {
@@ -1019,7 +1023,7 @@ static inline bool ptr_has_scope(const in_page_ptr *ptr, ptr_scope_type type)
     }
 }
 
-static inline void ptr_make_near(in_page_ptr *ptr, page_t *page, ptr_target type, offset_t offset)
+static inline void in_page_ptr_make_near(in_page_ptr *ptr, page_t *page, ptr_target type, offset_t offset)
 {
     assert(ptr);
     assert(page);
@@ -1048,7 +1052,7 @@ static inline void ptr_make_near(in_page_ptr *ptr, page_t *page, ptr_target type
     }
 }
 
-static inline ptr_target ptr_get_type(const in_page_ptr *ptr)
+static inline ptr_target in_page_ptr_get_type(const in_page_ptr *ptr)
 {
     assert (ptr);
     if (ptr->target_type_bit_0 == 0) {
@@ -1066,21 +1070,33 @@ static inline ptr_target ptr_get_type(const in_page_ptr *ptr)
     }
 }
 
-static inline zone_t *ptr_cast_zone(const page_t *page, const in_page_ptr *ptr)
+static inline void *in_page_ptr_deref(buffer_manager_t *buffer_manager, const in_page_ptr *ptr)
 {
-    panic_if(ptr_get_type(ptr) != target_zone, MSG_BADCAST, ptr);
-    return (zone_t *) data_store_at_unsafe(page, ptr->offset);
+    panic_if((buffer_manager == NULL), BADARGNULL, to_string(buffer_manager));
+    panic_if((ptr == NULL), BADARGNULL, to_string(ptr));
+    panic_if((buffer_manager->page_register == NULL), UNEXPECTED, "page register vector is null");
+    void *page_base_ptr = page_pool_get(buffer_manager, ptr->page_id);
+    panic_if((page_base_ptr == NULL), UNEXPECTED, "page base pointer is not allowed to be null");
+    return (page_base_ptr + ptr->offset);
 }
 
-static inline frame_t *ptr_cast_frame(const page_t *page, const in_page_ptr *ptr)
+static inline zone_t *ptr_cast_zone(buffer_manager_t *buffer_manager, const in_page_ptr *ptr)
 {
-    panic_if(ptr_get_type(ptr) != target_frame, MSG_BADCAST, ptr);
-    return (frame_t *) data_store_at_unsafe(page, ptr->offset);
+    panic_if(in_page_ptr_get_type(ptr) != target_zone, MSG_BADCAST, ptr);
+    void *data = in_page_ptr_deref(buffer_manager, ptr);
+    return (zone_t *) data;
+}
+
+static inline frame_t *ptr_cast_frame(buffer_manager_t *buffer_manager, const in_page_ptr *ptr)
+{
+    panic_if(in_page_ptr_get_type(ptr) != target_frame, MSG_BADCAST, ptr);
+    void *data = in_page_ptr_deref(buffer_manager, ptr);
+    return (frame_t *) data;
 }
 
 /*static inline void *persistent_ptr_cast_userdata(const page_t *page, in_page_ptr *ptr)
 {
-    panic_if(ptr_get_type(ptr) != target_zone, MSG_BADCAST, ptr);
+    panic_if(in_page_ptr_get_type(ptr) != target_zone, MSG_BADCAST, ptr);
     return (void *) data_store_at_unsafe(page, ptr->offset);
 }*/
 
@@ -1116,5 +1132,6 @@ static inline bool free_store_push(page_t *page, offset_t begin, offset_t end)
         entry->begin = begin;
         entry->end = end;
     }
+    panic_if((entry == NULL), UNEXPECTED, "Free store capacity exceeded");
     return (entry != NULL);
 }
