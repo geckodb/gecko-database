@@ -31,7 +31,7 @@
 #define NULL_OFFSET     0
 #define CORE_HDR_SIZE   (sizeof(page_header_t) + sizeof(free_store_t) + sizeof(frame_store_t))
 #define FRAME_HDR_SIZE  (sizeof(frame_t))
-#define MIN_DATA_SIZE   (sizeof(zone_t) + sizeof(persistent_ptr))
+#define MIN_DATA_SIZE   (sizeof(zone_t) + sizeof(in_page_ptr))
 
 #define MSG_BADBRANCH   "Internal error: unknown condition during operation on object %p."
 #define MSG_BADCAST     "Unsupported cast request for persistent ptr %p."
@@ -119,7 +119,7 @@ typedef enum {
     ((val & flag) == flag)
 
 #define null_ptr()                                                                                                     \
-    (persistent_ptr) {                                                                                                 \
+    (in_page_ptr) {                                                                                                 \
         .offset = NULL_OFFSET,                                                                                         \
         .target_type_bit_0 = 1,                                                                                        \
         .target_type_bit_1 = 1,                                                                                        \
@@ -149,13 +149,13 @@ static inline void free_store_unempty(page_t *page);
 static inline void free_store_merge(page_t *page);
 static inline frame_id_t frame_store_scan(const page_t *page, frame_state state);
 
-static inline bool ptr_is_null(const persistent_ptr *ptr);
-static inline bool ptr_has_scope(const persistent_ptr *ptr, ptr_scope_type type);
-static inline void ptr_make_near(persistent_ptr *ptr, page_t *page, ptr_target type, offset_t offset);
-static inline ptr_target ptr_get_type(const persistent_ptr *ptr);
-static inline zone_t *ptr_cast_zone(const page_t *page, const persistent_ptr *ptr);
-static inline frame_t *ptr_cast_frame(const page_t *page, const persistent_ptr *ptr);
-//static inline void *persistent_ptr_cast_userdata(const page_t *page, persistent_ptr *ptr);
+static inline bool ptr_is_null(const in_page_ptr *ptr);
+static inline bool ptr_has_scope(const in_page_ptr *ptr, ptr_scope_type type);
+static inline void ptr_make_near(in_page_ptr *ptr, page_t *page, ptr_target type, offset_t offset);
+static inline ptr_target ptr_get_type(const in_page_ptr *ptr);
+static inline zone_t *ptr_cast_zone(const page_t *page, const in_page_ptr *ptr);
+static inline frame_t *ptr_cast_frame(const page_t *page, const in_page_ptr *ptr);
+//static inline void *persistent_ptr_cast_userdata(const page_t *page, in_page_ptr *ptr);
 
 
 static inline int comp_range_start(const void *lhs, const void *rhs);
@@ -602,7 +602,7 @@ void page_dump(FILE *out, const page_t *page)
              frame_id = frame_store_scan(NULL, frame_inuse)) {
 
             frame_t *frame = frame_store_frame_by_id(page, frame_id);
-            persistent_ptr ptr = frame_store_frame_by_id(page, frame_id)->first;
+            in_page_ptr ptr = frame_store_frame_by_id(page, frame_id)->first;
             while (!ptr_is_null(&ptr) && ptr_has_scope(&ptr, type_near_ptr)) {
                 assert(ptr.page_id == page->page_header.page_id);
 
@@ -1001,13 +1001,13 @@ static inline frame_id_t frame_store_scan(const page_t *page, frame_state state)
     return NULL_FID;
 }
 
-static inline bool ptr_is_null(const persistent_ptr *ptr)
+static inline bool ptr_is_null(const in_page_ptr *ptr)
 {
     assert(ptr);
     return (ptr->offset == NULL_OFFSET);
 }
 
-static inline bool ptr_has_scope(const persistent_ptr *ptr, ptr_scope_type type)
+static inline bool ptr_has_scope(const in_page_ptr *ptr, ptr_scope_type type)
 {
     assert (ptr);
     switch (type) {
@@ -1019,7 +1019,7 @@ static inline bool ptr_has_scope(const persistent_ptr *ptr, ptr_scope_type type)
     }
 }
 
-static inline void ptr_make_near(persistent_ptr *ptr, page_t *page, ptr_target type, offset_t offset)
+static inline void ptr_make_near(in_page_ptr *ptr, page_t *page, ptr_target type, offset_t offset)
 {
     assert(ptr);
     assert(page);
@@ -1048,7 +1048,7 @@ static inline void ptr_make_near(persistent_ptr *ptr, page_t *page, ptr_target t
     }
 }
 
-static inline ptr_target ptr_get_type(const persistent_ptr *ptr)
+static inline ptr_target ptr_get_type(const in_page_ptr *ptr)
 {
     assert (ptr);
     if (ptr->target_type_bit_0 == 0) {
@@ -1066,19 +1066,19 @@ static inline ptr_target ptr_get_type(const persistent_ptr *ptr)
     }
 }
 
-static inline zone_t *ptr_cast_zone(const page_t *page, const persistent_ptr *ptr)
+static inline zone_t *ptr_cast_zone(const page_t *page, const in_page_ptr *ptr)
 {
     panic_if(ptr_get_type(ptr) != target_zone, MSG_BADCAST, ptr);
     return (zone_t *) data_store_at_unsafe(page, ptr->offset);
 }
 
-static inline frame_t *ptr_cast_frame(const page_t *page, const persistent_ptr *ptr)
+static inline frame_t *ptr_cast_frame(const page_t *page, const in_page_ptr *ptr)
 {
-    panic_if(ptr_get_type(ptr) != target_zone, MSG_BADCAST, ptr);
+    panic_if(ptr_get_type(ptr) != target_frame, MSG_BADCAST, ptr);
     return (frame_t *) data_store_at_unsafe(page, ptr->offset);
 }
 
-/*static inline void *persistent_ptr_cast_userdata(const page_t *page, persistent_ptr *ptr)
+/*static inline void *persistent_ptr_cast_userdata(const page_t *page, in_page_ptr *ptr)
 {
     panic_if(ptr_get_type(ptr) != target_zone, MSG_BADCAST, ptr);
     return (void *) data_store_at_unsafe(page, ptr->offset);

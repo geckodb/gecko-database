@@ -50,8 +50,7 @@ typedef struct __force_packing__ {
         offset_t target_type_bit_1    : 1;
         offset_t offset               : 62;
     };
-} persistent_ptr;
-
+} in_page_ptr;
 
 typedef enum
 {
@@ -92,12 +91,12 @@ typedef struct __force_packing__ {
 } frame_store_t;
 
 typedef struct __force_packing__ {
-    persistent_ptr first, last;
+    in_page_ptr first, last;
     size_t elem_size;
 } frame_t;
 
 typedef struct __force_packing__ {
-    persistent_ptr prev, next;
+    in_page_ptr prev, next;
     access_stats_t statistics;
 } zone_t;
 
