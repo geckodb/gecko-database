@@ -25,6 +25,7 @@
 // C O N S T A N T S
 // ---------------------------------------------------------------------------------------------------------------------
 
+#define INIT_NUM_PAGES  1024
 #define NULL_FID        UINT_MAX
 #define MAX_OFFSET      SIZE_MAX
 #define NULL_OFFSET     0
@@ -37,6 +38,13 @@
 #define MSG_BADTYPE     "Persistent ptr %p points to illegal type."
 #define MSG_BADBACKLINK "Internal error: back link for persistent ptr %p is not allowed to be null."
 #define MSG_BADFRWDLINK "Internal error: forward link for persitent ptr %p is not allowed to point to a non-zone obj."
+#define BADPOOLINIT     "Internal error: page pool %p is already initialized."
+#define BADENTRYINIT    "Internal error: bad page pool init request from %p to %p"
+#define BADPAGEID       "Internal error: bad page id '%du'"
+#define BADARGNULL      "Illegal argument for function. Parameter '%s' points to null"
+#define BADARGZERO      "Illegal argument for function. Parameter '%s' is zero"
+#define UNEXPECTED      "Unexpected behavior: '%s'"
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 // T Y P E S
@@ -110,8 +118,8 @@ typedef enum {
 #define has_flag(val, flag)                                                                                            \
     ((val & flag) == flag)
 
-#define null_zone_ptr()                                                                                                \
-    {                                                                                                                  \
+#define null_ptr()                                                                                                     \
+    (persistent_ptr) {                                                                                                 \
         .offset = NULL_OFFSET,                                                                                         \
         .target_type_bit_0 = 1,                                                                                        \
         .target_type_bit_1 = 1,                                                                                        \
@@ -145,8 +153,8 @@ static inline bool ptr_is_null(const persistent_ptr *ptr);
 static inline bool ptr_has_scope(const persistent_ptr *ptr, ptr_scope_type type);
 static inline void ptr_make_near(persistent_ptr *ptr, page_t *page, ptr_target type, offset_t offset);
 static inline ptr_target ptr_get_type(const persistent_ptr *ptr);
-static inline zone_t *ptr_cast_zone(const page_t *page, persistent_ptr *ptr);
-//static inline frame_t *persistent_ptr_cast_frame(const page_t *page, persistent_ptr *ptr);
+static inline zone_t *ptr_cast_zone(const page_t *page, const persistent_ptr *ptr);
+static inline frame_t *ptr_cast_frame(const page_t *page, const persistent_ptr *ptr);
 //static inline void *persistent_ptr_cast_userdata(const page_t *page, persistent_ptr *ptr);
 
 
@@ -170,7 +178,96 @@ static inline bool range_do_overlap(range_t *lhs, range_t *rhs);
 // I N T E R F A C E  I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-page_t *page_create(page_id_t id, size_t size, page_flags flags, size_t free_space, size_t frame_reg)
+buffer_manager_t *buffer_manager_create()
+{
+    buffer_manager_t *result = malloc(sizeof(buffer_manager_t));
+    expect_good_malloc(result, NULL);
+    result->page_register = vector_create(sizeof(void*), INIT_NUM_PAGES);
+    expect_non_null(result->page_register, NULL);
+    bool init_pages = page_pool_init(result, INIT_NUM_PAGES);
+    expect_equals(init_pages, true, NULL);
+    return result;
+}
+
+bool buffer_manager_free(buffer_manager_t *manager)
+{
+    expect_non_null(manager, false);
+    expect_non_null(manager->page_register, false);
+    bool free_page_reg = vector_free(manager->page_register);
+    if (free_page_reg) {
+        free (manager);
+    }
+    return true;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// I N T E R F A C E   F U N C T I O N S
+// ---------------------------------------------------------------------------------------------------------------------
+
+static bool _init_page_pool_entry(void *capture, void *from, void *to)
+{
+    panic_if((from >= to), BADENTRYINIT, from, to);
+    void **start = (void **) from;
+    void **end = (void **)to;
+    for (void **it = start; it < end; it++)
+        *it = NULL;
+    return true;
+}
+
+static bool _count_nulls(void *capture, void *it)
+{
+    panic_if((it == NULL), BADARGNULL, "it");
+    return (*((void **) it) == NULL);
+}
+
+bool page_pool_init(buffer_manager_t *manager, size_t num_pages)
+{
+    panic_if((manager == NULL), BADARGNULL, "manager");
+    panic_if((manager == NULL), BADARGZERO, "num_pages");
+    panic_if(manager->page_register->num_elements != 0, BADPOOLINIT, manager);
+    vector_resize(manager->page_register, num_pages);
+    panic_if(manager->page_register->num_elements != num_pages, UNEXPECTED, "vector was not resized as expected");
+    vector_foreach(manager->page_register, NULL, _init_page_pool_entry);
+    panic_if((vector_count(manager->page_register, NULL, _count_nulls) != num_pages), UNEXPECTED, "condition is wrong");
+    return true;
+}
+
+bool page_pool_set(buffer_manager_t *manager, page_id_t id, void *ptr)
+{
+    panic_if((manager == NULL), BADARGNULL, "manager");
+    panic_if((manager->page_register == NULL), UNEXPECTED, "page register in manager");
+    panic_if(((size_t) id >= manager->page_register->num_elements), BADPAGEID, id);
+    panic_if((page_pool_is_loaded(manager, id)), UNEXPECTED, "already set");
+    return vector_set(manager->page_register, id, 1, &ptr);
+}
+
+bool page_pool_is_loaded(buffer_manager_t *manager, page_id_t id)
+{
+    return (page_pool_get(manager, id) != NULL);
+}
+
+bool page_pool_remove(buffer_manager_t *manager, page_id_t id)
+{
+    panic_if((manager == NULL), BADARGNULL, "manager");
+    panic_if((manager->page_register == NULL), UNEXPECTED, "page register in manager");
+    panic_if (id >= manager->page_register->num_elements, BADPAGEID, id);
+    void *null_value = NULL;
+    return vector_set(manager->page_register, id, 1, &null_value);
+}
+
+void *page_pool_get(buffer_manager_t *manager, page_id_t id)
+{
+    panic_if((manager == NULL), BADARGNULL, "manager");
+    panic_if((manager->page_register == NULL), UNEXPECTED, "page register in manager");
+    panic_if (id >= manager->page_register->num_elements, BADPAGEID, id);
+    return vector_at(manager->page_register, id);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// I N T E R F A C E   F U N C T I O N S
+// ---------------------------------------------------------------------------------------------------------------------
+
+page_t *page_create(buffer_manager_t *manager, page_id_t id, size_t size, page_flags flags, size_t free_space, size_t frame_reg)
 {
     size_t header_size = sizeof_total_hdr(free_space, frame_reg);
     size_t min_page_size = header_size + FRAME_HDR_SIZE + MIN_DATA_SIZE;
@@ -186,6 +283,7 @@ page_t *page_create(page_id_t id, size_t size, page_flags flags, size_t free_spa
     expect_greater(free_space, 0, NULL)
     expect_greater(frame_reg, 0, NULL)
     expect_greater(free_space_size, 1, NULL)
+    expect_non_null(manager, NULL);
 
     page_t *page = malloc(size);
     expect_good_malloc(page, NULL);
@@ -201,6 +299,8 @@ page_t *page_create(page_id_t id, size_t size, page_flags flags, size_t free_spa
 
     frame_store_init(page, frame_reg);
     free_store_push(page, free_space_begin_offset, free_space_end_offset);
+
+    page_pool_set(manager, id, page);
 
     return page;
 }
@@ -260,7 +360,7 @@ zone_t *zone_create(page_t *page, fid_t *frame_handle, block_positioning strateg
         assert (ptr_distance(free_range.begin, free_range.end) >= block_size);
 
         zone_t zone = {
-                .next = null_zone_ptr(),
+                .next = null_ptr(),
         };
 
         if (ptr_is_null(&frame->first)) {
@@ -348,6 +448,10 @@ bool zone_remove(page_t *page, const zone_t *zone)
          *  |     |-------- last -------^               |       |     |------- last -------^                |
          *  +-------------------------------------------+       +-------------------------------------------+
          */
+            frame_t *frame = ptr_cast_frame(page, &zone->prev);
+            frame->first = null_ptr();
+            frame->last = null_ptr();
+
         } else if (in_page_zone_is_head) {
         /*
          *  +---------------- THIS PAGE ----------------------------+       +---------------- THIS PAGE -------------+
@@ -355,9 +459,19 @@ bool zone_remove(page_t *page, const zone_t *zone)
          *  |  +-------+            +--------+     +------+         |       |  +-------+            +------+         |
          *  |  | FRAME | - first -> | ZONE X | <-> | ZONE | -> ...  |   =>  |  | FRAME | - first -> | ZONE | -> ...  |
          *  |  +-------+            +--------+     +------+         |       |  +-------+            +------+         |
-         *  |     |------- last ---------------------^              |       |     |------- last -------^             |
+         *  |     |------- last -----------------------^?-------^   |       |     |------- last --------^?-------^   |
          *  +-------------------------------------------------------+       +----------------------------------------+
          */
+            frame_t *frame = ptr_cast_frame(page, &zone->prev);
+            zone_t *next_zone = ptr_cast_zone(page, &zone->next);
+            size_t next_zone_offset = ptr_distance(page, next_zone);
+
+            frame->first = zone->next;
+            ptr_make_near(&next_zone->prev, page, target_frame, ptr_distance(page, frame));
+            if (frame->last.offset == next_zone_offset) {
+                ptr_make_near(&frame->last, page, target_zone, next_zone_offset);
+            }
+            
         } else if (in_page_zone_is_tail) {
         /*
         *  +---------------- THIS PAGE -----------------------------+       +---------------- THIS PAGE -------------+
@@ -685,8 +799,8 @@ static inline frame_id_t frame_store_create(page_t *page, block_positioning stra
         frame_id = *frame_store_recycle(page, --(frame_store_in(page))->free_list_len);
 
         frame_t frame = {
-            .first = null_zone_ptr(),
-            .last = null_zone_ptr(),
+            .first = null_ptr(),
+            .last = null_ptr(),
             .elem_size = size
         };
         offset_t frame_offset = free_range.begin;
@@ -952,17 +1066,17 @@ static inline ptr_target ptr_get_type(const persistent_ptr *ptr)
     }
 }
 
-static inline zone_t *ptr_cast_zone(const page_t *page, persistent_ptr *ptr)
+static inline zone_t *ptr_cast_zone(const page_t *page, const persistent_ptr *ptr)
 {
     panic_if(ptr_get_type(ptr) != target_zone, MSG_BADCAST, ptr);
     return (zone_t *) data_store_at_unsafe(page, ptr->offset);
 }
 
-/*static inline frame_t *persistent_ptr_cast_frame(const page_t *page, persistent_ptr *ptr)
+static inline frame_t *ptr_cast_frame(const page_t *page, const persistent_ptr *ptr)
 {
     panic_if(ptr_get_type(ptr) != target_zone, MSG_BADCAST, ptr);
     return (frame_t *) data_store_at_unsafe(page, ptr->offset);
-}*/
+}
 
 /*static inline void *persistent_ptr_cast_userdata(const page_t *page, persistent_ptr *ptr)
 {

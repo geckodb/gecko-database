@@ -166,7 +166,8 @@ int main(void)
 
         printf("%zu\n", sizeof(page_t));
         fflush(stdout);
-        page_t *page = page_create(42, 1024 * 1024 /* 1 MiB */, page_flag_fixed, 10, 10);
+        buffer_manager_t *manager = buffer_manager_create();
+        page_t *page = page_create(manager, 42, 1024 * 1024 /* 1 MiB */, page_flag_fixed, 10, 10);
         fid_t *frame_handle = frame_create(page, positioning_first_nomerge, 20 /* 40 B */);
         frame_create(page, positioning_first_nomerge, 2048 /* 2 KiB */);
 

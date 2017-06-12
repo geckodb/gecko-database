@@ -122,7 +122,7 @@ bool vector_set(vector_t *vec, size_t idx, size_t num_elements, const void *data
         size_t last_idx = idx + num_elements;
         if (last_idx < vec->element_capacity) {
             memcpy(vec->data + idx * vec->sizeof_element, data, num_elements * vec->sizeof_element);
-            vec->num_elements = min(vec->num_elements, last_idx);
+            vec->num_elements = max(vec->num_elements, last_idx);
             return true;
         } else if (_advance(vec, idx, num_elements))
             return vector_set(vec, idx, num_elements, data);
@@ -142,9 +142,21 @@ size_t vector_get_elements_size(vector_t *vec)
 
 bool vector_foreach(vector_t *vec, void *capture, bool (*func)(void *capture, void *begin, void *end))
 {
-    if (!require_non_null(vec) || !require_non_null(vec))
+    if (!require_non_null(vec) || !require_non_null(func))
         return false;
     return func(capture, vec->data, vec->data + vec->num_elements * vec->sizeof_element);
+}
+
+size_t vector_count(vector_t *vec, void *capture, bool (*pred)(void *capture, void *it))
+{
+    size_t count = 0;
+    if (require_non_null(vec) && require_non_null(pred)) {
+        void *end = (vec->data + vec->num_elements * vec->sizeof_element);
+        for (void *it = vec->data; it != end; it += vec->sizeof_element) {
+            count += pred(capture, it);
+        }
+    }
+    return count;
 }
 
 bool vector_contains(vector_t *vec, void *needle)

@@ -72,4 +72,6 @@ bool vector_comp(const vector_t *lhs, const vector_t *rhs, bool (*comp)(const vo
 
 bool vector_foreach(vector_t *vec, void *capture, bool (*func)(void *capture, void *begin, void *end));
 
+size_t vector_count(vector_t *vec, void *capture, bool (*pred)(void *capture, void *it));
+
 bool vector_contains(vector_t *vec, void *needle);

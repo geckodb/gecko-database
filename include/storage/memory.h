@@ -18,6 +18,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <defs.h>
+#include <containers/vector.h>
 
 #define __force_packing__        __attribute__((__packed__))
 
@@ -50,6 +51,7 @@ typedef struct __force_packing__ {
         offset_t offset               : 62;
     };
 } persistent_ptr;
+
 
 typedef enum
 {
@@ -129,13 +131,38 @@ typedef enum {
     type_near_ptr
 } ptr_scope_type;
 
+typedef struct {
+    vector_t *page_register;
 
+} buffer_manager_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-page_t *page_create(page_id_t id, size_t size, page_flags flags, size_t free_space, size_t frame_reg);
+buffer_manager_t *buffer_manager_create();
+
+bool buffer_manager_free(buffer_manager_t *manager);
+
+// ---------------------------------------------------------------------------------------------------------------------
+// I N T E R F A C E   F U N C T I O N S
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool page_pool_init(buffer_manager_t *manager, size_t num_pages);
+
+bool page_pool_set(buffer_manager_t *manager, page_id_t id, void *ptr);
+
+bool page_pool_is_loaded(buffer_manager_t *manager, page_id_t id);
+
+bool page_pool_remove(buffer_manager_t *manager, page_id_t id);
+
+void *page_pool_get(buffer_manager_t *manager, page_id_t id);
+
+// ---------------------------------------------------------------------------------------------------------------------
+// I N T E R F A C E   F U N C T I O N S
+// ---------------------------------------------------------------------------------------------------------------------
+
+page_t *page_create(buffer_manager_t *manager, page_id_t id, size_t size, page_flags flags, size_t free_space, size_t frame_reg);
 
 fid_t *frame_create(page_t *page, block_positioning strategy, size_t element_size);
 
