@@ -44,6 +44,7 @@
 #define BADARGNULL      "Illegal argument for function. Parameter '%s' points to null"
 #define BADARGZERO      "Illegal argument for function. Parameter '%s' is zero"
 #define UNEXPECTED      "Unexpected behavior: '%s'"
+#define BADHURRY        "Not implemented: '%s'"
 
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -158,6 +159,7 @@ static inline ptr_target in_page_ptr_get_type(const in_page_ptr *ptr);
 static inline void *in_page_ptr_deref(buffer_manager_t *buffer_manager, const in_page_ptr *ptr);
 static inline zone_t *ptr_cast_zone(buffer_manager_t *buffer_manager, const in_page_ptr *ptr);
 static inline frame_t *ptr_cast_frame(buffer_manager_t *buffer_manager, const in_page_ptr *ptr);
+static inline frame_t *find_frame(buffer_manager_t *manager, const zone_t *zone);
 //static inline void *persistent_ptr_cast_userdata(const page_t *page, in_page_ptr *ptr);
 
 
@@ -293,7 +295,7 @@ page_t *page_create(buffer_manager_t *manager, page_id_t id, size_t size, page_f
     expect_good_malloc(page, NULL);
     page->page_header.page_id = id;
     page->page_header.page_size = size;
-    page->page_header.free_space = free_space_size;
+    page->page_header.free_space = 0;
     page->page_header.flags.is_dirty  = has_flag(flags, page_flag_dirty);
     page->page_header.flags.is_fixed  = has_flag(flags, page_flag_fixed);
     page->page_header.flags.is_locked = has_flag(flags, page_flag_locked);
@@ -441,6 +443,8 @@ bool zone_remove(buffer_manager_t *manager, page_t *page, const zone_t *zone)
         error(err_notincharge);
         return false;
     } else {
+        frame_t *frame = find_frame(manager, zone);
+
         if (in_page_zone_is_lonely) {
         /*
          *  +---------------- THIS PAGE ----------------+       +---------------- THIS PAGE ----------------+
@@ -451,11 +455,8 @@ bool zone_remove(buffer_manager_t *manager, page_t *page, const zone_t *zone)
          *  |     |-------- last -------^               |       |     |------- last -------^                |
          *  +-------------------------------------------+       +-------------------------------------------+
          */
-            frame_t *frame = ptr_cast_frame(manager, &zone->prev);
-            free_store_push(page, ptr_distance(page, zone), ptr_distance(page, zone + frame->elem_size));
             frame->first = null_ptr();
             frame->last = null_ptr();
-
         } else if (in_page_zone_is_head) {
         /*
          *  +---------------- THIS PAGE ----------------------------+       +---------------- THIS PAGE -------------+
@@ -466,7 +467,6 @@ bool zone_remove(buffer_manager_t *manager, page_t *page, const zone_t *zone)
          *  |     |------- last -----------------------^?-------^   |       |     |------- last --------^?-------^   |
          *  +-------------------------------------------------------+       +----------------------------------------+
          */
-            frame_t *frame = ptr_cast_frame(manager, &zone->prev);
             zone_t *next_zone = ptr_cast_zone(manager, &zone->next);
             size_t next_zone_offset = ptr_distance(page, next_zone);
 
@@ -475,7 +475,6 @@ bool zone_remove(buffer_manager_t *manager, page_t *page, const zone_t *zone)
             if (frame->last.offset == next_zone_offset) {
                 in_page_ptr_make_near(&frame->last, page, target_zone, next_zone_offset);
             }
-            
         } else if (in_page_zone_is_tail) {
         /*
         *  +---------------- THIS PAGE -----------------------------+       +---------------- THIS PAGE -------------+
@@ -486,6 +485,9 @@ bool zone_remove(buffer_manager_t *manager, page_t *page, const zone_t *zone)
         *  |     |------- last --------------------^                |       |     |------- last -------^             |
         *  +--------------------------------------------------------+       +----------------------------------------+
         */
+            zone_t *prev_zone = ptr_cast_zone(manager, &zone->prev);
+            frame->last = zone->prev;
+            prev_zone->next = null_ptr();
         } else if (in_page_zone_is_middle) {
          /*
          *  +---------------- THIS PAGE ----------------------------------------+       +---------------- THIS PAGE --------------------------+
@@ -496,7 +498,13 @@ bool zone_remove(buffer_manager_t *manager, page_t *page, const zone_t *zone)
          *  |     |------- last --------------------------------------------^   |       |     |------- last ------------------------------^   |
          *  +-------------------------------------------------------------------+       +-----------------------------------------------------+
          */
+            zone_t *prev_zone = ptr_cast_zone(manager, &zone->prev), *next_zone = ptr_cast_zone(manager, &zone->next);
+            prev_zone->next = zone->next;
+            next_zone->prev = zone->prev;
         } else panic(MSG_BADBRANCH, zone);
+
+        free_store_push(page, ptr_distance(page, zone), ptr_distance(page, ((void *)zone + sizeof(zone_t) + frame->elem_size)));
+        free_store_rebuild(page);
     }
 
     return true;
@@ -969,7 +977,7 @@ static inline void free_store_merge(page_t *page)
     qsort(raw_data, len, sizeof(range_t), comp_range_start);
 
     vector_t *stack = vector_create(sizeof(range_t), len);
-    vector_add(stack, 1, raw_data);
+    vector_add(stack, 1, raw_data); // ... stack is buggy
 
     for (size_t range_idx = 0; range_idx < len; range_idx++) {
         range_t *current_range = (range_t *)(raw_data + range_idx * sizeof(range_t));
@@ -1094,6 +1102,17 @@ static inline frame_t *ptr_cast_frame(buffer_manager_t *buffer_manager, const in
     return (frame_t *) data;
 }
 
+static inline frame_t *find_frame(buffer_manager_t *manager, const zone_t *zone)
+{
+    while (!in_page_ptr_is_null(&zone->prev) && in_page_ptr_get_type(&zone->prev) != target_frame) {
+        zone = ptr_cast_zone(manager, &zone->prev);
+        panic_if(!in_page_ptr_has_scope(&zone->prev, type_near_ptr), BADHURRY, "Traversing over page boundaries "
+                "not implemented!");
+    }
+    return ptr_cast_frame(manager, &zone->prev);
+}
+
+
 /*static inline void *persistent_ptr_cast_userdata(const page_t *page, in_page_ptr *ptr)
 {
     panic_if(in_page_ptr_get_type(ptr) != target_zone, MSG_BADCAST, ptr);
@@ -1133,5 +1152,6 @@ static inline bool free_store_push(page_t *page, offset_t begin, offset_t end)
         entry->end = end;
     }
     panic_if((entry == NULL), UNEXPECTED, "Free store capacity exceeded");
+    page->page_header.free_space += offset_distance(begin, end);
     return (entry != NULL);
 }

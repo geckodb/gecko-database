@@ -31,8 +31,6 @@ typedef uint16_t  u16;
 typedef uint32_t  u32;
 typedef uint64_t  u64;
 
-typedef unsigned char byte_t;
-
 typedef u32 page_id_t;
 typedef u32 frame_id_t;
 

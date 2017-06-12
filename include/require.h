@@ -25,7 +25,6 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 typedef enum {
-    constraint_less_than,
     constraint_less,
     constraint_less_equal,
     constraint_equal,

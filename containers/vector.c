@@ -107,13 +107,18 @@ void *vector_get(vector_t *vec)
 
 void *vector_at(const vector_t *vec, size_t pos)
 {
-    return require_non_null(vec) && require_constraint_size_t(pos, constraint_less, vec->num_elements) ?
-           (vec->data + pos * vec->sizeof_element) : NULL;
+    void *result = NULL;
+    if (require_non_null(vec) && require_constraint_size_t(pos, constraint_less, vec->num_elements))
+       result = (vec->data + pos * vec->sizeof_element);
+    return result;
 }
 
 void *vector_peek(const vector_t *vec)
 {
-    return require_non_null(vec) && require_non_zero(vec->num_elements) ? vector_at(vec, vec->num_elements - 1) : NULL;
+    void *result = NULL;
+    if (require_non_null(vec) && require_non_zero(vec->num_elements))
+        result = vector_at(vec, vec->num_elements - 1);
+    return result;
 }
 
 bool vector_set(vector_t *vec, size_t idx, size_t num_elements, const void *data)

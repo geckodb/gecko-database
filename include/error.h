@@ -38,7 +38,7 @@ void trace_print(FILE *file);
         fprintf(stderr, "# Core panic (%s:%d): ", __FILE__, __LINE__);                                                 \
         fprintf(stderr, msg, args);                                                                                    \
         fflush(stderr);                                                                                                \
-        exit(1);                                                                                                       \
+        abort();                                                                                                       \
     }
 
 #define panic_if(expr, msg, args...)                                                                                   \

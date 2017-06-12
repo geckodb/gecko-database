@@ -74,7 +74,7 @@ bool require_constraint(const void *lhs, relation_constraint constraint, const v
     if (require_non_null(lhs) && require_non_null(rhs) && require_non_null(comp)) {
         int result = comp(lhs, rhs);
         switch (constraint) {
-            case constraint_less_than:     return _check_expected_true(result < 0);
+            case constraint_less:          return _check_expected_true(result < 0);
             case constraint_less_equal:    return _check_expected_true(result <= 0);
             case constraint_equal:         return _check_expected_true(result == 0);
             case constraint_greater_equal: return _check_expected_true(result >= 0);

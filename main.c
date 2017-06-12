@@ -172,22 +172,59 @@ int main(void)
         frame_create(page, positioning_first_nomerge, 2048 /* 2 KiB */);
 
 
+        printf("****************** REMOVE ZONE CASE 1 **********************\n\n");
+        printf("+---------------- THIS PAGE ----------------+       +---------------- THIS PAGE ----------------+\n");
+        printf("|     v--------- frame -----|               |       |                                           |\n");
+        printf("|  +-------+            +--------+          |       |  +-------+                                |\n");
+        printf("|  | FRAME | - first -> | ZONE X | -> NULL  |   =>  |  | FRAME | - first ->   NULL              |\n");
+        printf("|  +-------+            +--------+          |       |  +-------+                                |\n");
+        printf("|     |-------- last -------^               |       |     |------- last -------^                |\n");
+        printf("+-------------------------------------------+       +-------------------------------------------+\n");
         zone_t *zone_1 = zone_create(manager, page, frame_handle, positioning_first_nomerge);
+        zone_memcpy(page, zone_1, "Hello Zone!", sizeof(char) * strlen("Hello Zone!"));
+        page_dump(stdout, manager, page);
+
+        // Remove one and only zone
+        zone_remove(manager, page, zone_1);
+        page_dump(stdout, manager, page);
+
+        printf("****************** REMOVE ZONE CASE 2 **********************\n");
+        zone_1 = zone_create(manager, page, frame_handle, positioning_first_nomerge);
         zone_memcpy(page, zone_1, "Hello Zone!", sizeof(char) * strlen("Hello Zone!"));
         zone_t *zone_2 = zone_create(manager, page, frame_handle, positioning_first_nomerge);
         zone_memcpy(page, zone_2, "Hello Zone 2!", sizeof(char) * strlen("Hello Zone 2!"));
-        zone_t *zone_3 = zone_create(manager, page, frame_handle, positioning_first_nomerge);
-        zone_memcpy(page, zone_3, "Hello Zone 3!", sizeof(char) * strlen("Hello Zone 3!"));
+        page_dump(stdout, manager, page);
 
+        // Remove head only
         zone_remove(manager, page, zone_1);
-        zone_remove(manager, page, zone_2);
-        zone_remove(manager, page, zone_3);
+        page_dump(stdout, manager, page);
 
+        printf("****************** REMOVE ZONE CASE 3 **********************\n");
+        zone_1 = zone_create(manager, page, frame_handle, positioning_first_nomerge);
+        zone_memcpy(page, zone_1, "Hello Zone 1!", sizeof(char) * strlen("Hello Zone 1!"));
+        page_dump(stdout, manager, page);
+
+        // Remove tail only
+        zone_remove(manager, page, zone_1);
+        page_dump(stdout, manager, page);
+
+        printf("****************** REMOVE ZONE CASE 4 **********************\n");
+        zone_1 = zone_create(manager, page, frame_handle, positioning_first_nomerge);
+        zone_memcpy(page, zone_1, "Hello Zone 1!", sizeof(char) * strlen("Hello Zone 1!"));
+        zone_t *zone_3 = zone_create(manager, page, frame_handle, positioning_first_nomerge);
+        zone_memcpy(page, zone_3, "Hello Zone 3!", sizeof(char) * strlen("Hello Zone 2!"));
+        page_dump(stdout, manager, page);
+
+        // Remove middle
+        zone_remove(manager, page, zone_1);
         page_dump(stdout, manager, page);
 
 
-        fid_t x;
-        frame_delete(&x);
+
+
+     //   fid_t x;
+    //    frame_delete(&x);
+        exit(0);
     }
 
 
