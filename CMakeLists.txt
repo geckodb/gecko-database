@@ -10,6 +10,8 @@ set(SOURCE_FILES main.c
         include/storage/attribute.h
         include/storage/rowstore.h
         include/storage/schema.h
+        include/containers/hash_table.h
+        containers/hash_table.c
         include/defs.h
         include/error.h
         include/require.h
