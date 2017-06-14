@@ -19,6 +19,8 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <defs.h>
+#include "macros.h"
+#include "error.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 // D A T A   T Y P E S
@@ -31,6 +33,29 @@ typedef enum {
     constraint_greater_equal,
     constraint_greater
 } relation_constraint;
+
+// ---------------------------------------------------------------------------------------------------------------------
+// M A C R O S
+// ---------------------------------------------------------------------------------------------------------------------
+
+#define require_nonnull(x)                                                                                             \
+    panic_if((x == NULL), BADARG, "parameter '" to_string(x) "' is null");
+
+#define require_impl(fun)                                                                                              \
+    panic_if((fun == NULL), BADCALL, "illegal call to pure virtual function '" to_string(fun) "'");
+
+#define require(expr, msg)                                                                                             \
+    panic_if((!(expr)), BADEXPR, msg);
+
+#define require_not_zero(value)                                                                                        \
+    require(value > 0, to_string(value) " is not allowed to be zero")
+
+#define require_good_malloc(size)                                                                                      \
+    ({                                                                                                                 \
+        void *block = malloc(size);                                                                                    \
+        panic_if((block == NULL), BADMALLOC, "request to allocate '" to_string(size) "' bytes failed");                \
+        block;                                                                                                         \
+    })
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S

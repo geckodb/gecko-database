@@ -1,4 +1,4 @@
-// An implementation of the hash table data structure
+// An implementation of base object for oop
 // Copyright (C) 2017 Marcus Pinnecke
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -12,38 +12,34 @@
 // You should have received a copy of the GNU General Public License along with this program.
 // If not, see <http://www.gnu.org/licenses/>.
 
+#pragma once
+
 // ---------------------------------------------------------------------------------------------------------------------
 // I N C L U D E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <containers/hash_table.h>
+#include <defs.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
-// H E L P E R   P R O T O T Y P E S
+// D A T A   T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
+struct object_t;
+
+typedef void (*object_to_string_fn_t)(void *self, FILE *out);
+
+typedef struct object_t {
+    struct {
+        struct {
+            object_to_string_fn_t to_string_fn;
+        } methods;
+    } public;
+} object_t;
+
 // ---------------------------------------------------------------------------------------------------------------------
-// I N T E R F A C E  I M P L E M E N T A T I O N
+// I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-hash_table_t *hash_table_create();
+void object_create(object_t *obj);
 
-bool hash_table_free(hash_table_t *table);
-
-bool hash_table_clear(hash_table_t *table);
-
-bool hash_table_is_empty(const hash_table_t *table);
-
-bool hash_table_contains_values(const hash_table_t *table, size_t num_values, const void *values);
-
-bool hash_table_contains_keys(const hash_table_t *table, size_t num_keys, const void *keys);
-
-const void *hash_table_get(const hash_table_t *table, const void *key);
-
-vector_t *hash_table_gets(const hash_table_t *table, size_t num_keys, const void *keys);
-
-float hash_table_load_factor(hash_table_t *table);
-
-bool hash_table_put(hash_table_t *table, const void *key, const void *value);
-
-size_t hash_table_num_elements(hash_table_t *table);
+void object_override(object_t *obj, object_to_string_fn_t f);

@@ -7,6 +7,10 @@
 #include <assert.h>
 #include <containers/list.h>
 #include <storage/memory.h>
+#include <object.h>
+#include <containers/dictionary.h>
+#include <containers/dictionaries/hash_tables/linear_hash_table.h>
+#include <containers/dictionaries/hash_table.h>
 
 void test_promise_on_main_thread(const char *string, future_eval_policy policy);
 
@@ -218,6 +222,17 @@ int main(void)
         // Remove middle
         zone_remove(manager, page, zone_1);
         page_dump(stdout, manager, page);
+
+        printf("\n\n\n\n");
+
+
+        printf("\n");
+
+        linear_hash_table_t table;
+        linear_hash_table_construct(&table, hash_code_size_t, hash_fn_mod, 1024, 1024);
+        table.protected.member.base.protected.members.base.protected.members.base.public.methods.to_string_fn(&table, stdout);
+
+
 
 
 
