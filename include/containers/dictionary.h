@@ -41,6 +41,7 @@ typedef struct dictionary_t {
     vector_t *(*gets)(const struct dictionary_t *self, size_t num_keys, const void *keys);
     bool (*remove)(struct dictionary_t *self, size_t num_keys, const void *keys);
     void (*put)(struct dictionary_t *self, const void *key, const void *value);
+    void (*puts)(struct dictionary_t *self, size_t num_elements, const void *keys, const void *values);
     size_t (*num_elements)(struct dictionary_t *self);
     void (*for_each)(struct dictionary_t *self, void *capture, void (*consumer)(void *capture, const void *key, const void *value));
 
@@ -59,5 +60,6 @@ const void *dictionary_get(const dictionary_t *dictionary, const void *key);
 vector_t *dictionary_gets(const dictionary_t *dictionary, size_t num_keys, const void *keys);
 bool dictionary_remove(dictionary_t *dictionary, size_t num_keys, const void *keys);
 void dictionary_put(dictionary_t *dictionary, const void *key, const void *value);
+void dictionary_puts(dictionary_t *dictionary, size_t num_elements, const void *keys, const void *values);
 size_t dictionary_num_elements(dictionary_t *dictionary);
 void dictionary_for_each(dictionary_t *dictionary, void *capture, void (*consumer)(void *capture, const void *key, const void *value));

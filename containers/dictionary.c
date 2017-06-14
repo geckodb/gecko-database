@@ -84,6 +84,11 @@ void dictionary_put(dictionary_t *dictionary, const void *key, const void *value
     delegte_call_wargs(dictionary, put, key, value);
 }
 
+void dictionary_puts(dictionary_t *dictionary, size_t num_elements, const void *keys, const void *values)
+{
+    delegte_call_wargs(dictionary, puts, num_elements, keys, values);
+}
+
 size_t dictionary_num_elements(dictionary_t *dictionary)
 {
     return delegte_call(dictionary, num_elements);

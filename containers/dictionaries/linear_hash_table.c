@@ -91,6 +91,7 @@ const void *this_get(const struct dictionary_t *self, const void *key);
 vector_t *this_gets(const struct dictionary_t *self, size_t num_keys, const void *keys);
 bool this_remove(struct dictionary_t *self, size_t num_keys, const void *keys);
 void this_put(struct dictionary_t *self, const void *key, const void *value);
+void this_puts(struct dictionary_t *self, size_t num_elements, const void *keys, const void *values);
 size_t this_num_elements(struct dictionary_t *self);
 void this_for_each(struct dictionary_t *self, void *capture, void (*consumer)(void *capture, const void *key, const void *value));
 
@@ -129,6 +130,7 @@ dictionary_t *linear_hash_table_create(hash_code_fn_t hash_code, hash_fn_t hash,
         .gets = this_gets,
         .remove = this_remove,
         .put = this_put,
+        .puts = this_puts,
         .num_elements = this_num_elements,
         .for_each = this_for_each,
 
@@ -265,28 +267,41 @@ void this_put(struct dictionary_t *self, const void *key, const void *value)
 {
     require_instanceof_this(self);
     require_nonnull(key && value);
+    this_puts(self, 1, key, value);
+}
+
+void this_puts(struct dictionary_t *self, size_t num_elements, const void *keys, const void *values)
+{
+    require_instanceof_this(self);
+    require_nonnull(keys && values);
+    require_not_zero(num_elements);
 
     hash_table_extra_t *extra = (hash_table_extra_t *) self->extra;
 
-    size_t hash_code = extra->hash_code(self->key_size, key);
-    size_t slot_id = extra->hash(hash_code, extra->num_slots);
-    size_t round_trip_slot_id = (slot_id == 0 ? (extra->num_slots - 1) : ((slot_id - 1) % extra->num_slots));
+    while (num_elements--) {
+        const void *key   = keys + (num_elements * self->key_size);
+        const void *value = values + (num_elements * self->elem_size);
 
-    while ((round_trip_slot_id != slot_id) && !slot_is_empty(extra->slots, slot_id, self->key_size,
-                                                             self->elem_size, extra->empty_indicator)) {
-        slot_id = ((slot_id + 1) % extra->num_slots);
-        extra->counters.num_collisions++;
-    }
+        size_t hash_code = extra->hash_code(self->key_size, key);
+        size_t slot_id = extra->hash(hash_code, extra->num_slots);
+        size_t round_trip_slot_id = (slot_id == 0 ? (extra->num_slots - 1) : ((slot_id - 1) % extra->num_slots));
 
-    if (round_trip_slot_id == slot_id) {
-        rebuild(self, extra);
-        extra->counters.num_rebuilds++;
-        this_put(self, key, value);
-    } else {
-        slot_put(extra->slots, slot_id, self->key_size, self->elem_size, key, value);
-        assert (extra->num_inuse < extra->num_slots);
-        extra->num_inuse++;
-        extra->counters.num_put_calls++;
+        while ((round_trip_slot_id != slot_id) && !slot_is_empty(extra->slots, slot_id, self->key_size,
+                                                                 self->elem_size, extra->empty_indicator)) {
+            slot_id = ((slot_id + 1) % extra->num_slots);
+            extra->counters.num_collisions++;
+        }
+
+        if (round_trip_slot_id == slot_id) {
+            rebuild(self, extra);
+            extra->counters.num_rebuilds++;
+            this_put(self, key, value);
+        } else {
+            slot_put(extra->slots, slot_id, self->key_size, self->elem_size, key, value);
+            assert (extra->num_inuse < extra->num_slots);
+            extra->num_inuse++;
+            extra->counters.num_put_calls++;
+        }
     }
 }
 
