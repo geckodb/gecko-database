@@ -19,57 +19,45 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <defs.h>
-#include <object.h>
 #include <containers/vector.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 // D A T A   T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-struct dictionary_t;
-
-typedef bool (*dictionary_clear_fn_t)(void *self);
-typedef bool (*dictionary_empty_fn_t)(const void *self);
-typedef bool (*dictionary_contains_values_fn_t)(const void *self, size_t num_values, const void *values);
-typedef bool (*dictionary_contains_keys_fn_t)(const void *self, size_t num_keys, const void *keys);
-typedef const void *(*dictionary_get_fn_t)(const void *self, const void *key);
-typedef vector_t *(*dictionary_gets_fn_t)(const void *self, size_t num_keys, const void *keys);
-typedef bool (*dictionary_remove_fn_t)(void *self, size_t num_keys, const void *keys);
-typedef bool (*dictionary_put_fn_t)(void *self, const void *key, const void *value);
-typedef size_t (*dictionary_num_elements_fn_t)(void *self);
+typedef enum {
+    dict_type_linear_hash_table
+} dict_type_tag;
 
 typedef struct dictionary_t {
-    struct {
-        struct {
-            object_t base;
-            size_t elem_size, key_size;
-        } members;
-    } protected;
+    dict_type_tag tag;
+    size_t key_size, elem_size;
 
-    struct {
-        struct {
-            dictionary_clear_fn_t clear;
-            dictionary_empty_fn_t is_empty;
-            dictionary_contains_values_fn_t contains_values;
-            dictionary_contains_keys_fn_t contains_keys;
-            dictionary_get_fn_t get;
-            dictionary_gets_fn_t gets;
-            dictionary_remove_fn_t remove;
-            dictionary_put_fn_t put;
-            dictionary_num_elements_fn_t num_elements;
-        } methods;
-    } public;
+    void (*clear)(struct dictionary_t *self);
+    bool (*empty)(const struct dictionary_t *self);
+    bool (*contains_values)(const struct dictionary_t *self, size_t num_values, const void *values);
+    bool (*contains_keys)(const struct dictionary_t *self, size_t num_keys, const void *keys);
+    const void *(*get)(const struct dictionary_t *self, const void *key);
+    vector_t *(*gets)(const struct dictionary_t *self, size_t num_keys, const void *keys);
+    bool (*remove)(struct dictionary_t *self, size_t num_keys, const void *keys);
+    void (*put)(struct dictionary_t *self, const void *key, const void *value);
+    size_t (*num_elements)(struct dictionary_t *self);
+    void (*for_each)(struct dictionary_t *self, void *capture, void (*consumer)(void *capture, const void *key, const void *value));
+
+    void *extra;
 } dictionary_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-void dictionary_create(dictionary_t *dictionary, size_t key_size, size_t elem_size,
-                       dictionary_clear_fn_t clear, dictionary_empty_fn_t empty,
-                       dictionary_contains_values_fn_t contains_values, dictionary_contains_keys_fn_t contains_keys,
-                       dictionary_get_fn_t get, dictionary_gets_fn_t gets, dictionary_remove_fn_t remove,
-                       dictionary_put_fn_t put, dictionary_num_elements_fn_t num_elements);
-
-void dictionary_override_to_string(dictionary_t *dictionary, object_to_string_fn_t f);
-
+void dictionary_clear(dictionary_t *dictionary);
+bool dictionary_empty(const dictionary_t *dictionary);
+bool dictionary_contains_values(const dictionary_t *dictionary, size_t num_values, const void *values);
+bool dictionary_contains_keys(const dictionary_t *dictionary, size_t num_keys, const void *keys);
+const void *dictionary_get(const dictionary_t *dictionary, const void *key);
+vector_t *dictionary_gets(const dictionary_t *dictionary, size_t num_keys, const void *keys);
+bool dictionary_remove(dictionary_t *dictionary, size_t num_keys, const void *keys);
+void dictionary_put(dictionary_t *dictionary, const void *key, const void *value);
+size_t dictionary_num_elements(dictionary_t *dictionary);
+void dictionary_for_each(dictionary_t *dictionary, void *capture, void (*consumer)(void *capture, const void *key, const void *value));

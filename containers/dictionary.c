@@ -17,70 +17,79 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <containers/dictionary.h>
-#include <error.h>
-#include <msg.h>
-#include <macros.h>
 #include <require.h>
-#include <object.h>
+#include <msg.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
-// N O N - P U B L I C   M E T H O D   P R O T O T Y P E S
+// M A C R O S
 // ---------------------------------------------------------------------------------------------------------------------
 
-void dictionary_to_string(void *self, FILE *out);
+#define delegte_call(dic, fun)                                                                                         \
+    ({                                                                                                                 \
+        require_nonnull(dic);                                                                                          \
+        require_impl(dic->fun);                                                                                        \
+        dic->fun(dic);                                                                                                 \
+    })
+
+#define delegte_call_wargs(dic, fun, ...)                                                                              \
+    ({                                                                                                                 \
+        require_nonnull(dic);                                                                                          \
+        require_impl(dic->fun);                                                                                        \
+        dic->fun(dic,__VA_ARGS__);                                                                                     \
+    })
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E  I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-void dictionary_create(dictionary_t *dictionary, size_t key_size, size_t elem_size,
-                       dictionary_clear_fn_t clear, dictionary_empty_fn_t empty,
-                       dictionary_contains_values_fn_t contains_values, dictionary_contains_keys_fn_t contains_keys,
-                       dictionary_get_fn_t get, dictionary_gets_fn_t gets, dictionary_remove_fn_t remove,
-                       dictionary_put_fn_t put, dictionary_num_elements_fn_t num_elements)
+
+void dictionary_clear(dictionary_t *dictionary)
 {
-    require_nonnull(dictionary);
-    require_not_zero(key_size);
-    require_not_zero(elem_size);
-    *dictionary = (dictionary_t) {
-        .protected = {
-            .members = {
-                .elem_size = elem_size,
-                .key_size = key_size
-            }
-        },
-        .public = {
-            .methods = {
-                .clear = clear,
-                .is_empty = empty,
-                .contains_values = contains_values,
-                .contains_keys = contains_keys,
-                .get = get,
-                .gets = gets,
-                .remove = remove,
-                .put = put,
-                .num_elements = num_elements
-            }
-        }
-    };
-    object_create(&dictionary->protected.members.base);
-    dictionary_override_to_string(dictionary, dictionary_to_string);
+    delegte_call(dictionary, clear);
 }
 
-void dictionary_override_to_string(dictionary_t *dictionary, object_to_string_fn_t f)
+bool dictionary_empty(const dictionary_t *dictionary)
 {
-    require_nonnull(dictionary);
-    require_nonnull(f);
-    object_override(&dictionary->protected.members.base, f);
+    return delegte_call(dictionary, empty);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// N O N - P U B L I C   M E T H O D   P R O T O T Y P E S
-// ---------------------------------------------------------------------------------------------------------------------
-
-void dictionary_to_string(void *self, FILE *out)
+bool dictionary_contains_values(const dictionary_t *dictionary, size_t num_values, const void *values)
 {
-    require_nonnull(self);
-    require_nonnull(out);
-    fprintf(out, "dictionary(adr=%p)", self);
+    return delegte_call_wargs(dictionary, contains_values, num_values, values);
+}
+
+bool dictionary_contains_keys(const dictionary_t *dictionary, size_t num_keys, const void *keys)
+{
+    return delegte_call_wargs(dictionary, contains_keys, num_keys, keys);
+}
+
+const void *dictionary_get(const dictionary_t *dictionary, const void *key)
+{
+    return delegte_call_wargs(dictionary, get, key);
+}
+
+vector_t *dictionary_gets(const dictionary_t *dictionary, size_t num_keys, const void *keys)
+{
+    return delegte_call_wargs(dictionary, gets, num_keys, keys);
+}
+
+bool dictionary_remove(dictionary_t *dictionary, size_t num_keys, const void *keys)
+{
+    return delegte_call_wargs(dictionary, remove, num_keys, keys);
+}
+
+void dictionary_put(dictionary_t *dictionary, const void *key, const void *value)
+{
+    delegte_call_wargs(dictionary, put, key, value);
+}
+
+size_t dictionary_num_elements(dictionary_t *dictionary)
+{
+    return delegte_call(dictionary, num_elements);
+}
+
+void dictionary_for_each(dictionary_t *dictionary, void *capture, void (*consumer)(void *capture, const void *key, const void *value))
+{
+    delegte_call_wargs(dictionary, for_each, capture, consumer);
 }

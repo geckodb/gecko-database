@@ -1,4 +1,4 @@
-// An implementation of base object for oop
+// Several pre-defined functions related to hash operations
 // Copyright (C) 2017 Marcus Pinnecke
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -16,46 +16,23 @@
 // I N C L U D E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <object.h>
-#include <require.h>
-#include <msg.h>
+#include <hashing.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
-// N O N - P U B L I C   M E T H O D   P R O T O T Y P E S
+// H A S H   C O D E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-void object_to_string(void *self, FILE *out);
-
-// ---------------------------------------------------------------------------------------------------------------------
-// I N T E R F A C E  I M P L E M E N T A T I O N
-// ---------------------------------------------------------------------------------------------------------------------
-
-void object_create(object_t *obj)
+size_t hash_code_size_t(size_t key_size, const void *key)
 {
-    require_nonnull(obj);
-    *obj = (struct object_t) {
-        .public = {
-            .methods = {
-                    .to_string_fn = object_to_string
-            }
-        }
-    };
-}
-
-void object_override(object_t *obj, object_to_string_fn_t f)
-{
-    require_nonnull(obj);
-    require_nonnull(f);
-    obj->public.methods.to_string_fn = f;
+    assert (key_size == sizeof(size_t));
+    return *((size_t *)key);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-// N O N - P U B L I C   M E T H O D   P R O T O T Y P E S
+// H A S H   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-void object_to_string(void *self, FILE *out)
+size_t hash_fn_mod(size_t code, size_t upper_bound)
 {
-    require_nonnull(self);
-    require_nonnull(out);
-    fprintf(out, "object(adr=%p)", self);
+    return (code % upper_bound);
 }

@@ -1,4 +1,4 @@
-// An implementation of base object for oop
+// Several pre-defined functions related to hash operations
 // Copyright (C) 2017 Marcus Pinnecke
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -15,31 +15,22 @@
 #pragma once
 
 // ---------------------------------------------------------------------------------------------------------------------
-// I N C L U D E S
-// ---------------------------------------------------------------------------------------------------------------------
-
-#include <defs.h>
-
-// ---------------------------------------------------------------------------------------------------------------------
 // D A T A   T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-struct object_t;
+#include "defs.h"
 
-typedef void (*object_to_string_fn_t)(void *self, FILE *out);
-
-typedef struct object_t {
-    struct {
-        struct {
-            object_to_string_fn_t to_string_fn;
-        } methods;
-    } public;
-} object_t;
+typedef size_t (*hash_code_fn_t)(size_t key_size, const void *key);
+typedef size_t (*hash_fn_t)(size_t code, size_t upper_bound);
 
 // ---------------------------------------------------------------------------------------------------------------------
-// I N T E R F A C E   F U N C T I O N S
+// H A S H   C O D E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-void object_create(object_t *obj);
+size_t hash_code_size_t(size_t key_size, const void *key);
 
-void object_override(object_t *obj, object_to_string_fn_t f);
+// ---------------------------------------------------------------------------------------------------------------------
+// H A S H   F U N C T I O N S
+// ---------------------------------------------------------------------------------------------------------------------
+
+size_t hash_fn_mod(size_t code, size_t upper_bound);

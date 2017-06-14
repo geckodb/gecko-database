@@ -111,6 +111,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named sample_lin_hash
+
+# Build rule for target.
+sample_lin_hash: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 sample_lin_hash
+.PHONY : sample_lin_hash
+
+# fast build rule for target.
+sample_lin_hash/fast:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/build
+.PHONY : sample_lin_hash/fast
+
+#=============================================================================
 # Target rules for targets named myimdb
 
 # Build rule for target.
@@ -129,6 +142,7 @@ async.o: async.c.o
 
 # target to build an object file
 async.c.o:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/async.c.o
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/async.c.o
 .PHONY : async.c.o
 
@@ -138,6 +152,7 @@ async.i: async.c.i
 
 # target to preprocess a source file
 async.c.i:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/async.c.i
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/async.c.i
 .PHONY : async.c.i
 
@@ -147,62 +162,39 @@ async.s: async.c.s
 
 # target to generate assembly for a file
 async.c.s:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/async.c.s
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/async.c.s
 .PHONY : async.c.s
 
-containers/dictionaries/hash_table.o: containers/dictionaries/hash_table.c.o
+containers/dictionaries/linear_hash_table.o: containers/dictionaries/linear_hash_table.c.o
 
-.PHONY : containers/dictionaries/hash_table.o
-
-# target to build an object file
-containers/dictionaries/hash_table.c.o:
-	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/containers/dictionaries/hash_table.c.o
-.PHONY : containers/dictionaries/hash_table.c.o
-
-containers/dictionaries/hash_table.i: containers/dictionaries/hash_table.c.i
-
-.PHONY : containers/dictionaries/hash_table.i
-
-# target to preprocess a source file
-containers/dictionaries/hash_table.c.i:
-	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/containers/dictionaries/hash_table.c.i
-.PHONY : containers/dictionaries/hash_table.c.i
-
-containers/dictionaries/hash_table.s: containers/dictionaries/hash_table.c.s
-
-.PHONY : containers/dictionaries/hash_table.s
-
-# target to generate assembly for a file
-containers/dictionaries/hash_table.c.s:
-	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/containers/dictionaries/hash_table.c.s
-.PHONY : containers/dictionaries/hash_table.c.s
-
-containers/dictionaries/hash_tables/linear_hash_table.o: containers/dictionaries/hash_tables/linear_hash_table.c.o
-
-.PHONY : containers/dictionaries/hash_tables/linear_hash_table.o
+.PHONY : containers/dictionaries/linear_hash_table.o
 
 # target to build an object file
-containers/dictionaries/hash_tables/linear_hash_table.c.o:
-	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/containers/dictionaries/hash_tables/linear_hash_table.c.o
-.PHONY : containers/dictionaries/hash_tables/linear_hash_table.c.o
+containers/dictionaries/linear_hash_table.c.o:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/dictionaries/linear_hash_table.c.o
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/containers/dictionaries/linear_hash_table.c.o
+.PHONY : containers/dictionaries/linear_hash_table.c.o
 
-containers/dictionaries/hash_tables/linear_hash_table.i: containers/dictionaries/hash_tables/linear_hash_table.c.i
+containers/dictionaries/linear_hash_table.i: containers/dictionaries/linear_hash_table.c.i
 
-.PHONY : containers/dictionaries/hash_tables/linear_hash_table.i
+.PHONY : containers/dictionaries/linear_hash_table.i
 
 # target to preprocess a source file
-containers/dictionaries/hash_tables/linear_hash_table.c.i:
-	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/containers/dictionaries/hash_tables/linear_hash_table.c.i
-.PHONY : containers/dictionaries/hash_tables/linear_hash_table.c.i
+containers/dictionaries/linear_hash_table.c.i:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/dictionaries/linear_hash_table.c.i
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/containers/dictionaries/linear_hash_table.c.i
+.PHONY : containers/dictionaries/linear_hash_table.c.i
 
-containers/dictionaries/hash_tables/linear_hash_table.s: containers/dictionaries/hash_tables/linear_hash_table.c.s
+containers/dictionaries/linear_hash_table.s: containers/dictionaries/linear_hash_table.c.s
 
-.PHONY : containers/dictionaries/hash_tables/linear_hash_table.s
+.PHONY : containers/dictionaries/linear_hash_table.s
 
 # target to generate assembly for a file
-containers/dictionaries/hash_tables/linear_hash_table.c.s:
-	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/containers/dictionaries/hash_tables/linear_hash_table.c.s
-.PHONY : containers/dictionaries/hash_tables/linear_hash_table.c.s
+containers/dictionaries/linear_hash_table.c.s:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/dictionaries/linear_hash_table.c.s
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/containers/dictionaries/linear_hash_table.c.s
+.PHONY : containers/dictionaries/linear_hash_table.c.s
 
 containers/dictionary.o: containers/dictionary.c.o
 
@@ -210,6 +202,7 @@ containers/dictionary.o: containers/dictionary.c.o
 
 # target to build an object file
 containers/dictionary.c.o:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/dictionary.c.o
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/containers/dictionary.c.o
 .PHONY : containers/dictionary.c.o
 
@@ -219,6 +212,7 @@ containers/dictionary.i: containers/dictionary.c.i
 
 # target to preprocess a source file
 containers/dictionary.c.i:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/dictionary.c.i
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/containers/dictionary.c.i
 .PHONY : containers/dictionary.c.i
 
@@ -228,6 +222,7 @@ containers/dictionary.s: containers/dictionary.c.s
 
 # target to generate assembly for a file
 containers/dictionary.c.s:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/dictionary.c.s
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/containers/dictionary.c.s
 .PHONY : containers/dictionary.c.s
 
@@ -237,6 +232,7 @@ containers/list.o: containers/list.c.o
 
 # target to build an object file
 containers/list.c.o:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/list.c.o
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/containers/list.c.o
 .PHONY : containers/list.c.o
 
@@ -246,6 +242,7 @@ containers/list.i: containers/list.c.i
 
 # target to preprocess a source file
 containers/list.c.i:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/list.c.i
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/containers/list.c.i
 .PHONY : containers/list.c.i
 
@@ -255,6 +252,7 @@ containers/list.s: containers/list.c.s
 
 # target to generate assembly for a file
 containers/list.c.s:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/list.c.s
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/containers/list.c.s
 .PHONY : containers/list.c.s
 
@@ -264,6 +262,7 @@ containers/vector.o: containers/vector.c.o
 
 # target to build an object file
 containers/vector.c.o:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/vector.c.o
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/containers/vector.c.o
 .PHONY : containers/vector.c.o
 
@@ -273,6 +272,7 @@ containers/vector.i: containers/vector.c.i
 
 # target to preprocess a source file
 containers/vector.c.i:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/vector.c.i
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/containers/vector.c.i
 .PHONY : containers/vector.c.i
 
@@ -282,6 +282,7 @@ containers/vector.s: containers/vector.c.s
 
 # target to generate assembly for a file
 containers/vector.c.s:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/vector.c.s
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/containers/vector.c.s
 .PHONY : containers/vector.c.s
 
@@ -291,6 +292,7 @@ error.o: error.c.o
 
 # target to build an object file
 error.c.o:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/error.c.o
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/error.c.o
 .PHONY : error.c.o
 
@@ -300,6 +302,7 @@ error.i: error.c.i
 
 # target to preprocess a source file
 error.c.i:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/error.c.i
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/error.c.i
 .PHONY : error.c.i
 
@@ -309,8 +312,39 @@ error.s: error.c.s
 
 # target to generate assembly for a file
 error.c.s:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/error.c.s
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/error.c.s
 .PHONY : error.c.s
+
+hashing.o: hashing.c.o
+
+.PHONY : hashing.o
+
+# target to build an object file
+hashing.c.o:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/hashing.c.o
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/hashing.c.o
+.PHONY : hashing.c.o
+
+hashing.i: hashing.c.i
+
+.PHONY : hashing.i
+
+# target to preprocess a source file
+hashing.c.i:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/hashing.c.i
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/hashing.c.i
+.PHONY : hashing.c.i
+
+hashing.s: hashing.c.s
+
+.PHONY : hashing.s
+
+# target to generate assembly for a file
+hashing.c.s:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/hashing.c.s
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/hashing.c.s
+.PHONY : hashing.c.s
 
 main.o: main.c.o
 
@@ -339,39 +373,13 @@ main.c.s:
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/main.c.s
 .PHONY : main.c.s
 
-object.o: object.c.o
-
-.PHONY : object.o
-
-# target to build an object file
-object.c.o:
-	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/object.c.o
-.PHONY : object.c.o
-
-object.i: object.c.i
-
-.PHONY : object.i
-
-# target to preprocess a source file
-object.c.i:
-	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/object.c.i
-.PHONY : object.c.i
-
-object.s: object.c.s
-
-.PHONY : object.s
-
-# target to generate assembly for a file
-object.c.s:
-	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/object.c.s
-.PHONY : object.c.s
-
 require.o: require.c.o
 
 .PHONY : require.o
 
 # target to build an object file
 require.c.o:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/require.c.o
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/require.c.o
 .PHONY : require.c.o
 
@@ -381,6 +389,7 @@ require.i: require.c.i
 
 # target to preprocess a source file
 require.c.i:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/require.c.i
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/require.c.i
 .PHONY : require.c.i
 
@@ -390,8 +399,36 @@ require.s: require.c.s
 
 # target to generate assembly for a file
 require.c.s:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/require.c.s
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/require.c.s
 .PHONY : require.c.s
+
+samples/containers/dictionaries/linear_hash_table_sample.o: samples/containers/dictionaries/linear_hash_table_sample.c.o
+
+.PHONY : samples/containers/dictionaries/linear_hash_table_sample.o
+
+# target to build an object file
+samples/containers/dictionaries/linear_hash_table_sample.c.o:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/samples/containers/dictionaries/linear_hash_table_sample.c.o
+.PHONY : samples/containers/dictionaries/linear_hash_table_sample.c.o
+
+samples/containers/dictionaries/linear_hash_table_sample.i: samples/containers/dictionaries/linear_hash_table_sample.c.i
+
+.PHONY : samples/containers/dictionaries/linear_hash_table_sample.i
+
+# target to preprocess a source file
+samples/containers/dictionaries/linear_hash_table_sample.c.i:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/samples/containers/dictionaries/linear_hash_table_sample.c.i
+.PHONY : samples/containers/dictionaries/linear_hash_table_sample.c.i
+
+samples/containers/dictionaries/linear_hash_table_sample.s: samples/containers/dictionaries/linear_hash_table_sample.c.s
+
+.PHONY : samples/containers/dictionaries/linear_hash_table_sample.s
+
+# target to generate assembly for a file
+samples/containers/dictionaries/linear_hash_table_sample.c.s:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/samples/containers/dictionaries/linear_hash_table_sample.c.s
+.PHONY : samples/containers/dictionaries/linear_hash_table_sample.c.s
 
 storage/attribute.o: storage/attribute.c.o
 
@@ -399,6 +436,7 @@ storage/attribute.o: storage/attribute.c.o
 
 # target to build an object file
 storage/attribute.c.o:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/storage/attribute.c.o
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/storage/attribute.c.o
 .PHONY : storage/attribute.c.o
 
@@ -408,6 +446,7 @@ storage/attribute.i: storage/attribute.c.i
 
 # target to preprocess a source file
 storage/attribute.c.i:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/storage/attribute.c.i
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/storage/attribute.c.i
 .PHONY : storage/attribute.c.i
 
@@ -417,6 +456,7 @@ storage/attribute.s: storage/attribute.c.s
 
 # target to generate assembly for a file
 storage/attribute.c.s:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/storage/attribute.c.s
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/storage/attribute.c.s
 .PHONY : storage/attribute.c.s
 
@@ -426,6 +466,7 @@ storage/memory.o: storage/memory.c.o
 
 # target to build an object file
 storage/memory.c.o:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/storage/memory.c.o
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/storage/memory.c.o
 .PHONY : storage/memory.c.o
 
@@ -435,6 +476,7 @@ storage/memory.i: storage/memory.c.i
 
 # target to preprocess a source file
 storage/memory.c.i:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/storage/memory.c.i
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/storage/memory.c.i
 .PHONY : storage/memory.c.i
 
@@ -444,6 +486,7 @@ storage/memory.s: storage/memory.c.s
 
 # target to generate assembly for a file
 storage/memory.c.s:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/storage/memory.c.s
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/storage/memory.c.s
 .PHONY : storage/memory.c.s
 
@@ -453,6 +496,7 @@ storage/schema.o: storage/schema.c.o
 
 # target to build an object file
 storage/schema.c.o:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/storage/schema.c.o
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/storage/schema.c.o
 .PHONY : storage/schema.c.o
 
@@ -462,6 +506,7 @@ storage/schema.i: storage/schema.c.i
 
 # target to preprocess a source file
 storage/schema.c.i:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/storage/schema.c.i
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/storage/schema.c.i
 .PHONY : storage/schema.c.i
 
@@ -471,6 +516,7 @@ storage/schema.s: storage/schema.c.s
 
 # target to generate assembly for a file
 storage/schema.c.s:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/storage/schema.c.s
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/storage/schema.c.s
 .PHONY : storage/schema.c.s
 
@@ -480,6 +526,7 @@ storage/table.o: storage/table.c.o
 
 # target to build an object file
 storage/table.c.o:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/storage/table.c.o
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/storage/table.c.o
 .PHONY : storage/table.c.o
 
@@ -489,6 +536,7 @@ storage/table.i: storage/table.c.i
 
 # target to preprocess a source file
 storage/table.c.i:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/storage/table.c.i
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/storage/table.c.i
 .PHONY : storage/table.c.i
 
@@ -498,6 +546,7 @@ storage/table.s: storage/table.c.s
 
 # target to generate assembly for a file
 storage/table.c.s:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/storage/table.c.s
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/storage/table.c.s
 .PHONY : storage/table.c.s
 
@@ -507,6 +556,7 @@ types.o: types.c.o
 
 # target to build an object file
 types.c.o:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/types.c.o
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/types.c.o
 .PHONY : types.c.o
 
@@ -516,6 +566,7 @@ types.i: types.c.i
 
 # target to preprocess a source file
 types.c.i:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/types.c.i
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/types.c.i
 .PHONY : types.c.i
 
@@ -525,6 +576,7 @@ types.s: types.c.s
 
 # target to generate assembly for a file
 types.c.s:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/types.c.s
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/types.c.s
 .PHONY : types.c.s
 
@@ -536,16 +588,14 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
+	@echo "... sample_lin_hash"
 	@echo "... myimdb"
 	@echo "... async.o"
 	@echo "... async.i"
 	@echo "... async.s"
-	@echo "... containers/dictionaries/hash_table.o"
-	@echo "... containers/dictionaries/hash_table.i"
-	@echo "... containers/dictionaries/hash_table.s"
-	@echo "... containers/dictionaries/hash_tables/linear_hash_table.o"
-	@echo "... containers/dictionaries/hash_tables/linear_hash_table.i"
-	@echo "... containers/dictionaries/hash_tables/linear_hash_table.s"
+	@echo "... containers/dictionaries/linear_hash_table.o"
+	@echo "... containers/dictionaries/linear_hash_table.i"
+	@echo "... containers/dictionaries/linear_hash_table.s"
 	@echo "... containers/dictionary.o"
 	@echo "... containers/dictionary.i"
 	@echo "... containers/dictionary.s"
@@ -558,15 +608,18 @@ help:
 	@echo "... error.o"
 	@echo "... error.i"
 	@echo "... error.s"
+	@echo "... hashing.o"
+	@echo "... hashing.i"
+	@echo "... hashing.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
-	@echo "... object.o"
-	@echo "... object.i"
-	@echo "... object.s"
 	@echo "... require.o"
 	@echo "... require.i"
 	@echo "... require.s"
+	@echo "... samples/containers/dictionaries/linear_hash_table_sample.o"
+	@echo "... samples/containers/dictionaries/linear_hash_table_sample.i"
+	@echo "... samples/containers/dictionaries/linear_hash_table_sample.s"
 	@echo "... storage/attribute.o"
 	@echo "... storage/attribute.i"
 	@echo "... storage/attribute.s"
