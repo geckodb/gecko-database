@@ -45,11 +45,11 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <defs.h>
-#include <hashing.h>
+#include <hash.h>
 #include <containers/dictionary.h>
 
 typedef struct {
-    size_t num_put_calls, num_collisions, num_locks, num_rebuilds;
+    size_t num_put_calls, num_collisions, num_locks, num_rebuilds, num_put_slotsearch, num_updates;
 } counters_t;
 
 typedef struct
@@ -60,11 +60,16 @@ typedef struct
     counters_t counters;
 } linear_hash_table_info_t;
 
+typedef struct {
+    const void *capture;
+    hash_code_fn_t hash_code;
+} hash_function_t;
+
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-dictionary_t *linear_hash_table_create(hash_code_fn_t hash_code, hash_fn_t hash, size_t key_size, size_t elem_size,
+dictionary_t *linear_hash_table_create(const hash_function_t *hash_function, size_t key_size, size_t elem_size,
                                        size_t num_slots, float grow_factor);
 void linear_hash_table_lock(dictionary_t *dict);
 void linear_hash_table_unlock(dictionary_t *dict);

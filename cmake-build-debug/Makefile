@@ -316,35 +316,35 @@ error.c.s:
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/error.c.s
 .PHONY : error.c.s
 
-hashing.o: hashing.c.o
+hash.o: hash.c.o
 
-.PHONY : hashing.o
+.PHONY : hash.o
 
 # target to build an object file
-hashing.c.o:
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/hashing.c.o
-	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/hashing.c.o
-.PHONY : hashing.c.o
+hash.c.o:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/hash.c.o
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/hash.c.o
+.PHONY : hash.c.o
 
-hashing.i: hashing.c.i
+hash.i: hash.c.i
 
-.PHONY : hashing.i
+.PHONY : hash.i
 
 # target to preprocess a source file
-hashing.c.i:
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/hashing.c.i
-	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/hashing.c.i
-.PHONY : hashing.c.i
+hash.c.i:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/hash.c.i
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/hash.c.i
+.PHONY : hash.c.i
 
-hashing.s: hashing.c.s
+hash.s: hash.c.s
 
-.PHONY : hashing.s
+.PHONY : hash.s
 
 # target to generate assembly for a file
-hashing.c.s:
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/hashing.c.s
-	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/hashing.c.s
-.PHONY : hashing.c.s
+hash.c.s:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/hash.c.s
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/hash.c.s
+.PHONY : hash.c.s
 
 main.o: main.c.o
 
@@ -608,9 +608,9 @@ help:
 	@echo "... error.o"
 	@echo "... error.i"
 	@echo "... error.s"
-	@echo "... hashing.o"
-	@echo "... hashing.i"
-	@echo "... hashing.s"
+	@echo "... hash.o"
+	@echo "... hash.i"
+	@echo "... hash.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

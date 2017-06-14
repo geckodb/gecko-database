@@ -150,7 +150,7 @@
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
-		<Unit filename="/Users/marcus/git/myimdb/hashing.c">
+		<Unit filename="/Users/marcus/git/myimdb/hash.c">
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
@@ -186,7 +186,7 @@
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
-		<Unit filename="/Users/marcus/git/myimdb/include/hashing.h">
+		<Unit filename="/Users/marcus/git/myimdb/include/hash.h">
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>

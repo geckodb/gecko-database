@@ -15,8 +15,8 @@ set(SOURCE_FILES
         containers/dictionary.c
         containers/dictionaries/linear_hash_table.c
         include/macros.h
-        hashing.c
-        include/hashing.h
+        hash.c
+        include/hash.h
         include/msg.h
         include/defs.h
         include/error.h
