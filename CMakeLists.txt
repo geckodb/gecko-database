@@ -3,17 +3,17 @@ project(myimdb)
 
 include_directories("include")
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -std=c11 -Wall -Werror")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -std=c11 -Wall -Werror")
 
 set(SOURCE_FILES
         include/containers/vector.h
         include/storage/attribute.h
         include/storage/rowstore.h
         include/storage/schema.h
-        include/containers/dictionaries/linear_hash_table.h
-        include/containers/dictionary.h
-        containers/dictionary.c
-        containers/dictionaries/linear_hash_table.c
+        include/containers/dictionaries/fixed_linear_hash_table.h
+        include/containers/dict.h
+        containers/dict.c
+        containers/dictionaries/fixed_linear_hash_table.c
         include/macros.h
         hash.c
         include/hash.h
@@ -40,3 +40,4 @@ set(SOURCE_FILES
 
 add_executable(myimdb main.c ${SOURCE_FILES})
 add_executable(sample_lin_hash samples/containers/dictionaries/linear_hash_table_sample.c ${SOURCE_FILES})
+add_executable(sample_linuxwc samples/containers/dictionaries/linear_hash_table_linuxwc.c ${SOURCE_FILES})

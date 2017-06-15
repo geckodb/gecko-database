@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include <defs.h>
 #include <time.h>
-#include <containers/dictionary.h>
-#include <containers/dictionaries/linear_hash_table.h>
+#include <containers/dict.h>
+#include <containers/dictionaries/fixed_linear_hash_table.h>
 
 typedef struct test_data_t {
     size_t a, b, c;
@@ -23,8 +23,8 @@ void run_with_hash_function(hash_function_t *hash_function, const char *hash_fun
     const size_t NUM_ELEMENTS = 4000000 * 2;
     const size_t NUM_SLOTS = NUM_ELEMENTS * 2;
 
-    dictionary_t *dict = linear_hash_table_create(hash_function,
-                                                  sizeof(size_t), sizeof(test_data_t), NUM_SLOTS, GROW_FACTOR);
+    dict_t *dict = fixed_linear_hash_table_create(hash_function,
+                                                  sizeof(size_t), sizeof(test_data_t), NUM_SLOTS, GROW_FACTOR, 0.7f);
 
     clock_t start, stop;
 
@@ -39,10 +39,10 @@ void run_with_hash_function(hash_function_t *hash_function, const char *hash_fun
                 .b = 42,
                 .c = 114
         };
-        dictionary_put(dict, &key, &value);
+        dict_put(dict, &key, &value);
     }*/
     stop = clock();
-    dictionary_clear(dict);
+    dict_clear(dict);
     double put_call_elapsed = (double)(stop - start) * 1000.0 / CLOCKS_PER_SEC;
 
     /*******************************************************************************************************************
@@ -51,7 +51,7 @@ void run_with_hash_function(hash_function_t *hash_function, const char *hash_fun
     size_t *keys = malloc (sizeof(size_t) * NUM_ELEMENTS);
     test_data_t *values = malloc (sizeof(test_data_t) * NUM_ELEMENTS);
 
-    linear_hash_reset_counters(dict);
+    fixed_linear_hash_reset_counters(dict);
     for (int i = 0; i < NUM_ELEMENTS; i++) {
         keys[i] = rand();
         values[i] = (test_data_t) {
@@ -62,7 +62,7 @@ void run_with_hash_function(hash_function_t *hash_function, const char *hash_fun
     }
 
     start = clock();
-    dictionary_puts(dict, NUM_ELEMENTS, keys, values);
+    dict_puts(dict, NUM_ELEMENTS, keys, values);
     stop = clock();
     free (values);
 
@@ -75,7 +75,7 @@ void run_with_hash_function(hash_function_t *hash_function, const char *hash_fun
     double get_call_elapsed_keyfound = 0;
     for (int i = 0; i < NUM_ELEMENTS; i++) {
         start = clock();
-        dictionary_get(dict, &keys[i]);
+        dict_get(dict, &keys[i]);
         stop = clock();
         get_call_elapsed_keyfound += (double)(stop - start) * 1000.0 / CLOCKS_PER_SEC;
     }
@@ -91,7 +91,7 @@ void run_with_hash_function(hash_function_t *hash_function, const char *hash_fun
     for (int i = 0; i < NUM_ELEMENTS; i++) {
         size_t key = rand();
         start = clock();
-        dictionary_get(dict, &key);
+        dict_get(dict, &key);
         stop = clock();
         get_call_elapsed_nokey += (double)(stop - start) * 1000.0 / CLOCKS_PER_SEC;
     }
@@ -105,7 +105,7 @@ void run_with_hash_function(hash_function_t *hash_function, const char *hash_fun
      ******************************************************************************************************************/
 
     start = clock();
-    vector_t *gets_result1 = dictionary_gets(dict, NUM_ELEMENTS, keys);
+    vector_t *gets_result1 = dict_gets(dict, NUM_ELEMENTS, keys);
     stop = clock();
     vector_free(gets_result1);
     double gets_call_elapsed_keyfound = (double)(stop - start) * 1000.0 / CLOCKS_PER_SEC;
@@ -121,7 +121,7 @@ void run_with_hash_function(hash_function_t *hash_function, const char *hash_fun
     }
 
     start = clock();
-    vector_t *gets_result2 = dictionary_gets(dict, NUM_ELEMENTS, other_keys);
+    vector_t *gets_result2 = dict_gets(dict, NUM_ELEMENTS, other_keys);
     stop = clock();
     vector_free(gets_result2);
     double gets_call_elapsed_nokey = (double)(stop - start) * 1000.0 / CLOCKS_PER_SEC;
@@ -141,7 +141,7 @@ void run_with_hash_function(hash_function_t *hash_function, const char *hash_fun
      ******************************************************************************************************************/
 
     linear_hash_table_info_t info;
-    linear_hash_table_info(dict, &info);
+    fixed_linear_hash_table_info(dict, &info);
 
     printf("%s;%zu;%zu;%0.2f;%0.2f;%0.2f;%zu;%zu;%zu;%zu;%0.4f;%0.4f;%zu;%zu;%zu;%zu;%zu;%zu;%zu;%zu;%zu;%0.8f;%0.8f;%0.8f;%0.8f;%0.8f;%0.8f\n",
            hash_function_name,
@@ -157,7 +157,7 @@ void run_with_hash_function(hash_function_t *hash_function, const char *hash_fun
 
            gets_call_elapsed_keyfound, gets_call_elapsed_nokey);
 
-    linear_hash_table_free(dict);
+    fixed_linear_hash_table_free(dict);
 }
 
 int main(void)

@@ -7,8 +7,8 @@
 #include <assert.h>
 #include <containers/list.h>
 #include <storage/memory.h>
-#include <containers/dictionary.h>
-#include <containers/dictionaries/linear_hash_table.h>
+#include <containers/dict.h>
+#include <containers/dictionaries/fixed_linear_hash_table.h>
 
 void test_promise_on_main_thread(const char *string, future_eval_policy policy);
 

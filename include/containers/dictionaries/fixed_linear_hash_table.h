@@ -46,7 +46,7 @@
 
 #include <defs.h>
 #include <hash.h>
-#include <containers/dictionary.h>
+#include <containers/dict.h>
 
 typedef struct {
     size_t num_put_calls, num_collisions, num_locks, num_rebuilds, num_put_slotsearch, num_updates,
@@ -71,12 +71,12 @@ typedef struct {
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-dictionary_t *linear_hash_table_create(const hash_function_t *hash_function, size_t key_size, size_t elem_size,
-                                       size_t num_slots, float grow_factor);
-void linear_hash_table_lock(dictionary_t *dict);
-void linear_hash_table_unlock(dictionary_t *dict);
-void linear_hash_table_free(dictionary_t *dict);
-void linear_hash_reset_counters(dictionary_t *dict);
-void linear_hash_table_info(dictionary_t *dict, linear_hash_table_info_t *info);
+dict_t *fixed_linear_hash_table_create(const hash_function_t *hash_function, size_t key_size, size_t elem_size,
+                                       size_t num_slots, float grow_factor, float max_load_factor);
+void fixed_linear_hash_table_lock(dict_t *dict);
+void fixed_linear_hash_table_unlock(dict_t *dict);
+void fixed_linear_hash_table_free(dict_t *dict);
+void fixed_linear_hash_reset_counters(dict_t *dict);
+void fixed_linear_hash_table_info(dict_t *dict, linear_hash_table_info_t *info);
 
 

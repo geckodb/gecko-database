@@ -16,7 +16,7 @@
 // I N C L U D E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <containers/dictionary.h>
+#include <containers/dict.h>
 #include <require.h>
 #include <msg.h>
 
@@ -44,57 +44,58 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 
-void dictionary_clear(dictionary_t *dictionary)
+void dict_clear(dict_t *dict)
 {
-    delegte_call(dictionary, clear);
+    delegte_call(dict, clear);
 }
 
-bool dictionary_empty(const dictionary_t *dictionary)
+bool dict_empty(const dict_t *dict)
 {
-    return delegte_call(dictionary, empty);
+    return delegte_call(dict, empty);
 }
 
-bool dictionary_contains_values(const dictionary_t *dictionary, size_t num_values, const void *values)
+bool dict_contains_values(const dict_t *dict, size_t num_values, const void *values)
 {
-    return delegte_call_wargs(dictionary, contains_values, num_values, values);
+    return delegte_call_wargs(dict, contains_values, num_values, values);
 }
 
-bool dictionary_contains_keys(const dictionary_t *dictionary, size_t num_keys, const void *keys)
+bool dict_contains_keys(const dict_t *dict, size_t num_keys, const void *keys)
 {
-    return delegte_call_wargs(dictionary, contains_keys, num_keys, keys);
+    return delegte_call_wargs(dict, contains_keys, num_keys, keys);
 }
 
-const void *dictionary_get(const dictionary_t *dictionary, const void *key)
+const void *dict_get(const dict_t *dict, const void *key)
 {
-    return delegte_call_wargs(dictionary, get, key);
+    return delegte_call_wargs(dict, get, key);
 }
 
-vector_t *dictionary_gets(const dictionary_t *dictionary, size_t num_keys, const void *keys)
+vector_t *dict_gets(const dict_t *dict, size_t num_keys, const void *keys)
 {
-    return delegte_call_wargs(dictionary, gets, num_keys, keys);
+    return delegte_call_wargs(dict, gets, num_keys, keys);
 }
 
-bool dictionary_remove(dictionary_t *dictionary, size_t num_keys, const void *keys)
+bool dict_remove(dict_t *dict, size_t num_keys, const void *keys)
 {
-    return delegte_call_wargs(dictionary, remove, num_keys, keys);
+    return delegte_call_wargs(dict, remove, num_keys, keys);
 }
 
-void dictionary_put(dictionary_t *dictionary, const void *key, const void *value)
+void dict_put(dict_t *dict, const void *key, const void *value)
 {
-    delegte_call_wargs(dictionary, put, key, value);
+    delegte_call_wargs(dict, put, key, value);
 }
 
-void dictionary_puts(dictionary_t *dictionary, size_t num_elements, const void *keys, const void *values)
+void dict_puts(dict_t *dict, size_t num_elements, const void *keys, const void *values)
 {
-    delegte_call_wargs(dictionary, puts, num_elements, keys, values);
+    delegte_call_wargs(dict, puts, num_elements, keys, values);
 }
 
-size_t dictionary_num_elements(dictionary_t *dictionary)
+size_t dict_num_elements(dict_t *dict)
 {
-    return delegte_call(dictionary, num_elements);
+    return delegte_call(dict, num_elements);
 }
 
-void dictionary_for_each(dictionary_t *dictionary, void *capture, void (*consumer)(void *capture, const void *key, const void *value))
+void dict_for_each(dict_t *dict, void *capture,
+                   void (*consumer)(void *capture, const void *key, const void *value))
 {
-    delegte_call_wargs(dictionary, for_each, capture, consumer);
+    delegte_call_wargs(dict, for_each, capture, consumer);
 }
