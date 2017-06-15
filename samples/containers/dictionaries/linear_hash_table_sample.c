@@ -20,7 +20,7 @@ void print_to_stdout(void *counter, const void *key, const void *value)
 
 void run_with_hash_function(hash_function_t *hash_function, const char *hash_function_name)
 {
-    const size_t NUM_ELEMENTS = 40000000 * 2;
+    const size_t NUM_ELEMENTS = 4000000 * 2;
     const size_t NUM_SLOTS = NUM_ELEMENTS * 2;
 
     dictionary_t *dict = linear_hash_table_create(hash_function,
@@ -64,20 +64,98 @@ void run_with_hash_function(hash_function_t *hash_function, const char *hash_fun
     start = clock();
     dictionary_puts(dict, NUM_ELEMENTS, keys, values);
     stop = clock();
-    free (keys);
     free (values);
 
     double puts_call_elapsed = (double)(stop - start) * 1000.0 / CLOCKS_PER_SEC;
 
+    /*******************************************************************************************************************
+     * MEASURE GET CALL TIME
+     ******************************************************************************************************************/
+
+    double get_call_elapsed_keyfound = 0;
+    for (int i = 0; i < NUM_ELEMENTS; i++) {
+        start = clock();
+        dictionary_get(dict, &keys[i]);
+        stop = clock();
+        get_call_elapsed_keyfound += (double)(stop - start) * 1000.0 / CLOCKS_PER_SEC;
+    }
+
+    double multi_get_call_elapsed_keyfound = get_call_elapsed_keyfound;
+    get_call_elapsed_keyfound = get_call_elapsed_keyfound / (double)NUM_ELEMENTS;
+
+    /*******************************************************************************************************************
+     * MEASURE GET CALL TIME (NO KEY FOUND)
+     ******************************************************************************************************************/
+
+    double get_call_elapsed_nokey = 0;
+    for (int i = 0; i < NUM_ELEMENTS; i++) {
+        size_t key = rand();
+        start = clock();
+        dictionary_get(dict, &key);
+        stop = clock();
+        get_call_elapsed_nokey += (double)(stop - start) * 1000.0 / CLOCKS_PER_SEC;
+    }
+
+    double multi_get_call_elapsed_nokey = get_call_elapsed_nokey;
+    get_call_elapsed_nokey = get_call_elapsed_nokey / (double) NUM_ELEMENTS;
+
+
+    /*******************************************************************************************************************
+     * MEASURE GETS CALL TIME
+     ******************************************************************************************************************/
+
+    start = clock();
+    vector_t *gets_result1 = dictionary_gets(dict, NUM_ELEMENTS, keys);
+    stop = clock();
+    vector_free(gets_result1);
+    double gets_call_elapsed_keyfound = (double)(stop - start) * 1000.0 / CLOCKS_PER_SEC;
+
+
+    /*******************************************************************************************************************
+     * MEASURE GETS CALL TIME (NO KEY FOUND)
+     ******************************************************************************************************************/
+
+    size_t *other_keys = malloc (sizeof(size_t) * NUM_ELEMENTS);
+    for (int i = 0; i < NUM_ELEMENTS; i++) {
+        other_keys[i] = rand();
+    }
+
+    start = clock();
+    vector_t *gets_result2 = dictionary_gets(dict, NUM_ELEMENTS, other_keys);
+    stop = clock();
+    vector_free(gets_result2);
+    double gets_call_elapsed_nokey = (double)(stop - start) * 1000.0 / CLOCKS_PER_SEC;
+
+
+
+
+
+    /*******************************************************************************************************************
+     * CLEANUP
+     ******************************************************************************************************************/
+    free (keys);
+    free (other_keys);
+
+    /*******************************************************************************************************************
+     * SAVE MEASUREMENTS
+     ******************************************************************************************************************/
+
     linear_hash_table_info_t info;
     linear_hash_table_info(dict, &info);
 
-    printf("%s;%zu;%zu;%0.2f;%0.2f;%0.2f;%zu;%zu;%zu;%zu;%0.4f;%0.4f;%zu;%zu\n",
+    printf("%s;%zu;%zu;%0.2f;%0.2f;%0.2f;%zu;%zu;%zu;%zu;%0.4f;%0.4f;%zu;%zu;%zu;%zu;%zu;%zu;%zu;%zu;%zu;%0.8f;%0.8f;%0.8f;%0.8f;%0.8f;%0.8f\n",
            hash_function_name,
            info.num_slots_inuse, info.num_slots_free, info.load_factor,
            info.overhead_size / 1024.0 / 1024.0, info.user_data_size / 1024.0 / 1024.0,
            info.counters.num_locks, info.counters.num_collisions, info.counters.num_rebuilds, info.counters.num_put_calls,
-           put_call_elapsed, puts_call_elapsed, info.counters.num_put_slotsearch, info.counters.num_updates);
+           put_call_elapsed, puts_call_elapsed, info.counters.num_put_slotsearch, info.counters.num_updates,
+
+           info.counters.num_get_foundkey, info.counters.num_get_slotdisplaced, info.counters.num_get_nosuchkey_fullsearch,
+           info.counters.num_get_nosuchkey, info.counters.num_test_slot, info.counters.num_slot_get_key,
+           info.counters.num_slot_get_value, get_call_elapsed_keyfound, get_call_elapsed_nokey,
+           multi_get_call_elapsed_keyfound, multi_get_call_elapsed_nokey,
+
+           gets_call_elapsed_keyfound, gets_call_elapsed_nokey);
 
     linear_hash_table_free(dict);
 }
@@ -88,7 +166,10 @@ int main(void)
 
     printf("hash_fn;slots_inuse;slots_free;load_factor;footprint_overhead_mib;footprint_user_mib;num_locks;num_collisions;"
                    "num_rebuilds;num_putcalls;elapsed_put_calls_ms;elapsed_puts_calls_ms;num_put_slotsearch;"
-                   "num_updates\n");
+                   "num_updates;num_get_foundkey;num_get_slotdisplaced;num_get_nosuchkey_fullsearch;"
+                   "num_get_nosuchkey;num_test_slot;num_slot_get_key;num_slot_get_value;get_call_elapsed_keyfound;"
+                   "get_call_elapsed_nokey;multi_get_call_elapsed_keyfound;multi_get_call_elapsed_nokey;"
+                   "gets_call_elapsed_keyfound;gets_call_elapsed_nokey\n");
 
     run_with_hash_function(&(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen}, "jenkins");
     run_with_hash_function(&(hash_function_t) {.capture = NULL, .hash_code = hash_code_identity_size_t}, "identity");

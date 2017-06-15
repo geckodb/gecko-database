@@ -49,7 +49,9 @@
 #include <containers/dictionary.h>
 
 typedef struct {
-    size_t num_put_calls, num_collisions, num_locks, num_rebuilds, num_put_slotsearch, num_updates;
+    size_t num_put_calls, num_collisions, num_locks, num_rebuilds, num_put_slotsearch, num_updates,
+           num_get_foundkey, num_get_slotdisplaced, num_get_nosuchkey_fullsearch, num_get_nosuchkey,
+            num_test_slot, num_slot_get_key, num_slot_get_value;
 } counters_t;
 
 typedef struct

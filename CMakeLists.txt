@@ -3,7 +3,7 @@ project(myimdb)
 
 include_directories("include")
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -std=c11 -Wall -Werror")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -std=c11 -Wall -Werror")
 
 set(SOURCE_FILES
         include/containers/vector.h
