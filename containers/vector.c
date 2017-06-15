@@ -19,6 +19,7 @@
 #include <error.h>
 #include <require.h>
 #include <containers/vector.h>
+#include <math.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 // H E L P E R   P R O T O T Y P E S
@@ -283,7 +284,7 @@ static bool _outside_bounds_enabled(vector_t *vec, size_t idx, size_t num_elemen
 bool _realloc_vector(vector_t *vec, size_t new_num_elements)
 {
     while (new_num_elements >= vec->element_capacity)
-        vec->element_capacity *= vec->grow_factor;
+        vec->element_capacity = ceil(vec->element_capacity * vec->grow_factor);
 
     if ((vec->data = realloc(vec->data, vec->element_capacity * vec->sizeof_element)) == NULL) {
         error(err_bad_realloc);
