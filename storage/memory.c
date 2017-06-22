@@ -22,6 +22,7 @@
 #include <containers/vector.h>
 #include <macros.h>
 #include <msg.h>
+#include <require.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 // C O N S T A N T S
@@ -187,16 +188,25 @@ buffer_manager_t *buffer_manager_create()
 {
     buffer_manager_t *result = malloc(sizeof(buffer_manager_t));
     expect_good_malloc(result, NULL);
-    result->page_register = fixed_linear_hash_table_create(&(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen},
+    result->page_hot_store = fixed_linear_hash_table_create(&(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen},
                                                            sizeof(page_id_t), sizeof(void*), PAGEPOOL_INITCAP,
                                                            PAGEPOOL_GROW_FACTOR, PAGEPOOL_MAX_FILL_FAC);
-    expect_non_null(result->page_register, NULL);
+    expect_non_null(result->page_hot_store, NULL);
     return result;
 }
 
 block_ptr *buffer_manager_block_alloc(buffer_manager_t *manager, size_t size, size_t nzones)
 {
-    panic(NOTIMPLEMENTED, to_string(buffer_manager_block_alloc));   // TODO: Implement
+    expect_non_null(manager, NULL);
+    expect_greater(size, 0, NULL);
+    expect_greater(nzones, 0, NULL);
+
+    block_ptr *result = require_good_malloc(sizeof(block_ptr));
+    frame_id_t frame_id;
+    page_id_t page_id;
+
+
+
     return NULL;
 }
 
@@ -261,8 +271,8 @@ void buffer_manager_zone_set(zone_ptr *dst, size_t offset, int value, size_t num
 bool buffer_manager_free(buffer_manager_t *manager)
 {
     expect_non_null(manager, false);
-    expect_non_null(manager->page_register, false);
-    bool free_page_reg = dict_free(manager->page_register);
+    expect_non_null(manager->page_hot_store, false);
+    bool free_page_reg = dict_free(manager->page_hot_store);
     if (free_page_reg) {
         free (manager);
     }
@@ -289,41 +299,41 @@ bool buffer_manager_free(buffer_manager_t *manager)
     return (*((void **) it) == NULL);
 }*/
 
-bool page_pool_init(buffer_manager_t *manager)
+bool page_hot_store_init(buffer_manager_t *manager)
 {
     panic_if((manager == NULL), BADARGNULL, to_string(manager));
     panic_if((manager == NULL), BADARGZERO, to_string(num_pages));
-    panic_if(!dict_empty(manager->page_register), BADPOOLINIT, manager);
+    panic_if(!dict_empty(manager->page_hot_store), BADPOOLINIT, manager);
     return true;
 }
 
-void page_pool_set(buffer_manager_t *manager, page_id_t id, void *ptr)
+void page_hot_store_set(buffer_manager_t *manager, page_id_t id, void *ptr)
 {
     panic_if((manager == NULL), BADARGNULL, to_string(manager));
-    panic_if((manager->page_register == NULL), UNEXPECTED, "page register in manager");
-    panic_if((page_pool_is_loaded(manager, id)), UNEXPECTED, "already set");
-    dict_put(manager->page_register, &id, &ptr);
+    panic_if((manager->page_hot_store == NULL), UNEXPECTED, "page register in manager");
+    panic_if((page_hot_store_has(manager, id)), UNEXPECTED, "already set");
+    dict_put(manager->page_hot_store, &id, &ptr);
 }
 
-bool page_pool_is_loaded(buffer_manager_t *manager, page_id_t id)
+bool page_hot_store_has(buffer_manager_t *manager, page_id_t id)
 {
-    return (page_pool_get(manager, id) != NULL);
+    return (page_hot_store_get(manager, id) != NULL);
 }
 
-bool page_pool_remove(buffer_manager_t *manager, page_id_t id)
-{
-    panic_if((manager == NULL), BADARGNULL, to_string(manager));
-    panic_if((manager->page_register == NULL), UNEXPECTED, "page register in manager");
-    panic_if (!(dict_contains_key(manager->page_register, &id)), BADPAGEID, id);
-    return dict_remove(manager->page_register, 1, &id);
-}
-
-void *page_pool_get(buffer_manager_t *manager, page_id_t id)
+bool page_hot_store_remove(buffer_manager_t *manager, page_id_t id)
 {
     panic_if((manager == NULL), BADARGNULL, to_string(manager));
-    panic_if((manager->page_register == NULL), UNEXPECTED, "page register in manager");
+    panic_if((manager->page_hot_store == NULL), UNEXPECTED, "page register in manager");
+    panic_if (!(dict_contains_key(manager->page_hot_store, &id)), BADPAGEID, id);
+    return dict_remove(manager->page_hot_store, 1, &id);
+}
 
-    const void *page_ptr = dict_get(manager->page_register, &id);
+void *page_hot_store_get(buffer_manager_t *manager, page_id_t id)
+{
+    panic_if((manager == NULL), BADARGNULL, to_string(manager));
+    panic_if((manager->page_hot_store == NULL), UNEXPECTED, "page register in manager");
+
+    const void *page_ptr = dict_get(manager->page_hot_store, &id);
     //panic_if ((page_ptr == NULL), BADPAGEID, id);
     void **element = (void **)page_ptr;
     return (element != NULL ? *element : NULL);
@@ -366,7 +376,7 @@ page_t *page_create(buffer_manager_t *manager, page_id_t id, size_t size, page_f
     frame_store_init(page, frame_reg);
     free_store_push(page, free_space_begin_offset, free_space_end_offset);
 
-    page_pool_set(manager, id, page);
+    page_hot_store_set(manager, id, page);
 
     return page;
 }
@@ -1142,8 +1152,8 @@ static inline void *in_page_ptr_deref(buffer_manager_t *buffer_manager, const in
 {
     panic_if((buffer_manager == NULL), BADARGNULL, to_string(buffer_manager));
     panic_if((ptr == NULL), BADARGNULL, to_string(ptr));
-    panic_if((buffer_manager->page_register == NULL), UNEXPECTED, "page register hash table is null");
-    void *page_base_ptr = page_pool_get(buffer_manager, ptr->page_id);
+    panic_if((buffer_manager->page_hot_store == NULL), UNEXPECTED, "page register hash table is null");
+    void *page_base_ptr = page_hot_store_get(buffer_manager, ptr->page_id);
     panic_if((page_base_ptr == NULL), UNEXPECTED, "page base pointer is not allowed to be null");
     return (page_base_ptr + ptr->offset);
 }

@@ -122,7 +122,19 @@ typedef struct {
 } fid_t;
 
 typedef struct {
-    dict_t *page_register;
+    void (*push)();
+    void (*fetch)();
+} page_cold_store_t;
+
+typedef struct {
+    int reserved;
+} page_anticache_t;
+
+typedef struct {
+    dict_t *page_hot_store;
+    page_anticache_t page_anticache;
+    page_cold_store_t page_cold_store;
+
 } buffer_manager_t;
 
 typedef enum {
@@ -185,15 +197,51 @@ bool buffer_manager_free(buffer_manager_t *manager);
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool page_pool_init(buffer_manager_t *manager);
+bool page_hot_store_init(buffer_manager_t *manager);
 
-void page_pool_set(buffer_manager_t *manager, page_id_t id, void *ptr);
+void page_hot_store_set(buffer_manager_t *manager, page_id_t id, void *ptr);
 
-bool page_pool_is_loaded(buffer_manager_t *manager, page_id_t id);
+bool page_hot_store_has(buffer_manager_t *manager, page_id_t id);
 
-bool page_pool_remove(buffer_manager_t *manager, page_id_t id);
+bool page_hot_store_remove(buffer_manager_t *manager, page_id_t id);
 
-void *page_pool_get(buffer_manager_t *manager, page_id_t id);
+void *page_hot_store_get(buffer_manager_t *manager, page_id_t id);
+
+// ---------------------------------------------------------------------------------------------------------------------
+// I N T E R F A C E   F U N C T I O N S
+// ---------------------------------------------------------------------------------------------------------------------
+
+// Note: no "flush list"
+
+void page_anticache_init(buffer_manager_t *manager);
+
+void page_anticache_page_new(buffer_manager_t *manager, size_t size);
+
+void page_anticache_page_delete(buffer_manager_t *manager, page_t *page);
+
+void page_anticache_free_list_push(buffer_manager_t *manager, page_t *page);
+
+void page_anticache_heat_list_update(buffer_manager_t *manager, page_t *page);
+
+page_t *page_anticache_free_list_pop(buffer_manager_t *manager);
+
+void page_anticache_page_freeze(buffer_manager_t *manager, page_t *page);
+
+void page_anticache_page_freeze_all(buffer_manager_t *manager);
+
+void page_anticache_free(buffer_manager_t *manager);
+
+// ---------------------------------------------------------------------------------------------------------------------
+// I N T E R F A C E   F U N C T I O N S
+// ---------------------------------------------------------------------------------------------------------------------
+
+void page_cold_store_init(buffer_manager_t *manager);
+
+void page_cold_store_clear(buffer_manager_t *manager);
+
+void *page_cold_store_fetch(buffer_manager_t *manager, page_id_t id);
+
+void page_cold_store_push(buffer_manager_t *manager, page_t *page);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
