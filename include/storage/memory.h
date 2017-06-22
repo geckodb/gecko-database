@@ -42,6 +42,7 @@ typedef uint64_t  u64;
 
 typedef u32 page_id_t;
 typedef u32 frame_id_t;
+typedef u32 zone_id_t;
 
 typedef size_t offset_t;
 
@@ -120,6 +121,10 @@ typedef struct {
     frame_id_t frame_id;
 } fid_t;
 
+typedef struct {
+    dict_t *page_register;
+} buffer_manager_t;
+
 typedef enum {
     positioning_first_nomerge,
     positioning_first_merge,
@@ -140,15 +145,39 @@ typedef enum {
 } ptr_scope_type;
 
 typedef struct {
-    dict_t *page_register;
+    buffer_manager_t *manager;
+    page_id_t page_id;
+    frame_id_t frame_id;
+} block_ptr;
 
-} buffer_manager_t;
+typedef struct {
+    buffer_manager_t *manager;
+    page_id_t page_id;
+    frame_id_t frame_id;
+    in_page_ptr zone;
+} zone_ptr;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
 buffer_manager_t *buffer_manager_create();
+
+block_ptr *buffer_manager_block_alloc(buffer_manager_t *manager, size_t size, size_t nzones);
+void buffer_manager_block_free(block_ptr *ptr);
+
+zone_id_t buffer_manager_block_nextzone(block_ptr *ptr);
+void buffer_manager_block_setzones(block_ptr *ptr, zone_id_t last_zone);
+void buffer_manager_block_rmzone(block_ptr *ptr, zone_id_t zone);
+
+zone_ptr *buffer_manager_block_seek(block_ptr *ptr, zone_id_t zone_id);
+zone_ptr *buffer_manager_block_open(block_ptr *ptr);
+void buffer_manager_block_next(zone_ptr *ptr);
+void buffer_manager_block_close(block_ptr *ptr);
+
+void buffer_manager_zone_read(zone_ptr *zone, void *capture, void (*consumer) (void *capture, const void *data));
+void buffer_manager_zone_cpy(zone_ptr *dst, size_t offset, const void *src, size_t num);
+void buffer_manager_zone_set(zone_ptr *dst, size_t offset, int value, size_t num);
 
 bool buffer_manager_free(buffer_manager_t *manager);
 

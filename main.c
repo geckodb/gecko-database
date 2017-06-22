@@ -31,6 +31,15 @@ void *sample_promise_print(promise_result *return_value, const void *capture) {
     }
 }
 
+typedef struct {
+    size_t a,b,c;
+} hardcoded_tuple_t;
+
+void print_to_console(void *caputure, const void *data) {
+    hardcoded_tuple_t *tuple = (hardcoded_tuple_t *) data;
+    printf("tuple (%zu, %zu, %zu)\n", tuple->a, tuple->b, tuple->c);
+}
+
 int main(void)
 {
     for (int i = 0; i < 1000; i++) {
@@ -225,6 +234,35 @@ int main(void)
 
 
         printf("\n");
+
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // B U F F E R   M A N A G E R   T E S T
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        buffer_manager_t *buffer_manager = buffer_manager_create();
+        block_ptr *block = buffer_manager_block_alloc(buffer_manager, 100 * sizeof(hardcoded_tuple_t), 50);
+        zone_ptr *zone_cursor = buffer_manager_block_open(block);
+        for (int j = 0; j < 50; j++) {
+            for (int i = 0; i < 100; i++) {
+                hardcoded_tuple_t my_tuple = {
+                        .a = rand(),
+                        .b = rand(),
+                        .c = rand()
+                };
+                buffer_manager_zone_cpy(zone_cursor, i * sizeof(hardcoded_tuple_t), &my_tuple, 1);
+            }
+            buffer_manager_block_next(zone_cursor);
+        }
+        buffer_manager_block_close(block);
+
+        zone_cursor = buffer_manager_block_open(block);
+        while (zone_cursor != NULL) {
+            buffer_manager_zone_read(zone_cursor, NULL, print_to_console);
+            buffer_manager_block_next(zone_cursor);
+        }
+
+        buffer_manager_block_close(block);
+
 
 
 

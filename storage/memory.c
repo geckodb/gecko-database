@@ -21,6 +21,7 @@
 #include <limits.h>
 #include <containers/vector.h>
 #include <macros.h>
+#include <msg.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 // C O N S T A N T S
@@ -191,6 +192,70 @@ buffer_manager_t *buffer_manager_create()
                                                            PAGEPOOL_GROW_FACTOR, PAGEPOOL_MAX_FILL_FAC);
     expect_non_null(result->page_register, NULL);
     return result;
+}
+
+block_ptr *buffer_manager_block_alloc(buffer_manager_t *manager, size_t size, size_t nzones)
+{
+    panic(NOTIMPLEMENTED, to_string(buffer_manager_block_alloc));   // TODO: Implement
+    return NULL;
+}
+
+void buffer_manager_block_free(block_ptr *ptr)
+{
+    panic(NOTIMPLEMENTED, to_string(buffer_manager_block_free));   // TODO: Implement
+}
+
+zone_id_t buffer_manager_block_nextzone(block_ptr *ptr)
+{
+    panic(NOTIMPLEMENTED, to_string(buffer_manager_block_nextzone));   // TODO: Implement
+    return 0;
+}
+
+void buffer_manager_block_setzones(block_ptr *ptr, zone_id_t last_zone)
+{
+    panic(NOTIMPLEMENTED, to_string(buffer_manager_block_setzones));   // TODO: Implement
+}
+
+void buffer_manager_block_rmzone(block_ptr *ptr, zone_id_t zone)
+{
+    panic(NOTIMPLEMENTED, to_string(buffer_manager_block_rmzone));   // TODO: Implement
+}
+
+zone_ptr *buffer_manager_block_seek(block_ptr *ptr, zone_id_t zone_id)
+{
+    panic(NOTIMPLEMENTED, to_string(buffer_manager_block_seek));   // TODO: Implement
+    return NULL;
+}
+
+zone_ptr *buffer_manager_block_open(block_ptr *ptr)
+{
+    panic(NOTIMPLEMENTED, to_string(buffer_manager_block_open));   // TODO: Implement
+    return NULL;
+}
+
+void buffer_manager_block_next(zone_ptr *ptr)
+{
+    panic(NOTIMPLEMENTED, to_string(buffer_manager_block_next));   // TODO: Implement
+}
+
+void buffer_manager_block_close(block_ptr *ptr)
+{
+    panic(NOTIMPLEMENTED, to_string(buffer_manager_block_close));   // TODO: Implement
+}
+
+void buffer_manager_zone_read(zone_ptr *zone, void *capture, void (*consumer) (void *capture, const void *data))
+{
+    panic(NOTIMPLEMENTED, to_string(buffer_manager_zone_read));   // TODO: Implement
+}
+
+void buffer_manager_zone_cpy(zone_ptr *dst, size_t offset, const void *src, size_t num)
+{
+    panic(NOTIMPLEMENTED, to_string(buffer_manager_zone_cpy));   // TODO: Implement
+}
+
+void buffer_manager_zone_set(zone_ptr *dst, size_t offset, int value, size_t num)
+{
+    panic(NOTIMPLEMENTED, to_string(buffer_manager_zone_set));   // TODO: Implement
 }
 
 bool buffer_manager_free(buffer_manager_t *manager)
