@@ -351,6 +351,8 @@ next_key:
 
 bool this_remove(struct dict_t *self, size_t num_keys, const void *keys)
 {
+    panic("The function '%s' is not properly implemented.", "this_remove"); // TODO: Mark removed elements as "deleted". Actually removing them causes issues with chained entries for linear probing
+
     require_instanceof_this(self);
     require_nonnull(keys);
     require_not_zero(num_keys);
