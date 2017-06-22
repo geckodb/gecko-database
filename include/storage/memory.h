@@ -19,8 +19,17 @@
 
 #include <defs.h>
 #include <containers/vector.h>
+#include <containers/dictionaries/fixed_linear_hash_table.h>
 
 #define __force_packing__        __attribute__((__packed__))
+
+// ---------------------------------------------------------------------------------------------------------------------
+// C O N F I G
+// ---------------------------------------------------------------------------------------------------------------------
+
+#define PAGEPOOL_INITCAP        100
+#define PAGEPOOL_GROW_FACTOR  2.00f
+#define PAGEPOOL_MAX_FILL_FAC 0.75f
 
 // ---------------------------------------------------------------------------------------------------------------------
 // D A T A   T Y P E S
@@ -131,7 +140,7 @@ typedef enum {
 } ptr_scope_type;
 
 typedef struct {
-    vector_t *page_register;
+    dict_t *page_register;
 
 } buffer_manager_t;
 
@@ -147,9 +156,9 @@ bool buffer_manager_free(buffer_manager_t *manager);
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool page_pool_init(buffer_manager_t *manager, size_t num_pages);
+bool page_pool_init(buffer_manager_t *manager);
 
-bool page_pool_set(buffer_manager_t *manager, page_id_t id, void *ptr);
+void page_pool_set(buffer_manager_t *manager, page_id_t id, void *ptr);
 
 bool page_pool_is_loaded(buffer_manager_t *manager, page_id_t id);
 

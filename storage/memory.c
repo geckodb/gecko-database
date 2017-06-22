@@ -41,7 +41,7 @@
 #define MSG_BADFRWDLINK "Internal error: forward link for persitent ptr %p is not allowed to point to a non-zone obj."
 #define BADPOOLINIT     "Internal error: page pool %p is already initialized."
 #define BADENTRYINIT    "Internal error: bad page pool init request from %p to %p"
-#define BADPAGEID       "Internal error: bad page id '%du'"
+#define BADPAGEID       "Internal error: page id '%du' was not loaded into page pool."
 #define BADARGNULL      "Illegal argument for function. Parameter '%s' points to null"
 #define BADARGZERO      "Illegal argument for function. Parameter '%s' is zero"
 #define UNEXPECTED      "Unexpected behavior: '%s'"
@@ -186,10 +186,10 @@ buffer_manager_t *buffer_manager_create()
 {
     buffer_manager_t *result = malloc(sizeof(buffer_manager_t));
     expect_good_malloc(result, NULL);
-    result->page_register = vector_create(sizeof(void*), INIT_NUM_PAGES);
+    result->page_register = fixed_linear_hash_table_create(&(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen},
+                                                           sizeof(page_id_t), sizeof(void*), PAGEPOOL_INITCAP,
+                                                           PAGEPOOL_GROW_FACTOR, PAGEPOOL_MAX_FILL_FAC);
     expect_non_null(result->page_register, NULL);
-    bool init_pages = page_pool_init(result, INIT_NUM_PAGES);
-    expect_equals(init_pages, true, NULL);
     return result;
 }
 
@@ -197,7 +197,7 @@ bool buffer_manager_free(buffer_manager_t *manager)
 {
     expect_non_null(manager, false);
     expect_non_null(manager->page_register, false);
-    bool free_page_reg = vector_free(manager->page_register);
+    bool free_page_reg = dict_free(manager->page_register);
     if (free_page_reg) {
         free (manager);
     }
@@ -208,7 +208,7 @@ bool buffer_manager_free(buffer_manager_t *manager)
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-static bool _init_page_pool_entry(void *capture, void *from, void *to)
+/*static bool _init_page_pool_entry(void *capture, void *from, void *to)
 {
     panic_if((from >= to), BADENTRYINIT, from, to);
     void **start = (void **) from;
@@ -216,33 +216,28 @@ static bool _init_page_pool_entry(void *capture, void *from, void *to)
     for (void **it = start; it < end; it++)
         *it = NULL;
     return true;
-}
+}*/
 
-static bool _count_nulls(void *capture, void *it)
+/*static bool _count_nulls(void *capture, void *it)
 {
     panic_if((it == NULL), BADARGNULL, to_string(it));
     return (*((void **) it) == NULL);
-}
+}*/
 
-bool page_pool_init(buffer_manager_t *manager, size_t num_pages)
+bool page_pool_init(buffer_manager_t *manager)
 {
     panic_if((manager == NULL), BADARGNULL, to_string(manager));
     panic_if((manager == NULL), BADARGZERO, to_string(num_pages));
-    panic_if(manager->page_register->num_elements != 0, BADPOOLINIT, manager);
-    vector_resize(manager->page_register, num_pages);
-    panic_if(manager->page_register->num_elements != num_pages, UNEXPECTED, "vector was not resized as expected");
-    vector_foreach(manager->page_register, NULL, _init_page_pool_entry);
-    panic_if((vector_count(manager->page_register, NULL, _count_nulls) != num_pages), UNEXPECTED, "condition is wrong");
+    panic_if(!dict_empty(manager->page_register), BADPOOLINIT, manager);
     return true;
 }
 
-bool page_pool_set(buffer_manager_t *manager, page_id_t id, void *ptr)
+void page_pool_set(buffer_manager_t *manager, page_id_t id, void *ptr)
 {
     panic_if((manager == NULL), BADARGNULL, to_string(manager));
     panic_if((manager->page_register == NULL), UNEXPECTED, "page register in manager");
-    panic_if(((size_t) id >= manager->page_register->num_elements), BADPAGEID, id);
     panic_if((page_pool_is_loaded(manager, id)), UNEXPECTED, "already set");
-    return vector_set(manager->page_register, id, 1, &ptr);
+    dict_put(manager->page_register, &id, &ptr);
 }
 
 bool page_pool_is_loaded(buffer_manager_t *manager, page_id_t id)
@@ -254,17 +249,18 @@ bool page_pool_remove(buffer_manager_t *manager, page_id_t id)
 {
     panic_if((manager == NULL), BADARGNULL, to_string(manager));
     panic_if((manager->page_register == NULL), UNEXPECTED, "page register in manager");
-    panic_if (id >= manager->page_register->num_elements, BADPAGEID, id);
-    void *null_value = NULL;
-    return vector_set(manager->page_register, id, 1, &null_value);
+    panic_if (!(dict_contains_key(manager->page_register, &id)), BADPAGEID, id);
+    return dict_remove(manager->page_register, 1, &id);
 }
 
 void *page_pool_get(buffer_manager_t *manager, page_id_t id)
 {
     panic_if((manager == NULL), BADARGNULL, to_string(manager));
     panic_if((manager->page_register == NULL), UNEXPECTED, "page register in manager");
-    panic_if (id >= manager->page_register->num_elements, BADPAGEID, id);
-    void **element = (void **)manager->page_register->data + id;
+
+    const void *page_ptr = dict_get(manager->page_register, &id);
+    //panic_if ((page_ptr == NULL), BADPAGEID, id);
+    void **element = (void **)page_ptr;
     return (element != NULL ? *element : NULL);
 }
 
@@ -1081,7 +1077,7 @@ static inline void *in_page_ptr_deref(buffer_manager_t *buffer_manager, const in
 {
     panic_if((buffer_manager == NULL), BADARGNULL, to_string(buffer_manager));
     panic_if((ptr == NULL), BADARGNULL, to_string(ptr));
-    panic_if((buffer_manager->page_register == NULL), UNEXPECTED, "page register vector is null");
+    panic_if((buffer_manager->page_register == NULL), UNEXPECTED, "page register hash table is null");
     void *page_base_ptr = page_pool_get(buffer_manager, ptr->page_id);
     panic_if((page_base_ptr == NULL), UNEXPECTED, "page base pointer is not allowed to be null");
     return (page_base_ptr + ptr->offset);

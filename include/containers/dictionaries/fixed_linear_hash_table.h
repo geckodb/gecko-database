@@ -76,7 +76,7 @@ dict_t *fixed_linear_hash_table_create(const hash_function_t *hash_function, siz
                                        size_t num_slots, float grow_factor, float max_load_factor);
 void fixed_linear_hash_table_lock(dict_t *dict);
 void fixed_linear_hash_table_unlock(dict_t *dict);
-void fixed_linear_hash_table_free(dict_t *dict);
+bool fixed_linear_hash_table_free(dict_t *dict);
 void fixed_linear_hash_reset_counters(dict_t *dict);
 void fixed_linear_hash_table_info(dict_t *dict, linear_hash_table_info_t *info);
 

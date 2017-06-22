@@ -27,6 +27,7 @@ static vector_t *read_all_lines(const char *file)
     FILE * fp;
     char * line = NULL;
     size_t len = 0;
+    ssize_t read;
     vector_t *result = vector_create(SIZEOF_KEY, 69199328);
 
     fp = fopen(file, "r");
@@ -82,6 +83,7 @@ int main(void)
 
     char *key = malloc(SIZEOF_KEY);
 
+    clock_t start = clock();
     for (int i = 0; i < words->num_elements; i++) {
         set_buffer_from_list(key, words->data, i, SIZEOF_KEY);
         const void *value = dict_get(dict, key);
@@ -89,8 +91,11 @@ int main(void)
         dict_put(dict, key, &count);
         linear_hash_table_info_t info;
         fixed_linear_hash_table_info(dict, &info);
-        printf("%0.4f%% load factor: %0.4f%%, num rebuilds %zu, num slots:%zu\n", (i / (float) words->num_elements) * 100, info.load_factor, info.counters.num_rebuilds, info.num_slots_inuse + info.num_slots_free);
+      //  printf("%0.4f%% load factor: %0.4f%%, num rebuilds %zu, num slots:%zu\n", (i / (float) words->num_elements) * 100, info.load_factor, info.counters.num_rebuilds, info.num_slots_inuse + info.num_slots_free);
     }
+    clock_t stop = clock();
+    double elapsed = (double)(stop - start) * 1000.0 / CLOCKS_PER_SEC;
+    printf("It tooks %0.4fms to load %zu words\n", elapsed, words->num_elements);
 
 
     query(key, dict, "auto");

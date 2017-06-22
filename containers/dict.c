@@ -43,6 +43,10 @@
 // I N T E R F A C E  I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
+bool dict_free(dict_t *dict)
+{
+    return delegte_call(dict, free_dict);
+}
 
 void dict_clear(dict_t *dict)
 {
@@ -69,7 +73,7 @@ vector_t *dict_gets(const dict_t *dict, size_t num_keys, const void *keys)
     return delegte_call_wargs(dict, gets, num_keys, keys);
 }
 
-void dict_remove(dict_t *dict, size_t num_keys, const void *keys)
+bool dict_remove(dict_t *dict, size_t num_keys, const void *keys)
 {
     return delegte_call_wargs(dict, remove, num_keys, keys);
 }

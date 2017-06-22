@@ -132,7 +132,7 @@ bool this_empty(const struct dict_t *self);
 bool this_contains_key(const struct dict_t *self, const void *key);
 const void *this_get(const struct dict_t *self, const void *key);
 vector_t *this_gets(const struct dict_t *self, size_t num_keys, const void *keys);
-void this_remove(struct dict_t *self, size_t num_keys, const void *keys);
+bool this_remove(struct dict_t *self, size_t num_keys, const void *keys);
 void this_put(struct dict_t *self, const void *key, const void *value);
 void this_puts(struct dict_t *self, size_t num_elements, const void *keys, const void *values);
 size_t this_num_elements(struct dict_t *self);
@@ -214,15 +214,18 @@ void fixed_linear_hash_table_unlock(dict_t *dict)
     pthread_mutex_unlock(&(((hash_table_extra_t*) dict->extra)->mutex));
 }
 
-void fixed_linear_hash_table_free(dict_t *dict)
+bool fixed_linear_hash_table_free(dict_t *dict)
 {
-    require_instanceof_this(dict);
-    hash_table_extra_t *extra = (hash_table_extra_t *) dict->extra;
-    require_nonnull(extra->slots);
-    require_nonnull(extra->empty_indicator);
-    free (extra->slots);
-    free (extra->empty_indicator);
-    free (dict);
+    if (dict != NULL) {
+        require_instanceof_this(dict);
+        hash_table_extra_t *extra = (hash_table_extra_t *) dict->extra;
+        require_nonnull(extra->slots);
+        require_nonnull(extra->empty_indicator);
+        free(extra->slots);
+        free(extra->empty_indicator);
+        free(dict);
+        return true;
+    } else return false;
 }
 
 void fixed_linear_hash_reset_counters(dict_t *dict)
@@ -346,12 +349,13 @@ next_key:
     return result;
 }
 
-void this_remove(struct dict_t *self, size_t num_keys, const void *keys)
+bool this_remove(struct dict_t *self, size_t num_keys, const void *keys)
 {
     require_instanceof_this(self);
     require_nonnull(keys);
     require_not_zero(num_keys);
 
+    bool removed_one_entry = false;
     hash_table_extra_t *extra = (hash_table_extra_t *) self->extra;
 
     while (num_keys--) {
@@ -371,6 +375,7 @@ void this_remove(struct dict_t *self, size_t num_keys, const void *keys)
                     remove_key(self, extra, slot_id);
                     extra->num_inuse--;
                     assert (extra->num_inuse < extra->num_slots);
+                    removed_one_entry = true;
                     goto next_key;
                 } else {
                     extra->counters.num_remove_slotdisplaced++;
@@ -383,6 +388,7 @@ void this_remove(struct dict_t *self, size_t num_keys, const void *keys)
         extra->counters.num_remove_nosuchkey_fullsearch += (round_trip_slot_id == slot_id);
         extra->counters.num_remove_nosuchkey += empty_slot_found;
     }
+    return removed_one_entry;
 }
 
 void this_put(struct dict_t *self, const void *key, const void *value)
@@ -411,10 +417,6 @@ void this_puts(struct dict_t *self, size_t num_elements, const void *keys, const
         bool slot_found = test_slot(self, extra, slot_id);
         if (!slot_found) {
             while ((round_trip_slot_id != slot_id) && !slot_found) {
-                if (strcmp(key, "int") == 0) {
-                    printf("... looking for... slot id %zu\n", slot_id);
-                }
-
                 const void *old_key = get_key(self, extra, slot_id);
                 bool key_match = keys_match(self, key, old_key);
                 if (!key_match) {
@@ -423,9 +425,6 @@ void this_puts(struct dict_t *self, size_t num_elements, const void *keys, const
                     break;
                 } else {
                     extra->counters.num_updates++;
-                    if (strcmp(key, "int") == 0) {
-                        printf("update... %zu\n", slot_id); // TODO: Store data
-                    }
                     break;
                 }
                 slot_found = test_slot(self, extra, slot_id);
