@@ -35,11 +35,10 @@ typedef struct dict_t {
 
     void (*clear)(struct dict_t *self);
     bool (*empty)(const struct dict_t *self);
-    bool (*contains_values)(const struct dict_t *self, size_t num_values, const void *values);
-    bool (*contains_keys)(const struct dict_t *self, size_t num_keys, const void *keys);
+    bool (*contains_key)(const struct dict_t *self, const void *key);
     const void *(*get)(const struct dict_t *self, const void *key);
     vector_t *(*gets)(const struct dict_t *self, size_t num_keys, const void *keys);
-    bool (*remove)(struct dict_t *self, size_t num_keys, const void *keys);
+    void (*remove)(struct dict_t *self, size_t num_keys, const void *keys);
     void (*put)(struct dict_t *self, const void *key, const void *value);
     void (*puts)(struct dict_t *self, size_t num_elements, const void *keys, const void *values);
     size_t (*num_elements)(struct dict_t *self);
@@ -54,11 +53,10 @@ typedef struct dict_t {
 
 void dict_clear(dict_t *dict);
 bool dict_empty(const dict_t *dict);
-bool dict_contains_values(const dict_t *dict, size_t num_values, const void *values);
-bool dict_contains_keys(const dict_t *dict, size_t num_keys, const void *keys);
+bool dict_contains_key(const dict_t *dict, const void *key);
 const void *dict_get(const dict_t *dict, const void *key);
 vector_t *dict_gets(const dict_t *dict, size_t num_keys, const void *keys);
-bool dict_remove(dict_t *dict, size_t num_keys, const void *keys);
+void dict_remove(dict_t *dict, size_t num_keys, const void *keys);
 void dict_put(dict_t *dict, const void *key, const void *value);
 void dict_puts(dict_t *dict, size_t num_elements, const void *keys, const void *values);
 size_t dict_num_elements(dict_t *dict);

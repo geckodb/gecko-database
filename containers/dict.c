@@ -54,14 +54,9 @@ bool dict_empty(const dict_t *dict)
     return delegte_call(dict, empty);
 }
 
-bool dict_contains_values(const dict_t *dict, size_t num_values, const void *values)
+bool dict_contains_key(const dict_t *dict, const void *key)
 {
-    return delegte_call_wargs(dict, contains_values, num_values, values);
-}
-
-bool dict_contains_keys(const dict_t *dict, size_t num_keys, const void *keys)
-{
-    return delegte_call_wargs(dict, contains_keys, num_keys, keys);
+    return delegte_call_wargs(dict, contains_key, key);
 }
 
 const void *dict_get(const dict_t *dict, const void *key)
@@ -74,7 +69,7 @@ vector_t *dict_gets(const dict_t *dict, size_t num_keys, const void *keys)
     return delegte_call_wargs(dict, gets, num_keys, keys);
 }
 
-bool dict_remove(dict_t *dict, size_t num_keys, const void *keys)
+void dict_remove(dict_t *dict, size_t num_keys, const void *keys)
 {
     return delegte_call_wargs(dict, remove, num_keys, keys);
 }

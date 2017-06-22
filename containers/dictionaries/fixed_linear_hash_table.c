@@ -89,6 +89,12 @@
         value;                                                                                                         \
     })
 
+#define remove_key(self, extra, slot_id)                                                                               \
+    ({                                                                                                                 \
+        slot_remove(extra->slots, slot_id, self->key_size, self->elem_size, extra->empty_indicator);                   \
+        extra->counters.num_remove_key++;                                                                              \
+    })
+
 #define shallow_cpy(other)                                                                                             \
     ({(hash_table_extra_t) {                                                                                           \
         .mutex = (other)->mutex,                                                                                       \
@@ -97,7 +103,9 @@
         .grow_factor = (other)->grow_factor,                                                                           \
         .hash_function = (other)->hash_function,                                                                       \
         .num_slots = (other)->num_slots,                                                                               \
-        .slots = (other)->slots                                                                                        \
+        .slots = (other)->slots,                                                                                       \
+        .max_load_factor = (other)->max_load_factor,                                                                   \
+        .counters = (other)->counters                                                                                  \
     };})
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -121,11 +129,10 @@ typedef struct {
 
 void this_clear(struct dict_t *self);
 bool this_empty(const struct dict_t *self);
-bool this_contains_values(const struct dict_t *self, size_t num_values, const void *values);
-bool this_contains_keys(const struct dict_t *self, size_t num_keys, const void *keys);
+bool this_contains_key(const struct dict_t *self, const void *key);
 const void *this_get(const struct dict_t *self, const void *key);
 vector_t *this_gets(const struct dict_t *self, size_t num_keys, const void *keys);
-bool this_remove(struct dict_t *self, size_t num_keys, const void *keys);
+void this_remove(struct dict_t *self, size_t num_keys, const void *keys);
 void this_put(struct dict_t *self, const void *key, const void *value);
 void this_puts(struct dict_t *self, size_t num_elements, const void *keys, const void *values);
 size_t this_num_elements(struct dict_t *self);
@@ -137,6 +144,7 @@ static inline bool slot_is_empty(const dict_t *self, hash_table_extra_t *extra, 
 static inline void slot_put(void *slots, size_t slot_id, size_t key_size, size_t elem_size, const void *key, const void *data);
 static inline void *slot_get_key(void *slots, size_t slot_id, size_t key_size, size_t elem_size);
 static inline void *slot_get_value(void *slots, size_t slot_id, size_t key_size, size_t elem_size);
+static inline void slot_remove(void *slots, size_t slot_id, size_t key_size, size_t elem_size, void *empty_indicator);
 
 
 static inline void rebuild(const dict_t *self, hash_table_extra_t *extra);
@@ -161,8 +169,7 @@ dict_t *fixed_linear_hash_table_create(const hash_function_t *hash_function, siz
 
         .clear = this_clear,
         .empty = this_empty,
-        .contains_values = this_contains_values,
-        .contains_keys = this_contains_keys,
+        .contains_key = this_contains_key,
         .get = this_get,
         .gets = this_gets,
         .remove = this_remove,
@@ -235,7 +242,11 @@ void fixed_linear_hash_reset_counters(dict_t *dict)
         .num_get_nosuchkey            = 0,
         .num_test_slot                = 0,
         .num_slot_get_key             = 0,
-        .num_slot_get_value           = 0
+        .num_slot_get_value           = 0,
+        .num_remove_key               = 0,
+        .num_remove_slotdisplaced     = 0,
+        .num_remove_nosuchkey_fullsearch = 0,
+        .num_remove_nosuchkey         = 0
     };
 }
 
@@ -274,18 +285,10 @@ bool this_empty(const struct dict_t *self)
     return (((hash_table_extra_t *) self->extra)->num_inuse == 0);
 }
 
-bool this_contains_values(const struct dict_t *self, size_t num_values, const void *values)
+bool this_contains_key(const struct dict_t *self, const void *key)
 {
     require_instanceof_this(self);
-    // TODO: Implement
-    return false;
-}
-
-bool this_contains_keys(const struct dict_t *self, size_t num_keys, const void *keys)
-{
-    require_instanceof_this(self);
-    // TODO: Implement
-    return false;
+    return (this_get(self, key) != NULL);
 }
 
 const void *this_get(const struct dict_t *self, const void *key)
@@ -343,11 +346,43 @@ next_key:
     return result;
 }
 
-bool this_remove(struct dict_t *self, size_t num_keys, const void *keys)
+void this_remove(struct dict_t *self, size_t num_keys, const void *keys)
 {
     require_instanceof_this(self);
-    // TODO: Implement
-    return false;
+    require_nonnull(keys);
+    require_not_zero(num_keys);
+
+    hash_table_extra_t *extra = (hash_table_extra_t *) self->extra;
+
+    while (num_keys--) {
+        const void *key = keys + (num_keys * self->key_size);
+
+        size_t hash_code = calc_hash_code(self, extra, key);
+        size_t slot_id = convert_to_slot_id(hash_code, extra);
+        size_t round_trip_slot_id = calc_round_trip(slot_id, extra);
+
+        bool empty_slot_found = test_slot(self, extra, slot_id);
+
+        if (!empty_slot_found) {
+            while ((round_trip_slot_id != slot_id) && !empty_slot_found) {
+                const void *old_key = get_key(self, extra, slot_id);
+                if (keys_match(self, key, old_key)) {
+                    extra->counters.num_remove_key++;
+                    remove_key(self, extra, slot_id);
+                    extra->num_inuse--;
+                    assert (extra->num_inuse < extra->num_slots);
+                    goto next_key;
+                } else {
+                    extra->counters.num_remove_slotdisplaced++;
+                    slot_id = convert_to_slot_id((slot_id + 1), extra);
+                }
+                empty_slot_found = test_slot(self, extra, slot_id);
+            }
+        }
+        next_key:
+        extra->counters.num_remove_nosuchkey_fullsearch += (round_trip_slot_id == slot_id);
+        extra->counters.num_remove_nosuchkey += empty_slot_found;
+    }
 }
 
 void this_put(struct dict_t *self, const void *key, const void *value)
@@ -374,15 +409,23 @@ void this_puts(struct dict_t *self, size_t num_elements, const void *keys, const
         size_t round_trip_slot_id = calc_round_trip(slot_id, extra);
 
         bool slot_found = test_slot(self, extra, slot_id);
-        if (slot_found) {
+        if (!slot_found) {
             while ((round_trip_slot_id != slot_id) && !slot_found) {
+                if (strcmp(key, "int") == 0) {
+                    printf("... looking for... slot id %zu\n", slot_id);
+                }
+
                 const void *old_key = get_key(self, extra, slot_id);
                 bool key_match = keys_match(self, key, old_key);
                 if (!key_match) {
                     extra->counters.num_put_slotsearch++;
                     slot_id = convert_to_slot_id((slot_id + 1), extra);
+                    break;
                 } else {
                     extra->counters.num_updates++;
+                    if (strcmp(key, "int") == 0) {
+                        printf("update... %zu\n", slot_id); // TODO: Store data
+                    }
                     break;
                 }
                 slot_found = test_slot(self, extra, slot_id);
@@ -393,7 +436,6 @@ void this_puts(struct dict_t *self, size_t num_elements, const void *keys, const
 
         if (round_trip_slot_id == slot_id) {
             rebuild(self, extra);
-            extra->counters.num_rebuilds++;
             this_put(self, key, value);
         } else {
             slot_put(extra->slots, slot_id, self->key_size, self->elem_size, key, value);
@@ -463,6 +505,13 @@ static inline void *slot_get_value(void *slots, size_t slot_id, size_t key_size,
     return seek_to_slot(slots, slot_id, key_size, elem_size) + key_size;
 }
 
+static inline void slot_remove(void *slots, size_t slot_id, size_t key_size, size_t elem_size, void *empty_indicator)
+{
+    assert (slots && empty_indicator && elem_size > 0 && key_size > 0);
+    size_t slot_len = (key_size + elem_size);
+    memcpy(slots + (slot_id * slot_len), empty_indicator, key_size);
+}
+
 static inline void rebuild(const dict_t *self, hash_table_extra_t *extra)
 {
     assert (self && extra && extra->grow_factor > 1);
@@ -481,7 +530,10 @@ static inline void rebuild(const dict_t *self, hash_table_extra_t *extra)
         }
     }
 
+    counters_t counters = extra->counters;
+    counters.num_rebuilds++;
     swap((hash_table_extra_t *) tmp->extra, extra);
+    extra->counters = counters;
     fixed_linear_hash_table_free(tmp);
 }
 
