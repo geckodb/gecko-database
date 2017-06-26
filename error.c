@@ -37,11 +37,6 @@ void error_if(bool expr, error_code code)
         error(code);
 }
 
-error_code error_last()
-{
-    return last_error;
-}
-
 const char *error_str(error_code code)
 {
     switch (code) {
@@ -65,6 +60,6 @@ const char *error_str(error_code code)
 
 void error_print()
 {
-    int last = error_last();
+    int last = error_get();
     fprintf(stderr, "ERROR 0x%08x: %s\n", last, error_str(last));
 }
