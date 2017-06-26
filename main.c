@@ -177,7 +177,7 @@ int main(void)
 
         printf("%zu\n", sizeof(page_t));
         fflush(stdout);
-        buffer_manager_t *manager = buffer_manager_create();
+        buffer_manager_t *manager = buffer_manager_create(1000, 1000, 1000, 10000);
         page_t *page = page_create(manager, 42, 1024 * 1024 /* 1 MiB */, page_flag_fixed, 10, 10);
         fid_t *frame_handle = frame_create(page, positioning_first_nomerge, 20 /* 40 B */);
         frame_create(page, positioning_first_nomerge, 2048 /* 2 KiB */);
@@ -191,7 +191,7 @@ int main(void)
         printf("|  +-------+            +--------+          |       |  +-------+                                |\n");
         printf("|     |-------- last -------^               |       |     |------- last -------^                |\n");
         printf("+-------------------------------------------+       +-------------------------------------------+\n");
-        zone_t *zone_1 = zone_create(manager, page, frame_handle, positioning_first_nomerge);
+        zone_t *zone_1 = buf_zone_create(manager, page, frame_handle->frame_id, page, positioning_first_nomerge);
         zone_memcpy(page, zone_1, "Hello Zone!", sizeof(char) * strlen("Hello Zone!"));
         page_dump(stdout, manager, page);
 
@@ -200,9 +200,9 @@ int main(void)
         page_dump(stdout, manager, page);
 
         printf("****************** REMOVE ZONE CASE 2 **********************\n");
-        zone_1 = zone_create(manager, page, frame_handle, positioning_first_nomerge);
+        zone_1 = buf_zone_create(manager, page, frame_handle->frame_id, page, positioning_first_nomerge);
         zone_memcpy(page, zone_1, "Hello Zone!", sizeof(char) * strlen("Hello Zone!"));
-        zone_t *zone_2 = zone_create(manager, page, frame_handle, positioning_first_nomerge);
+        zone_t *zone_2 = buf_zone_create(manager, page, frame_handle->frame_id, page, positioning_first_nomerge);
         zone_memcpy(page, zone_2, "Hello Zone 2!", sizeof(char) * strlen("Hello Zone 2!"));
         page_dump(stdout, manager, page);
 
@@ -211,7 +211,7 @@ int main(void)
         page_dump(stdout, manager, page);
 
         printf("****************** REMOVE ZONE CASE 3 **********************\n");
-        zone_1 = zone_create(manager, page, frame_handle, positioning_first_nomerge);
+        zone_1 = buf_zone_create(manager, page, frame_handle->frame_id, page, positioning_first_nomerge);
         zone_memcpy(page, zone_1, "Hello Zone 1!", sizeof(char) * strlen("Hello Zone 1!"));
         page_dump(stdout, manager, page);
 
@@ -220,9 +220,9 @@ int main(void)
         page_dump(stdout, manager, page);
 
         printf("****************** REMOVE ZONE CASE 4 **********************\n");
-        zone_1 = zone_create(manager, page, frame_handle, positioning_first_nomerge);
+        zone_1 = buf_zone_create(manager, page, frame_handle->frame_id, page, positioning_first_nomerge);
         zone_memcpy(page, zone_1, "Hello Zone 1!", sizeof(char) * strlen("Hello Zone 1!"));
-        zone_t *zone_3 = zone_create(manager, page, frame_handle, positioning_first_nomerge);
+        zone_t *zone_3 = buf_zone_create(manager, page, frame_handle->frame_id, page, positioning_first_nomerge);
         zone_memcpy(page, zone_3, "Hello Zone 3!", sizeof(char) * strlen("Hello Zone 2!"));
         page_dump(stdout, manager, page);
 
@@ -239,8 +239,8 @@ int main(void)
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // B U F F E R   M A N A G E R   T E S T
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        buffer_manager_t *buffer_manager = buffer_manager_create();
-        block_ptr *block = buffer_manager_block_alloc(buffer_manager, 100 * sizeof(hardcoded_tuple_t), 50);
+        buffer_manager_t *buffer_manager = buffer_manager_create(1000000, 1000, 1000, 5000000);
+        block_ptr *block = buffer_manager_block_alloc(buffer_manager, 100 * sizeof(hardcoded_tuple_t), 500, positioning_first_nomerge);
         zone_ptr *zone_cursor = buffer_manager_block_open(block);
         for (int j = 0; j < 50; j++) {
             for (int i = 0; i < 100; i++) {

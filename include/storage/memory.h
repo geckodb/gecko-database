@@ -27,9 +27,16 @@
 // C O N F I G
 // ---------------------------------------------------------------------------------------------------------------------
 
-#define PAGEPOOL_INITCAP        100
-#define PAGEPOOL_GROW_FACTOR  2.00f
-#define PAGEPOOL_MAX_FILL_FAC 0.75f
+#define HOTSTORE_INITCAP              100
+#define HOTSTORE_GROW_FACTOR        2.00f
+#define HOTSTORE_MAX_FILL_FAC       0.75f
+
+#define ANTICACHE_HOTSTORELIST_INITCAP         100
+#define ANTICACHE_HOTSTORELIST_GROW_FACTOR    1.7f
+#define ANTICACHE_COLDSTORELIST_INITCAP        100
+#define ANTICACHE_COLDSTORELIST_GROW_FACTOR   1.7f
+#define ANTICACHE_PAGEID_FREELIST_INITCAP      100
+#define ANTICACHE_PAGEID_FREELIST_GROW_FACTOR 1.7f
 
 // ---------------------------------------------------------------------------------------------------------------------
 // D A T A   T Y P E S
@@ -75,6 +82,8 @@ typedef enum {
     page_flag_fixed = 1 << 2,
     page_flag_locked = 1 << 3
 } page_flags;
+
+#define PAGE_FLAG_FRESH_PAGE_FLAGS 0
 
 typedef struct __force_packing__ {
     u64 time_created, time_last_read, time_last_write;
@@ -123,18 +132,30 @@ typedef struct {
 
 typedef struct {
     void (*push)();
-    void (*fetch)();
+    page_t *(*fetch)(page_id_t id);
 } page_cold_store_t;
 
 typedef struct {
-    int reserved;
+    vector_t *hot_store_page_ids;   /* all page ids that are in use who live in hot-store */
+    vector_t *cold_store_page_ids;  /* all page ids that are in use who live in hot-store */
+    vector_t *free_page_ids_stack;  /* page ids that are free to be recycled */
+    page_id_t next_page_id;
 } page_anticache_t;
 
 typedef struct {
+    size_t page_size;
+    size_t free_space_reg_capacity;
+    size_t frame_reg_capacity;
+} buffer_manager_config_t;
+
+typedef struct {
     dict_t *page_hot_store;
+    size_t max_size_hot_store;
+
     page_anticache_t page_anticache;
     page_cold_store_t page_cold_store;
 
+    buffer_manager_config_t config;
 } buffer_manager_t;
 
 typedef enum {
@@ -169,13 +190,19 @@ typedef struct {
     in_page_ptr zone;
 } zone_ptr;
 
+typedef enum {
+    free_space_get_quickapprox,
+    free_space_get_slowexact
+} free_space_get_strategy;
+
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-buffer_manager_t *buffer_manager_create();
+buffer_manager_t *buffer_manager_create(size_t page_size, size_t free_space_reg_capacity,
+                                        size_t frame_reg_capacity, size_t max_hot_store_size);
 
-block_ptr *buffer_manager_block_alloc(buffer_manager_t *manager, size_t size, size_t nzones);
+block_ptr *buffer_manager_block_alloc(buffer_manager_t *manager, size_t size, size_t nzones, block_positioning strategy);
 void buffer_manager_block_free(block_ptr *ptr);
 
 zone_id_t buffer_manager_block_nextzone(block_ptr *ptr);
@@ -205,7 +232,19 @@ bool page_hot_store_has(buffer_manager_t *manager, page_id_t id);
 
 bool page_hot_store_remove(buffer_manager_t *manager, page_id_t id);
 
-void *page_hot_store_get(buffer_manager_t *manager, page_id_t id);
+page_t *page_hot_store_fetch(buffer_manager_t *manager, page_id_t id);
+
+// ---------------------------------------------------------------------------------------------------------------------
+// I N T E R F A C E   F U N C T I O N S
+// ---------------------------------------------------------------------------------------------------------------------
+
+void page_cold_store_init(buffer_manager_t *manager);
+
+void page_cold_store_clear(buffer_manager_t *manager);
+
+page_t *page_cold_store_fetch(buffer_manager_t *manager, page_id_t id);
+
+void page_cold_store_push(buffer_manager_t *manager, page_t *page);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
@@ -217,17 +256,35 @@ void page_anticache_init(buffer_manager_t *manager);
 
 void page_anticache_page_new(buffer_manager_t *manager, size_t size);
 
+page_t *page_anticache_get_page_by_id(buffer_manager_t *manager, page_id_t page_id);
+
 void page_anticache_page_delete(buffer_manager_t *manager, page_t *page);
 
-void page_anticache_free_list_push(buffer_manager_t *manager, page_t *page);
+void page_anticache_free_list_push(buffer_manager_t *manager, page_id_t page_id);
 
-void page_anticache_heat_list_update(buffer_manager_t *manager, page_t *page);
+bool page_anticache_free_list_is_empty(buffer_manager_t *manager);
 
-page_t *page_anticache_free_list_pop(buffer_manager_t *manager);
+page_t *page_anticache_create_page(buffer_manager_t *manager);
 
-void page_anticache_page_freeze(buffer_manager_t *manager, page_t *page);
+page_id_t page_anticache_free_list_pop(buffer_manager_t *manager);
 
-void page_anticache_page_freeze_all(buffer_manager_t *manager);
+size_t page_anticache_new_page_id(buffer_manager_t *manager);
+
+void page_anticache_hot_store_add(buffer_manager_t *manager, page_t *page);
+
+void page_anticache_hot_store_remove(buffer_manager_t *manager, page_id_t page_id);
+
+page_id_t page_anticache_hot_store_iterate(buffer_manager_t *manager, page_id_t last);
+
+bool page_anticache_hot_store_is_empty(buffer_manager_t *manager);
+
+void page_anticache_cold_store_add(buffer_manager_t *manager, page_id_t page_id);
+
+void page_anticache_cold_store_remove(buffer_manager_t *manager, page_id_t page_id);
+
+page_id_t page_anticache_cold_store_iterate(buffer_manager_t *manager, page_id_t last);
+
+bool page_anticache_cold_store_is_empty(buffer_manager_t *manager);
 
 void page_anticache_free(buffer_manager_t *manager);
 
@@ -235,23 +292,17 @@ void page_anticache_free(buffer_manager_t *manager);
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-void page_cold_store_init(buffer_manager_t *manager);
-
-void page_cold_store_clear(buffer_manager_t *manager);
-
-void *page_cold_store_fetch(buffer_manager_t *manager, page_id_t id);
-
-void page_cold_store_push(buffer_manager_t *manager, page_t *page);
-
-// ---------------------------------------------------------------------------------------------------------------------
-// I N T E R F A C E   F U N C T I O N S
-// ---------------------------------------------------------------------------------------------------------------------
-
 page_t *page_create(buffer_manager_t *manager, page_id_t id, size_t size, page_flags flags, size_t free_space, size_t frame_reg);
+
+size_t page_get_free_space(page_t *page, free_space_get_strategy strategy);
 
 fid_t *frame_create(page_t *page, block_positioning strategy, size_t element_size);
 
-zone_t *zone_create(buffer_manager_t *manager, page_t *page, fid_t *frame_handle, block_positioning strategy);
+zone_t *buf_zone_create(buffer_manager_t *manager,
+                        page_t *frame_page,
+                        frame_id_t frame_id,
+                        page_t *zone_page,
+                        block_positioning strategy);
 
 bool zone_memcpy(page_t *page, zone_t *zone, const void *data, size_t size);
 

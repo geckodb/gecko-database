@@ -28,17 +28,31 @@ error_code error_get();
 
 void trace_print(FILE *file);
 
-#define panic(msg, args...)                                                                                            \
-    {                                                                                                                  \
+#define begin_write(caption)                                                                                           \
         fflush(stdout);                                                                                                \
         fflush(stderr);                                                                                                \
         fprintf(stderr, "# \n");                                                                                       \
         trace_print(stderr);                                                                                           \
         fprintf(stderr, "# \n");                                                                                       \
-        fprintf(stderr, "# Core panic (%s:%d): ", __FILE__, __LINE__);                                                 \
+        fprintf(stderr, "# " caption " ('%s:%d'): ", __FILE__, __LINE__);
+
+#define end_write()                                                                                                    \
+        fprintf(stderr, "\n");                                                                                         \
+        fflush(stderr);
+
+#define panic(msg, args...)                                                                                            \
+    {                                                                                                                  \
+        begin_write("Core panic");                                                                                     \
         fprintf(stderr, msg, args);                                                                                    \
-        fflush(stderr);                                                                                                \
+        end_write();                                                                                                   \
         abort();                                                                                                       \
+    }
+
+#define warn(msg, args...)                                                                                             \
+    {                                                                                                                  \
+        begin_write("WARNING");                                                                                        \
+        fprintf(stderr, msg, args);                                                                                    \
+        end_write();                                                                                                   \
     }
 
 #define panic_if(expr, msg, args...)                                                                                   \
@@ -46,9 +60,12 @@ void trace_print(FILE *file);
         if (expr) { panic(msg, args); }                                                                                \
     }
 
-void error_if(bool expr, error_code code);
+#define warn_if(expr, msg, args...)                                                                                    \
+    {                                                                                                                  \
+        if (expr) { warn(msg, args); }                                                                                 \
+    }
 
-error_code error_last();
+void error_if(bool expr, error_code code);
 
 const char *error_str(error_code code);
 
