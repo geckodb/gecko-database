@@ -182,7 +182,7 @@ int main(void)
 //
 //        printf("%zu\n", sizeof(page_t));
 //        fflush(stdout);
-//        buffer_manager_t *manager = buffer_manager_create(1000, 1000, 1000, 10000);
+//        anit_buffer_t *manager = buf_create(1000, 1000, 1000, 10000);
 //        page_t *page = page_create(manager, 42, 1024 * 1024 /* 1 MiB */, page_flag_fixed, 10, 10);
 //        fid_t *frame_handle = frame_create(page, positioning_first_nomerge, 20 /* 40 B */);
 //        frame_create(page, positioning_first_nomerge, 2048 /* 2 KiB */);
@@ -244,14 +244,15 @@ int main(void)
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // B U F F E R   M A N A G E R   T E S T
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        buffer_manager_t *buffer_manager = buffer_manager_create(10000, 100, 100, 50000);
-        block_ptr *block = buffer_manager_block_alloc(buffer_manager, TUPLE_PER_BLOCK * sizeof(hardcoded_tuple_t), 10, positioning_first_nomerge);
-        buffer_manager_block_open(block);
+        anit_buffer_t *buffer = buf_create(10000, 100, 100, 50000);
+        cursor_t *cursor = buf_alloc(buffer, TUPLE_PER_BLOCK * sizeof(hardcoded_tuple_t), 10,
+                                     positioning_first_nomerge);
+        buf_open(cursor);
 
         size_t super_counter = 0;
 
-        while (buffer_manager_block_next(block)) {
-            printf("write to page %d:%d:%p\n", block->page_id, block->frame_id, block->zone);
+        while (buf_next(cursor)) {
+            printf("write to page %d:%d:%p\n", cursor->page_id, cursor->frame_id, cursor->zone);
             for (int i = 0; i < TUPLE_PER_BLOCK; i++) {
                 hardcoded_tuple_t my_tuple = {
                         .a = super_counter,
@@ -259,18 +260,18 @@ int main(void)
                         .c = super_counter + 2
                 };
                 super_counter++;
-              buffer_manager_zone_cpy(block, i * sizeof(hardcoded_tuple_t), &my_tuple, sizeof(hardcoded_tuple_t));
+                buf_memcpy(cursor, i * sizeof(hardcoded_tuple_t), &my_tuple, sizeof(hardcoded_tuple_t));
             printf("write tuple (%zu, %zu, %zu)\n", my_tuple.a, my_tuple.b, my_tuple.c);
             }
         }
-        buffer_manager_block_close(block);
+        buf_close(cursor);
 
-        buffer_manager_block_open(block);
-        while (buffer_manager_block_next(block)) {
-            buffer_manager_zone_read(block, NULL, print_to_console);
+        buf_open(cursor);
+        while (buf_next(cursor)) {
+            buf_read(cursor, NULL, print_to_console);
         }
-        buffer_manager_block_close(block);
-        buffer_manager_block_free(block);
+        buf_close(cursor);
+        buf_cursor_free(cursor);
 
 
 

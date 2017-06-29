@@ -15,35 +15,31 @@
 // I N C L U D E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <storage/memory.h>
-#include <error.h>
-#include <assert.h>
 #include <limits.h>
-#include <containers/vector.h>
+
+#include <error.h>
 #include <macros.h>
 #include <msg.h>
 #include <require.h>
+#include <storage/memory.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 // C O N S T A N T S
 // ---------------------------------------------------------------------------------------------------------------------
 
-#define INIT_NUM_PAGES  1024
 #define NULL_FID        UINT_MAX
 #define MAX_OFFSET      SIZE_MAX
-#define NULL_PAGE_ID    UINT_MAX
 #define NULL_OFFSET     0
-#define CORE_HDR_SIZE   (sizeof(page_header_t) + sizeof(free_store_t) + sizeof(frame_store_t))
-#define FRAME_HDR_SIZE  (sizeof(frame_t))
+#define CORE_HDR_SIZE   (sizeof(page_header_t) + sizeof(freespace_reg_t) + sizeof(lane_reg_t))
+#define FRAME_HDR_SIZE  (sizeof(lane_t))
 #define MIN_DATA_SIZE   (sizeof(zone_t) + sizeof(in_page_ptr))
 
-#define MSG_BADBRANCH    "Internal error: unknown condition during operation on object %p."
-#define MSG_BADCAST      "Unsupported cast request for persistent ptr %p."
-#define MSG_BADTYPE      "Persistent ptr %p points to illegal type."
-#define MSG_BADBACKLINK  "Internal error: back link for persistent ptr %p is not allowed to be null."
-#define MSG_BADFRWDLINK  "Internal error: forward link for persitent ptr %p is not allowed to point to a non-zone obj."
+#define BADBRANCH        "Internal error: unknown condition during operation on object %p."
+#define BADCAST          "Unsupported cast request for persistent ptr %p."
+#define BADTYPE          "Persistent ptr %p points to illegal type."
+#define BADBACKLINK      "Internal error: back link for persistent ptr %p is not allowed to be null."
+#define BADFRWDLINK      "Internal error: forward link for persistent ptr %p is not allowed to point to a non-zone obj."
 #define BADPOOLINIT      "Internal error: page pool %p is already initialized."
-#define BADENTRYINIT     "Internal error: bad page pool init request from %p to %p"
 #define BADPAGEID        "Internal error: page id '%du' was not loaded into hot store. Maybe it does not exists."
 #define BADARGNULL       "Illegal argument for function. Parameter '%s' points to null"
 #define BADARGZERO       "Illegal argument for function. Parameter '%s' is zero"
@@ -51,37 +47,34 @@
 #define BADHURRY         "Not implemented: '%s'"
 #define BADPAGESIZE      "Request to create a page size of %zuB with a hot store limit of %zuB is illegal"
 #define BADSTATE         "Bad state: %s"
-#define BADRESULT        "Return value of '%s' is unexpected"
-#define BADHOTSTOREINIT  "Memory allocation failed: unable to initialize hot store of buffer manager"
 #define BADCOLDSTOREINIT "Memory allocation failed: unable to initialize cold store of buffer manager"
 #define BADFREELISTINIT  "Memory allocation failed: unable to initialize page free list in buffer manager"
 #define BADHOTSTOREOBJ   "Page with id '%du' is not located in hot store"
 #define BADINTERNAL      "Internal error: %s"
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 // T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
 typedef enum {
-    target_free_space_reg,
-    target_frame_reg,
-    target_free_space_data,
-    target_frame_reg_inuse_data,
-    target_frame_reg_freelist_data,
-    target_free_space_begin
+    SEEK_FREESPACE_REGISTER,
+    SEEK_FREESPACE_ENTRIES,
+    SEEK_LANE_REGISTER,
+    SEEK_LANE_INUSE,
+    SEEK_LANE_FREELIST,
+    SEEK_PAYLOAD
 } seek_target;
 
 typedef enum {
-    ptr_type_near,
-    ptr_type_far
-} ptr_type;
+    PAGE_PTR_NEAR,
+    PAGE_PTR_FAR
+} page_ptr_type;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // M A C R O S
 // ---------------------------------------------------------------------------------------------------------------------
 
-#define output_error(code)                                                                                             \
+#define ERROR_OUT(code)                                                                                                \
     {                                                                                                                  \
         error(code);                                                                                                   \
         error_print();                                                                                                 \
@@ -90,23 +83,20 @@ typedef enum {
         abort();                                                                                                       \
     }
 
-#define return_if(expr, error_code, retval)                                                                            \
+#define RETURN_IF(expr, error_code, retval)                                                                            \
     if (expr) {                                                                                                        \
-        output_error(error_code);                                                                                      \
+        ERROR_OUT(error_code);                                                                                         \
         return retval;                                                                                                 \
     }
 
-#define debug_var(type, name, value)                                                                                   \
-    type name = value;
-
-#define num_args(...)                                                                                                  \
+#define ARG_NUM(...)                                                                                                   \
     (sizeof((int[]){__VA_ARGS__})/sizeof(int))
 
-#define in_range(type, val, ...)                                                                                       \
+#define IN_RANGE(type, val, ...)                                                                                       \
     ({                                                                                                                 \
         bool retval = false;                                                                                           \
         type *list = (type[]){__VA_ARGS__};                                                                            \
-        for (unsigned i = 0; i < num_args(__VA_ARGS__); i++)                                                           \
+        for (unsigned i = 0; i < ARG_NUM(__VA_ARGS__); i++)                                                            \
             if (*(list + i) == val) {                                                                                  \
                 retval = true;                                                                                         \
                 break;                                                                                                 \
@@ -114,23 +104,21 @@ typedef enum {
         retval;                                                                                                        \
     })
 
-#define expect_non_null(obj, retval)              return_if((obj == NULL), err_null_ptr, retval)
-#define expect_equals(obj, val, retval)           return_if((obj != val), err_illegal_args, retval)
-#define expect_greater(val, lower_bound, retval)  return_if((val <= lower_bound), err_illegal_args, retval)
-#define expect_less(val, upper_bound, retval)     return_if((val >= upper_bound), err_illegal_args, retval)
-#define expect_good_malloc(obj, retval)           return_if((obj == NULL), err_bad_malloc, retval)
+#define EXPECT_NONNULL(obj, retval)               RETURN_IF((obj == NULL), err_null_ptr, retval)
+#define EXPECT_GREATER(val, lower_bound, retval)  RETURN_IF((val <= lower_bound), err_illegal_args, retval)
+#define EXPECT_GOOD_MALLOC(obj, retval)           RETURN_IF((obj == NULL), err_bad_malloc, retval)
 
-#define ptr_distance(a, b)                                                                                             \
+#define PTR_DISTANCE(a, b)                                                                                             \
     ((void *)b > (void *)a ? ((void *)b - (void *)a) : ((void *)a - (void *)b))
 
-#define offset_distance(a, b)                                                                                          \
+#define OFFSET_DISTANCE(a, b)                                                                                          \
     (a < b ? b - a : NULL_OFFSET )
 
-#define has_flag(val, flag)                                                                                            \
+#define HAS_FLAG(val, flag)                                                                                            \
     ((val & flag) == flag)
 
-#define null_ptr()                                                                                                     \
-    (in_page_ptr) {                                                                                                 \
+#define PAGE_NULL_PTR()                                                                                                \
+    (in_page_ptr) {                                                                                                    \
         .offset = NULL_OFFSET,                                                                                         \
         .target_type_bit_0 = 1,                                                                                        \
         .target_type_bit_1 = 1,                                                                                        \
@@ -142,82 +130,279 @@ typedef enum {
 // H E L P E R   P R O T O T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-static inline size_t sizeof_ext_hdr(size_t free_space_cap, size_t frame_reg_cap);
-static inline size_t sizeof_total_hdr(size_t free_space_cap, size_t frame_reg_cap);
+// - B A S I C ---------------------------------------------------------------------------------------------------------
 
-static inline void *seek(const page_t *page, seek_target target);
+static inline void *
+seek(
+        const page_t *    page,
+        seek_target       target
+);
 
-static inline free_store_t *free_store_in(const page_t *page);
-static inline range_t *free_store_at(const page_t *page, size_t pos);
-static inline size_t free_store_len(const page_t *page);
-static inline bool free_store_pop(range_t *range, page_t *page);
-static inline bool free_store_push(page_t *page, offset_t begin, offset_t end);
-static inline range_t *free_store_new(const page_t *page);
-static inline bool free_store_bind(range_t *range, page_t *page, size_t size, block_positioning strategy);
-static inline range_t free_store_splitoff(page_t *page, size_t pos, size_t size);
-static inline void free_store_rebuild(page_t *page);
-static inline void free_store_unempty(page_t *page);
-static inline void free_store_merge(page_t *page);
-static inline void free_store_free_space_inc(page_t *page, size_t size);
-static inline void free_store_free_space_dec(page_t *page, size_t size);
-static inline size_t free_store_free_space_get(const page_t *page);
-static inline size_t free_store_find_range_pos_with_capacity(const page_t *page, size_t capacity);
-static inline size_t free_store_get_max_free_range_capacity(const page_t *page);
+static inline void
+write_unsafe(
+        page_t *          page,
+        offset_t          offset,
+        const void *      data,
+        size_t            size
+);
 
-static inline bool in_page_ptr_is_null(const in_page_ptr *ptr);
-//static inline bool in_page_ptr_equals(const in_page_ptr *lhs, const in_page_ptr *rhs);
-static inline bool in_page_ptr_has_scope(const in_page_ptr *ptr, ptr_scope_type type);
-static inline void in_page_ptr_make(in_page_ptr *ptr, page_t *page, ptr_type type, ptr_target target, offset_t offset);
-static inline void in_page_ptr_make_near(in_page_ptr *ptr, page_t *page, ptr_target type, offset_t offset);
-static inline ptr_target in_page_ptr_get_type(const in_page_ptr *ptr);
-static inline void *in_page_ptr_deref(buffer_manager_t *buffer_manager, const in_page_ptr *ptr);
-static inline zone_t *ptr_cast_zone(buffer_manager_t *buffer_manager, const in_page_ptr *ptr);
-static inline frame_t *ptr_cast_frame(buffer_manager_t *buffer_manager, const in_page_ptr *ptr);
-static inline frame_t *find_frame(buffer_manager_t *manager, const zone_t *zone);
-//static inline void *persistent_ptr_cast_userdata(const page_t *page, in_page_ptr *ptr);
+static inline void *
+read_unsafe(
+        const page_t *    page,
+        offset_t          offset);
+
+// - F R E E S P A C E   R E G I S T E R -------------------------------------------------------------------------------
+
+static inline freespace_reg_t *
+freespace(
+        const page_t *    page
+);
+
+static inline range_t *
+freespace_at(
+        const page_t *    page,
+        size_t            pos
+);
+
+static inline size_t
+freespace_len(
+        const page_t *    page
+);
+
+static inline bool
+freespace_pop(
+        range_t *         range,
+        page_t *          page
+);
+
+static inline bool
+freespace_push(
+        page_t *          page,
+        offset_t          begin,
+        offset_t          end
+);
+
+static inline range_t *
+freespace_new(
+        const page_t *    page
+);
+
+static inline int
+freespace_comp_by_start(
+        const void *      lhs,
+        const void *      rhs
+);
+
+static inline bool
+freespace_bind(
+        range_t *         range,
+        page_t *          page,
+        size_t            size,
+        block_pos         strategy
+);
+
+static inline range_t
+freespace_split(
+        page_t *          page,
+        size_t            pos,
+        size_t            size
+);
+
+static inline void
+freespace_rebuild(
+        page_t *          page
+);
+
+static inline void
+freespace_cleanup(
+        page_t *          page
+);
+
+static inline void
+freespace_merge(
+        page_t *          page
+);
+
+static inline size_t
+freespace_find_first(
+        const page_t *    page,
+        size_t            capacity
+);
+
+static inline size_t
+freespace_largest(
+        const page_t *    page
+);
+
+// - P A G E -----------------------------------------------------------------------------------------------------------
+
+static inline size_t
+page_approx_freespace(
+        const page_t *    page
+);
+
+static inline void
+page_approx_freespace_inc(
+        page_t *          page,
+        size_t            size
+);
+
+static inline void
+page_approx_freespace_dec(
+        page_t *          page,
+        size_t            size
+);
+
+static inline size_t
+page_ext_header_sizeof(
+        size_t            free_space_cap,
+        size_t            frame_reg_cap
+);
+
+static inline size_t
+page_total_header_sizeof(
+        size_t            free_space_cap,
+        size_t            frame_reg_cap
+);
+
+// - P A G E  P O I N T E R --------------------------------------------------------------------------------------------
+
+static inline bool
+ptr_is_null(
+        const in_page_ptr *ptr
+);
+
+static inline bool
+ptr_has_scope(
+        const in_page_ptr *ptr,
+        ptr_scope_type     type
+);
+
+static inline void
+ptr_make(
+        in_page_ptr *      ptr,
+        page_t *           page,
+        page_ptr_type      type,
+        ptr_target         target,
+        offset_t           offset
+);
+
+static inline ptr_target
+ptr_typeof(
+        const in_page_ptr *ptr
+);
+
+static inline void *
+ptr_deref(
+        anit_buffer_t * buffer_manager,
+        const in_page_ptr *ptr
+);
+
+static inline zone_t *
+ptr_cast_zone(
+        anit_buffer_t * buffer_manager,
+        const in_page_ptr *ptr
+);
+
+static inline lane_t *
+ptr_cast_frame(
+        anit_buffer_t * buffer_manager,
+        const in_page_ptr *ptr
+);
+
+// - L A N E   R E G I S T E R  ----------------------------------------------------------------------------------------
+
+static inline lane_t *
+lane_by_zone(
+        anit_buffer_t *manager,
+        const zone_t     *zone
+);
+
+static inline void
+lane_reg_init(
+        page_t *          page,
+        size_t            num_frames
+);
+
+static inline lane_reg_t *
+lane_reg(
+        const page_t *    page
+);
+
+static inline offset_t *
+lane_offsetof(
+        const page_t *    page,
+        lane_id_t         id
+);
+
+static inline lane_t *
+lane_by_id(
+        const page_t *   page,
+        lane_id_t        id
+);
+
+static inline lane_id_t *
+lane_reg_entry_by_pos(
+        const page_t *    page,
+        size_t            pos
+);
+
+static inline bool
+lane_reg_is_full(
+        const page_t *    page
+);
+
+static inline lane_id_t
+lane_new(
+        page_t *          page,
+        block_pos         strategy,
+        size_t            size
+);
+
+static inline void
+lane_reg_link(
+        page_t *          page,
+        lane_id_t         id,
+        offset_t          offset
+);
+
+static inline lane_id_t
+lane_reg_scan(
+        const page_t *    page,
+        frame_state       state
+);
 
 
-static inline int comp_range_start(const void *lhs, const void *rhs);
 
-static inline void frame_store_init(page_t *page, size_t num_frames);
-static inline frame_store_t *frame_store_in(const page_t *page);
-static inline offset_t *frame_store_offset_of(const page_t *page, frame_id_t frame_id);
-static inline frame_t *frame_store_frame_by_id(const page_t *page, frame_id_t frame_id);
-static inline frame_id_t *frame_store_recycle(const page_t *page, size_t pos);
-static inline bool frame_store_is_full(const page_t *page);
-static inline frame_id_t frame_store_create(page_t *page, block_positioning strategy, size_t size);
-static inline void frame_store_link(page_t *page, frame_id_t frame_id, offset_t frame_offset);
-static inline frame_id_t frame_store_scan(const page_t *page, frame_state state);
-
-static inline void data_store_write(page_t *page, offset_t offset, const void *data, size_t size);
-static inline void *data_store_at_unsafe(const page_t *page, offset_t offset);
-
-static inline bool range_do_overlap(range_t *lhs, range_t *rhs);
+static inline bool
+range_do_overlap(
+        range_t *         lhs,
+        range_t *         rhs);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E  I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-buffer_manager_t *buffer_manager_create(
-    size_t page_size,
-    size_t free_space_reg_capacity,
-    size_t frame_reg_capacity,
-    size_t max_hot_store_size)
+anit_buffer_t *buf_create(
+        size_t page_size,
+        size_t free_space_reg_capacity,
+        size_t frame_reg_capacity,
+        size_t max_hot_store_size)
 {
-    expect_greater(page_size, 0, NULL);
-    expect_greater(max_hot_store_size, 0, NULL);
-    expect_greater(free_space_reg_capacity, 0, NULL);
-    expect_greater(frame_reg_capacity, 0, NULL);
+    EXPECT_GREATER(page_size, 0, NULL);
+    EXPECT_GREATER(max_hot_store_size, 0, NULL);
+    EXPECT_GREATER(free_space_reg_capacity, 0, NULL);
+    EXPECT_GREATER(frame_reg_capacity, 0, NULL);
 
     panic_if((max_hot_store_size < 2 * page_size), BADPAGESIZE, page_size, max_hot_store_size);
 
-    buffer_manager_t *result = malloc(sizeof(buffer_manager_t));
-    expect_good_malloc(result, NULL);
+    anit_buffer_t *result = malloc(sizeof(anit_buffer_t));
+    EXPECT_GOOD_MALLOC(result, NULL);
     result->page_anticache.page_hot_store = fixed_linear_hash_table_create(&(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen},
                                                            sizeof(page_id_t), sizeof(void*), HOTSTORE_INITCAP,
                                                            HOTSTORE_GROW_FACTOR, HOTSTORE_MAX_FILL_FAC);
     result->max_size_hot_store = max_hot_store_size;
-    expect_non_null(result->page_anticache.page_hot_store, NULL);
+    EXPECT_NONNULL(result->page_anticache.page_hot_store, NULL);
 
     result->config = (buffer_manager_config_t) {
         .frame_reg_capacity = frame_reg_capacity,
@@ -232,10 +417,10 @@ buffer_manager_t *buffer_manager_create(
 }
 
 static inline page_t *generic_store_get(
-    buffer_manager_t    *manager,
+    anit_buffer_t    *manager,
     size_t               size,
-    const page_id_t     *(*iterate)(buffer_manager_t *, const page_id_t*),
-    page_t              *(*fetch)(buffer_manager_t *, page_id_t),
+    const page_id_t     *(*iterate)(anit_buffer_t *, const page_id_t*),
+    page_t              *(*fetch)(anit_buffer_t *, page_id_t),
     size_t              (*get_capacity)(page_t *, free_space_get_strategy)
 )
 {
@@ -256,7 +441,7 @@ static inline page_t *generic_store_get(
 }
 
 static inline page_t *page_anticache_find_page_by_free_size(
-    buffer_manager_t    *manager,
+    anit_buffer_t    *manager,
     size_t               size,
     page_t              *favored_page)
 {
@@ -286,7 +471,7 @@ static inline page_t *page_anticache_find_page_by_free_size(
 }
 
 static inline void page_anticache_pin_page(
-    buffer_manager_t    *manager,
+    anit_buffer_t    *manager,
     page_t              *page)
 {
     warn(NOTIMPLEMENTED, to_string(page_anticache_pin_page));   // TODO: Implement
@@ -294,17 +479,17 @@ static inline void page_anticache_pin_page(
 }
 
 static inline void page_anticache_unpin_page(
-    buffer_manager_t    *manager,
+    anit_buffer_t    *manager,
     page_t              *page)
 {
     warn(NOTIMPLEMENTED, to_string(page_anticache_unpin_page));   // TODO: Implement
     printf("DEBUG: UNPIN PAGE request was for page id %d\n", page->page_header.page_id);
 }
 
-static inline frame_id_t page_anticache_create_frame(
-    buffer_manager_t    *manager,
+static inline lane_id_t page_anticache_create_frame(
+    anit_buffer_t    *manager,
     page_t              *page,
-    block_positioning    strategy,
+    block_pos    strategy,
     size_t               size
 ) {
     require_non_null(manager);
@@ -313,41 +498,41 @@ static inline frame_id_t page_anticache_create_frame(
     panic_if(!(page_hot_store_has(manager, page->page_header.page_id)), BADHOTSTOREOBJ, page->page_header.page_id);
     fid_t *fid = frame_create(page, strategy, size);            // TODO: just return frame_id here instead of frame handle
     panic_if((fid == NULL), UNEXPECTED, "Frame handle is null");
-    frame_id_t result = fid->frame_id;
+    lane_id_t result = fid->frame_id;
     free (fid);
     return result;
 }
 
-block_ptr *buffer_manager_block_alloc(
-    buffer_manager_t    *manager,
-    size_t size, size_t  nzones,
-    block_positioning    strategy)
+cursor_t *buf_alloc(
+        anit_buffer_t *manager,
+        size_t size, size_t nlanes,
+        block_pos strategy)
 {
-    expect_non_null(manager, NULL);
-    expect_greater(size, 0, NULL);
-    expect_greater(nzones, 0, NULL);
+    EXPECT_NONNULL(manager, NULL);
+    EXPECT_GREATER(size, 0, NULL);
+    EXPECT_GREATER(nlanes, 0, NULL);
 
-    block_ptr *result = require_good_malloc(sizeof(block_ptr));
+    cursor_t *result = require_good_malloc(sizeof(cursor_t));
     page_t *page_frame = page_anticache_find_page_by_free_size(manager, FRAME_HDR_SIZE, NULL);
-    frame_id_t frame = page_anticache_create_frame(manager, page_frame, strategy, size);
+    lane_id_t frame = page_anticache_create_frame(manager, page_frame, strategy, size);
 
     page_anticache_pin_page(manager, page_frame);
     page_t *last_page_written_to = page_frame;
 
-    while (nzones--) {
+    while (nlanes--) {
         page_t *page_zone = page_anticache_find_page_by_free_size(manager, size, last_page_written_to);
         last_page_written_to = page_zone;
         printf("DEBUG: page %d capacity left: %zuB\n", page_zone->page_header.page_id, page_zone->page_header.free_space);
         zone_t *new_zone = NULL;
 
         page_anticache_pin_page(manager, page_zone);
-        nzones += ((new_zone = buf_zone_create(manager, page_frame, frame, page_zone, strategy)) == NULL);
+        nlanes += ((new_zone = buf_zone_create(manager, page_frame, frame, page_zone, strategy)) == NULL);
         page_anticache_unpin_page(manager, page_zone);
     }
 
     page_anticache_unpin_page(manager, page_frame);
 
-    *result = (block_ptr) {
+    *result = (cursor_t) {
         .page_id   = page_frame->page_header.page_id,
         .frame_id  = frame,
         .manager   = manager,
@@ -358,37 +543,37 @@ block_ptr *buffer_manager_block_alloc(
     return result;
 }
 
-void buffer_manager_block_free(
-    block_ptr *ptr)
+void buf_cursor_free(
+        cursor_t *cursor)
 {
-    require_non_null(ptr);
-    assert ((ptr->state != block_state_opened) || (ptr->zone != NULL));
-    free (ptr);
+    require_non_null(cursor);
+    assert ((cursor->state != block_state_opened) || (cursor->zone != NULL));
+    free (cursor);
 }
 
 zone_id_t buffer_manager_block_nextzone(
-    block_ptr *ptr)
+    cursor_t *ptr)
 {
     panic(NOTIMPLEMENTED, to_string(buffer_manager_block_nextzone));   // TODO: Implement
     return 0;
 }
 
 void buffer_manager_block_setzones(
-    block_ptr *ptr,
+    cursor_t *ptr,
     zone_id_t last_zone)
 {
     panic(NOTIMPLEMENTED, to_string(buffer_manager_block_setzones));   // TODO: Implement
 }
 
 void buffer_manager_block_rmzone(
-    block_ptr *ptr,
+    cursor_t *ptr,
     zone_id_t zone)
 {
     panic(NOTIMPLEMENTED, to_string(buffer_manager_block_rmzone));   // TODO: Implement
 }
 
-void buffer_manager_block_open(
-    block_ptr *ptr)
+void buf_open(
+        cursor_t *ptr)
 {
     require_non_null(ptr);
     require_non_null(ptr->manager);
@@ -401,8 +586,8 @@ void buffer_manager_block_open(
     ptr->state = block_state_opened;
 }
 
-bool buffer_manager_block_next(
-    block_ptr *ptr)
+bool buf_next(
+        cursor_t *ptr)
 {
     require_non_null(ptr);
     require_non_null(ptr->manager);
@@ -419,17 +604,17 @@ bool buffer_manager_block_next(
     } else return false;
 }
 
-void buffer_manager_block_close(
-    block_ptr *ptr)
+void buf_close(
+        cursor_t *ptr)
 {
     require_non_null(ptr);
     ptr->state = block_state_closed;
 }
 
-void buffer_manager_zone_read(
-    block_ptr *ptr,
-    void *capture,
-    void (*consumer) (void *capture, const void *data))
+void buf_read(
+        cursor_t *ptr,
+        void *capture,
+        void (*consumer)(void *capture, const void *data))
 {
     require_non_null(ptr);
     require_non_null(consumer);
@@ -437,25 +622,25 @@ void buffer_manager_zone_read(
     consumer (capture, zone_get_data(ptr->zone));
 }
 
-void buffer_manager_zone_cpy(
-    block_ptr *dst,
-    size_t offset,
-    const void *src, size_t num)
+void buf_memcpy(
+        cursor_t *dst,
+        size_t offset,
+        const void *src, size_t num)
 {
     require_non_null(dst);
     require_non_null(src);
     panic_if((dst->state != block_state_opened), BADSTATE, "block must be opened before call to memcpy");
     panic_if((dst->zone == NULL), BADINTERNAL, "block is opened but pointer to zone is null");
     assert (page_hot_store_has(dst->manager, dst->page_id));
-    assert (offset + num <= frame_store_frame_by_id(page_hot_store_fetch(dst->manager, dst->page_id), dst->frame_id)->elem_size);
+    assert (offset + num <= lane_by_id(page_hot_store_fetch(dst->manager, dst->page_id), dst->frame_id)->elem_size);
     zone_memcpy(dst->zone, offset, src, num);
 }
 
-bool buffer_manager_free(
-    buffer_manager_t *manager)
+bool buf_free(
+        anit_buffer_t *manager)
 {
-    expect_non_null(manager, false);
-    expect_non_null(manager->page_anticache.page_hot_store, false);
+    EXPECT_NONNULL(manager, false);
+    EXPECT_NONNULL(manager->page_anticache.page_hot_store, false);
     bool free_page_reg = dict_free(manager->page_anticache.page_hot_store);
     if (free_page_reg) {
         free (manager);
@@ -470,7 +655,7 @@ bool buffer_manager_free(
 // Note: no "flush list"
 
 void page_anticache_init(
-    buffer_manager_t *manager)
+    anit_buffer_t *manager)
 {
     require_non_null(manager);
     manager->page_anticache.page_hot_store_page_ids = list_create(sizeof(page_id_t));
@@ -489,13 +674,13 @@ void page_anticache_init(
 }
 
 void page_anticache_page_new(
-    buffer_manager_t *manager,
+    anit_buffer_t *manager,
     size_t size)
 {
     panic(NOTIMPLEMENTED, to_string(page_anticache_page_new));   // TODO: Implement
 }
 
-page_t *page_anticache_get_page_by_id(buffer_manager_t *manager, page_id_t page_id)
+page_t *page_anticache_get_page_by_id(anit_buffer_t *manager, page_id_t page_id)
 {
     require_non_null(manager);
     warn_if((page_id >= manager->page_anticache.next_page_id), "Requested page id '%d' might not from this pool", page_id);
@@ -510,35 +695,35 @@ page_t *page_anticache_get_page_by_id(buffer_manager_t *manager, page_id_t page_
 }
 
 void page_anticache_activate_page_by_id(
-    buffer_manager_t *manager,
+    anit_buffer_t *manager,
     page_id_t page_id)
 {
     page_anticache_get_page_by_id(manager, page_id);
 }
 
 void page_anticache_page_delete(
-    buffer_manager_t *manager,
+    anit_buffer_t *manager,
     page_t *page)
 {
     panic(NOTIMPLEMENTED, to_string(page_anticache_page_delete));   // TODO: Implement
 }
 
 void page_anticache_free_list_push(
-    buffer_manager_t *manager,
+    anit_buffer_t *manager,
     page_id_t page_id)
 {
     panic(NOTIMPLEMENTED, to_string(page_anticache_free_list_push));   // TODO: Implement
 }
 
 bool page_anticache_free_list_is_empty(
-    buffer_manager_t *manager)
+    anit_buffer_t *manager)
 {
     assert (manager);
     return (manager->page_anticache.free_page_ids_stack->num_elements == 0);
 }
 
 page_t *page_anticache_create_page(
-    buffer_manager_t *manager)
+    anit_buffer_t *manager)
 {
     require_non_null(manager);
     page_t *result = NULL;
@@ -555,19 +740,19 @@ page_t *page_anticache_create_page(
 }
 
 page_id_t page_anticache_free_list_pop(
-    buffer_manager_t *manager)
+    anit_buffer_t *manager)
 {
     panic(NOTIMPLEMENTED, to_string(page_anticache_free_list_pop));   // TODO: Implement
 }
 
-size_t page_anticache_new_page_id(buffer_manager_t *manager)
+size_t page_anticache_new_page_id(anit_buffer_t *manager)
 {
     require_non_null(manager);
     return manager->page_anticache.next_page_id++;
 }
 
 void page_anticache_hot_store_add(
-    buffer_manager_t *manager,
+    anit_buffer_t *manager,
     page_t *page)
 {
     warn(NOTIMPLEMENTED, to_string(page_anticache_hot_store_add));   // TODO: Implement
@@ -578,14 +763,14 @@ void page_anticache_hot_store_add(
 }
 
 void page_anticache_hot_store_remove(
-    buffer_manager_t *manager,
+    anit_buffer_t *manager,
     page_id_t page_id)
 {
     panic(NOTIMPLEMENTED, to_string(page_anticache_hot_store_remove));   // TODO: Implement
 }
 
 const page_id_t* page_anticache_hot_store_iterate(
-    buffer_manager_t *manager,
+    anit_buffer_t *manager,
     const page_id_t* last)
 {
     return (last == NULL? list_begin(manager->page_anticache.page_hot_store_page_ids) :
@@ -593,7 +778,7 @@ const page_id_t* page_anticache_hot_store_iterate(
 }
 
 bool page_anticache_hot_store_is_empty(
-    buffer_manager_t *manager)
+    anit_buffer_t *manager)
 {
     assert (manager);
 
@@ -601,35 +786,35 @@ bool page_anticache_hot_store_is_empty(
 }
 
 void page_anticache_cold_store_add(
-    buffer_manager_t *manager,
+    anit_buffer_t *manager,
     page_id_t page_id)
 {
     panic(NOTIMPLEMENTED, to_string(page_anticache_cold_store_add));   // TODO: Implement
 }
 
 void page_anticache_cold_store_remove(
-    buffer_manager_t *manager,
+    anit_buffer_t *manager,
     page_id_t page_id)
 {
     panic(NOTIMPLEMENTED, to_string(page_anticache_cold_store_remove));   // TODO: Implement
 }
 
 const page_id_t *page_anticache_cold_store_iterate(
-    buffer_manager_t *manager,
+    anit_buffer_t *manager,
     const page_id_t *last)
 {
     panic(NOTIMPLEMENTED, to_string(page_anticache_cold_store_iterate));   // TODO: Implement
 }
 
 bool page_anticache_cold_store_is_empty(
-    buffer_manager_t *manager)
+    anit_buffer_t *manager)
 {
     assert (manager);
     return (manager->page_anticache.cold_store_page_ids->num_elements == 0);
 }
 
 void page_anticache_free(
-    buffer_manager_t *manager)
+    anit_buffer_t *manager)
 {
     panic(NOTIMPLEMENTED, to_string(page_anticache_free));   // TODO: Implement
 }
@@ -639,7 +824,7 @@ void page_anticache_free(
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool page_hot_store_init(
-    buffer_manager_t *manager)
+    anit_buffer_t *manager)
 {
     panic_if((manager == NULL), BADARGNULL, to_string(manager));
     panic_if((manager == NULL), BADARGZERO, to_string(num_pages));
@@ -648,7 +833,7 @@ bool page_hot_store_init(
 }
 
 void page_hot_store_set(
-    buffer_manager_t *manager,
+    anit_buffer_t *manager,
     page_id_t id,
     void *ptr)
 {
@@ -661,14 +846,14 @@ void page_hot_store_set(
 }
 
 bool page_hot_store_has(
-    buffer_manager_t *manager,
+    anit_buffer_t *manager,
     page_id_t id)
 {
     return (page_hot_store_fetch(manager, id) != NULL);
 }
 
 bool page_hot_store_remove(
-    buffer_manager_t *manager,
+    anit_buffer_t *manager,
     page_id_t id)
 {
     panic_if((manager == NULL), BADARGNULL, to_string(manager));
@@ -687,7 +872,7 @@ bool page_hot_store_remove(
 }
 
 page_t *page_hot_store_fetch(
-        buffer_manager_t *manager,
+        anit_buffer_t *manager,
         page_id_t id)
 {
     panic_if((manager == NULL), BADARGNULL, to_string(manager));
@@ -706,19 +891,19 @@ page_t *page_hot_store_fetch(
 // ---------------------------------------------------------------------------------------------------------------------
 
 void page_cold_store_init(
-    buffer_manager_t *manager)
+    anit_buffer_t *manager)
 {
 
 }
 
 void page_cold_store_clear(
-    buffer_manager_t *manager)
+    anit_buffer_t *manager)
 {
     panic(NOTIMPLEMENTED, to_string(page_cold_store_clear));   // TODO: Implement
 }
 
 page_t *page_cold_store_fetch(
-    buffer_manager_t *manager,
+    anit_buffer_t *manager,
     page_id_t id)
 {
     assert (manager);
@@ -728,7 +913,7 @@ page_t *page_cold_store_fetch(
 }
 
 void page_cold_store_push(
-    buffer_manager_t *manager,
+    anit_buffer_t *manager,
     page_t *page)
 {
     panic(NOTIMPLEMENTED, to_string(page_cold_store_push));   // TODO: Implement
@@ -739,14 +924,14 @@ void page_cold_store_push(
 // ---------------------------------------------------------------------------------------------------------------------
 
 page_t *page_create(
-    buffer_manager_t *manager,
+    anit_buffer_t *manager,
     page_id_t id,
     size_t size,
     page_flags flags,
     size_t free_space,
     size_t frame_reg)
 {
-    size_t header_size = sizeof_total_hdr(free_space, frame_reg);
+    size_t header_size = page_total_header_sizeof(free_space, frame_reg);
     size_t min_page_size = header_size + FRAME_HDR_SIZE + MIN_DATA_SIZE;
 
     size_t free_space_begin_offset = header_size;
@@ -755,26 +940,26 @@ page_t *page_create(
 
     warn_if((size < MIN_DATA_SIZE), "requested page page_size %zu bytes is too small. Must be at least %zu bytes.\n",
             size, min_page_size)
-    expect_greater(size, min_page_size, NULL)
-    expect_greater(free_space, 0, NULL)
-    expect_greater(frame_reg, 0, NULL)
-    expect_greater(free_space_size, 1, NULL)
-    expect_non_null(manager, NULL);
+    EXPECT_GREATER(size, min_page_size, NULL)
+    EXPECT_GREATER(free_space, 0, NULL)
+    EXPECT_GREATER(frame_reg, 0, NULL)
+    EXPECT_GREATER(free_space_size, 1, NULL)
+    EXPECT_NONNULL(manager, NULL);
 
     page_t *page = malloc(size);
-    expect_good_malloc(page, NULL);
+    EXPECT_GOOD_MALLOC(page, NULL);
     page->page_header.page_id = id;
     page->page_header.page_size = size;
     page->page_header.free_space = 0;
-    page->page_header.flags.is_dirty  = has_flag(flags, page_flag_dirty);
-    page->page_header.flags.is_fixed  = has_flag(flags, page_flag_fixed);
-    page->page_header.flags.is_locked = has_flag(flags, page_flag_locked);
+    page->page_header.flags.is_dirty  = HAS_FLAG(flags, page_flag_dirty);
+    page->page_header.flags.is_fixed  = HAS_FLAG(flags, page_flag_fixed);
+    page->page_header.flags.is_locked = HAS_FLAG(flags, page_flag_locked);
     page->frame_register.free_list_len = page->frame_register.in_use_num = page->free_space_register.list_len = 0;
     page->frame_register.max_num_frames = frame_reg;
     page->free_space_register.list_max = free_space;
 
-    frame_store_init(page, frame_reg);
-    free_store_push(page, free_space_begin_offset, free_space_end_offset);
+    lane_reg_init(page, frame_reg);
+    freespace_push(page, free_space_begin_offset, free_space_end_offset);
 
   //  page_hot_store_set(manager, id, page);
 
@@ -785,14 +970,14 @@ size_t page_get_free_space(
     page_t *page,
     free_space_get_strategy strategy)
 {
-    expect_non_null(page, 0);
+    EXPECT_NONNULL(page, 0);
     switch (strategy) {
         case free_space_get_quickapprox:
-            return free_store_free_space_get(page);
+            return page_approx_freespace(page);
         case free_space_get_slowexact:
-            return free_store_get_max_free_range_capacity(page);
+            return freespace_largest(page);
         default: {
-            panic(MSG_BADBRANCH, page);
+            panic(BADBRANCH, page);
             return 0;
         }
     }
@@ -819,18 +1004,18 @@ size_t page_get_free_space(
  */
 fid_t *frame_create(
     page_t *page,
-    block_positioning strategy,
+    block_pos strategy,
     size_t element_size)
 {
     fid_t *handle = NULL;
 
-    expect_non_null(page, NULL);
-    expect_greater(element_size, 0, NULL);
+    EXPECT_NONNULL(page, NULL);
+    EXPECT_GREATER(element_size, 0, NULL);
 
-    if (!frame_store_is_full(page)) {
-        handle = malloc (sizeof(frame_store_t));
-        expect_good_malloc(handle, NULL);
-        if ((handle->frame_id = frame_store_create(page, strategy, element_size)) == NULL_FID) {
+    if (!lane_reg_is_full(page)) {
+        handle = malloc (sizeof(lane_reg_t));
+        EXPECT_GOOD_MALLOC(handle, NULL);
+        if ((handle->frame_id = lane_new(page, strategy, element_size)) == NULL_FID) {
             return NULL;
         }
         handle->page_id = page->page_header.page_id;
@@ -847,56 +1032,56 @@ static inline bool page_equals(
 }
 
 zone_t *buf_zone_create(
-    buffer_manager_t *manager,
+    anit_buffer_t *manager,
     page_t *frame_page,
-    frame_id_t frame_id,
+    lane_id_t frame_id,
     page_t *new_zone_page,
-    block_positioning strategy)
+    block_pos strategy)
 {
     zone_t              *retval       = NULL;
-    frame_t             *frame        = frame_store_frame_by_id(frame_page, frame_id);
+    lane_t             *frame        = lane_by_id(frame_page, frame_id);
     const size_t         block_size   = (sizeof(zone_t) + frame->elem_size);
     range_t              free_range;
 
-    if (free_store_bind(&free_range, new_zone_page, block_size, strategy)) {
-        zone_t           new_zone            = { .next = null_ptr() };
+    if (freespace_bind(&free_range, new_zone_page, block_size, strategy)) {
+        zone_t           new_zone            = { .next = PAGE_NULL_PTR() };
         const offset_t   new_zone_offset     = free_range.begin;
         printf("DEBUG: zone offset %zu\n", new_zone_offset);
-        ptr_type         dist_frame_to_new   = page_equals(frame_page, new_zone_page) ? ptr_type_near : ptr_type_far;
-        bool             is_first_zone       = in_page_ptr_is_null(&frame->first);
+        page_ptr_type         dist_frame_to_new   = page_equals(frame_page, new_zone_page) ? PAGE_PTR_NEAR : PAGE_PTR_FAR;
+        bool             is_first_zone       = ptr_is_null(&frame->first);
 
-        assert (ptr_distance(free_range.begin, free_range.end) >= block_size);
+        assert (PTR_DISTANCE(free_range.begin, free_range.end) >= block_size);
 
         if (is_first_zone) {
-            assert (in_page_ptr_is_null(&frame->last));
-            in_page_ptr_make(&new_zone.prev, frame_page, dist_frame_to_new, target_frame, ptr_distance(frame_page, frame));
-            in_page_ptr_make(&frame->first, new_zone_page, dist_frame_to_new, target_zone, new_zone_offset);
+            assert (ptr_is_null(&frame->last));
+            ptr_make(&new_zone.prev, frame_page, dist_frame_to_new, target_frame, PTR_DISTANCE(frame_page, frame));
+            ptr_make(&frame->first, new_zone_page, dist_frame_to_new, target_zone, new_zone_offset);
         } else {
             // TODO: Implement partial update in cold store in case one of these pages are not in hot store
             // This step requires to hold max 3 pages in memory (the frame page itself, the page with the last new_zone
             // and (in worst case) an additional page for the last new_zone. To avoid loaded one page from the cold store
             // into the hot store, an alternative can be to apply "partial update" directly in the cold store to
             // update the pointers. With "partial update", no additional page must be loaded from cold store.
-            assert (!in_page_ptr_is_null(&frame->last));
+            assert (!ptr_is_null(&frame->last));
 
             zone_t       *last_zone        = ptr_cast_zone(manager, &frame->last);
             page_t       *last_zone_page   = page_anticache_get_page_by_id(manager, frame->last.page_id);
             page_anticache_pin_page(manager, last_zone_page);
-            ptr_type      dist_last_to_new = page_equals(last_zone_page, new_zone_page) ? ptr_type_near : ptr_type_far;
+            page_ptr_type      dist_last_to_new = page_equals(last_zone_page, new_zone_page) ? PAGE_PTR_NEAR : PAGE_PTR_FAR;
 
-            in_page_ptr_make(&new_zone.prev, last_zone_page, dist_last_to_new, target_zone, frame->last.offset);
-            in_page_ptr_make(&last_zone->next, new_zone_page, dist_last_to_new, target_zone, new_zone_offset);
+            ptr_make(&new_zone.prev, last_zone_page, dist_last_to_new, target_zone, frame->last.offset);
+            ptr_make(&last_zone->next, new_zone_page, dist_last_to_new, target_zone, new_zone_offset);
 
             assert (ptr_cast_zone(manager, &last_zone->next) != last_zone);
 
             page_anticache_unpin_page(manager, last_zone_page);
         }
 
-        in_page_ptr_make(&frame->last, new_zone_page, dist_frame_to_new, target_zone, new_zone_offset);
-        data_store_write(new_zone_page, new_zone_offset, &new_zone, sizeof(zone_t));
-        //memset(data_store_at_unsafe(frame_page, new_zone_offset + sizeof(zone_t)), 'X',
+        ptr_make(&frame->last, new_zone_page, dist_frame_to_new, target_zone, new_zone_offset);
+        write_unsafe(new_zone_page, new_zone_offset, &new_zone, sizeof(zone_t));
+        //memset(read_unsafe(frame_page, new_zone_offset + sizeof(zone_t)), 'X',
         //       frame->elem_size);   // TODO: Remove this line; its just for debugging purposes
-        retval = data_store_at_unsafe(new_zone_page, new_zone_offset);
+        retval = read_unsafe(new_zone_page, new_zone_offset);
     } else {
         error(err_limitreached);
     }
@@ -905,24 +1090,24 @@ zone_t *buf_zone_create(
 }
 
 zone_t *buf_zone_head(
-    buffer_manager_t *manager,
+    anit_buffer_t *manager,
     page_t *page,
-    frame_id_t frame_id)
+    lane_id_t frame_id)
 {
     require_non_null(manager);
     require_non_null(page);
 
-    frame_t *frame = frame_store_frame_by_id(page, frame_id);
-    return (in_page_ptr_is_null(&frame->first) ? NULL : ptr_cast_zone(manager, &frame->first));
+    lane_t *frame = lane_by_id(page, frame_id);
+    return (ptr_is_null(&frame->first) ? NULL : ptr_cast_zone(manager, &frame->first));
 }
 
 zone_t *buf_zone_next(
-    buffer_manager_t *manager,
+    anit_buffer_t *manager,
     zone_t *zone)
 {
     require_non_null(manager);
     require_non_null(zone);
-    if (in_page_ptr_is_null(&zone->next)) {
+    if (ptr_is_null(&zone->next)) {
         return NULL;
     } else {
         page_t *page = page_anticache_get_page_by_id(manager, zone->next.page_id);
@@ -934,7 +1119,7 @@ zone_t *buf_zone_next(
                zone->next.page_id, zone->next.offset);
 
         printf("DEBUG: next zone offset %zu in page id %d (next page id %d, offset %zu)\n",
-               ptr_distance(page, next_zone), page->page_header.page_id,
+               PTR_DISTANCE(page, next_zone), page->page_header.page_id,
                next_zone->next.page_id, next_zone->next.offset);
         // END Remove
 
@@ -951,9 +1136,9 @@ bool zone_memcpy(
     const void *data,
     size_t size)
 {
-    expect_non_null(zone, false);
-    expect_non_null(data, false);
-    expect_greater(size, 0, false);
+    EXPECT_NONNULL(zone, false);
+    EXPECT_NONNULL(data, false);
+    EXPECT_GREATER(size, 0, false);
 
     memcpy(zone_get_data(zone) + offset, data, size);
     return true;
@@ -967,12 +1152,12 @@ void *zone_get_data(
 }
 
 bool zone_remove(
-    buffer_manager_t *manager,
+    anit_buffer_t *manager,
     page_t *page,
     const zone_t *zone)
 {
-    expect_non_null(page, false);
-    expect_non_null(page, zone);
+    EXPECT_NONNULL(page, false);
+    EXPECT_NONNULL(page, zone);
     /*
      *  Case | IN-NULL | OUT-NULL | IN	 | OUT  | Scope	  | Note
      *  -----+---------+----------+------+------+---------+-------------------------
@@ -990,15 +1175,15 @@ bool zone_remove(
      *  11   | NO	   | NO		  | FAR	 | FAR  | 3 Pages | Handled outside this page
      */
 
-    panic_if(in_page_ptr_is_null(&zone->prev), MSG_BADBACKLINK, zone);
-    panic_if((!in_page_ptr_is_null(&zone->next) && !(in_page_ptr_get_type(&zone->next) == target_zone)), MSG_BADFRWDLINK, zone);
-    panic_if(!in_range(ptr_target, in_page_ptr_get_type(&zone->prev), target_frame, target_zone), MSG_BADTYPE, &zone->prev);
+    panic_if(ptr_is_null(&zone->prev), BADBACKLINK, zone);
+    panic_if((!ptr_is_null(&zone->next) && !(ptr_typeof(&zone->next) == target_zone)), BADFRWDLINK, zone);
+    panic_if(!IN_RANGE(ptr_target, ptr_typeof(&zone->prev), target_frame, target_zone), BADTYPE, &zone->prev);
 
-    bool prev_is_near  = (in_page_ptr_has_scope(&zone->prev, type_near_ptr));
-    bool next_is_near  = (in_page_ptr_has_scope(&zone->next, type_near_ptr));
-    bool prev_is_frame = (in_page_ptr_get_type(&zone->prev) == target_frame);
-    bool prev_is_zone  = (in_page_ptr_get_type(&zone->prev) == target_zone);
-    bool next_is_null  = (in_page_ptr_is_null(&zone->next));
+    bool prev_is_near  = (ptr_has_scope(&zone->prev, type_near_ptr));
+    bool next_is_near  = (ptr_has_scope(&zone->next, type_near_ptr));
+    bool prev_is_frame = (ptr_typeof(&zone->prev) == target_frame);
+    bool prev_is_zone  = (ptr_typeof(&zone->prev) == target_zone);
+    bool next_is_null  = (ptr_is_null(&zone->next));
 
     bool in_page_zone_is_lonely = (prev_is_frame && prev_is_near && next_is_null);
     bool in_page_zone_is_head   = (prev_is_frame && !next_is_null && prev_is_near && next_is_near);
@@ -1009,7 +1194,7 @@ bool zone_remove(
         error(err_notincharge);
         return false;
     } else {
-        frame_t *frame = find_frame(manager, zone);
+        lane_t *frame = lane_by_zone(manager, zone);
 
         if (in_page_zone_is_lonely) {
         /*
@@ -1021,8 +1206,8 @@ bool zone_remove(
          *  |     |-------- last -------^               |       |     |------- last -------^                |
          *  +-------------------------------------------+       +-------------------------------------------+
          */
-            frame->first = null_ptr();
-            frame->last = null_ptr();
+            frame->first = PAGE_NULL_PTR();
+            frame->last = PAGE_NULL_PTR();
         } else if (in_page_zone_is_head) {
         /*
          *  +---------------- THIS PAGE ----------------------------+       +---------------- THIS PAGE -------------+
@@ -1034,12 +1219,12 @@ bool zone_remove(
          *  +-------------------------------------------------------+       +----------------------------------------+
          */
             zone_t *next_zone = ptr_cast_zone(manager, &zone->next);
-            size_t next_zone_offset = ptr_distance(page, next_zone);
+            size_t next_zone_offset = PTR_DISTANCE(page, next_zone);
 
             frame->first = zone->next;
-            in_page_ptr_make_near(&next_zone->prev, page, target_frame, ptr_distance(page, frame));
+            ptr_make(&next_zone->prev, page, PAGE_PTR_NEAR, target_frame, PTR_DISTANCE(page, frame));
             if (frame->last.offset == next_zone_offset) {
-                in_page_ptr_make_near(&frame->last, page, target_zone, next_zone_offset);
+                ptr_make(&frame->last, page, PAGE_PTR_NEAR, target_zone, next_zone_offset);
             }
         } else if (in_page_zone_is_tail) {
         /*
@@ -1053,7 +1238,7 @@ bool zone_remove(
         */
             zone_t *prev_zone = ptr_cast_zone(manager, &zone->prev);
             frame->last = zone->prev;
-            prev_zone->next = null_ptr();
+            prev_zone->next = PAGE_NULL_PTR();
         } else if (in_page_zone_is_middle) {
          /*
          *  +---------------- THIS PAGE ----------------------------------------+       +---------------- THIS PAGE --------------------------+
@@ -1067,10 +1252,11 @@ bool zone_remove(
             zone_t *prev_zone = ptr_cast_zone(manager, &zone->prev), *next_zone = ptr_cast_zone(manager, &zone->next);
             prev_zone->next = zone->next;
             next_zone->prev = zone->prev;
-        } else panic(MSG_BADBRANCH, zone);
+        } else panic(BADBRANCH, zone);
 
-        free_store_push(page, ptr_distance(page, zone), ptr_distance(page, ((void *)zone + sizeof(zone_t) + frame->elem_size)));
-        free_store_rebuild(page);
+        freespace_push(page, PTR_DISTANCE(page, zone),
+                       PTR_DISTANCE(page, ((void *) zone + sizeof(zone_t) + frame->elem_size)));
+        freespace_rebuild(page);
     }
 
     return true;
@@ -1091,7 +1277,7 @@ bool page_free(
 
 void page_dump(
     FILE *out,
-    buffer_manager_t *manager,
+    anit_buffer_t *manager,
     const page_t *page,
     bool hex_view)
 {
@@ -1100,12 +1286,12 @@ void page_dump(
     printf("# A page dump was requested by the system.\n");
     printf("# \n");
     if (page) {
-        size_t free_space_reg_len = free_store_in(page)->list_max;
-        size_t frame_reg_len = frame_store_in(page)->max_num_frames;
-        size_t total_header_size = sizeof_total_hdr(free_space_reg_len, frame_reg_len);
+        size_t free_space_reg_len = freespace(page)->list_max;
+        size_t frame_reg_len = lane_reg(page)->max_num_frames;
+        size_t total_header_size = page_total_header_sizeof(free_space_reg_len, frame_reg_len);
 
-        free_store_t *free_space_reg = free_store_in(page);
-        frame_store_t *frame_reg = frame_store_in(page);
+        freespace_reg_t *free_space_reg = freespace(page);
+        lane_reg_t *frame_reg = lane_reg(page);
 
         size_t page_capacity = (page->page_header.page_size - total_header_size);
         printf("# Page (%p), pid=%d, page_size/capacity/free=%zu/%zu/%zu byte (footprint=%.4f%%, filled=%.4f%%)\n",
@@ -1118,62 +1304,62 @@ void page_dump(
         printf("#\n");
         printf("# Segments:\n");
         printf("# 0x%08x [HEADER]\n", 0);
-        printf("# %#010lx  [free space register]\n",     ptr_distance(page, free_space_reg));
-        printf("# %#010lx    capacity: %u\n",            ptr_distance(page, &free_space_reg->list_max),
+        printf("# %#010lx  [free space register]\n",     PTR_DISTANCE(page, free_space_reg));
+        printf("# %#010lx    capacity: %u\n",            PTR_DISTANCE(page, &free_space_reg->list_max),
                                                             free_space_reg->list_max);
-        printf("# %#010lx    page_size: %u\n",                ptr_distance(page, &free_space_reg->list_len),
+        printf("# %#010lx    page_size: %u\n",                PTR_DISTANCE(page, &free_space_reg->list_len),
                                                             free_space_reg->list_len);
-        printf("# %#010lx  [frame register]\n",          ptr_distance(page, frame_reg));
-        printf("# %#010lx    capacity: %u\n",            ptr_distance(page, &frame_reg->max_num_frames),
+        printf("# %#010lx  [frame register]\n",          PTR_DISTANCE(page, frame_reg));
+        printf("# %#010lx    capacity: %u\n",            PTR_DISTANCE(page, &frame_reg->max_num_frames),
                                                             frame_reg->max_num_frames);
-        printf("# %#010lx    in-use page_size: %u\n",         ptr_distance(page, &frame_reg->in_use_num),
+        printf("# %#010lx    in-use page_size: %u\n",         PTR_DISTANCE(page, &frame_reg->in_use_num),
                                                             frame_reg->in_use_num);
-        printf("# %#010lx    free-list page_size: %u\n",      ptr_distance(page, &frame_reg->free_list_len),
+        printf("# %#010lx    free-list page_size: %u\n",      PTR_DISTANCE(page, &frame_reg->free_list_len),
                                                             frame_reg->free_list_len);
-        printf("# %#010lx  [free space data]\n",         ptr_distance(page, free_store_at(page, 0)));
+        printf("# %#010lx  [free space data]\n",         PTR_DISTANCE(page, freespace_at(page, 0)));
         for (size_t idx = 0; idx < free_space_reg->list_len; idx++) {
-            free_store_at(page, idx);
-            range_t *range = free_store_at(page, idx);
+            freespace_at(page, idx);
+            range_t *range = freespace_at(page, idx);
             printf("# %#010lx    idx=%zu: off_start=%zu, off_end=%zu\n",
-                   ptr_distance(page, range), idx, range->begin, range->end);
+                   PTR_DISTANCE(page, range), idx, range->begin, range->end);
         }
         if (free_space_reg->list_len < free_space_reg->list_max) {
             printf("# %#010lx    (undefined until %#010lx)\n",
-                   ptr_distance(page, free_store_at(page, free_space_reg->list_len)),
-                   ptr_distance(page, free_store_at(page, free_space_reg->list_max - 1)));
+                   PTR_DISTANCE(page, freespace_at(page, free_space_reg->list_len)),
+                   PTR_DISTANCE(page, freespace_at(page, free_space_reg->list_max - 1)));
         }
 
-        printf("# %#010lx  [frame register in-use list]\n",       ptr_distance(page, frame_store_offset_of(page, 0)));
-        for (frame_id_t frame_id = 0; frame_id < frame_reg_len; frame_id++) {
-            offset_t *offset = frame_store_offset_of(page, frame_id);
-            printf("# %#010lx    fid=%05u: offset=", ptr_distance(page, offset), frame_id);
+        printf("# %#010lx  [frame register in-use list]\n",       PTR_DISTANCE(page, lane_offsetof(page, 0)));
+        for (lane_id_t frame_id = 0; frame_id < frame_reg_len; frame_id++) {
+            offset_t *offset = lane_offsetof(page, frame_id);
+            printf("# %#010lx    fid=%05u: offset=", PTR_DISTANCE(page, offset), frame_id);
             if (*offset != NULL_OFFSET) {
                 printf("%#010lx\n", *offset);
             } else
                 printf("(unset)\n");
         }
 
-        printf("# %#010lx  [frame register free-list stack]\n",       ptr_distance(page, frame_store_recycle(page, 0)));
+        printf("# %#010lx  [frame register free-list stack]\n",       PTR_DISTANCE(page, lane_reg_entry_by_pos(page, 0)));
         for (size_t idx = 0; idx < frame_reg->free_list_len; idx++) {
-            frame_id_t *frame = frame_store_recycle(page, idx);
-            printf("# %#010lx    pos=%05zu: fid=%u\n", ptr_distance(page, frame), idx, *frame);
+            lane_id_t *frame = lane_reg_entry_by_pos(page, idx);
+            printf("# %#010lx    pos=%05zu: fid=%u\n", PTR_DISTANCE(page, frame), idx, *frame);
         }
 
         for (size_t idx = frame_reg->free_list_len; idx < frame_reg->max_num_frames; idx++) {
-            frame_id_t *frame = frame_store_recycle(page, idx);
-            printf("# %#010lx    pos=%05zu: (unset)\n", ptr_distance(page, frame), idx);
+            lane_id_t *frame = lane_reg_entry_by_pos(page, idx);
+            printf("# %#010lx    pos=%05zu: (unset)\n", PTR_DISTANCE(page, frame), idx);
         }
 
-        printf("# %#010lx [PAYLOAD]\n",                   ptr_distance(page, seek(page, target_free_space_begin)));
+        printf("# %#010lx [PAYLOAD]\n",                   PTR_DISTANCE(page, seek(page, SEEK_PAYLOAD)));
 
         printf("# ---------- [FRAMES IN USE]\n");
-        for (frame_id_t frame_id = frame_store_scan(page, frame_inuse); frame_id != NULL_FID;
-             frame_id = frame_store_scan(NULL, frame_inuse))
+        for (lane_id_t frame_id = lane_reg_scan(page, frame_inuse); frame_id != NULL_FID;
+             frame_id = lane_reg_scan(NULL, frame_inuse))
         {
-            frame_t *frame = frame_store_frame_by_id(page, frame_id);
+            lane_t *frame = lane_by_id(page, frame_id);
             assert (frame);
 
-            offset_t frame_offset = *frame_store_offset_of(page, frame_id);
+            offset_t frame_offset = *lane_offsetof(page, frame_id);
             printf("# %#010lx    elem_size:%zu, first:(far_ptr:%d, pid=%d, offset=%#010lx), "
                    "last:(far_ptr:%d, pid=%d, offset=%#010lx) \n",
                        frame_offset, frame->elem_size, frame->first.is_far_ptr,
@@ -1182,18 +1368,18 @@ void page_dump(
         }
 
         printf("# ---------- [ZONES]\n");
-        for (frame_id_t frame_id = frame_store_scan(page, frame_inuse); frame_id != NULL_FID;
-             frame_id = frame_store_scan(NULL, frame_inuse)) {
+        for (lane_id_t frame_id = lane_reg_scan(page, frame_inuse); frame_id != NULL_FID;
+             frame_id = lane_reg_scan(NULL, frame_inuse)) {
 
-            frame_t *frame = frame_store_frame_by_id(page, frame_id);
-            in_page_ptr ptr = frame_store_frame_by_id(page, frame_id)->first;
-            while (!in_page_ptr_is_null(&ptr) && in_page_ptr_has_scope(&ptr, type_near_ptr)) {
+            lane_t *frame = lane_by_id(page, frame_id);
+            in_page_ptr ptr = lane_by_id(page, frame_id)->first;
+            while (!ptr_is_null(&ptr) && ptr_has_scope(&ptr, type_near_ptr)) {
                 assert(ptr.page_id == page->page_header.page_id);
 
                 const zone_t *zone = ptr_cast_zone(manager, &ptr);
 
                 printf("# %#010lx    prev:(far_ptr:%d, pid=%d, offset=%#010lx), next:(far_ptr:%d, pid=%d, offset=%#010lx)\n",
-                       ptr_distance(page, zone), zone->prev.is_far_ptr, zone->prev.page_id, zone->prev.offset,
+                       PTR_DISTANCE(page, zone), zone->prev.is_far_ptr, zone->prev.page_id, zone->prev.offset,
                         zone->next.is_far_ptr, zone->next.page_id, zone->next.offset);
 
                 if (hex_view) {
@@ -1210,7 +1396,7 @@ void page_dump(
                     for (; block_end < frame->elem_size; block_end += 16) {
                         memset(puffer, 0, 16);
                         memcpy(puffer, data + block_end - 16, 16);
-                        printf("# %#010lx    ", ptr_distance(page, data + block_end));
+                        printf("# %#010lx    ", PTR_DISTANCE(page, data + block_end));
                         for (unsigned i = 0; i < 16; i++) {
                             printf("%02X ", (unsigned char) puffer[i]);
                         }
@@ -1224,7 +1410,7 @@ void page_dump(
                     if (bytes_remain > 0) {
                         memset(puffer, 0, 16);
                         memcpy(puffer, data + (block_end - 16), bytes_remain);
-                        printf("# %#010lx    ", ptr_distance(page, data + block_end + 1));
+                        printf("# %#010lx    ", PTR_DISTANCE(page, data + block_end + 1));
                         for (unsigned i = 0; i < bytes_remain; i++) {
                             printf("%02X ", (unsigned char) puffer[i]);
                         }
@@ -1265,18 +1451,18 @@ void page_dump(
 // H E L P E R  I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-static inline size_t sizeof_ext_hdr(
-    size_t free_space_cap,
-    size_t frame_reg_cap)
+static inline size_t page_ext_header_sizeof(
+        size_t free_space_cap,
+        size_t frame_reg_cap)
 {
-    return (free_space_cap * sizeof(range_t) + frame_reg_cap * sizeof(offset_t) + frame_reg_cap * sizeof(frame_id_t));
+    return (free_space_cap * sizeof(range_t) + frame_reg_cap * sizeof(offset_t) + frame_reg_cap * sizeof(lane_id_t));
 }
 
-static inline size_t sizeof_total_hdr(
-    size_t free_space_cap,
-    size_t frame_reg_cap)
+static inline size_t page_total_header_sizeof(
+        size_t free_space_cap,
+        size_t frame_reg_cap)
 {
-    return CORE_HDR_SIZE + sizeof_ext_hdr(free_space_cap, frame_reg_cap);
+    return CORE_HDR_SIZE + page_ext_header_sizeof(free_space_cap, frame_reg_cap);
 }
 
 static inline void *seek(
@@ -1284,181 +1470,181 @@ static inline void *seek(
     seek_target target)
 {
     switch (target) {
-        case target_free_space_reg:
+        case SEEK_FREESPACE_REGISTER:
             return (void *) page + sizeof(page_header_t);
-        case target_frame_reg:
-            return seek(page, target_free_space_reg) + sizeof(free_store_t);
-        case target_free_space_data:
-            return seek(page, target_frame_reg) + sizeof(frame_store_t);
-        case target_frame_reg_inuse_data:
-            return seek(page, target_free_space_data) + sizeof(range_t) * free_store_in(page)->list_max;
-        case target_frame_reg_freelist_data:
-            return seek(page, target_frame_reg_inuse_data) + frame_store_in(page)->max_num_frames * sizeof(offset_t);
-        case target_free_space_begin:
-            return seek(page, target_frame_reg_freelist_data) +
-                    frame_store_in(page)->max_num_frames * sizeof(frame_id_t);
+        case SEEK_LANE_REGISTER:
+            return seek(page, SEEK_FREESPACE_REGISTER) + sizeof(freespace_reg_t);
+        case SEEK_FREESPACE_ENTRIES:
+            return seek(page, SEEK_LANE_REGISTER) + sizeof(lane_reg_t);
+        case SEEK_LANE_INUSE:
+            return seek(page, SEEK_FREESPACE_ENTRIES) + sizeof(range_t) * freespace(page)->list_max;
+        case SEEK_LANE_FREELIST:
+            return seek(page, SEEK_LANE_INUSE) + lane_reg(page)->max_num_frames * sizeof(offset_t);
+        case SEEK_PAYLOAD:
+            return seek(page, SEEK_LANE_FREELIST) +
+                    lane_reg(page)->max_num_frames * sizeof(lane_id_t);
         default: panic("Unknown seek target '%d'", target);
     }
 }
 
-static inline free_store_t *free_store_in(
-    const page_t *page)
+static inline freespace_reg_t *freespace(
+        const page_t *page)
 {
-    return (free_store_t *) seek(page, target_free_space_reg);
+    return (freespace_reg_t *) seek(page, SEEK_FREESPACE_REGISTER);
 }
 
-static inline void frame_store_init(
-    page_t *page,
-    size_t num_frames)
+static inline void lane_reg_init(
+        page_t *page,
+        size_t num_frames)
 {
-    frame_store_t *frame_reg = frame_store_in(page);
+    lane_reg_t *frame_reg = lane_reg(page);
 
     frame_reg->free_list_len = frame_reg->max_num_frames = num_frames;
     for (size_t idx = 0; idx < frame_reg->free_list_len; idx++) {
-        *frame_store_recycle(page, idx) = frame_reg->free_list_len - idx - 1;
+        *lane_reg_entry_by_pos(page, idx) = frame_reg->free_list_len - idx - 1;
     }
 
     frame_reg->in_use_num = 0;
     for (size_t idx = 0; idx < frame_reg->max_num_frames; idx++) {
-        *frame_store_offset_of(page, idx) = NULL_OFFSET;
+        *lane_offsetof(page, idx) = NULL_OFFSET;
     }
 }
 
-static inline frame_store_t *frame_store_in(
-    const page_t *page)
+static inline lane_reg_t *lane_reg(
+        const page_t *page)
 {
-    return (frame_store_t *) seek(page, target_frame_reg);
+    return (lane_reg_t *) seek(page, SEEK_LANE_REGISTER);
 }
 
-static inline range_t *free_store_at(
-    const page_t *page,
-    size_t pos)
+static inline range_t *freespace_at(
+        const page_t *page,
+        size_t pos)
 {
-    free_store_t *free_space_reg = free_store_in(page);
+    freespace_reg_t *free_space_reg = freespace(page);
     assert (pos < free_space_reg->list_max);
-    return seek(page, target_free_space_data) + sizeof(range_t) * pos;
+    return seek(page, SEEK_FREESPACE_ENTRIES) + sizeof(range_t) * pos;
 }
 
-static inline size_t free_store_len(
-    const page_t *page)
+static inline size_t freespace_len(
+        const page_t *page)
 {
-    free_store_t *free_space_reg = free_store_in(page);
+    freespace_reg_t *free_space_reg = freespace(page);
     return free_space_reg->list_len;
 }
 
-static inline bool free_store_pop(
-    range_t *range,
-    page_t *page)
+static inline bool freespace_pop(
+        range_t *range,
+        page_t *page)
 {
-    free_store_t *free_space_reg = free_store_in(page);
-    size_t len = free_store_len(page);
+    freespace_reg_t *free_space_reg = freespace(page);
+    size_t len = freespace_len(page);
     if (len > 0) {
         if (range != NULL) {
-            *range = *free_store_at(page, free_store_len(page) - 1);
+            *range = *freespace_at(page, freespace_len(page) - 1);
         }
         free_space_reg->list_len--;
         return true;
     } else return false;
 }
 
-static inline offset_t *frame_store_offset_of(
-    const page_t *page,
-    frame_id_t frame_id)
+static inline offset_t *lane_offsetof(
+        const page_t *page,
+        lane_id_t frame_id)
 {
     assert (page);
-    frame_store_t *frame_reg = frame_store_in(page);
+    lane_reg_t *frame_reg = lane_reg(page);
     assert (frame_id < frame_reg->max_num_frames);
-    return seek(page, target_frame_reg_inuse_data) + frame_id * sizeof(offset_t);
+    return seek(page, SEEK_LANE_INUSE) + frame_id * sizeof(offset_t);
 }
 
-static inline frame_t *frame_store_frame_by_id(
-    const page_t *page,
-    frame_id_t frame_id)
+static inline lane_t *lane_by_id(
+        const page_t *page,
+        lane_id_t frame_id)
 {
     assert (page);
-    offset_t offset = *frame_store_offset_of(page, frame_id);
-    void *data = data_store_at_unsafe(page, offset);
-    expect_non_null(data, NULL);
+    offset_t offset = *lane_offsetof(page, frame_id);
+    void *data = read_unsafe(page, offset);
+    EXPECT_NONNULL(data, NULL);
     return data;
 }
 
-static inline frame_id_t *frame_store_recycle(
-    const page_t *page,
-    size_t pos)
+static inline lane_id_t *lane_reg_entry_by_pos(
+        const page_t *page,
+        size_t pos)
 {
-    frame_store_t *frame_reg = frame_store_in(page);
+    lane_reg_t *frame_reg = lane_reg(page);
     assert (pos < frame_reg->max_num_frames);
-    return seek(page, target_frame_reg_inuse_data) + frame_reg->max_num_frames * sizeof(offset_t) +
-            pos * sizeof(frame_id_t);
+    return seek(page, SEEK_LANE_INUSE) + frame_reg->max_num_frames * sizeof(offset_t) +
+            pos * sizeof(lane_id_t);
 }
 
-static inline bool frame_store_is_full(
-    const page_t *page)
+static inline bool lane_reg_is_full(
+        const page_t *page)
 {
-    frame_store_t *frame_reg = frame_store_in(page);
+    lane_reg_t *frame_reg = lane_reg(page);
     return (frame_reg->free_list_len == 0);
 }
 
-static inline frame_id_t frame_store_create(
-    page_t *page,
-    block_positioning strategy,
-    size_t size)
+static inline lane_id_t lane_new(
+        page_t *page,
+        block_pos strategy,
+        size_t size)
 {
-    assert (!frame_store_is_full(page));
+    assert (!lane_reg_is_full(page));
 
-    frame_id_t frame_id = NULL_FID;
+    lane_id_t frame_id = NULL_FID;
     range_t free_range;
-    if ((free_store_bind(&free_range, page, FRAME_HDR_SIZE, strategy))) {
-        frame_id = *frame_store_recycle(page, --(frame_store_in(page))->free_list_len);
+    if ((freespace_bind(&free_range, page, FRAME_HDR_SIZE, strategy))) {
+        frame_id = *lane_reg_entry_by_pos(page, --(lane_reg(page))->free_list_len);
 
-        frame_t frame = {
-            .first = null_ptr(),
-            .last = null_ptr(),
+        lane_t frame = {
+            .first = PAGE_NULL_PTR(),
+            .last = PAGE_NULL_PTR(),
             .elem_size = size
         };
         offset_t frame_offset = free_range.begin;
-        assert (ptr_distance(free_range.begin, free_range.end) >= sizeof(frame_t));
-        data_store_write(page, free_range.begin, &frame, sizeof(frame_t));
-        frame_store_link(page, frame_id, frame_offset);
+        assert (PTR_DISTANCE(free_range.begin, free_range.end) >= sizeof(lane_t));
+        write_unsafe(page, free_range.begin, &frame, sizeof(lane_t));
+        lane_reg_link(page, frame_id, frame_offset);
     }
     return frame_id;
 }
 
-static inline void frame_store_link(
-    page_t *page,
-    frame_id_t frame_id,
-    offset_t frame_offset)
+static inline void lane_reg_link(
+        page_t *page,
+        lane_id_t frame_id,
+        offset_t frame_offset)
 {
     assert(page);
-    frame_store_t *frame_reg = frame_store_in(page);
+    lane_reg_t *frame_reg = lane_reg(page);
     assert(frame_id < frame_reg->max_num_frames);
-    *(offset_t *)(seek(page, target_frame_reg_inuse_data) + frame_id * sizeof(offset_t)) = frame_offset;
+    *(offset_t *)(seek(page, SEEK_LANE_INUSE) + frame_id * sizeof(offset_t)) = frame_offset;
 }
 
-static inline range_t *free_store_new(
-    const page_t *page)
+static inline range_t *freespace_new(
+        const page_t *page)
 {
     range_t *entry = NULL;
-    free_store_t *free_space_stack = free_store_in(page);
+    freespace_reg_t *free_space_stack = freespace(page);
     if (free_space_stack->list_len < free_space_stack->list_max) {
         size_t entry_pos = free_space_stack->list_len++;
-        entry = free_store_at(page, entry_pos);
+        entry = freespace_at(page, entry_pos);
     }
     return entry;
 }
 
-static inline size_t free_store_find_range_pos_with_capacity(
-    const page_t *page,
-    size_t capacity)
+static inline size_t freespace_find_first(
+        const page_t *page,
+        size_t capacity)
 {
     assert (page);
     assert (capacity > 0);
 
-    size_t entry_id_cursor = free_store_len(page);
+    size_t entry_id_cursor = freespace_len(page);
 
     while (entry_id_cursor--) {
-        range_t *cursor = free_store_at(page, entry_id_cursor);
-        if (offset_distance(cursor->begin, cursor->end) >= capacity) {
+        range_t *cursor = freespace_at(page, entry_id_cursor);
+        if (OFFSET_DISTANCE(cursor->begin, cursor->end) >= capacity) {
             goto return_position;
         }
     }
@@ -1469,26 +1655,26 @@ return_position:
     return entry_id_cursor;
 }
 
-static inline size_t free_store_get_max_free_range_capacity(const page_t *page)
+static inline size_t freespace_largest(const page_t *page)
 {
     assert (page);
 
     size_t max_capacity = 0;
-    size_t entry_id_cursor = free_store_len(page);
+    size_t entry_id_cursor = freespace_len(page);
 
     while (entry_id_cursor--) {
-        range_t *cursor = free_store_at(page, entry_id_cursor);
-        max_capacity = max(max_capacity, offset_distance(cursor->begin, cursor->end));
+        range_t *cursor = freespace_at(page, entry_id_cursor);
+        max_capacity = max(max_capacity, OFFSET_DISTANCE(cursor->begin, cursor->end));
     }
 
     return max_capacity;
 }
 
-static inline bool free_store_bind(
-    range_t *range,
-    page_t *page,
-    size_t size,
-    block_positioning strategy)
+static inline bool freespace_bind(
+        range_t *range,
+        page_t *page,
+        size_t size,
+        block_pos strategy)
 {
     assert(page);
     assert(size > 0);
@@ -1497,48 +1683,48 @@ static inline bool free_store_bind(
     range->begin = MAX_OFFSET;
     range->end = NULL_OFFSET;
 
-    const size_t no_such_entry_id = free_store_len(page);
+    const size_t no_such_entry_id = freespace_len(page);
     size_t entry_id_cursor = no_such_entry_id, best_entry_id = no_such_entry_id;
 
     switch (strategy) {
         case positioning_first_nomerge: case positioning_first_merge:
             /*while (entry_id_cursor--) {
-                range_t *cursor = free_store_at(page, entry_id_cursor);
-                if (offset_distance(cursor->begin, cursor->end) >= page_size) {
-                    *range = free_store_splitoff(page, entry_id_cursor, page_size);
+                range_t *cursor = freespace_at(page, entry_id_cursor);
+                if (OFFSET_DISTANCE(cursor->begin, cursor->end) >= page_size) {
+                    *range = freespace_split(page, entry_id_cursor, page_size);
                     break;
                 }
             }*/
-            entry_id_cursor = free_store_find_range_pos_with_capacity(page, size);
+            entry_id_cursor = freespace_find_first(page, size);
             if (entry_id_cursor != SIZE_MAX)
-                *range = free_store_splitoff(page, entry_id_cursor, size);
+                *range = freespace_split(page, entry_id_cursor, size);
 
             break;
         case positioning_smallest_nomerge: case positioning_smallest_merge:
             while (entry_id_cursor--) {
-                range_t *cursor = free_store_at(page, entry_id_cursor);
-                size_t cursor_block_size = offset_distance(cursor->begin, cursor->end);
+                range_t *cursor = freespace_at(page, entry_id_cursor);
+                size_t cursor_block_size = OFFSET_DISTANCE(cursor->begin, cursor->end);
                 if (cursor_block_size >= size &&
-                    cursor_block_size < offset_distance(range->begin, range->begin)) {
+                    cursor_block_size < OFFSET_DISTANCE(range->begin, range->begin)) {
                     range->begin = cursor->begin;
                     range->end = cursor->end;
                     best_entry_id = entry_id_cursor;
                 }
             }
-            *range = free_store_splitoff(page, best_entry_id, size);
+            *range = freespace_split(page, best_entry_id, size);
             break;
         case positioning_largest_nomerge: case positioning_largest_merge:
             while (entry_id_cursor--) {
-                range_t *cursor = free_store_at(page, entry_id_cursor);
-                size_t cursor_block_size = offset_distance(cursor->begin, cursor->end);
+                range_t *cursor = freespace_at(page, entry_id_cursor);
+                size_t cursor_block_size = OFFSET_DISTANCE(cursor->begin, cursor->end);
                 if (cursor_block_size >= size &&
-                    cursor_block_size > offset_distance(range->begin, range->begin)) {
+                    cursor_block_size > OFFSET_DISTANCE(range->begin, range->begin)) {
                     range->begin = cursor->begin;
                     range->end = cursor->end;
                     best_entry_id = entry_id_cursor;
                 }
             }
-            *range = free_store_splitoff(page, best_entry_id, size);
+            *range = freespace_split(page, best_entry_id, size);
             break;
         default:
             error(err_internal);
@@ -1549,7 +1735,7 @@ static inline bool free_store_bind(
         if ((strategy == positioning_first_merge) ||
             (strategy == positioning_smallest_merge) ||
             (strategy == positioning_largest_merge)) {
-            free_store_rebuild(page);
+            freespace_rebuild(page);
         }
     }
 
@@ -1561,78 +1747,78 @@ static inline bool free_store_bind(
     return success;
 }
 
-static inline range_t free_store_splitoff(
-    page_t *page,
-    size_t pos,
-    size_t size)
+static inline range_t freespace_split(
+        page_t *page,
+        size_t pos,
+        size_t size)
 {
     assert (page);
-    free_store_t *free_space_reg = free_store_in(page);
+    freespace_reg_t *free_space_reg = freespace(page);
     assert (pos < free_space_reg->list_len);
-    range_t *range = free_store_at(page, pos);
-    assert (size <= ptr_distance(range->begin, range->end));
+    range_t *range = freespace_at(page, pos);
+    assert (size <= PTR_DISTANCE(range->begin, range->end));
     range_t result = {
         .begin = range->begin,
         .end = range->begin + size
     };
     range->begin = result.end;
-    free_store_free_space_dec(page, size);
+    page_approx_freespace_dec(page, size);
     return result;
 }
 
-static inline void free_store_rebuild(
-    page_t *page)
+static inline void freespace_rebuild(
+        page_t *page)
 {
     assert (page);
-    free_store_unempty(page);
-    free_store_merge(page);
+    freespace_cleanup(page);
+    freespace_merge(page);
 }
 
-static inline void free_store_unempty(
-    page_t *page)
+static inline void freespace_cleanup(
+        page_t *page)
 {
     assert (page);
-    size_t idx = free_store_len(page);
+    size_t idx = freespace_len(page);
     while (idx--) {
-        range_t *range = free_store_at(page, idx);
+        range_t *range = freespace_at(page, idx);
         assert (range->begin <= range->end);
-        if (offset_distance(range->begin, range->end) == 0) {
-            size_t reg_len = free_store_len(page);
+        if (OFFSET_DISTANCE(range->begin, range->end) == 0) {
+            size_t reg_len = freespace_len(page);
             if (idx < reg_len) {
-                memcpy((void *) range, free_store_at(page, idx) + 1, (reg_len - idx) * sizeof(range_t));
+                memcpy((void *) range, freespace_at(page, idx) + 1, (reg_len - idx) * sizeof(range_t));
             }
-            bool success = free_store_pop(NULL, page);
+            bool success = freespace_pop(NULL, page);
             assert(success);
             idx++;
         }
     }
 }
 
-static inline int comp_range_start(
-    const void *lhs,
-    const void *rhs)
+static inline int freespace_comp_by_start(
+        const void *lhs,
+        const void *rhs)
 {
     offset_t a = ((range_t *) lhs)->begin;
     offset_t b = ((range_t *) rhs)->begin;
     return (a == b ? 0 : (a < b) ? - 1 : 1);
 }
 
-static inline void free_store_merge(
-    page_t *page)
+static inline void freespace_merge(
+        page_t *page)
 {
     assert (page);
-    free_store_t *free_space_reg = free_store_in(page);
-    size_t len = free_store_len(page);
+    freespace_reg_t *free_space_reg = freespace(page);
+    size_t len = freespace_len(page);
     vector_t *vector = vector_create(sizeof(range_t), len);
 
     size_t idx = len;
     while (idx--) {
-        range_t *range = free_store_at(page, idx);
+        range_t *range = freespace_at(page, idx);
         vector_add(vector, 1, range);
     }
 
     void *raw_data = vector_get(vector);
-    qsort(raw_data, len, sizeof(range_t), comp_range_start);
+    qsort(raw_data, len, sizeof(range_t), freespace_comp_by_start);
 
     vector_t *stack = vector_create(sizeof(range_t), len);
     vector_add(stack, 1, raw_data); // ... stack is buggy
@@ -1646,25 +1832,25 @@ static inline void free_store_merge(
     }
 
     free_space_reg->list_len = stack->num_elements;
-    memcpy(free_store_at(page, 0), vector_get(stack), stack->num_elements * sizeof(range_t));
+    memcpy(freespace_at(page, 0), vector_get(stack), stack->num_elements * sizeof(range_t));
 
     vector_free(vector);
     vector_free(stack);
 }
 
-static inline frame_id_t frame_store_scan(
-    const page_t *page,
-    frame_state state)
+static inline lane_id_t lane_reg_scan(
+        const page_t *page,
+        frame_state state)
 {
     static size_t frame_id;
     static page_t *last_page = NULL;
     if (page != NULL) {
         last_page = (page_t *) page;
-        frame_id = frame_store_in(last_page)->max_num_frames;
+        frame_id = lane_reg(last_page)->max_num_frames;
     }
 
     while (frame_id--) {
-        offset_t frame_offset = *frame_store_offset_of(last_page, frame_id);
+        offset_t frame_offset = *lane_offsetof(last_page, frame_id);
         if ((state == frame_inuse && frame_offset != NULL_OFFSET) ||
             (state == frame_free  && frame_offset == NULL_OFFSET))
             return frame_id;
@@ -1673,8 +1859,8 @@ static inline frame_id_t frame_store_scan(
     return NULL_FID;
 }
 
-static inline bool in_page_ptr_is_null(
-    const in_page_ptr *ptr)
+static inline bool ptr_is_null(
+        const in_page_ptr *ptr)
 {
     assert(ptr);
     return (ptr->offset == NULL_OFFSET);
@@ -1694,9 +1880,9 @@ static inline bool in_page_ptr_is_null(
 }
 */
 
-static inline bool in_page_ptr_has_scope(
-    const in_page_ptr *ptr,
-    ptr_scope_type type)
+static inline bool ptr_has_scope(
+        const in_page_ptr *ptr,
+        ptr_scope_type type)
 {
     assert (ptr);
     switch (type) {
@@ -1708,18 +1894,18 @@ static inline bool in_page_ptr_has_scope(
     }
 }
 
-static inline void in_page_ptr_make(
-    in_page_ptr *ptr,
-    page_t *page,
-    ptr_type type,
-    ptr_target target,
-    offset_t offset)
+static inline void ptr_make(
+        in_page_ptr *ptr,
+        page_t *page,
+        page_ptr_type type,
+        ptr_target target,
+        offset_t offset)
 {
     assert(ptr);
     assert(page);
     assert(offset != NULL_OFFSET);
     ptr->page_id = page->page_header.page_id;
-    ptr->is_far_ptr = (type == ptr_type_far);
+    ptr->is_far_ptr = (type == PAGE_PTR_FAR);
     ptr->offset = offset;
     switch (target) {
         case target_frame:
@@ -1742,17 +1928,8 @@ static inline void in_page_ptr_make(
     }
 }
 
-static inline void in_page_ptr_make_near(
-    in_page_ptr  *ptr,
-    page_t       *page,
-    ptr_target   target,
-    offset_t     offset)
-{
-    return in_page_ptr_make(ptr, page, ptr_type_near, target, offset);
-}
-
-static inline ptr_target in_page_ptr_get_type(
-    const in_page_ptr *ptr)
+static inline ptr_target ptr_typeof(
+        const in_page_ptr *ptr)
 {
     assert (ptr);
     if (ptr->target_type_bit_0 == 0) {
@@ -1770,9 +1947,9 @@ static inline ptr_target in_page_ptr_get_type(
     }
 }
 
-static inline void *in_page_ptr_deref(
-    buffer_manager_t *buffer_manager,
-    const in_page_ptr *ptr)
+static inline void *ptr_deref(
+        anit_buffer_t *buffer_manager,
+        const in_page_ptr *ptr)
 {
     panic_if((buffer_manager == NULL), BADARGNULL, to_string(buffer_manager));
     panic_if((ptr == NULL), BADARGNULL, to_string(ptr));
@@ -1783,43 +1960,43 @@ static inline void *in_page_ptr_deref(
 }
 
 static inline zone_t *ptr_cast_zone(
-    buffer_manager_t *buffer_manager,
+    anit_buffer_t *buffer_manager,
     const in_page_ptr *ptr)
 {
-    panic_if(in_page_ptr_get_type(ptr) != target_zone, MSG_BADCAST, ptr);
-    void *data = in_page_ptr_deref(buffer_manager, ptr);
+    panic_if(ptr_typeof(ptr) != target_zone, BADCAST, ptr);
+    void *data = ptr_deref(buffer_manager, ptr);
     return (zone_t *) data;
 }
 
-static inline frame_t *ptr_cast_frame(
-    buffer_manager_t *buffer_manager,
+static inline lane_t *ptr_cast_frame(
+    anit_buffer_t *buffer_manager,
     const in_page_ptr *ptr)
 {
-    panic_if(in_page_ptr_get_type(ptr) != target_frame, MSG_BADCAST, ptr);
-    void *data = in_page_ptr_deref(buffer_manager, ptr);
-    return (frame_t *) data;
+    panic_if(ptr_typeof(ptr) != target_frame, BADCAST, ptr);
+    void *data = ptr_deref(buffer_manager, ptr);
+    return (lane_t *) data;
 }
 
-static inline frame_t *find_frame(
-    buffer_manager_t *manager,
-    const zone_t *zone)
+static inline lane_t *lane_by_zone(
+        anit_buffer_t *manager,
+        const zone_t *zone)
 {
-    while (!in_page_ptr_is_null(&zone->prev) && in_page_ptr_get_type(&zone->prev) != target_frame) {
+    while (!ptr_is_null(&zone->prev) && ptr_typeof(&zone->prev) != target_frame) {
         zone = ptr_cast_zone(manager, &zone->prev);
-        panic_if(!in_page_ptr_has_scope(&zone->prev, type_near_ptr), BADHURRY, "Traversing over page boundaries "
+        panic_if(!ptr_has_scope(&zone->prev, type_near_ptr), BADHURRY, "Traversing over page boundaries "
                 "not implemented!");
     }
     return ptr_cast_frame(manager, &zone->prev);
 }
 
-static inline void data_store_write(
-    page_t *page,
-    offset_t offset,
-    const void *data,
-    size_t size)
+static inline void write_unsafe(
+        page_t *page,
+        offset_t offset,
+        const void *data,
+        size_t size)
 {
     assert (page);
-    assert (offset >= ptr_distance(page, seek(page, target_free_space_begin)));
+    assert (offset >= PTR_DISTANCE(page, seek(page, SEEK_PAYLOAD)));
     assert (data);
     assert (size > 0);
 
@@ -1827,12 +2004,12 @@ static inline void data_store_write(
     memcpy(base + offset, data, size);
 }
 
-static inline void *data_store_at_unsafe(
-    const page_t *page,
-    offset_t offset)
+static inline void *read_unsafe(
+        const page_t *page,
+        offset_t offset)
 {
     assert (page);
-    assert (offset >= ptr_distance(page, seek(page, target_free_space_begin)));
+    assert (offset >= PTR_DISTANCE(page, seek(page, SEEK_PAYLOAD)));
     return offset != NULL_OFFSET ? (void *) page + offset : NULL;
 }
 
@@ -1844,40 +2021,40 @@ static inline bool range_do_overlap(
            (rhs->end >= lhs->begin && rhs->begin <= lhs->begin);
 }
 
-static inline void free_store_free_space_inc(
-    page_t *page,
-    size_t size)
+static inline void page_approx_freespace_inc(
+        page_t *page,
+        size_t size)
 {
     assert (page);
     page->page_header.free_space += size;
 }
 
-static inline void free_store_free_space_dec(
-    page_t *page,
-    size_t size)
+static inline void page_approx_freespace_dec(
+        page_t *page,
+        size_t size)
 {
     assert (page);
     page->page_header.free_space -= size;
 }
 
-static inline size_t free_store_free_space_get(
-    const page_t *page)
+static inline size_t page_approx_freespace(
+        const page_t *page)
 {
     return page->page_header.free_space;
 }
 
-static inline bool free_store_push(
-    page_t *page,
-    offset_t begin,
-    offset_t end)
+static inline bool freespace_push(
+        page_t *page,
+        offset_t begin,
+        offset_t end)
 {
     range_t *entry = NULL;
-    if ((entry = free_store_new(page))) {
-        expect_non_null(entry, false);
+    if ((entry = freespace_new(page))) {
+        EXPECT_NONNULL(entry, false);
         entry->begin = begin;
         entry->end = end;
     }
     panic_if((entry == NULL), UNEXPECTED, "Free store capacity exceeded");
-    free_store_free_space_inc(page, offset_distance(begin, end));
+    page_approx_freespace_inc(page, OFFSET_DISTANCE(begin, end));
     return (entry != NULL);
 }
