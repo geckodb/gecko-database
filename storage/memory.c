@@ -165,6 +165,7 @@ static inline size_t free_store_find_range_pos_with_capacity(const page_t *page,
 static inline size_t free_store_get_max_free_range_capacity(const page_t *page);
 
 static inline bool in_page_ptr_is_null(const in_page_ptr *ptr);
+//static inline bool in_page_ptr_equals(const in_page_ptr *lhs, const in_page_ptr *rhs);
 static inline bool in_page_ptr_has_scope(const in_page_ptr *ptr, ptr_scope_type type);
 static inline void in_page_ptr_make(in_page_ptr *ptr, page_t *page, ptr_type type, ptr_target target, offset_t offset);
 static inline void in_page_ptr_make_near(in_page_ptr *ptr, page_t *page, ptr_target type, offset_t offset);
@@ -212,11 +213,11 @@ buffer_manager_t *buffer_manager_create(
 
     buffer_manager_t *result = malloc(sizeof(buffer_manager_t));
     expect_good_malloc(result, NULL);
-    result->page_hot_store = fixed_linear_hash_table_create(&(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen},
+    result->page_anticache.page_hot_store = fixed_linear_hash_table_create(&(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen},
                                                            sizeof(page_id_t), sizeof(void*), HOTSTORE_INITCAP,
                                                            HOTSTORE_GROW_FACTOR, HOTSTORE_MAX_FILL_FAC);
     result->max_size_hot_store = max_hot_store_size;
-    expect_non_null(result->page_hot_store, NULL);
+    expect_non_null(result->page_anticache.page_hot_store, NULL);
 
     result->config = (buffer_manager_config_t) {
         .frame_reg_capacity = frame_reg_capacity,
@@ -233,23 +234,25 @@ buffer_manager_t *buffer_manager_create(
 static inline page_t *generic_store_get(
     buffer_manager_t    *manager,
     size_t               size,
-    page_id_t           (*iterate)(buffer_manager_t *, page_id_t),
-    page_t *            (*fetch)(buffer_manager_t *, page_id_t),
+    const page_id_t     *(*iterate)(buffer_manager_t *, const page_id_t*),
+    page_t              *(*fetch)(buffer_manager_t *, page_id_t),
     size_t              (*get_capacity)(page_t *, free_space_get_strategy)
 )
 {
-    page_id_t cursor = NULL_PAGE_ID;
+    const page_id_t *cursor = NULL;
     page_t *page = NULL;
 
-    while ((cursor = iterate(manager, cursor)) != NULL_PAGE_ID) {
-        page = fetch(manager, cursor);
-        if ((get_capacity(page, free_space_get_quickapprox) >= size) &&
-            (get_capacity(page, free_space_get_slowexact) >= size)) {
-            return page;
+    while ((cursor = iterate(manager, cursor)) != NULL) {
+        page = fetch(manager, *cursor);
+        size_t quick_free = get_capacity(page, free_space_get_quickapprox);
+        if (quick_free >= size) {
+            size_t exact_free = get_capacity(page, free_space_get_slowexact);
+            if (exact_free >= size)
+                return page;
         }
     }
 
-    return page;
+    return NULL;
 }
 
 static inline page_t *page_anticache_find_page_by_free_size(
@@ -266,12 +269,16 @@ static inline page_t *page_anticache_find_page_by_free_size(
         if (!page_anticache_hot_store_is_empty(manager)) {
             page = generic_store_get(manager, size, page_anticache_hot_store_iterate, page_hot_store_fetch,
                                      page_get_free_space);
-        } else if (page == NULL && !page_anticache_cold_store_is_empty(manager)) {
+        }
+
+        if (page == NULL && !page_anticache_cold_store_is_empty(manager)) {
             page = generic_store_get(manager, size, page_anticache_cold_store_iterate, page_cold_store_fetch, page_get_free_space);
             page_anticache_hot_store_add(manager, page);
-        } else {
+        }
+
+        if (page == NULL) {
             page = page_anticache_create_page(manager);
-            page_anticache_hot_store_add(manager, page);
+            //page_anticache_hot_store_add(manager, page);
         }
     }
 
@@ -283,7 +290,7 @@ static inline void page_anticache_pin_page(
     page_t              *page)
 {
     warn(NOTIMPLEMENTED, to_string(page_anticache_pin_page));   // TODO: Implement
-    printf("DEBUG: request was for page id %d\n", page->page_header.page_id);
+    printf("DEBUG: PIN PAGE request was for page id %d\n", page->page_header.page_id);
 }
 
 static inline void page_anticache_unpin_page(
@@ -291,6 +298,7 @@ static inline void page_anticache_unpin_page(
     page_t              *page)
 {
     warn(NOTIMPLEMENTED, to_string(page_anticache_unpin_page));   // TODO: Implement
+    printf("DEBUG: UNPIN PAGE request was for page id %d\n", page->page_header.page_id);
 }
 
 static inline frame_id_t page_anticache_create_frame(
@@ -324,9 +332,12 @@ block_ptr *buffer_manager_block_alloc(
     frame_id_t frame = page_anticache_create_frame(manager, page_frame, strategy, size);
 
     page_anticache_pin_page(manager, page_frame);
+    page_t *last_page_written_to = page_frame;
 
     while (nzones--) {
-        page_t *page_zone = page_anticache_find_page_by_free_size(manager, size, page_frame);
+        page_t *page_zone = page_anticache_find_page_by_free_size(manager, size, last_page_written_to);
+        last_page_written_to = page_zone;
+        printf("DEBUG: page %d capacity left: %zuB\n", page_zone->page_header.page_id, page_zone->page_header.free_space);
         zone_t *new_zone = NULL;
 
         page_anticache_pin_page(manager, page_zone);
@@ -383,7 +394,10 @@ void buffer_manager_block_open(
     require_non_null(ptr->manager);
     panic_if((ptr->state == block_state_opened), BADSTATE, "block was already opened.")
 
-    page_anticache_activate_page_by_id(ptr->manager, ptr->page_id);
+    //page_anticache_activate_page_by_id(ptr->manager, ptr->page_id);           // TODO: Uncomment
+    page_t *page = page_anticache_get_page_by_id(ptr->manager, ptr->page_id);   // TODO: Remove
+    page_dump(stdout, ptr->manager, page, false);                                      // TODO: Remove
+
     ptr->state = block_state_opened;
 }
 
@@ -401,7 +415,7 @@ bool buffer_manager_block_next(
             ptr->zone = buf_zone_next(ptr->manager, ptr->zone);
             ptr->state = (ptr->zone == NULL ? block_state_closed : block_state_opened);
         }
-        return true;
+        return (ptr->zone != NULL ? true : false);
     } else return false;
 }
 
@@ -441,8 +455,8 @@ bool buffer_manager_free(
     buffer_manager_t *manager)
 {
     expect_non_null(manager, false);
-    expect_non_null(manager->page_hot_store, false);
-    bool free_page_reg = dict_free(manager->page_hot_store);
+    expect_non_null(manager->page_anticache.page_hot_store, false);
+    bool free_page_reg = dict_free(manager->page_anticache.page_hot_store);
     if (free_page_reg) {
         free (manager);
     }
@@ -459,10 +473,7 @@ void page_anticache_init(
     buffer_manager_t *manager)
 {
     require_non_null(manager);
-    manager->page_anticache.hot_store_page_ids  = vector_create_ex(sizeof(page_id_t),
-                                                                   ANTICACHE_HOTSTORELIST_INITCAP,
-                                                                   auto_resize,
-                                                                   ANTICACHE_HOTSTORELIST_GROW_FACTOR);
+    manager->page_anticache.page_hot_store_page_ids = list_create(sizeof(page_id_t));
     manager->page_anticache.cold_store_page_ids = vector_create_ex(sizeof(page_id_t),
                                                                    ANTICACHE_COLDSTORELIST_INITCAP,
                                                                    auto_resize,
@@ -472,7 +483,7 @@ void page_anticache_init(
                                                                    auto_resize,
                                                                    ANTICACHE_PAGEID_FREELIST_GROW_FACTOR);
     manager->page_anticache.next_page_id = 0;
-    require((manager->page_anticache.hot_store_page_ids), BADHOTSTOREINIT);
+    require((manager->page_anticache.page_hot_store_page_ids), BADCOLDSTOREINIT);
     require((manager->page_anticache.cold_store_page_ids), BADCOLDSTOREINIT);
     require((manager->page_anticache.free_page_ids_stack), BADFREELISTINIT);
 }
@@ -563,6 +574,7 @@ void page_anticache_hot_store_add(
 
     // and register
     page_hot_store_set(manager, page->page_header.page_id, page);
+
 }
 
 void page_anticache_hot_store_remove(
@@ -572,18 +584,20 @@ void page_anticache_hot_store_remove(
     panic(NOTIMPLEMENTED, to_string(page_anticache_hot_store_remove));   // TODO: Implement
 }
 
-page_id_t page_anticache_hot_store_iterate(
+const page_id_t* page_anticache_hot_store_iterate(
     buffer_manager_t *manager,
-    page_id_t last)
+    const page_id_t* last)
 {
-    panic(NOTIMPLEMENTED, to_string(page_anticache_hot_store_iterate));   // TODO: Implement
+    return (last == NULL? list_begin(manager->page_anticache.page_hot_store_page_ids) :
+                          list_next(last));
 }
 
 bool page_anticache_hot_store_is_empty(
     buffer_manager_t *manager)
 {
     assert (manager);
-    return (manager->page_anticache.hot_store_page_ids->num_elements == 0);
+
+    return (dict_empty(manager->page_anticache.page_hot_store));
 }
 
 void page_anticache_cold_store_add(
@@ -600,9 +614,9 @@ void page_anticache_cold_store_remove(
     panic(NOTIMPLEMENTED, to_string(page_anticache_cold_store_remove));   // TODO: Implement
 }
 
-page_id_t page_anticache_cold_store_iterate(
+const page_id_t *page_anticache_cold_store_iterate(
     buffer_manager_t *manager,
-    page_id_t last)
+    const page_id_t *last)
 {
     panic(NOTIMPLEMENTED, to_string(page_anticache_cold_store_iterate));   // TODO: Implement
 }
@@ -629,7 +643,7 @@ bool page_hot_store_init(
 {
     panic_if((manager == NULL), BADARGNULL, to_string(manager));
     panic_if((manager == NULL), BADARGZERO, to_string(num_pages));
-    panic_if(!dict_empty(manager->page_hot_store), BADPOOLINIT, manager);
+    panic_if(!dict_empty(manager->page_anticache.page_hot_store), BADPOOLINIT, manager);
     return true;
 }
 
@@ -639,9 +653,11 @@ void page_hot_store_set(
     void *ptr)
 {
     panic_if((manager == NULL), BADARGNULL, to_string(manager));
-    panic_if((manager->page_hot_store == NULL), UNEXPECTED, "page register in manager");
-    warn_if((page_hot_store_has(manager, id)), UNEXPECTED, "page is already registered in hot store");
-    dict_put(manager->page_hot_store, &id, &ptr);
+    panic_if((manager->page_anticache.page_hot_store == NULL), UNEXPECTED, "page register in manager");
+  //  warn_if((page_hot_store_has(manager, id)), UNEXPECTED, "page is already registered in hot store");    // TODO: Remove
+    dict_put(manager->page_anticache.page_hot_store, &id, &ptr);
+    list_push(manager->page_anticache.page_hot_store_page_ids, &id);
+    printf("DEBUG: PUT page id %d to hot store\n", id);
 }
 
 bool page_hot_store_has(
@@ -656,9 +672,18 @@ bool page_hot_store_remove(
     page_id_t id)
 {
     panic_if((manager == NULL), BADARGNULL, to_string(manager));
-    panic_if((manager->page_hot_store == NULL), UNEXPECTED, "page register in manager");
-    panic_if (!(dict_contains_key(manager->page_hot_store, &id)), BADPAGEID, id);
-    return dict_remove(manager->page_hot_store, 1, &id);
+    panic_if((manager->page_anticache.page_hot_store == NULL), UNEXPECTED, "page register in manager");
+    panic_if (!(dict_contains_key(manager->page_anticache.page_hot_store, &id)), BADPAGEID, id);
+
+    const void *it = list_begin(manager->page_anticache.page_hot_store_page_ids);
+    do {
+        if (* (page_id_t *)it == id) {
+            list_remove(it);
+            break;
+        }
+    } while ((it = list_next(it)));
+
+    return dict_remove(manager->page_anticache.page_hot_store, 1, &id);
 }
 
 page_t *page_hot_store_fetch(
@@ -666,10 +691,13 @@ page_t *page_hot_store_fetch(
         page_id_t id)
 {
     panic_if((manager == NULL), BADARGNULL, to_string(manager));
-    panic_if((manager->page_hot_store == NULL), UNEXPECTED, "page register in manager");
+    panic_if((manager->page_anticache.page_hot_store == NULL), UNEXPECTED, "page register in manager");
 
-    const void *page_ptr = dict_get(manager->page_hot_store, &id);
+    const void *page_ptr = dict_get(manager->page_anticache.page_hot_store, &id);
     void **element = (void **)page_ptr;
+
+    assert (element != NULL); // TODO: Remove if cold store works
+
     return (element != NULL ? *element : NULL);
 }
 
@@ -694,7 +722,7 @@ page_t *page_cold_store_fetch(
     page_id_t id)
 {
     assert (manager);
-    page_t *loaded_page = manager->page_cold_store.fetch(id);
+    page_t *loaded_page = manager->page_anticache.cold_store.fetch(id);
     page_anticache_hot_store_add(manager, loaded_page);
     return loaded_page;
 }
@@ -748,7 +776,7 @@ page_t *page_create(
     frame_store_init(page, frame_reg);
     free_store_push(page, free_space_begin_offset, free_space_end_offset);
 
-    page_hot_store_set(manager, id, page);
+  //  page_hot_store_set(manager, id, page);
 
     return page;
 }
@@ -833,6 +861,7 @@ zone_t *buf_zone_create(
     if (free_store_bind(&free_range, new_zone_page, block_size, strategy)) {
         zone_t           new_zone            = { .next = null_ptr() };
         const offset_t   new_zone_offset     = free_range.begin;
+        printf("DEBUG: zone offset %zu\n", new_zone_offset);
         ptr_type         dist_frame_to_new   = page_equals(frame_page, new_zone_page) ? ptr_type_near : ptr_type_far;
         bool             is_first_zone       = in_page_ptr_is_null(&frame->first);
 
@@ -857,6 +886,9 @@ zone_t *buf_zone_create(
 
             in_page_ptr_make(&new_zone.prev, last_zone_page, dist_last_to_new, target_zone, frame->last.offset);
             in_page_ptr_make(&last_zone->next, new_zone_page, dist_last_to_new, target_zone, new_zone_offset);
+
+            assert (ptr_cast_zone(manager, &last_zone->next) != last_zone);
+
             page_anticache_unpin_page(manager, last_zone_page);
         }
 
@@ -893,8 +925,23 @@ zone_t *buf_zone_next(
     if (in_page_ptr_is_null(&zone->next)) {
         return NULL;
     } else {
-        page_anticache_get_page_by_id(manager, zone->next.page_id);
-        return ptr_cast_zone(manager, in_page_ptr_deref(manager, &zone->next));
+        page_t *page = page_anticache_get_page_by_id(manager, zone->next.page_id);
+        zone_t *next_zone = ptr_cast_zone(manager, &zone->next);
+
+        // TODO: REmove this this debug
+
+        printf("DEBUG: this zone offset ? in page id ? (next page id %d, offset %zu)\n",
+               zone->next.page_id, zone->next.offset);
+
+        printf("DEBUG: next zone offset %zu in page id %d (next page id %d, offset %zu)\n",
+               ptr_distance(page, next_zone), page->page_header.page_id,
+               next_zone->next.page_id, next_zone->next.offset);
+        // END Remove
+
+        assert (next_zone != zone);
+
+
+        return next_zone;
     }
 }
 
@@ -1045,7 +1092,8 @@ bool page_free(
 void page_dump(
     FILE *out,
     buffer_manager_t *manager,
-    const page_t *page)
+    const page_t *page,
+    bool hex_view)
 {
     assert (out);
     printf("\n#\n");
@@ -1144,57 +1192,61 @@ void page_dump(
 
                 const zone_t *zone = ptr_cast_zone(manager, &ptr);
 
-                printf("# %#010lx    prev:(far_ptr:%d, pid=%d, offset=%#010lx), prev:(far_ptr:%d, pid=%d, offset=%#010lx)\n",
+                printf("# %#010lx    prev:(far_ptr:%d, pid=%d, offset=%#010lx), next:(far_ptr:%d, pid=%d, offset=%#010lx)\n",
                        ptr_distance(page, zone), zone->prev.is_far_ptr, zone->prev.page_id, zone->prev.offset,
                         zone->next.is_far_ptr, zone->next.page_id, zone->next.offset);
 
-                printf("# zone content  ");
-                for (unsigned i = 0; i < 16; i++) {
-                    printf("%02x ", i);
-                }
-                printf("\n");
-
-                const void* data = (zone + 1);
-                char *puffer = malloc(16);
-                size_t block_end = 16;
-
-                for (; block_end < frame->elem_size; block_end += 16) {
-                    memset(puffer, 0, 16);
-                    memcpy(puffer, data + block_end - 16, 16);
-                    printf("# %#010lx    ", ptr_distance(page, data + block_end));
+                if (hex_view) {
+                    printf("# zone content  ");
                     for (unsigned i = 0; i < 16; i++) {
-                        printf("%02X ", (unsigned char) puffer[i]);
-                    }
-                    for (unsigned i = 0; i < 16; i++) {
-                        printf("%c ", puffer[i]);
+                        printf("%02x ", i);
                     }
                     printf("\n");
+
+                    const void *data = (zone + 1);
+                    char *puffer = malloc(16);
+                    size_t block_end = 16;
+
+                    for (; block_end < frame->elem_size; block_end += 16) {
+                        memset(puffer, 0, 16);
+                        memcpy(puffer, data + block_end - 16, 16);
+                        printf("# %#010lx    ", ptr_distance(page, data + block_end));
+                        for (unsigned i = 0; i < 16; i++) {
+                            printf("%02X ", (unsigned char) puffer[i]);
+                        }
+                        for (unsigned i = 0; i < 16; i++) {
+                            printf("%c ", puffer[i]);
+                        }
+                        printf("\n");
+                    }
+
+                    unsigned bytes_remain = 16 - (block_end - frame->elem_size);
+                    if (bytes_remain > 0) {
+                        memset(puffer, 0, 16);
+                        memcpy(puffer, data + (block_end - 16), bytes_remain);
+                        printf("# %#010lx    ", ptr_distance(page, data + block_end + 1));
+                        for (unsigned i = 0; i < bytes_remain; i++) {
+                            printf("%02X ", (unsigned char) puffer[i]);
+                        }
+                        for (unsigned i = bytes_remain; i < 16; i++) {
+                            printf("   ");
+                        }
+
+                        for (unsigned i = 0; i < bytes_remain; i++) {
+                            printf("%c ", puffer[i]);
+                        }
+                        for (unsigned i = bytes_remain; i < 16; i++) {
+                            printf("   ");
+                        }
+
+                    }
+                    printf("\n");
+
+                    free(puffer);
                 }
 
-                unsigned bytes_remain = 16 - (block_end - frame->elem_size);
-                if (bytes_remain > 0) {
-                    memset(puffer, 0, 16);
-                    memcpy(puffer, data + (block_end - 16), bytes_remain);
-                    printf("# %#010lx    ", ptr_distance(page, data + block_end + 1));
-                    for (unsigned i = 0; i < bytes_remain; i++) {
-                        printf("%02X ", (unsigned char) puffer[i]);
-                    }
-                    for (unsigned i = bytes_remain; i < 16; i++) {
-                        printf("   ");
-                    }
-
-                    for (unsigned i = 0; i < bytes_remain; i++) {
-                        printf("%c ", puffer[i]);
-                    }
-                    for (unsigned i = bytes_remain; i < 16; i++) {
-                        printf("   ");
-                    }
-
-                }
-                printf("\n");
 
 
-                free(puffer);
 
                 ptr = zone->next;
             }
@@ -1628,6 +1680,20 @@ static inline bool in_page_ptr_is_null(
     return (ptr->offset == NULL_OFFSET);
 }
 
+/*static inline bool in_page_ptr_equals(
+        const in_page_ptr *lhs,
+        const in_page_ptr *rhs)
+{
+    assert(lhs);
+    assert(rhs);
+    return (lhs->page_id == rhs->page_id) &&
+            (lhs->is_far_ptr == rhs->is_far_ptr) &&
+            (lhs->offset == rhs->offset) &&
+            (lhs->target_type_bit_0 == rhs->target_type_bit_0) &&
+            (lhs->target_type_bit_1 == rhs->target_type_bit_1);
+}
+*/
+
 static inline bool in_page_ptr_has_scope(
     const in_page_ptr *ptr,
     ptr_scope_type type)
@@ -1710,7 +1776,7 @@ static inline void *in_page_ptr_deref(
 {
     panic_if((buffer_manager == NULL), BADARGNULL, to_string(buffer_manager));
     panic_if((ptr == NULL), BADARGNULL, to_string(ptr));
-    panic_if((buffer_manager->page_hot_store == NULL), UNEXPECTED, "page register hash table is null");
+    panic_if((buffer_manager->page_anticache.page_hot_store == NULL), UNEXPECTED, "page register hash table is null");
     void *page_base_ptr = page_hot_store_fetch(buffer_manager, ptr->page_id);
     panic_if((page_base_ptr == NULL), UNEXPECTED, "page base pointer is not allowed to be null");
     return (page_base_ptr + ptr->offset);

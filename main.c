@@ -10,6 +10,8 @@
 #include <containers/dict.h>
 #include <containers/dictionaries/fixed_linear_hash_table.h>
 
+#define TUPLE_PER_BLOCK 80
+
 void test_promise_on_main_thread(const char *string, future_eval_policy policy);
 
 void *sample_promise_print(promise_result *return_value, const void *capture) {
@@ -35,9 +37,12 @@ typedef struct {
     size_t a,b,c;
 } hardcoded_tuple_t;
 
-void print_to_console(void *caputure, const void *data) {
-    hardcoded_tuple_t *tuple = (hardcoded_tuple_t *) data;
-    printf("tuple (%zu, %zu, %zu)\n", tuple->a, tuple->b, tuple->c);
+void print_to_console(void *caputure, const void *data)
+{
+    for (int i = 0; i < TUPLE_PER_BLOCK; i++) {
+        hardcoded_tuple_t *tuple = (hardcoded_tuple_t *) (data + i * sizeof(hardcoded_tuple_t));
+        printf("tuple (%zu, %zu, %zu)\n", tuple->a, tuple->b, tuple->c);
+    }
 }
 
 int main(void)
@@ -239,17 +244,23 @@ int main(void)
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // B U F F E R   M A N A G E R   T E S T
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        buffer_manager_t *buffer_manager = buffer_manager_create(1000000, 1000, 1000, 5000000);
-        block_ptr *block = buffer_manager_block_alloc(buffer_manager, 100 * sizeof(hardcoded_tuple_t), 500, positioning_first_nomerge);
+        buffer_manager_t *buffer_manager = buffer_manager_create(10000, 100, 100, 50000);
+        block_ptr *block = buffer_manager_block_alloc(buffer_manager, TUPLE_PER_BLOCK * sizeof(hardcoded_tuple_t), 10, positioning_first_nomerge);
         buffer_manager_block_open(block);
+
+        size_t super_counter = 0;
+
         while (buffer_manager_block_next(block)) {
-            for (int i = 0; i < 100; i++) {
-           /*     hardcoded_tuple_t my_tuple = {
-                        .a = rand(),
-                        .b = rand(),
-                        .c = rand()
-                };*/
-              //  buffer_manager_zone_cpy(block, i * sizeof(hardcoded_tuple_t), &my_tuple, 1);
+            printf("write to page %d:%d:%p\n", block->page_id, block->frame_id, block->zone);
+            for (int i = 0; i < TUPLE_PER_BLOCK; i++) {
+                hardcoded_tuple_t my_tuple = {
+                        .a = super_counter,
+                        .b = super_counter + 1,
+                        .c = super_counter + 2
+                };
+                super_counter++;
+              buffer_manager_zone_cpy(block, i * sizeof(hardcoded_tuple_t), &my_tuple, sizeof(hardcoded_tuple_t));
+            printf("write tuple (%zu, %zu, %zu)\n", my_tuple.a, my_tuple.b, my_tuple.c);
             }
         }
         buffer_manager_block_close(block);

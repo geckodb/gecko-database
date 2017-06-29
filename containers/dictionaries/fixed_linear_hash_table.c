@@ -324,6 +324,12 @@ vector_t *this_gets(const struct dict_t *self, size_t num_keys, const void *keys
         size_t slot_id = convert_to_slot_id(hash_code, extra);
         size_t round_trip_slot_id = calc_round_trip(slot_id, extra);
 
+        // TODO: Remove this since its a debug hack!
+        if (*(uint32_t *) key == 12) {
+            printf("!! YEAH GET 12! Intended slot: %zu\n", slot_id);
+        }
+        // END REMOVE THIS
+
         bool empty_slot_found = test_slot(self, extra, slot_id);
 
         if (!empty_slot_found) {
@@ -333,6 +339,12 @@ vector_t *this_gets(const struct dict_t *self, size_t num_keys, const void *keys
                     extra->counters.num_get_foundkey++;
                     void *value_ptr = get_value(self, extra, slot_id);
                     vector_add(result, 1, &value_ptr);
+
+                    // TODO: Remove this since its a debug hack!
+                    if (*(uint32_t *) key == 12) {
+                        printf("!! YEAH ADD value for 12! Actual slot: %zu\n", slot_id);
+                    }
+
                     goto next_key;
                 } else {
                     extra->counters.num_get_slotdisplaced++;
@@ -424,7 +436,7 @@ void this_puts(struct dict_t *self, size_t num_elements, const void *keys, const
                 if (!key_match) {
                     extra->counters.num_put_slotsearch++;
                     slot_id = convert_to_slot_id((slot_id + 1), extra);
-                    break;
+                    //break;
                 } else {
                     extra->counters.num_updates++;
                     break;
@@ -439,6 +451,19 @@ void this_puts(struct dict_t *self, size_t num_elements, const void *keys, const
             rebuild(self, extra);
             this_put(self, key, value);
         } else {
+            // TODO: Remove this since its a debug hack!
+            if (*(uint32_t *) key == 12) {
+                printf("EXECUTE PUT 12! Actual slot: %zu\n", slot_id);
+            }
+            // END REMOVE THIS
+
+            // TODO: Remove this since its a debug hack!
+            if (*(uint32_t *) key == 26) {
+                printf("EXECUTE PUT 26! Actual slot: %zu\n", slot_id);
+            }
+            // END REMOVE THIS
+
+
             slot_put(extra->slots, slot_id, self->key_size, self->elem_size, key, value);
             assert (extra->num_inuse < extra->num_slots);
             extra->num_inuse++;

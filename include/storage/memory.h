@@ -20,6 +20,7 @@
 #include <defs.h>
 #include <containers/vector.h>
 #include <containers/dictionaries/fixed_linear_hash_table.h>
+#include <containers/list.h>
 
 #define __force_packing__        __attribute__((__packed__))
 
@@ -136,10 +137,14 @@ typedef struct {
 } page_cold_store_t;
 
 typedef struct {
-    vector_t *hot_store_page_ids;   /* all page ids that are in use who live in hot-store */
-    vector_t *cold_store_page_ids;  /* all page ids that are in use who live in hot-store */
-    vector_t *free_page_ids_stack;  /* page ids that are free to be recycled */
     page_id_t next_page_id;
+    vector_t *free_page_ids_stack;  /* page ids that are free to be recycled */
+
+    dict_t *page_hot_store;
+    list_t *page_hot_store_page_ids;
+
+    page_cold_store_t cold_store;
+    vector_t *cold_store_page_ids;  /* all page ids that are in use who live in cold-store */
 } page_anticache_t;
 
 typedef struct {
@@ -149,12 +154,9 @@ typedef struct {
 } buffer_manager_config_t;
 
 typedef struct {
-    dict_t *page_hot_store;
     size_t max_size_hot_store;
 
     page_anticache_t page_anticache;
-    page_cold_store_t page_cold_store;
-
     buffer_manager_config_t config;
 } buffer_manager_t;
 
@@ -276,7 +278,7 @@ void page_anticache_hot_store_add(buffer_manager_t *manager, page_t *page);
 
 void page_anticache_hot_store_remove(buffer_manager_t *manager, page_id_t page_id);
 
-page_id_t page_anticache_hot_store_iterate(buffer_manager_t *manager, page_id_t last);
+const page_id_t* page_anticache_hot_store_iterate(buffer_manager_t *manager, const page_id_t *last);
 
 bool page_anticache_hot_store_is_empty(buffer_manager_t *manager);
 
@@ -284,7 +286,7 @@ void page_anticache_cold_store_add(buffer_manager_t *manager, page_id_t page_id)
 
 void page_anticache_cold_store_remove(buffer_manager_t *manager, page_id_t page_id);
 
-page_id_t page_anticache_cold_store_iterate(buffer_manager_t *manager, page_id_t last);
+const page_id_t *page_anticache_cold_store_iterate(buffer_manager_t *manager, const page_id_t *last);
 
 bool page_anticache_cold_store_is_empty(buffer_manager_t *manager);
 
@@ -321,7 +323,7 @@ bool zone_remove(buffer_manager_t *manager, page_t *page, const zone_t *zone);
 
 bool frame_delete(fid_t *frame);
 
-void page_dump(FILE *out, buffer_manager_t *manager, const page_t *page);
+void page_dump(FILE *out, buffer_manager_t *manager, const page_t *page, bool hex_view);
 
 bool page_free(page_t *page);
 
