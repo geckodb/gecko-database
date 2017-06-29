@@ -177,18 +177,18 @@ typedef enum {
     type_near_ptr
 } ptr_scope_type;
 
-typedef struct {
-    buffer_manager_t *manager;
-    page_id_t page_id;
-    frame_id_t frame_id;
-} block_ptr;
+typedef enum {
+    block_state_closed,
+    block_state_opened
+} block_state;
 
 typedef struct {
     buffer_manager_t *manager;
     page_id_t page_id;
     frame_id_t frame_id;
-    in_page_ptr zone;
-} zone_ptr;
+    zone_t *zone;
+    block_state state;
+} block_ptr;
 
 typedef enum {
     free_space_get_quickapprox,
@@ -209,14 +209,14 @@ zone_id_t buffer_manager_block_nextzone(block_ptr *ptr);
 void buffer_manager_block_setzones(block_ptr *ptr, zone_id_t last_zone);
 void buffer_manager_block_rmzone(block_ptr *ptr, zone_id_t zone);
 
-zone_ptr *buffer_manager_block_seek(block_ptr *ptr, zone_id_t zone_id);
-zone_ptr *buffer_manager_block_open(block_ptr *ptr);
-void buffer_manager_block_next(zone_ptr *ptr);
+//zone_ptr *buffer_manager_block_seek(block_ptr *ptr, zone_id_t zone_id);
+void buffer_manager_block_open(block_ptr *ptr);
+bool buffer_manager_block_next(block_ptr *ptr);
 void buffer_manager_block_close(block_ptr *ptr);
 
-void buffer_manager_zone_read(zone_ptr *zone, void *capture, void (*consumer) (void *capture, const void *data));
-void buffer_manager_zone_cpy(zone_ptr *dst, size_t offset, const void *src, size_t num);
-void buffer_manager_zone_set(zone_ptr *dst, size_t offset, int value, size_t num);
+void buffer_manager_zone_read(block_ptr *ptr, void *capture, void (*consumer) (void *capture, const void *data));
+void buffer_manager_zone_cpy(block_ptr *dst, size_t offset, const void *src, size_t num);
+//void buffer_manager_zone_set(zone_ptr *dst, size_t offset, int value, size_t num);
 
 bool buffer_manager_free(buffer_manager_t *manager);
 
@@ -257,6 +257,8 @@ void page_anticache_init(buffer_manager_t *manager);
 void page_anticache_page_new(buffer_manager_t *manager, size_t size);
 
 page_t *page_anticache_get_page_by_id(buffer_manager_t *manager, page_id_t page_id);
+
+void page_anticache_activate_page_by_id(buffer_manager_t *manager, page_id_t page_id);
 
 void page_anticache_page_delete(buffer_manager_t *manager, page_t *page);
 
@@ -304,7 +306,16 @@ zone_t *buf_zone_create(buffer_manager_t *manager,
                         page_t *zone_page,
                         block_positioning strategy);
 
-bool zone_memcpy(page_t *page, zone_t *zone, const void *data, size_t size);
+zone_t *buf_zone_head(buffer_manager_t *manager,
+                      page_t *page,
+                      frame_id_t frame_id);
+
+zone_t *buf_zone_next(buffer_manager_t *manager,
+                      zone_t *zone);
+
+bool zone_memcpy(zone_t *zone, size_t offset, const void *data, size_t size);
+
+void *zone_get_data(zone_t *zone);
 
 bool zone_remove(buffer_manager_t *manager, page_t *page, const zone_t *zone);
 

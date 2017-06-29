@@ -56,6 +56,7 @@
 #define BADCOLDSTOREINIT "Memory allocation failed: unable to initialize cold store of buffer manager"
 #define BADFREELISTINIT  "Memory allocation failed: unable to initialize page free list in buffer manager"
 #define BADHOTSTOREOBJ   "Page with id '%du' is not located in hot store"
+#define BADINTERNAL      "Internal error: %s"
 
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -338,7 +339,9 @@ block_ptr *buffer_manager_block_alloc(
     *result = (block_ptr) {
         .page_id   = page_frame->page_header.page_id,
         .frame_id  = frame,
-        .manager   = manager
+        .manager   = manager,
+        .zone      = NULL,
+        .state     = block_state_closed,
     };
 
     return result;
@@ -347,7 +350,9 @@ block_ptr *buffer_manager_block_alloc(
 void buffer_manager_block_free(
     block_ptr *ptr)
 {
-    panic(NOTIMPLEMENTED, to_string(buffer_manager_block_free));   // TODO: Implement
+    require_non_null(ptr);
+    assert ((ptr->state != block_state_opened) || (ptr->zone != NULL));
+    free (ptr);
 }
 
 zone_id_t buffer_manager_block_nextzone(
@@ -371,57 +376,65 @@ void buffer_manager_block_rmzone(
     panic(NOTIMPLEMENTED, to_string(buffer_manager_block_rmzone));   // TODO: Implement
 }
 
-zone_ptr *buffer_manager_block_seek(
-    block_ptr *ptr,
-    zone_id_t zone_id)
-{
-    panic(NOTIMPLEMENTED, to_string(buffer_manager_block_seek));   // TODO: Implement
-    return NULL;
-}
-
-zone_ptr *buffer_manager_block_open(
+void buffer_manager_block_open(
     block_ptr *ptr)
 {
     require_non_null(ptr);
-    panic(NOTIMPLEMENTED, to_string(buffer_manager_block_open));   // TODO: Implement
-    return NULL;
+    require_non_null(ptr->manager);
+    panic_if((ptr->state == block_state_opened), BADSTATE, "block was already opened.")
+
+    page_anticache_activate_page_by_id(ptr->manager, ptr->page_id);
+    ptr->state = block_state_opened;
 }
 
-void buffer_manager_block_next(
-    zone_ptr *ptr)
+bool buffer_manager_block_next(
+    block_ptr *ptr)
 {
-    panic(NOTIMPLEMENTED, to_string(buffer_manager_block_next));   // TODO: Implement
+    require_non_null(ptr);
+    require_non_null(ptr->manager);
+
+    if (ptr->state == block_state_opened) {
+        page_t *page = page_anticache_get_page_by_id(ptr->manager, ptr->page_id);
+        if (ptr->zone == NULL) {
+            ptr->zone = buf_zone_head(ptr->manager, page, ptr->frame_id);
+        } else {
+            ptr->zone = buf_zone_next(ptr->manager, ptr->zone);
+            ptr->state = (ptr->zone == NULL ? block_state_closed : block_state_opened);
+        }
+        return true;
+    } else return false;
 }
 
 void buffer_manager_block_close(
     block_ptr *ptr)
 {
-    panic(NOTIMPLEMENTED, to_string(buffer_manager_block_close));   // TODO: Implement
+    require_non_null(ptr);
+    ptr->state = block_state_closed;
 }
 
 void buffer_manager_zone_read(
-    zone_ptr *zone,
+    block_ptr *ptr,
     void *capture,
     void (*consumer) (void *capture, const void *data))
 {
-    panic(NOTIMPLEMENTED, to_string(buffer_manager_zone_read));   // TODO: Implement
+    require_non_null(ptr);
+    require_non_null(consumer);
+    panic_if((ptr->zone == NULL), BADSTATE, "read operation on illegal zone");
+    consumer (capture, zone_get_data(ptr->zone));
 }
 
 void buffer_manager_zone_cpy(
-    zone_ptr *dst,
+    block_ptr *dst,
     size_t offset,
     const void *src, size_t num)
 {
-    panic(NOTIMPLEMENTED, to_string(buffer_manager_zone_cpy));   // TODO: Implement
-}
-
-void buffer_manager_zone_set(
-    zone_ptr *dst,
-    size_t offset,
-    int value,
-    size_t num)
-{
-    panic(NOTIMPLEMENTED, to_string(buffer_manager_zone_set));   // TODO: Implement
+    require_non_null(dst);
+    require_non_null(src);
+    panic_if((dst->state != block_state_opened), BADSTATE, "block must be opened before call to memcpy");
+    panic_if((dst->zone == NULL), BADINTERNAL, "block is opened but pointer to zone is null");
+    assert (page_hot_store_has(dst->manager, dst->page_id));
+    assert (offset + num <= frame_store_frame_by_id(page_hot_store_fetch(dst->manager, dst->page_id), dst->frame_id)->elem_size);
+    zone_memcpy(dst->zone, offset, src, num);
 }
 
 bool buffer_manager_free(
@@ -483,6 +496,13 @@ page_t *page_anticache_get_page_by_id(buffer_manager_t *manager, page_id_t page_
     }
 
     return result;
+}
+
+void page_anticache_activate_page_by_id(
+    buffer_manager_t *manager,
+    page_id_t page_id)
+{
+    page_anticache_get_page_by_id(manager, page_id);
 }
 
 void page_anticache_page_delete(
@@ -852,19 +872,51 @@ zone_t *buf_zone_create(
     return retval;
 }
 
-bool zone_memcpy(
+zone_t *buf_zone_head(
+    buffer_manager_t *manager,
     page_t *page,
+    frame_id_t frame_id)
+{
+    require_non_null(manager);
+    require_non_null(page);
+
+    frame_t *frame = frame_store_frame_by_id(page, frame_id);
+    return (in_page_ptr_is_null(&frame->first) ? NULL : ptr_cast_zone(manager, &frame->first));
+}
+
+zone_t *buf_zone_next(
+    buffer_manager_t *manager,
+    zone_t *zone)
+{
+    require_non_null(manager);
+    require_non_null(zone);
+    if (in_page_ptr_is_null(&zone->next)) {
+        return NULL;
+    } else {
+        page_anticache_get_page_by_id(manager, zone->next.page_id);
+        return ptr_cast_zone(manager, in_page_ptr_deref(manager, &zone->next));
+    }
+}
+
+bool zone_memcpy(
     zone_t *zone,
+    size_t offset,
     const void *data,
     size_t size)
 {
-    expect_non_null(page, false);
     expect_non_null(zone, false);
     expect_non_null(data, false);
     expect_greater(size, 0, false);
 
-    memcpy(zone + 1, data, size);
+    memcpy(zone_get_data(zone) + offset, data, size);
     return true;
+}
+
+void *zone_get_data(
+    zone_t *zone)
+{
+    require_non_null(zone);
+    return zone + 1;
 }
 
 bool zone_remove(
