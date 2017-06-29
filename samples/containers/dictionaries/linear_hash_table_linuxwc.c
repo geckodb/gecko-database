@@ -74,8 +74,8 @@ void query(char *key, dict_t *dict, const char *query)
 
 int main(void)
 {
-    dict_t *dict = fixed_linear_hash_table_create(&(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen},
-                                                  SIZEOF_KEY, SIZEOF_VALUE, NUM_SLOTS, 1.7f, MAX_LOAD_FACTOR);
+    dict_t *dict = hash_table_create(&(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen},
+                                     SIZEOF_KEY, SIZEOF_VALUE, NUM_SLOTS, 1.7f, MAX_LOAD_FACTOR);
 
     // TODO: The file can be downloaded here: https://www.dropbox.com/sh/kf5sbw74rru3kco/AAB07Cwy0oVbRih33nef_FTFa?dl=0
     vector_t *words = read_all_lines("/Users/marcus/temp/linux-words");
@@ -90,7 +90,7 @@ int main(void)
         size_t count = (value == NULL) ? 1 : ((*(size_t *) value) + 1);
         dict_put(dict, key, &count);
         linear_hash_table_info_t info;
-        fixed_linear_hash_table_info(dict, &info);
+        hash_table_info(dict, &info);
       //  printf("%0.4f%% load factor: %0.4f%%, num rebuilds %zu, num slots:%zu\n", (i / (float) words->num_elements) * 100, info.load_factor, info.counters.num_rebuilds, info.num_slots_inuse + info.num_slots_free);
     }
     clock_t stop = clock();

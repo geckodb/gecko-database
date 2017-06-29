@@ -22,15 +22,15 @@
 #include <containers/dictionaries/fixed_linear_hash_table.h>
 #include <containers/list.h>
 
-#define __force_packing__        __attribute__((__packed__))
+#define __force_packing__                   __attribute__((__packed__))
 
 // ---------------------------------------------------------------------------------------------------------------------
 // C O N F I G
 // ---------------------------------------------------------------------------------------------------------------------
 
-#define HOTSTORE_INITCAP              100
-#define HOTSTORE_GROW_FACTOR        2.00f
-#define HOTSTORE_MAX_FILL_FAC       0.75f
+#define HOTSTORE_INITCAP                       100
+#define HOTSTORE_GROW_FACTOR                 2.00f
+#define HOTSTORE_MAX_FILL_FAC                0.75f
 
 #define ANTICACHE_HOTSTORELIST_INITCAP         100
 #define ANTICACHE_HOTSTORELIST_GROW_FACTOR    1.7f
@@ -43,291 +43,179 @@
 // D A T A   T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-typedef uint8_t   u8;
-typedef uint16_t  u16;
-typedef uint32_t  u32;
-typedef uint64_t  u64;
+typedef uint32_t       page_id_t;
+typedef uint32_t       lane_id_t;
+typedef uint32_t       zone_id_t;
 
-typedef u32 page_id_t;
-typedef u32 lane_id_t;
-typedef u32 zone_id_t;
-
-typedef size_t offset_t;
-
-typedef struct {
-    offset_t begin, end;
-} range_t;
+typedef size_t         offset_t;
 
 typedef struct __force_packing__ {
-    struct __force_packing__ {
-        page_id_t is_far_ptr    : 1;
-        page_id_t page_id       : 31;
-    };
-    struct __force_packing__ {
-        offset_t target_type_bit_0    : 1;
-        offset_t target_type_bit_1    : 1;
-        offset_t offset               : 62;
-    };
-} in_page_ptr;
-
-typedef enum
-{
-    target_frame,
-    target_zone,
-    target_userdata,
-    target_corrupted,
-} ptr_target;
-
-typedef enum {
-    page_flag_dirty = 1 << 1,
-    page_flag_fixed = 1 << 2,
-    page_flag_locked = 1 << 3
-} page_flags;
-
-#define PAGE_FLAG_FRESH_PAGE_FLAGS 0
-
-typedef struct __force_packing__ {
-    u64 time_created, time_last_read, time_last_write;
-    u64 num_reads, num_writes;
-} access_stats_t;
-
-typedef struct __force_packing__ {
-    page_id_t page_id;
-    size_t page_size, free_space;
-    access_stats_t statistics;
-    struct {
-        u8 is_dirty  : 1;
-        u8 is_fixed  : 1;
-        u8 is_locked : 1;
-    } flags;
-} page_header_t;
-
-typedef struct __force_packing__ {
-    u32 list_max, list_len;
+        uint32_t       list_max;
+        uint32_t       list_len;
 } freespace_reg_t;
 
 typedef struct __force_packing__ {
-    u32 max_num_frames, in_use_num, free_list_len;
+        uint64_t       created;
+        uint64_t       read;
+        uint64_t       write;
+        uint64_t       num_reads;
+        uint64_t       num_writes;
+} access_stats_t;
+
+typedef struct __force_packing__ {
+        uint32_t       lane_num_limit;
+        uint32_t       in_use_num;
+        uint32_t       free_list_len;
 } lane_reg_t;
 
 typedef struct __force_packing__ {
-    in_page_ptr first, last;
-    size_t elem_size;
-} lane_t;
-
-typedef struct __force_packing__ {
-    in_page_ptr prev, next;
-    access_stats_t statistics;
-} zone_t;
+        page_id_t      id;
+        size_t         size;
+        size_t         freespace;
+        access_stats_t statistics;
+        struct {
+            uint8_t is_dirty  : 1;
+            uint8_t is_fixed  : 1;
+            uint8_t is_locked : 1;
+        } flags;
+} page_header_t;
 
 typedef struct {
-    page_header_t page_header;
-    freespace_reg_t free_space_register;
-    lane_reg_t frame_register;
+        page_header_t   header;
+        freespace_reg_t freespace_reg;
+        lane_reg_t      lane_reg;
 } page_t;
 
 typedef struct {
-    page_id_t page_id;
-    lane_id_t frame_id;
-} fid_t;
+        void          (*push)();
+        page_t *      (*fetch)(page_id_t id);
+} cold_store_t;
 
 typedef struct {
-    void (*push)();
-    page_t *(*fetch)(page_id_t id);
-} page_cold_store_t;
+        page_id_t     next_page_id;
+        vector_t *    free_page_ids_stack;  /* page ids that are free to be recycled */
 
-typedef struct {
-    page_id_t next_page_id;
-    vector_t *free_page_ids_stack;  /* page ids that are free to be recycled */
+        dict_t *      hot_store;
+        list_t *      hot_store_page_ids;
 
-    dict_t *page_hot_store;
-    list_t *page_hot_store_page_ids;
-
-    page_cold_store_t cold_store;
-    vector_t *cold_store_page_ids;  /* all page ids that are in use who live in cold-store */
+        cold_store_t  cold_store;
+        vector_t *    cold_store_page_ids;  /* all page ids that are in use who live in cold-store */
 } page_anticache_t;
 
 typedef struct {
-    size_t page_size;
-    size_t free_space_reg_capacity;
-    size_t frame_reg_capacity;
+        size_t        page_size;
+        size_t        free_space_reg_capacity;
+        size_t        lane_reg_capacity;
 } buffer_manager_config_t;
 
 typedef struct {
-    size_t max_size_hot_store;
-
-    page_anticache_t page_anticache;
-    buffer_manager_config_t config;
-} anit_buffer_t;
-
-typedef enum {
-    positioning_first_nomerge,
-    positioning_first_merge,
-    positioning_smallest_nomerge,
-    positioning_smallest_merge,
-    positioning_largest_nomerge,
-    positioning_largest_merge
-} block_pos;
+        size_t                  max_size_hot_store;
+        page_anticache_t        page_anticache;
+        buffer_manager_config_t config;
+} anti_buf_t;
 
 typedef enum {
-    frame_inuse,
-    frame_free
-} frame_state;
-
-typedef enum {
-    type_far_ptr,
-    type_near_ptr
-} ptr_scope_type;
-
-typedef enum {
-    block_state_closed,
-    block_state_opened
+        block_state_closed,
+        block_state_opened
 } block_state;
 
-typedef struct {
-    anit_buffer_t *manager;
-    page_id_t page_id;
-    lane_id_t frame_id;
-    zone_t *zone;
-    block_state state;
-} cursor_t;
+typedef struct __force_packing__ {
+        struct __force_packing__ {
+            page_id_t is_far_ptr    : 1;
+            page_id_t page_id       : 31;
+        };
+        struct __force_packing__ {
+            offset_t  target_type_bit_0    : 1;
+            offset_t  target_type_bit_1    : 1;
+            offset_t  offset               : 62;
+        };
+} in_page_ptr;
+
+typedef struct __force_packing__ {
+        in_page_ptr prev, next;
+        access_stats_t statistics;
+} zone_t;
 
 typedef enum {
-    free_space_get_quickapprox,
-    free_space_get_slowexact
-} free_space_get_strategy;
+        positioning_first_nomerge,
+        positioning_first_merge,
+        positioning_smallest_nomerge,
+        positioning_smallest_merge,
+        positioning_largest_nomerge,
+        positioning_largest_merge
+} block_pos;
+
+typedef struct {
+        anti_buf_t *  manager;
+        page_id_t     page_id;
+        lane_id_t     lane_id;
+        zone_t *      zone;
+        block_state   state;
+} cursor_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-anit_buffer_t *buf_create(size_t page_size, size_t free_space_reg_capacity,
-                             size_t frame_reg_capacity, size_t max_hot_store_size);
+anti_buf_t *
+buf_create(
+        size_t        page_size,
+        size_t        freespace_reg_capacity,
+        size_t        lane_reg_capacity,
+        size_t        hotstore_size_limit
+);
 
-bool buf_free(anit_buffer_t *buf);
+bool
+buf_free(
+        anti_buf_t *  buf
+);
 
-cursor_t *buf_alloc(anit_buffer_t *manager, size_t size, size_t nlanes, block_pos strategy);
-void buf_cursor_free(cursor_t *cursor);
+cursor_t *
+buf_alloc(
+        anti_buf_t *  buf,
+        size_t        size,
+        size_t        nlanes,
+        block_pos     strat
+);
 
-zone_id_t buffer_manager_block_nextzone(cursor_t *ptr);
-void buffer_manager_block_setzones(cursor_t *ptr, zone_id_t last_zone);
-void buffer_manager_block_rmzone(cursor_t *ptr, zone_id_t zone);
+void
+buf_release(
+        cursor_t *    cur
+);
 
-//zone_ptr *buffer_manager_block_seek(cursor_t *ptr, zone_id_t zone_id);
-void buf_open(cursor_t *ptr);
-bool buf_next(cursor_t *ptr);
-void buf_close(cursor_t *ptr);
+void
+buf_open(
+        cursor_t *    cur
+);
 
-void buf_read(cursor_t *ptr, void *capture, void (*consumer)(void *capture, const void *data));
-void buf_memcpy(cursor_t *dst, size_t offset, const void *src, size_t num);
-//void buffer_manager_zone_set(zone_ptr *dst, size_t offset, int value, size_t num);
+bool
+buf_next(
+        cursor_t *    cur
+);
 
+void
+buf_close(
+        cursor_t *    cur
+);
 
+void
+buf_read(
+        cursor_t *    cur,
+        void *        capture,
+        void          (*consumer)(void *capture, const void *data)
+);
 
-// ---------------------------------------------------------------------------------------------------------------------
-// I N T E R F A C E   F U N C T I O N S
-// ---------------------------------------------------------------------------------------------------------------------
+void
+buf_memcpy(
+        cursor_t *    dst,
+        size_t        offset,
+        const void *  src,
+        size_t        size
+);
 
-bool page_hot_store_init(anit_buffer_t *manager);
-
-void page_hot_store_set(anit_buffer_t *manager, page_id_t id, void *ptr);
-
-bool page_hot_store_has(anit_buffer_t *manager, page_id_t id);
-
-bool page_hot_store_remove(anit_buffer_t *manager, page_id_t id);
-
-page_t *page_hot_store_fetch(anit_buffer_t *manager, page_id_t id);
-
-// ---------------------------------------------------------------------------------------------------------------------
-// I N T E R F A C E   F U N C T I O N S
-// ---------------------------------------------------------------------------------------------------------------------
-
-void page_cold_store_init(anit_buffer_t *manager);
-
-void page_cold_store_clear(anit_buffer_t *manager);
-
-page_t *page_cold_store_fetch(anit_buffer_t *manager, page_id_t id);
-
-void page_cold_store_push(anit_buffer_t *manager, page_t *page);
-
-// ---------------------------------------------------------------------------------------------------------------------
-// I N T E R F A C E   F U N C T I O N S
-// ---------------------------------------------------------------------------------------------------------------------
-
-// Note: no "flush list"
-
-void page_anticache_init(anit_buffer_t *manager);
-
-void page_anticache_page_new(anit_buffer_t *manager, size_t size);
-
-page_t *page_anticache_get_page_by_id(anit_buffer_t *manager, page_id_t page_id);
-
-void page_anticache_activate_page_by_id(anit_buffer_t *manager, page_id_t page_id);
-
-void page_anticache_page_delete(anit_buffer_t *manager, page_t *page);
-
-void page_anticache_free_list_push(anit_buffer_t *manager, page_id_t page_id);
-
-bool page_anticache_free_list_is_empty(anit_buffer_t *manager);
-
-page_t *page_anticache_create_page(anit_buffer_t *manager);
-
-page_id_t page_anticache_free_list_pop(anit_buffer_t *manager);
-
-size_t page_anticache_new_page_id(anit_buffer_t *manager);
-
-void page_anticache_hot_store_add(anit_buffer_t *manager, page_t *page);
-
-void page_anticache_hot_store_remove(anit_buffer_t *manager, page_id_t page_id);
-
-const page_id_t* page_anticache_hot_store_iterate(anit_buffer_t *manager, const page_id_t *last);
-
-bool page_anticache_hot_store_is_empty(anit_buffer_t *manager);
-
-void page_anticache_cold_store_add(anit_buffer_t *manager, page_id_t page_id);
-
-void page_anticache_cold_store_remove(anit_buffer_t *manager, page_id_t page_id);
-
-const page_id_t *page_anticache_cold_store_iterate(anit_buffer_t *manager, const page_id_t *last);
-
-bool page_anticache_cold_store_is_empty(anit_buffer_t *manager);
-
-void page_anticache_free(anit_buffer_t *manager);
-
-// ---------------------------------------------------------------------------------------------------------------------
-// I N T E R F A C E   F U N C T I O N S
-// ---------------------------------------------------------------------------------------------------------------------
-
-page_t *page_create(anit_buffer_t *manager, page_id_t id, size_t size, page_flags flags, size_t free_space, size_t frame_reg);
-
-size_t page_get_free_space(page_t *page, free_space_get_strategy strategy);
-
-fid_t *frame_create(page_t *page, block_pos strategy, size_t element_size);
-
-zone_t *buf_zone_create(anit_buffer_t *manager,
-                        page_t *frame_page,
-                        lane_id_t frame_id,
-                        page_t *zone_page,
-                        block_pos strategy);
-
-zone_t *buf_zone_head(anit_buffer_t *manager,
-                      page_t *page,
-                      lane_id_t frame_id);
-
-zone_t *buf_zone_next(anit_buffer_t *manager,
-                      zone_t *zone);
-
-bool zone_memcpy(zone_t *zone, size_t offset, const void *data, size_t size);
-
-void *zone_get_data(zone_t *zone);
-
-bool zone_remove(anit_buffer_t *manager, page_t *page, const zone_t *zone);
-
-bool frame_delete(fid_t *frame);
-
-void page_dump(FILE *out, anit_buffer_t *manager, const page_t *page, bool hex_view);
-
-bool page_free(page_t *page);
-
-
-
+void
+buf_dump(
+        FILE *        out,
+        anti_buf_t *  buf,
+        bool          hex_view
+);

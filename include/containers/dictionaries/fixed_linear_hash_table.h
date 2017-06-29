@@ -72,12 +72,13 @@ typedef struct {
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-dict_t *fixed_linear_hash_table_create(const hash_function_t *hash_function, size_t key_size, size_t elem_size,
-                                       size_t num_slots, float grow_factor, float max_load_factor);
-void fixed_linear_hash_table_lock(dict_t *dict);
-void fixed_linear_hash_table_unlock(dict_t *dict);
-bool fixed_linear_hash_table_free(dict_t *dict);
-void fixed_linear_hash_reset_counters(dict_t *dict);
-void fixed_linear_hash_table_info(dict_t *dict, linear_hash_table_info_t *info);
+dict_t *hash_table_create(const hash_function_t *hash_function, size_t key_size, size_t elem_size,
+                          size_t num_slots, float grow_factor, float max_load_factor);
+
+void hash_table_lock(dict_t *dict);
+void hash_table_unlock(dict_t *dict);
+bool hash_table_free(dict_t *dict);
+void hash_reset_counters(dict_t *dict);
+void hash_table_info(dict_t *dict, linear_hash_table_info_t *info);
 
 

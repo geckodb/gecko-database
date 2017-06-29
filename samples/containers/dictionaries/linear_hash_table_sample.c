@@ -23,8 +23,8 @@ void run_with_hash_function(hash_function_t *hash_function, const char *hash_fun
     const size_t NUM_ELEMENTS = 4000000 * 2;
     const size_t NUM_SLOTS = NUM_ELEMENTS * 2;
 
-    dict_t *dict = fixed_linear_hash_table_create(hash_function,
-                                                  sizeof(size_t), sizeof(test_data_t), NUM_SLOTS, GROW_FACTOR, 0.7f);
+    dict_t *dict = hash_table_create(hash_function,
+                                     sizeof(size_t), sizeof(test_data_t), NUM_SLOTS, GROW_FACTOR, 0.7f);
 
     clock_t start, stop;
 
@@ -51,7 +51,7 @@ void run_with_hash_function(hash_function_t *hash_function, const char *hash_fun
     size_t *keys = malloc (sizeof(size_t) * NUM_ELEMENTS);
     test_data_t *values = malloc (sizeof(test_data_t) * NUM_ELEMENTS);
 
-    fixed_linear_hash_reset_counters(dict);
+    hash_reset_counters(dict);
     for (int i = 0; i < NUM_ELEMENTS; i++) {
         keys[i] = rand();
         values[i] = (test_data_t) {
@@ -141,7 +141,7 @@ void run_with_hash_function(hash_function_t *hash_function, const char *hash_fun
      ******************************************************************************************************************/
 
     linear_hash_table_info_t info;
-    fixed_linear_hash_table_info(dict, &info);
+    hash_table_info(dict, &info);
 
     printf("%s;%zu;%zu;%0.2f;%0.2f;%0.2f;%zu;%zu;%zu;%zu;%0.4f;%0.4f;%zu;%zu;%zu;%zu;%zu;%zu;%zu;%zu;%zu;%0.8f;%0.8f;%0.8f;%0.8f;%0.8f;%0.8f\n",
            hash_function_name,
@@ -157,7 +157,7 @@ void run_with_hash_function(hash_function_t *hash_function, const char *hash_fun
 
            gets_call_elapsed_keyfound, gets_call_elapsed_nokey);
 
-    fixed_linear_hash_table_free(dict);
+    hash_table_free(dict);
 }
 
 int main(void)

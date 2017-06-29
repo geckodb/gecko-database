@@ -60,7 +60,7 @@ void trace_print(FILE *file);
         if (expr) { panic(msg, args); }                                                                                \
     }
 
-#define warn_if(expr, msg, args...)                                                                                    \
+#define WARN_IF(expr, msg, args...)                                                                                    \
     {                                                                                                                  \
         if (expr) { warn(msg, args); }                                                                                 \
     }

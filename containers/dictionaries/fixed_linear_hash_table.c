@@ -154,8 +154,8 @@ static inline void swap(hash_table_extra_t *a, hash_table_extra_t *b);
 // I N T E R F A C E  I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-dict_t *fixed_linear_hash_table_create(const hash_function_t *hash_function, size_t key_size, size_t elem_size,
-                                       size_t num_slots, float grow_factor, float max_load_factor)
+dict_t *hash_table_create(const hash_function_t *hash_function, size_t key_size, size_t elem_size,
+                          size_t num_slots, float grow_factor, float max_load_factor)
 {
     require_nonnull(hash_function);
     require_nonnull(hash_function->hash_code);
@@ -195,12 +195,12 @@ dict_t *fixed_linear_hash_table_create(const hash_function_t *hash_function, siz
     memset(extra->empty_indicator, UCHAR_MAX, key_size);
 
     init_slots(extra->slots, num_slots, key_size, elem_size, extra->empty_indicator);
-    fixed_linear_hash_reset_counters(result);
+    hash_reset_counters(result);
 
     return result;
 }
 
-void fixed_linear_hash_table_lock(dict_t *dict)
+void hash_table_lock(dict_t *dict)
 {
     require_instanceof_this(dict);
     hash_table_extra_t* extra = (hash_table_extra_t*) dict->extra;
@@ -208,13 +208,13 @@ void fixed_linear_hash_table_lock(dict_t *dict)
     extra->counters.num_locks++;
 }
 
-void fixed_linear_hash_table_unlock(dict_t *dict)
+void hash_table_unlock(dict_t *dict)
 {
     require_instanceof_this(dict);
     pthread_mutex_unlock(&(((hash_table_extra_t*) dict->extra)->mutex));
 }
 
-bool fixed_linear_hash_table_free(dict_t *dict)
+bool hash_table_free(dict_t *dict)
 {
     if (dict != NULL) {
         require_instanceof_this(dict);
@@ -228,7 +228,7 @@ bool fixed_linear_hash_table_free(dict_t *dict)
     } else return false;
 }
 
-void fixed_linear_hash_reset_counters(dict_t *dict)
+void hash_reset_counters(dict_t *dict)
 {
     require_instanceof_this(dict);
     hash_table_extra_t *extra = (hash_table_extra_t *) dict->extra;
@@ -253,7 +253,7 @@ void fixed_linear_hash_reset_counters(dict_t *dict)
     };
 }
 
-void fixed_linear_hash_table_info(dict_t *dict, linear_hash_table_info_t *info)
+void hash_table_info(dict_t *dict, linear_hash_table_info_t *info)
 {
     require_instanceof_this(dict);
     hash_table_extra_t *extra = (hash_table_extra_t *) dict->extra;
@@ -324,12 +324,6 @@ vector_t *this_gets(const struct dict_t *self, size_t num_keys, const void *keys
         size_t slot_id = convert_to_slot_id(hash_code, extra);
         size_t round_trip_slot_id = calc_round_trip(slot_id, extra);
 
-        // TODO: Remove this since its a debug hack!
-        if (*(uint32_t *) key == 12) {
-            printf("!! YEAH GET 12! Intended slot: %zu\n", slot_id);
-        }
-        // END REMOVE THIS
-
         bool empty_slot_found = test_slot(self, extra, slot_id);
 
         if (!empty_slot_found) {
@@ -339,12 +333,6 @@ vector_t *this_gets(const struct dict_t *self, size_t num_keys, const void *keys
                     extra->counters.num_get_foundkey++;
                     void *value_ptr = get_value(self, extra, slot_id);
                     vector_add(result, 1, &value_ptr);
-
-                    // TODO: Remove this since its a debug hack!
-                    if (*(uint32_t *) key == 12) {
-                        printf("!! YEAH ADD value for 12! Actual slot: %zu\n", slot_id);
-                    }
-
                     goto next_key;
                 } else {
                     extra->counters.num_get_slotdisplaced++;
@@ -451,19 +439,6 @@ void this_puts(struct dict_t *self, size_t num_elements, const void *keys, const
             rebuild(self, extra);
             this_put(self, key, value);
         } else {
-            // TODO: Remove this since its a debug hack!
-            if (*(uint32_t *) key == 12) {
-                printf("EXECUTE PUT 12! Actual slot: %zu\n", slot_id);
-            }
-            // END REMOVE THIS
-
-            // TODO: Remove this since its a debug hack!
-            if (*(uint32_t *) key == 26) {
-                printf("EXECUTE PUT 26! Actual slot: %zu\n", slot_id);
-            }
-            // END REMOVE THIS
-
-
             slot_put(extra->slots, slot_id, self->key_size, self->elem_size, key, value);
             assert (extra->num_inuse < extra->num_slots);
             extra->num_inuse++;
@@ -543,8 +518,8 @@ static inline void rebuild(const dict_t *self, hash_table_extra_t *extra)
     assert (self && extra && extra->grow_factor > 1);
 
     size_t new_num_slots = ceil(extra->num_slots * extra->grow_factor);
-    dict_t *tmp = fixed_linear_hash_table_create(&extra->hash_function, self->key_size, self->elem_size,
-                                                 new_num_slots, extra->grow_factor, extra->max_load_factor);
+    dict_t *tmp = hash_table_create(&extra->hash_function, self->key_size, self->elem_size,
+                                    new_num_slots, extra->grow_factor, extra->max_load_factor);
 
     size_t slot_idx = extra->num_slots;
     size_t slot_size = (self->key_size + self->elem_size);
@@ -560,7 +535,7 @@ static inline void rebuild(const dict_t *self, hash_table_extra_t *extra)
     counters.num_rebuilds++;
     swap((hash_table_extra_t *) tmp->extra, extra);
     extra->counters = counters;
-    fixed_linear_hash_table_free(tmp);
+    hash_table_free(tmp);
 }
 
 static inline void swap(hash_table_extra_t *a, hash_table_extra_t *b)
