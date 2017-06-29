@@ -27,12 +27,13 @@
 // C O N S T A N T S
 // ---------------------------------------------------------------------------------------------------------------------
 
-#define NULL_LANE_ID        UINT_MAX
-#define MAX_OFFSET      SIZE_MAX
-#define NULL_OFFSET     0
-#define CORE_HDR_SIZE   (sizeof(page_header_t) + sizeof(freespace_reg_t) + sizeof(lane_reg_t))
-#define LANE_HDR_SIZE  (sizeof(lane_t))
-#define MIN_DATA_SIZE   (sizeof(zone_t) + sizeof(in_page_ptr))
+#define NULL_LANE_ID     UINT_MAX
+#define MAX_OFFSET       SIZE_MAX
+#define NULL_OFFSET      0
+#define CORE_HDR_SIZE    (sizeof(page_header_t) + sizeof(freespace_reg_t) + sizeof(lane_reg_t))
+#define LANE_HDR_SIZE    (sizeof(lane_t))
+#define MIN_DATA_SIZE    (sizeof(zone_t) + sizeof(in_page_ptr))
+#define FRESH_PAGE_FLAGS 0
 
 #define BADBRANCH        "Internal error: unknown condition during operation on object %p."
 #define BADCAST          "Unsupported cast request for persistent ptr %p."
@@ -74,8 +75,6 @@ typedef enum {
         PAGE_FLAG_FIXED     = 1 << 2,
         PAGE_FLAG_LOCKED    = 1 << 3
 } page_flags;
-
-#define PAGE_FLAG_FRESH_PAGE_FLAGS 0
 
 typedef struct __force_packing__ {
         in_page_ptr   first;
@@ -919,7 +918,7 @@ anticache_create_page_safe(
     size_t id = !anticache_is_freelist_empty(buf) ? anticache_freelist_pop(buf) :
                                                     anticache_new_page_id(buf);
 
-    result = page_create(buf, id, buf->config.page_size, PAGE_FLAG_FRESH_PAGE_FLAGS,
+    result = page_create(buf, id, buf->config.page_size, FRESH_PAGE_FLAGS,
                          buf->config.free_space_reg_capacity,
                          buf->config.lane_reg_capacity);
 
@@ -1442,7 +1441,6 @@ zone_next(
     if (ptr_is_null(&zone->next)) {
         return NULL;
     } else {
-        anticache_guarantee_page(buf, zone->next.page_id);
         zone_t *  nextzone = ptr_cast_zone(buf, &zone->next);
         assert (nextzone != zone);
         return nextzone;
@@ -2098,6 +2096,7 @@ ptr_deref(
     panic_if((buf == NULL), BADARGNULL, to_string(buf));
     panic_if((ptr == NULL), BADARGNULL, to_string(ptr));
     panic_if((buf->page_anticache.hot_store == NULL), UNEXPECTED, "page register hash table is null");
+    anticache_guarantee_page(buf, ptr->page_id);
     void *page_base_ptr = hotstore_get_unsafe(buf, ptr->page_id);
     panic_if((page_base_ptr == NULL), UNEXPECTED, "page base pointer is not allowed to be null");
     return (page_base_ptr + ptr->offset);
