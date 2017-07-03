@@ -21,11 +21,46 @@
 #include <containers/vector.h>
 #include <containers/dictionaries/fixed_linear_hash_table.h>
 #include <containers/list.h>
+#include <math.h>
+
+// ---------------------------------------------------------------------------------------------------------------------
+// M A C R O S
+// ---------------------------------------------------------------------------------------------------------------------
 
 #define __force_packing__                   __attribute__((__packed__))
 
+#define GIB_TO_BYTE(x)                      ((1024 * 1024 * 1024) * x)
+
 // ---------------------------------------------------------------------------------------------------------------------
 // C O N F I G
+// ---------------------------------------------------------------------------------------------------------------------
+
+#ifndef RAM_CAPACITY_GB
+#define RAM_CAPACITY_GB                          8
+#endif
+
+#ifndef HOTSTORE_SIZELIMIT
+#define HOTSTORE_SIZELIMIT                       GIB_TO_BYTE(0.75f * RAM_CAPACITY_GB)
+#endif
+
+#ifndef PAGESIZE_DEFAULT
+#define PAGESIZE_DEFAULT                         GIB_TO_BYTE(0.10f * RAM_CAPACITY_GB)
+#endif
+
+#ifndef PAGESIZE_MAX
+#define PAGESIZE_MAX                             (HOTSTORE_SIZELIMIT * 0.50f)
+#endif
+
+#ifndef FREESPACE_REG_CAPACITY
+#define FREESPACE_REG_CAPACITY                   1000
+#endif
+
+#ifndef LANE_REG_CAPACITY
+#define LANE_REG_CAPACITY                        1000
+#endif
+
+// ---------------------------------------------------------------------------------------------------------------------
+// C O N S T A N T S
 // ---------------------------------------------------------------------------------------------------------------------
 
 #define HOTSTORE_INITCAP                       100
@@ -103,15 +138,39 @@ typedef struct {
 } page_anticache_t;
 
 typedef struct {
-        size_t        page_size;
+        size_t        hotstore_size_limit;  /*!< The HotStore will keep at most this number of bytes in main memory.
+                                             *   If this limit is exceeded, certain pages are pushed to the ColdStore
+                                             *   in order to guarantee this limit.
+                                             *   <br/>
+                                             *   <b>The value of this parameter should be less than the capacity of
+                                             *   physical main memory in byte.</b>*/
+        size_t       ram_page_size_default;  /*!< The default number of bytes for page sizes. It is guaranteed that
+                                             *   each page has a size of at least this number of bytes. In case the
+                                             *   client requests an allocation that exceeds this size, the newly
+                                             *   created page will be larger than this parameter. The upper bound
+                                             *   for pages that are managed in main-memory is set by the parameter
+                                             *   'ram_page_size_max'.
+                                             *   <br/>
+                                             *   <b>The value of this parameter must be greater than the technical
+                                             *   minimum page size, and less than 0.5 * 'hotstore_size_limit'.</b>*/
+        size_t       ram_page_size_max;     /*!< In case the client requests to allocate more memory than fits into
+                                             *   a default-sized page (see 'ram_page_size_default'), this parameter
+                                             *   sets the maximum size in byte for these requests. If the client
+                                             *   requests for than 'ram_page_size_max' number of bytes for allocation,
+                                             *   the system does not guarantee to keep the page in main-memory, i.e.,
+                                             *   a mapping to a file will be used instead of allocation in
+                                             *   main-memory.
+                                             *   <br/>
+                                             *   <b>The value of this parameter must be greater than
+                                             *   'ram_page_size_default', and less than
+                                             *   0.5 * 'hotstore_size_limit'.</b>*/
         size_t        free_space_reg_capacity;
         size_t        lane_reg_capacity;
-} buffer_manager_config_t;
+} buf_config_t;
 
 typedef struct {
-        size_t                  max_size_hot_store;
         page_anticache_t        page_anticache;
-        buffer_manager_config_t config;
+        buf_config_t            config;
 } anti_buf_t;
 
 typedef enum {
@@ -154,15 +213,24 @@ typedef struct {
 } cursor_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
+// D E F A U L T S
+// ---------------------------------------------------------------------------------------------------------------------
+
+static buf_config_t DEFAULT_BUF_CONFIG = {
+        .hotstore_size_limit        = HOTSTORE_SIZELIMIT,
+        .ram_page_size_default      = PAGESIZE_DEFAULT,
+        .ram_page_size_max          = PAGESIZE_MAX,
+        .free_space_reg_capacity    = FREESPACE_REG_CAPACITY,
+        .lane_reg_capacity          = LANE_REG_CAPACITY
+};
+
+// ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
 anti_buf_t *
 buf_create(
-        size_t        page_size,
-        size_t        freespace_reg_capacity,
-        size_t        lane_reg_capacity,
-        size_t        hotstore_size_limit
+        buf_config_t config
 );
 
 bool

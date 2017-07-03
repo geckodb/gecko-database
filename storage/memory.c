@@ -502,10 +502,7 @@ range_do_overlap(
 static inline void
 buf_init(
         anti_buf_t *      buf,
-        size_t            page_size,
-        size_t            freespace_reg_capacity,
-        size_t            lane_reg_capacity,
-        size_t            hotstore_size_limit
+        buf_config_t      config
 );
 
 static inline page_t *
@@ -694,22 +691,22 @@ coldstore_is_empty(
 
 anti_buf_t *
 buf_create(
-    size_t    page_size,
-    size_t    freespace_reg_capacity,
-    size_t    lane_reg_capacity,
-    size_t    hotstore_size_limit)
+    buf_config_t config)
 {
-    EXPECT_GREATER(page_size, 0, NULL);
-    EXPECT_GREATER(hotstore_size_limit, 0, NULL);
-    EXPECT_GREATER(freespace_reg_capacity, 0, NULL);
-    EXPECT_GREATER(lane_reg_capacity, 0, NULL);
+    EXPECT_GREATER(config.ram_page_size_default, 0, NULL);
+    EXPECT_GREATER(config.hotstore_size_limit, 0, NULL);
+    EXPECT_GREATER(config.free_space_reg_capacity, 0, NULL);
+    EXPECT_GREATER(config.lane_reg_capacity, 0, NULL);
+    require((config.ram_page_size_max < config.hotstore_size_limit), "miss-configured.");
+    require((config.ram_page_size_default < config.ram_page_size_max), "miss-configured.");
 
-    panic_if((hotstore_size_limit < 2 * page_size), BADPAGESIZE, page_size, hotstore_size_limit);
+    panic_if((config.ram_page_size_max > 0.5 * config.hotstore_size_limit),
+             BADPAGESIZE, config.ram_page_size_max, config.hotstore_size_limit);
 
     anti_buf_t *result = malloc(sizeof(anti_buf_t));
     EXPECT_GOOD_MALLOC(result, NULL);
 
-    buf_init(result, page_size, freespace_reg_capacity, lane_reg_capacity, hotstore_size_limit);
+    buf_init(result, config);
     anticache_init(result);
 
     return result;
@@ -918,7 +915,7 @@ anticache_create_page_safe(
     size_t id = !anticache_is_freelist_empty(buf) ? anticache_freelist_pop(buf) :
                                                     anticache_new_page_id(buf);
 
-    result = page_create(buf, id, buf->config.page_size, FRESH_PAGE_FLAGS,
+    result = page_create(buf, id, buf->config.ram_page_size_default, FRESH_PAGE_FLAGS,
                          buf->config.free_space_reg_capacity,
                          buf->config.lane_reg_capacity);
 
@@ -2216,23 +2213,14 @@ freespace_push(
 static inline void
 buf_init(
     anti_buf_t *   buf,
-    size_t         page_size,
-    size_t         freespace_reg_capacity,
-    size_t         lane_reg_capacity,
-    size_t         hotstore_size_limit)
+    buf_config_t   config)
 {
     buf->page_anticache.hot_store = hash_table_create(
             &(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen},
             sizeof(page_id_t), sizeof(void *), HOTSTORE_INITCAP,
             HOTSTORE_GROW_FACTOR, HOTSTORE_MAX_FILL_FAC);
-    buf->max_size_hot_store = hotstore_size_limit;
+    buf->config = config;
     require_non_null(buf->page_anticache.hot_store);
-
-    buf->config = (buffer_manager_config_t) {
-            .lane_reg_capacity = lane_reg_capacity,
-            .free_space_reg_capacity = freespace_reg_capacity,
-            .page_size = page_size
-    };
 }
 
 static inline page_t *

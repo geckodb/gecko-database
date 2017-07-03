@@ -29,7 +29,7 @@ main(void)
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     for (int i = 0; i < 1000; i++) {
-        anti_buf_t *buffer = buf_create(10000, 100, 100, 50000);
+        anti_buf_t *buffer = buf_create(DEFAULT_BUF_CONFIG);
         cursor_t *  cursor = buf_alloc(buffer, TUPLE_PER_BLOCK * sizeof(hardcoded_tuple_t), 10,
                                        positioning_first_nomerge);
         buf_open(cursor);
