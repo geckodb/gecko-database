@@ -59,6 +59,10 @@
 #define LANE_REG_CAPACITY                        1000
 #endif
 
+#ifndef SWAP_DIR_DEFAULT
+#define SWAP_DIR_DEFAULT                        "${MYIMDB_HOME}/swap"
+#endif
+
 // ---------------------------------------------------------------------------------------------------------------------
 // C O N S T A N T S
 // ---------------------------------------------------------------------------------------------------------------------
@@ -166,6 +170,8 @@ typedef struct {
                                              *   0.5 * 'hotstore_size_limit'.</b>*/
         size_t        free_space_reg_capacity;
         size_t        lane_reg_capacity;
+
+        const char *  swap_dir;              /*!< Directory used for writing swapping files */
 } buf_config_t;
 
 typedef struct {
@@ -221,7 +227,8 @@ static buf_config_t DEFAULT_BUF_CONFIG = {
         .ram_page_size_default      = PAGESIZE_DEFAULT,
         .ram_page_size_max          = PAGESIZE_MAX,
         .free_space_reg_capacity    = FREESPACE_REG_CAPACITY,
-        .lane_reg_capacity          = LANE_REG_CAPACITY
+        .lane_reg_capacity          = LANE_REG_CAPACITY,
+        .swap_dir                   = SWAP_DIR_DEFAULT
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

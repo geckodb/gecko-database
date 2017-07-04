@@ -407,6 +407,39 @@ main.c.s:
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/main.c.s
 .PHONY : main.c.s
 
+pref.o: pref.c.o
+
+.PHONY : pref.o
+
+# target to build an object file
+pref.c.o:
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/pref.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/pref.c.o
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/pref.c.o
+.PHONY : pref.c.o
+
+pref.i: pref.c.i
+
+.PHONY : pref.i
+
+# target to preprocess a source file
+pref.c.i:
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/pref.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/pref.c.i
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/pref.c.i
+.PHONY : pref.c.i
+
+pref.s: pref.c.s
+
+.PHONY : pref.s
+
+# target to generate assembly for a file
+pref.c.s:
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/pref.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/pref.c.s
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/pref.c.s
+.PHONY : pref.c.s
+
 require.o: require.c.o
 
 .PHONY : require.o
@@ -694,6 +727,9 @@ help:
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... pref.o"
+	@echo "... pref.i"
+	@echo "... pref.s"
 	@echo "... require.o"
 	@echo "... require.i"
 	@echo "... require.s"

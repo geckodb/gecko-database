@@ -75,6 +75,11 @@ typedef struct {
 dict_t *hash_table_create(const hash_function_t *hash_function, size_t key_size, size_t elem_size,
                           size_t num_slots, float grow_factor, float max_load_factor);
 
+dict_t *hash_table_create_ex(const hash_function_t *hash_function, size_t key_size, size_t elem_size,
+                          size_t num_slots, float grow_factor, float max_load_factor,
+                          bool (*equals)(const void *key_lhs, const void *key_rhs),
+                          void (*cleanup)(void *key, void *value), bool key_is_str);
+
 void hash_table_lock(dict_t *dict);
 void hash_table_unlock(dict_t *dict);
 bool hash_table_free(dict_t *dict);

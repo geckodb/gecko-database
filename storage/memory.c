@@ -22,6 +22,7 @@
 #include <msg.h>
 #include <require.h>
 #include <storage/memory.h>
+#include <sys/stat.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 // C O N S T A N T S
@@ -110,6 +111,11 @@ typedef enum {
         PAGE_PTR_NEAR,
         PAGE_PTR_FAR
 } page_ptr_type;
+
+typedef enum {
+        MEM_SPACE_VM,
+        MEM_SPACE_FILE
+} mem_space;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // M A C R O S
@@ -310,6 +316,7 @@ page_create(
         page_id_t         id,
         size_t            size,
         page_flags        flags,
+        mem_space         mspace,
         size_t            freespace_reg_cap,
         size_t            lane_reg_cap
 );
@@ -556,7 +563,8 @@ anticache_is_freelist_empty(
 
 static inline page_t *
 anticache_create_page_safe(
-        anti_buf_t *      buf
+        anti_buf_t *      buf,
+        size_t            min_payload_size
 );
 
 static inline page_id_t
@@ -907,15 +915,27 @@ anticache_is_freelist_empty(
 
 static inline page_t *
 anticache_create_page_safe(
-    anti_buf_t *    buf)
+    anti_buf_t *    buf,
+    size_t          min_payload_size)
 {
     require_non_null(buf);
-    page_t *        result = NULL;
+    page_t *        result             = NULL;
+    size_t          matching_page_size = buf->config.ram_page_size_default;
+    mem_space       mspace             = MEM_SPACE_VM;
 
     size_t id = !anticache_is_freelist_empty(buf) ? anticache_freelist_pop(buf) :
                                                     anticache_new_page_id(buf);
 
-    result = page_create(buf, id, buf->config.ram_page_size_default, FRESH_PAGE_FLAGS,
+    if (min_payload_size > matching_page_size) {
+        if (min_payload_size < buf->config.ram_page_size_max) {
+            matching_page_size = buf->config.ram_page_size_max;
+        } else {
+            mspace             = MEM_SPACE_FILE;
+            matching_page_size = min_payload_size;
+        }
+    }
+
+    result = page_create(buf, id, matching_page_size, FRESH_PAGE_FLAGS, mspace,
                          buf->config.free_space_reg_capacity,
                          buf->config.lane_reg_capacity);
 
@@ -1111,6 +1131,7 @@ page_create(
     page_id_t      id,
     size_t         size,
     page_flags     flags,
+    mem_space      mspace,
     size_t         freespace_reg_cap,
     size_t         lane_reg_cap)
 {
@@ -1129,8 +1150,25 @@ page_create(
     EXPECT_GREATER(free_space_size, 1, NULL)
     EXPECT_NONNULL(buf, NULL);
 
-    page_t * page = malloc(size);
-    EXPECT_GOOD_MALLOC(page, NULL);
+    page_t * page = NULL;
+    struct stat st = {0};
+
+    switch (mspace) {
+        case MEM_SPACE_VM:
+            page = malloc(size);
+            EXPECT_GOOD_MALLOC(page, NULL);
+            break;
+        case MEM_SPACE_FILE:
+            if (stat(buf->config.swap_dir, &st) == -1) {
+                mkdir(buf->config.swap_dir, 0700);
+            }
+
+         //   int file_desc = fopen()
+            break;
+        default:
+        panic(BADBRANCH, buf);
+    }
+
     page->header.id = id;
     page->header.size = size;
     page->header.freespace = 0;
@@ -2269,7 +2307,7 @@ anticache_page_by_freesize(
             anticache_add_page_safe(buf, page);
         }
         if (page == NULL) {
-            page = anticache_create_page_safe(buf);
+            page = anticache_create_page_safe(buf, size);
         }
     }
 

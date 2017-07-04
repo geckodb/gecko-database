@@ -5,6 +5,13 @@ include_directories("include")
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -std=c11 -Wall -Werror")
 
+set(CMAKE_BINARY_DIR
+        ${CMAKE_SOURCE_DIR}/bin)
+set(EXECUTABLE_OUTPUT_PATH
+        ${CMAKE_BINARY_DIR})
+
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR})
+
 set(SOURCE_FILES
         include/containers/vector.h
         include/storage/attribute.h
@@ -16,6 +23,8 @@ set(SOURCE_FILES
         containers/dictionaries/fixed_linear_hash_table.c
         include/macros.h
         hash.c
+        include/pref.h
+        pref.c
         include/hash.h
         include/msg.h
         include/defs.h

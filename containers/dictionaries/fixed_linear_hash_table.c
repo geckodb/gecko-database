@@ -47,11 +47,11 @@
         equals;                                                                                                        \
     })
 
-#define keys_match(self, lhs, rhs)                                                                                     \
-    bytewise_equals(self->key_size, lhs, rhs)
+#define keys_match(self, extra, lhs, rhs)                                                                              \
+    (extra->equals != NULL ? extra->equals(lhs, rhs) : bytewise_equals(self->key_size, lhs, rhs))
 
-#define is_slot_empty(self, slot_data, empty_indicator)                                                                \
-    keys_match(self, slot_data, empty_indicator)
+#define is_slot_empty(self, extra, slot_data, empty_indicator)                                                         \
+    keys_match(self, extra, slot_data, extra->key_is_str ? &empty_indicator : empty_indicator)
 
 #define require_linear_hash_table_tag(dict)                                                                            \
     require((dict->tag == dict_type_linear_hash_table), BADTAG);
@@ -60,7 +60,8 @@
     { require_nonnull(dict); require_nonnull(dict->extra); require_linear_hash_table_tag(dict); }
 
 #define calc_hash_code(self, extra, key)                                                                               \
-    (extra->hash_function.hash_code(extra->hash_function.capture, self->key_size, key))
+    (extra->hash_function.hash_code(extra->hash_function.capture, extra->key_is_str ? strlen(*((char **) key)) : self->key_size,    \
+                                                                  extra->key_is_str ? *((char **) key) : key))
 
 #define convert_to_slot_id(hash_code, extra)                                                                           \
     (hash_code % extra->num_slots)
@@ -105,7 +106,10 @@
         .num_slots = (other)->num_slots,                                                                               \
         .slots = (other)->slots,                                                                                       \
         .max_load_factor = (other)->max_load_factor,                                                                   \
-        .counters = (other)->counters                                                                                  \
+        .counters = (other)->counters,                                                                                 \
+        .equals = (other)->equals,                                                                                     \
+        .cleanup = (other)->cleanup,                                                                                   \
+        .key_is_str = (other)->key_is_str                                                                              \
     };})
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -121,6 +125,9 @@ typedef struct {
     void *empty_indicator;
     pthread_mutex_t mutex;
     counters_t counters;
+    bool (*equals)(const void *key_lhs, const void *key_rhs);
+    void (*cleanup)(void *key, void *value);
+    bool key_is_str;
 } hash_table_extra_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -157,6 +164,15 @@ static inline void swap(hash_table_extra_t *a, hash_table_extra_t *b);
 dict_t *hash_table_create(const hash_function_t *hash_function, size_t key_size, size_t elem_size,
                           size_t num_slots, float grow_factor, float max_load_factor)
 {
+    return hash_table_create_ex(hash_function, key_size, elem_size, num_slots, grow_factor, max_load_factor,
+                                NULL, NULL, false);
+}
+
+dict_t *hash_table_create_ex(const hash_function_t *hash_function, size_t key_size, size_t elem_size,
+                          size_t num_slots, float grow_factor, float max_load_factor,
+                          bool (*equals)(const void *key_lhs, const void *key_rhs),
+                          void (*cleanup)(void *key, void *value), bool key_is_str)
+{
     require_nonnull(hash_function);
     require_nonnull(hash_function->hash_code);
     require_not_zero(num_slots);
@@ -181,6 +197,8 @@ dict_t *hash_table_create(const hash_function_t *hash_function, size_t key_size,
         .extra = require_good_malloc(sizeof(hash_table_extra_t))
     };
 
+    panic_if ((key_is_str && key_size != sizeof(char *)), BADARG, "key must be pointer to string");
+
     hash_table_extra_t *extra = (hash_table_extra_t*) result->extra;
     *extra = (hash_table_extra_t) {
         .hash_function = *hash_function,
@@ -189,10 +207,20 @@ dict_t *hash_table_create(const hash_function_t *hash_function, size_t key_size,
         .grow_factor = grow_factor,
         .max_load_factor = max_load_factor,
         .slots = require_good_malloc(num_slots * (key_size + elem_size)),
-        .empty_indicator = require_good_malloc(key_size),
-        .mutex = PTHREAD_MUTEX_INITIALIZER
+        .empty_indicator = key_is_str ? require_good_malloc(sizeof(char **)) : require_good_malloc(key_size),
+        .mutex = PTHREAD_MUTEX_INITIALIZER,
+        .equals = equals,
+        .cleanup = cleanup,
+        .key_is_str = key_is_str
     };
-    memset(extra->empty_indicator, UCHAR_MAX, key_size);
+
+    if (key_is_str) {
+        char *empty_str = malloc(1);
+        *empty_str = '\0';
+        extra->empty_indicator = &empty_str;
+    } else {
+        memset(extra->empty_indicator, UCHAR_MAX, key_size);
+    }
 
     init_slots(extra->slots, num_slots, key_size, elem_size, extra->empty_indicator);
     hash_reset_counters(result);
@@ -221,6 +249,17 @@ bool hash_table_free(dict_t *dict)
         hash_table_extra_t *extra = (hash_table_extra_t *) dict->extra;
         require_nonnull(extra->slots);
         require_nonnull(extra->empty_indicator);
+
+        if (extra->cleanup != NULL) {
+            for (size_t slot_id = 0; slot_id < extra->num_slots; slot_id++) {
+                if (slot_is_empty(dict, extra, slot_id)) {
+                    void *key = slot_get_key(extra->slots, slot_id, dict->key_size, dict->elem_size);
+                    void *value = slot_get_value(extra->slots, slot_id, dict->key_size, dict->elem_size);
+                    extra->cleanup(key, value);
+                }
+            }
+        }
+
         free(extra->slots);
         free(extra->empty_indicator);
         free(dict);
@@ -313,11 +352,6 @@ vector_t *this_gets(const struct dict_t *self, size_t num_keys, const void *keys
     hash_table_extra_t *extra = (hash_table_extra_t *) self->extra;
 
     while (num_keys--) {
-        float load_factor = extra->num_inuse/(float) extra->num_slots;
-        if (load_factor > extra->max_load_factor) {
-            rebuild(self, extra);
-        }
-
         const void *key = keys + (num_keys * self->key_size);
 
         size_t hash_code = calc_hash_code(self, extra, key);
@@ -329,7 +363,7 @@ vector_t *this_gets(const struct dict_t *self, size_t num_keys, const void *keys
         if (!empty_slot_found) {
             while ((round_trip_slot_id != slot_id) && !empty_slot_found) {
                 const void *old_key = get_key(self, extra, slot_id);
-                if (keys_match(self, key, old_key)) {
+                if (keys_match(self, extra, key, old_key)) {
                     extra->counters.num_get_foundkey++;
                     void *value_ptr = get_value(self, extra, slot_id);
                     vector_add(result, 1, &value_ptr);
@@ -372,7 +406,7 @@ bool this_remove(struct dict_t *self, size_t num_keys, const void *keys)
         if (!empty_slot_found) {
             while ((round_trip_slot_id != slot_id) && !empty_slot_found) {
                 const void *old_key = get_key(self, extra, slot_id);
-                if (keys_match(self, key, old_key)) {
+                if (keys_match(self, extra, key, old_key)) {
                     extra->counters.num_remove_key++;
                     remove_key(self, extra, slot_id);
                     extra->num_inuse--;
@@ -409,6 +443,11 @@ void this_puts(struct dict_t *self, size_t num_elements, const void *keys, const
     hash_table_extra_t *extra = (hash_table_extra_t *) self->extra;
 
     while (num_elements--) {
+        float load_factor = extra->num_inuse/(float) extra->num_slots;
+        if (load_factor > extra->max_load_factor) {
+            rebuild(self, extra);
+        }
+
         const void *key   = keys + (num_elements * self->key_size);
         const void *value = values + (num_elements * self->elem_size);
 
@@ -420,7 +459,7 @@ void this_puts(struct dict_t *self, size_t num_elements, const void *keys, const
         if (!slot_found) {
             while ((round_trip_slot_id != slot_id) && !slot_found) {
                 const void *old_key = get_key(self, extra, slot_id);
-                bool key_match = keys_match(self, key, old_key);
+                bool key_match = keys_match(self, extra, key, old_key);
                 if (!key_match) {
                     extra->counters.num_put_slotsearch++;
                     slot_id = convert_to_slot_id((slot_id + 1), extra);
@@ -462,7 +501,7 @@ void this_for_each(struct dict_t *self, void *capture, void (*consumer)(void *ca
 
     while (slot_idx--) {
         void *slot_data = (extra->slots + (slot_idx * slot_size));
-        if (!is_slot_empty(self, slot_data, extra->empty_indicator))
+        if (!is_slot_empty(self, extra, slot_data, extra->empty_indicator))
             consumer (capture, slot_data, (slot_data + self->key_size));
     }
 }
@@ -482,7 +521,7 @@ static inline bool slot_is_empty(const dict_t *self, hash_table_extra_t *extra, 
 {
     assert (self && extra && slot_id < extra->num_slots);
     void *pos = seek_to_slot(extra->slots, slot_id, self->key_size, self->elem_size);
-    bool empty = is_slot_empty(self, pos, extra->empty_indicator);
+    bool empty = is_slot_empty(self, extra, pos, extra->empty_indicator);
     return empty;
 }
 
@@ -526,7 +565,7 @@ static inline void rebuild(const dict_t *self, hash_table_extra_t *extra)
 
     while (slot_idx--) {
         void *old_slot_data = (extra->slots + (slot_idx * slot_size));
-        if (!is_slot_empty(self, old_slot_data, extra->empty_indicator)) {
+        if (!is_slot_empty(self, extra, old_slot_data, extra->empty_indicator)) {
             tmp->put(tmp, old_slot_data, old_slot_data + self->key_size);
         }
     }

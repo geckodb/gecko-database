@@ -1,6 +1,7 @@
 
 #include <containers/vector.h>
 #include <storage/memory.h>
+#include <pref.h>
 
 #define TUPLE_PER_BLOCK     80
 
@@ -45,12 +46,32 @@ main(void)
         }
         buf_close(cursor);
 
+        pref_t pref;
+        pref_create(&pref, "/Users/marcus/temp/test.conf");
+        const char *value = pref_get_str(&pref, "ein.schlüssel", "nütschs");
+        printf(">> value = '%s'\n", value);
+        const char *value2 = pref_get_str(&pref, "ein.schlüssel2", "nütschs");
+        printf(">> value2 = '%s'\n", value2);
+        const char *value3 = pref_get_str(&pref, "ein.schlüssel3", "nütschs");
+        printf(">> value3 = '%s'\n", value3);
+        const char *value4 = pref_get_str(&pref, "Ein_Schlüssel_Ohne", "nütschs");
+        printf(">> value4 = '%s'\n", value4);
+        const char *value5 = pref_get_str(&pref, "Ein_Schlüssel_Ohn", "nütschs");
+        printf(">> value5 = '%s'\n", value5);
+        const char *value6 = pref_get_str(&pref, "Das_ist_noch_mehr_schluessel", "nütschs");
+        printf(">> value6 = '%s'\n", value6);
+
+
         buf_open(cursor);
         while (buf_next(cursor)) {
             buf_read(cursor, NULL, print_to_console);
         }
         buf_close(cursor);
         buf_release(cursor);
+
+        cursor_t *  cursor2 = buf_alloc(buffer, HOTSTORE_SIZELIMIT, 10,
+                                       positioning_first_nomerge);
+        buf_open(cursor2);
     }
 
     return EXIT_SUCCESS;
