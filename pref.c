@@ -12,24 +12,6 @@ read_lines(
         const char *file
 );
 
-bool
-str_equals(
-        const void *lhs,
-        const void *rhs
-);
-
-void
-clean_up(
-        void *key,
-        void *value
-);
-
-bool free_strings(
-        void *capture,
-        void *begin,
-        void *end
-);
-
 typedef enum {
         TOKEN_COMMENT,
         TOKEN_KEY,
@@ -39,9 +21,9 @@ typedef enum {
 } token_t;
 
 void
-pref_create(
-    pref_t *pref,
-    const char *file)
+pref_load(
+        pref_t *pref,
+        const char *file)
 {
     require_non_null(pref);
     require_non_null(file);
@@ -57,9 +39,6 @@ pref_create(
 
     for (int i = 0; i < lines->num_elements; i++) {
         const char *line = *(const char **) vector_at(lines, i);
-
-        printf("IN %s \n", line);
-
         token_t token = TOKEN_UNKNOWN;
 
         const char *key_begin = NULL, *key_end, *value_begin = NULL, *value_end = NULL;
@@ -189,11 +168,12 @@ read_lines(
     panic_if((fp == NULL), NOSUCHFILE, file);
 
     while ((read = getline(&line, &len, fp)) != -1) {
-        if (len > 2) {
+        if (line[strlen(line) - 1] == '\n') {
             line[strlen(line) - 1] = '\0'; // removing the newline character
-            const char *dup = strdup(line);
-            vector_add(result, 1, &dup);
         }
+
+        const char *dup = strdup(line);
+        vector_add(result, 1, &dup);
     }
 
     fclose(fp);
@@ -202,37 +182,3 @@ read_lines(
 
     return result;
 }
-
-bool
-str_equals(
-    const void *lhs,
-    const void *rhs)
-{
-    return (strcmp(*(char **)lhs, *(char **)rhs) == 0);
-}
-
-void
-clean_up(
-        void *key,
-        void *value)
-{
-    char **key_string = (char **) key;
-    char **val_string = (char **) value;
-    free (*key_string);
-    free (*val_string);
-}
-
-bool
-free_strings(
-        void *capture,
-        void *begin,
-        void *end)
-{
-    bool result = require_non_null(begin) && require_non_null(end) && require_less_than(begin, end);
-    for (char **it = (char **) begin; it < (char **) end; it++) {
-        printf("%s\n", *it);
-        free (*it);
-    }
-
-    return result;
-};

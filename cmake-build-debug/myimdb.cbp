@@ -175,6 +175,11 @@
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/conf.c">
+			<Option target="sample_linuxwc"/>
+			<Option target="sample_lin_hash"/>
+			<Option target="myimdb"/>
+		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/containers/dict.c">
 			<Option target="sample_linuxwc"/>
 			<Option target="sample_lin_hash"/>
@@ -211,6 +216,11 @@
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/c11threads.h">
+			<Option target="sample_linuxwc"/>
+			<Option target="sample_lin_hash"/>
+			<Option target="myimdb"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/include/conf.h">
 			<Option target="sample_linuxwc"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>

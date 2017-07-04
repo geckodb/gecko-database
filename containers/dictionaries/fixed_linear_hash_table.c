@@ -47,11 +47,19 @@
         equals;                                                                                                        \
     })
 
+bool is_empty_key(const char *a) {
+    return (strlen(a) == 0);
+}
+
+bool key_comp(const char *a, const char *b) {
+    return (strcmp(a, b) == 0);
+}
+
 #define keys_match(self, extra, lhs, rhs)                                                                              \
-    (extra->equals != NULL ? extra->equals(lhs, rhs) : bytewise_equals(self->key_size, lhs, rhs))
+    (extra->key_is_str ? key_comp(*(char **)lhs, *(char **)rhs) : bytewise_equals(self->key_size, lhs, rhs))
 
 #define is_slot_empty(self, extra, slot_data, empty_indicator)                                                         \
-    keys_match(self, extra, slot_data, extra->key_is_str ? &empty_indicator : empty_indicator)
+    (extra->key_is_str ? is_empty_key(*(char **)slot_data) : bytewise_equals(self->key_size, slot_data, empty_indicator))
 
 #define require_linear_hash_table_tag(dict)                                                                            \
     require((dict->tag == dict_type_linear_hash_table), BADTAG);
@@ -261,7 +269,12 @@ bool hash_table_free(dict_t *dict)
         }
 
         free(extra->slots);
-        free(extra->empty_indicator);
+        if (extra->key_is_str) {
+            free(*(char **)extra->empty_indicator);
+        } else {
+            free(extra->empty_indicator);
+        }
+
         free(dict);
         return true;
     } else return false;
@@ -308,6 +321,39 @@ void hash_table_info(dict_t *dict, linear_hash_table_info_t *info)
                             ((dict->key_size + dict->elem_size) * (extra->num_slots - extra->num_inuse)) /* reserved */)
     };
 }
+
+bool
+str_equals(
+        const void *lhs,
+        const void *rhs)
+{
+    return (strcmp(*(char **)lhs, *(char **)rhs) == 0);
+}
+
+void
+clean_up(
+        void *key,
+        void *value)
+{
+    char **key_string = (char **) key;
+    char **val_string = (char **) value;
+    free (*key_string);
+    free (*val_string);
+}
+
+bool
+free_strings(
+        void *capture,
+        void *begin,
+        void *end)
+{
+    bool result = require_non_null(begin) && require_non_null(end) && require_less_than(begin, end);
+    for (char **it = (char **) begin; it < (char **) end; it++) {
+        free (*it);
+    }
+
+    return result;
+};
 
 // ---------------------------------------------------------------------------------------------------------------------
 // H E L P E R   I M P L E M E N T A T I O N
@@ -529,7 +575,7 @@ static inline void slot_put(void *slots, size_t slot_id, size_t key_size, size_t
 {
     assert (slots && key && data && key_size > 0 && elem_size > 0);
     void *slot_data = seek_to_slot(slots, slot_id, key_size, elem_size);
-    memcpy(slot_data, key, key_size);
+    memcpy(slot_data, key, key_size);               // Test
     memcpy(slot_data + key_size, data, elem_size);
 }
 

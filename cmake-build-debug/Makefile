@@ -182,6 +182,39 @@ async.c.s:
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/async.c.s
 .PHONY : async.c.s
 
+conf.o: conf.c.o
+
+.PHONY : conf.o
+
+# target to build an object file
+conf.c.o:
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/conf.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/conf.c.o
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/conf.c.o
+.PHONY : conf.c.o
+
+conf.i: conf.c.i
+
+.PHONY : conf.i
+
+# target to preprocess a source file
+conf.c.i:
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/conf.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/conf.c.i
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/conf.c.i
+.PHONY : conf.c.i
+
+conf.s: conf.c.s
+
+.PHONY : conf.s
+
+# target to generate assembly for a file
+conf.c.s:
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/conf.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/conf.c.s
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/conf.c.s
+.PHONY : conf.c.s
+
 containers/dict.o: containers/dict.c.o
 
 .PHONY : containers/dict.o
@@ -706,6 +739,9 @@ help:
 	@echo "... async.o"
 	@echo "... async.i"
 	@echo "... async.s"
+	@echo "... conf.o"
+	@echo "... conf.i"
+	@echo "... conf.s"
 	@echo "... containers/dict.o"
 	@echo "... containers/dict.i"
 	@echo "... containers/dict.s"

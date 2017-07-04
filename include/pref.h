@@ -10,7 +10,7 @@ typedef struct {
     dict_t *dict;
 } pref_t;
 
-void pref_create(
+void pref_load(
         pref_t *pref,
         const char *file
 );

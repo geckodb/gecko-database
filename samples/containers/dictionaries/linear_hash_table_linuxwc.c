@@ -91,7 +91,7 @@ int main(void)
         dict_put(dict, key, &count);
         linear_hash_table_info_t info;
         hash_table_info(dict, &info);
-      //  printf("%0.4f%% load factor: %0.4f%%, num rebuilds %zu, num slots:%zu\n", (i / (float) words->num_elements) * 100, info.load_factor, info.counters.num_rebuilds, info.num_slots_inuse + info.num_slots_free);
+        printf("%0.4f%% load factor: %0.4f%%, num rebuilds %zu, num slots:%zu\n", (i / (float) words->num_elements) * 100, info.load_factor, info.counters.num_rebuilds, info.num_slots_inuse + info.num_slots_free);
     }
     clock_t stop = clock();
     double elapsed = (double)(stop - start) * 1000.0 / CLOCKS_PER_SEC;

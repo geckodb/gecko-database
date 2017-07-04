@@ -24,6 +24,8 @@ set(SOURCE_FILES
         include/macros.h
         hash.c
         include/pref.h
+        conf.c
+        include/conf.h
         pref.c
         include/hash.h
         include/msg.h

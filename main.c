@@ -2,6 +2,7 @@
 #include <containers/vector.h>
 #include <storage/memory.h>
 #include <pref.h>
+#include <conf.h>
 
 #define TUPLE_PER_BLOCK     80
 
@@ -47,7 +48,7 @@ main(void)
         buf_close(cursor);
 
         pref_t pref;
-        pref_create(&pref, "/Users/marcus/temp/test.conf");
+        pref_load(&pref, "/Users/marcus/temp/test.conf");
         const char *value = pref_get_str(&pref, "ein.schlüssel", "nütschs");
         printf(">> value = '%s'\n", value);
         const char *value2 = pref_get_str(&pref, "ein.schlüssel2", "nütschs");
@@ -60,7 +61,15 @@ main(void)
         printf(">> value5 = '%s'\n", value5);
         const char *value6 = pref_get_str(&pref, "Das_ist_noch_mehr_schluessel", "nütschs");
         printf(">> value6 = '%s'\n", value6);
+        const char *value7 = pref_get_str(&pref, "data_size", "nütschs");
+        printf(">> data_size = '%s'\n", value7);
 
+        uint32_t val;
+        uint32_t def = 42;
+        pref_get_uint32(&val, &pref, "data_size", &def);
+        printf(">> int val = '%d'\n", val);
+
+        conf_load();
 
         buf_open(cursor);
         while (buf_next(cursor)) {
