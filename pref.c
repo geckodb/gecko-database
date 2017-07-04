@@ -23,7 +23,9 @@ typedef enum {
 void
 pref_load(
         pref_t *pref,
-        const char *file)
+        const char *file,
+        dict_t *dict,
+        char * (*resolve_variables)(dict_t *dict, const char *string))
 {
     require_non_null(pref);
     require_non_null(file);
@@ -92,6 +94,10 @@ next_line:
             memcpy(import_value, value_begin, value_size);
             import_key[key_size] = import_value[value_size] = '\0';
 
+            if (resolve_variables != NULL && dict != NULL) {
+                import_value = resolve_variables(dict, import_value);
+            }
+
             dict_put(pref->dict, &import_key, &import_value);
         }
     }
@@ -132,11 +138,11 @@ const char *pref_get_str(
     return (value != NULL ? (*value) : default_val);
 }
 
-void pref_get_uint32(
-    unsigned *out,
+void pref_get_size_t(
+    size_t *out,
     const pref_t *pref,
     const char *key,
-    unsigned *default_val)
+    size_t *default_val)
 {
     const char *value = pref_get_str(pref, key, NULL);
 

@@ -30,8 +30,10 @@ main(void)
     // B U F F E R   M A N A G E R   T E S T
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    conf_load();
+
     for (int i = 0; i < 1000; i++) {
-        anti_buf_t *buffer = buf_create(DEFAULT_BUF_CONFIG);
+        anti_buf_t *buffer = buf_create();
         cursor_t *  cursor = buf_alloc(buffer, TUPLE_PER_BLOCK * sizeof(hardcoded_tuple_t), 10,
                                        positioning_first_nomerge);
         buf_open(cursor);
@@ -48,7 +50,7 @@ main(void)
         buf_close(cursor);
 
         pref_t pref;
-        pref_load(&pref, "/Users/marcus/temp/test.conf");
+        pref_load(&pref, "/Users/marcus/temp/test.conf", NULL, NULL);
         const char *value = pref_get_str(&pref, "ein.schlüssel", "nütschs");
         printf(">> value = '%s'\n", value);
         const char *value2 = pref_get_str(&pref, "ein.schlüssel2", "nütschs");
@@ -64,12 +66,12 @@ main(void)
         const char *value7 = pref_get_str(&pref, "data_size", "nütschs");
         printf(">> data_size = '%s'\n", value7);
 
-        uint32_t val;
-        uint32_t def = 42;
-        pref_get_uint32(&val, &pref, "data_size", &def);
-        printf(">> int val = '%d'\n", val);
+//        uint32_t val;
+//        uint32_t def = 42;
+//        pref_get_uint32(&val, &pref, "data_size", &def);
+//        printf(">> int val = '%d'\n", val);
 
-        conf_load();
+
 
         buf_open(cursor);
         while (buf_next(cursor)) {
@@ -78,9 +80,9 @@ main(void)
         buf_close(cursor);
         buf_release(cursor);
 
-        cursor_t *  cursor2 = buf_alloc(buffer, HOTSTORE_SIZELIMIT, 10,
-                                       positioning_first_nomerge);
-        buf_open(cursor2);
+//        cursor_t *  cursor2 = buf_alloc(buffer, HOTSTORE_SIZELIMIT, 10,
+//                                       positioning_first_nomerge);
+//        buf_open(cursor2);
     }
 
     return EXIT_SUCCESS;

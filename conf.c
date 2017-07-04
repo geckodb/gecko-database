@@ -4,8 +4,10 @@
 #include <error.h>
 #include <hash.h>
 #include <containers/dictionaries/fixed_linear_hash_table.h>
+#include <macros.h>
 
 #define BADCWD          "Unable to get working directory (file name might exceed limit of %d)"
+#define NOCONFIG        "Configuration map for '%s' is not set. Did you call 'conf_load'?"
 
 static inline char
 path_separator()
@@ -146,7 +148,7 @@ load_config_file(
     const char *file_path)
 {
     char *config_file = resolve_variables(env, file_path);
-    pref_load(config, config_file);
+    pref_load(config, config_file, env, resolve_variables);
     free (config_file);
 }
 
@@ -172,13 +174,13 @@ conf_load()
     char *soft_link_file = resolve_variables(env, CONF_FILE_PATH_SOFTLINKS);
     if ((access(soft_link_file, F_OK ) != -1)) {
         pref_t soft_link_config;
-        pref_load(&soft_link_config, soft_link_file);
+        pref_load(&soft_link_config, soft_link_file, NULL, NULL);
 
         update_dir(env, &soft_link_config, CONF_VAR_MYIMDB_BIN, "bin_path", bin_path);
         update_dir(env, &soft_link_config, CONF_VAR_MYIMDB_ETC, "etc_path", etc_path);
         update_dir(env, &soft_link_config, CONF_VAR_MYIMDB_SWAP, "swap_path", swap_path);
 
-        warn("Call to 'pref_free' cannot be execute: NOT IMPLEMENTED (%s)", to_string(conf_load));
+        warn("Call to 'pref_free' cannot be executed: NOT IMPLEMENTED (%s)", to_string(conf_load));
         // pref_free(&soft_link_config);    // TODO: Uncomment, when hash table free is implemented
     }
 
@@ -192,20 +194,36 @@ conf_load()
     printf("%s: %s\n", CONF_VAR_MYIMDB_BIN,  get_by_key(env, CONF_VAR_MYIMDB_BIN));
     printf("%s: %s\n", CONF_VAR_MYIMDB_ETC,  get_by_key(env, CONF_VAR_MYIMDB_ETC));
     printf("%s: %s\n", CONF_VAR_MYIMDB_SWAP,  get_by_key(env, CONF_VAR_MYIMDB_SWAP));
-    printf("%s: %s\n", CONF_SETTING_SWAP_BUFFER_HOTSTORE_LIM,  pref_get_str(&swapbuf_config, CONF_SETTING_SWAP_BUFFER_HOTSTORE_LIM, "1024"));
+
+    printf("%s: %s\n", CONF_SETTING_SWAP_BUFFER_HOTSTORE_LIM,     pref_get_str(&swapbuf_config, CONF_SETTING_SWAP_BUFFER_HOTSTORE_LIM, "some limit"));
+    printf("%s: %s\n", CONF_SETTING_SWAP_BUFFER_PAGE_SIZE_DEF,    pref_get_str(&swapbuf_config, CONF_SETTING_SWAP_BUFFER_PAGE_SIZE_DEF, "some min"));
+    printf("%s: %s\n", CONF_SETTING_SWAP_BUFFER_PAGE_SIZE_MAX,    pref_get_str(&swapbuf_config, CONF_SETTING_SWAP_BUFFER_PAGE_SIZE_MAX, "some max"));
+    printf("%s: %s\n", CONF_SETTING_SWAP_BUFFER_PAGE_DEF_MSPACE,  pref_get_str(&swapbuf_config, CONF_SETTING_SWAP_BUFFER_PAGE_DEF_MSPACE, "some space"));
+    printf("%s: %s\n", CONF_SETTING_SWAP_BUFFER_PAGE_HUGE_MSPACE, pref_get_str(&swapbuf_config, CONF_SETTING_SWAP_BUFFER_PAGE_HUGE_MSPACE, "huge"));
+    printf("%s: %s\n", CONF_SETTING_SWAP_BUFFER_MMAP_SWAP_DIR,    pref_get_str(&swapbuf_config, CONF_SETTING_SWAP_BUFFER_MMAP_SWAP_DIR, "a dir"));
 
 
   //  printf("working dir: %s\n", dir);
     abort();
 }
 
-void
-conf_get(
-    void *out,
-    const char *module,
-    const char *settings_key)
-{
+const char *
+conf_get_str(
+        const char *settings_key,
+        const char *default_value
+) {
+    WARN_IF((swapbuf_config.dict == NULL), NOCONFIG, settings_key);
+    return pref_get_str(&swapbuf_config, settings_key, default_value);
+}
 
+void
+conf_get_size_t(
+        size_t *out,
+        const char *settings_key,
+        size_t default_value
+) {
+    WARN_IF((swapbuf_config.dict == NULL), NOCONFIG, settings_key);
+    pref_get_size_t(out, &swapbuf_config, settings_key, &default_value);
 }
 
 void

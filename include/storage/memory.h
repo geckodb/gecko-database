@@ -35,32 +35,12 @@
 // C O N F I G
 // ---------------------------------------------------------------------------------------------------------------------
 
-#ifndef RAM_CAPACITY_GB
-#define RAM_CAPACITY_GB                          8
-#endif
-
-#ifndef HOTSTORE_SIZELIMIT
-#define HOTSTORE_SIZELIMIT                       GIB_TO_BYTE(0.75f * RAM_CAPACITY_GB)
-#endif
-
-#ifndef PAGESIZE_DEFAULT
-#define PAGESIZE_DEFAULT                         GIB_TO_BYTE(0.10f * RAM_CAPACITY_GB)
-#endif
-
-#ifndef PAGESIZE_MAX
-#define PAGESIZE_MAX                             (HOTSTORE_SIZELIMIT * 0.50f)
-#endif
-
 #ifndef FREESPACE_REG_CAPACITY
 #define FREESPACE_REG_CAPACITY                   1000
 #endif
 
 #ifndef LANE_REG_CAPACITY
 #define LANE_REG_CAPACITY                        1000
-#endif
-
-#ifndef SWAP_DIR_DEFAULT
-#define SWAP_DIR_DEFAULT                        "${MYIMDB_HOME}/swap"
 #endif
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -222,23 +202,21 @@ typedef struct {
 // D E F A U L T S
 // ---------------------------------------------------------------------------------------------------------------------
 
-static buf_config_t DEFAULT_BUF_CONFIG = {
-        .hotstore_size_limit        = HOTSTORE_SIZELIMIT,
-        .ram_page_size_default      = PAGESIZE_DEFAULT,
-        .ram_page_size_max          = PAGESIZE_MAX,
-        .free_space_reg_capacity    = FREESPACE_REG_CAPACITY,
-        .lane_reg_capacity          = LANE_REG_CAPACITY,
-        .swap_dir                   = SWAP_DIR_DEFAULT
-};
+//static buf_config_t DEFAULT_BUF_CONFIG = {
+//        .hotstore_size_limit        = HOTSTORE_SIZELIMIT,
+//        .ram_page_size_default      = PAGESIZE_DEFAULT,
+//        .ram_page_size_max          = PAGESIZE_MAX,
+//        .free_space_reg_capacity    = FREESPACE_REG_CAPACITY,
+//        .lane_reg_capacity          = LANE_REG_CAPACITY,
+//        .swap_dir                   = SWAP_DIR_DEFAULT
+//};
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
 anti_buf_t *
-buf_create(
-        buf_config_t config
-);
+buf_create();
 
 bool
 buf_free(

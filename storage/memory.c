@@ -23,6 +23,7 @@
 #include <require.h>
 #include <storage/memory.h>
 #include <sys/stat.h>
+#include <conf.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 // C O N S T A N T S
@@ -508,8 +509,7 @@ range_do_overlap(
 
 static inline void
 buf_init(
-        anti_buf_t *      buf,
-        buf_config_t      config
+        anti_buf_t *      buf
 );
 
 static inline page_t *
@@ -698,23 +698,12 @@ coldstore_is_empty(
 // ---------------------------------------------------------------------------------------------------------------------
 
 anti_buf_t *
-buf_create(
-    buf_config_t config)
+buf_create()
 {
-    EXPECT_GREATER(config.ram_page_size_default, 0, NULL);
-    EXPECT_GREATER(config.hotstore_size_limit, 0, NULL);
-    EXPECT_GREATER(config.free_space_reg_capacity, 0, NULL);
-    EXPECT_GREATER(config.lane_reg_capacity, 0, NULL);
-    require((config.ram_page_size_max < config.hotstore_size_limit), "miss-configured.");
-    require((config.ram_page_size_default < config.ram_page_size_max), "miss-configured.");
-
-    panic_if((config.ram_page_size_max > 0.5 * config.hotstore_size_limit),
-             BADPAGESIZE, config.ram_page_size_max, config.hotstore_size_limit);
-
     anti_buf_t *result = malloc(sizeof(anti_buf_t));
     EXPECT_GOOD_MALLOC(result, NULL);
 
-    buf_init(result, config);
+    buf_init(result);
     anticache_init(result);
 
     return result;
@@ -2250,14 +2239,31 @@ freespace_push(
 
 static inline void
 buf_init(
-    anti_buf_t *   buf,
-    buf_config_t   config)
+    anti_buf_t *   buf)
 {
     buf->page_anticache.hot_store = hash_table_create(
             &(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen},
             sizeof(page_id_t), sizeof(void *), HOTSTORE_INITCAP,
             HOTSTORE_GROW_FACTOR, HOTSTORE_MAX_FILL_FAC);
-    buf->config = config;
+    buf->config = (buf_config_t) {
+            .free_space_reg_capacity = 10000,
+            .lane_reg_capacity = 10000
+    };
+    conf_get_size_t(&buf->config.hotstore_size_limit,   CONF_SETTING_SWAP_BUFFER_HOTSTORE_LIM,  8589934592);
+    conf_get_size_t(&buf->config.ram_page_size_default, CONF_SETTING_SWAP_BUFFER_PAGE_SIZE_DEF,  858993459);
+    conf_get_size_t(&buf->config.ram_page_size_max,     CONF_SETTING_SWAP_BUFFER_PAGE_SIZE_MAX, 3221225472);
+
+    require((buf->config.ram_page_size_default > 0), "Bad default page size");
+    require((buf->config.hotstore_size_limit > 0),  "Bad hot store limit");
+    require((buf->config.free_space_reg_capacity > 0), "Bad capacity of free space register");
+    require((buf->config.lane_reg_capacity > 0), "Bad capacity of lane register");
+    require((buf->config.ram_page_size_max < buf->config.hotstore_size_limit), "miss-configured.");
+    require((buf->config.ram_page_size_default < buf->config.ram_page_size_max), "miss-configured.");
+
+    panic_if((buf->config.ram_page_size_max > 0.5 * buf->config.hotstore_size_limit),
+             BADPAGESIZE, (size_t) buf->config.ram_page_size_max, (size_t) buf->config.hotstore_size_limit);
+
+
     require_non_null(buf->page_anticache.hot_store);
 }
 

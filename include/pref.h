@@ -12,7 +12,9 @@ typedef struct {
 
 void pref_load(
         pref_t *pref,
-        const char *file
+        const char *file,
+        dict_t *dict,
+        char * (*resolve_variables)(dict_t *dict, const char *string)
 );
 
 void pref_free(
@@ -30,9 +32,9 @@ const char *pref_get_str(
         const char *default_val
 );
 
-void pref_get_uint32(
-        unsigned *out,
+void pref_get_size_t(
+        size_t *out,
         const pref_t *pref,
         const char *key,
-        unsigned *default_val
+        size_t *default_val
 );
