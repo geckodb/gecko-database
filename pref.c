@@ -5,7 +5,7 @@
 #include <containers/dictionaries/fixed_linear_hash_table.h>
 #include <ctype.h>
 
-#define NOSUCHFILE          "unable to load preference file '%s' (file not found)"
+#define NOSUCHFILE          "unable to load configuration file '%s' (file not found)"
 
 vector_t *
 read_lines(

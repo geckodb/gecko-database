@@ -98,6 +98,19 @@ register_path_dir(
     dict_put(env, &import_name, &import_value);
 }
 
+char *resolve_variable(
+    dict_t *env,
+    char *string,
+    const char *var_name,
+    const char *built_in_var_name
+)
+{
+    const char *value = get_by_key(env, var_name);
+    char *result = replace(string, built_in_var_name, value);
+    free (string);
+    return result;
+}
+
 char *resolve_variables(
     dict_t *env,
     const char *string)
@@ -108,13 +121,12 @@ char *resolve_variables(
 
     char *str = replace(string, CONF_BUILT_IN_VARNAME_WORKING_DIR, myimdb_cwd);
 
-    const char *myimdb_home = get_by_key(env, CONF_VAR_MYIMDB_HOME);
+    str = resolve_variable(env, str, CONF_VAR_MYIMDB_HOME, CONF_BUILT_IN_VARNAME_MYIMDB_HOME);
+    str = resolve_variable(env, str, CONF_VAR_MYIMDB_BIN,  CONF_BUILT_IN_VARNAME_BIN_DIR);
+    str = resolve_variable(env, str, CONF_VAR_MYIMDB_ETC,  CONF_BUILT_IN_VARNAME_ETC_DIR);
+    str = resolve_variable(env, str, CONF_VAR_MYIMDB_SWAP, CONF_BUILT_IN_VARNAME_SWAP_DIR);
 
-    char *str2 = replace(str, CONF_BUILT_IN_VARNAME_MYIMDB_HOME, myimdb_home);
-
-    free (str);
-
-    return str2;
+    return str;
 }
 
 void
@@ -123,6 +135,19 @@ update_dir(dict_t *env, pref_t *pref, const char *var_name, const char *key_name
     char *path = resolve_variables(env, pref_get_str(pref, key_name, default_value));
     register_path_dir(env, var_name,  path);
     free (path);
+}
+
+pref_t swapbuf_config;
+
+void
+load_config_file(
+    dict_t *env,
+    pref_t *config,
+    const char *file_path)
+{
+    char *config_file = resolve_variables(env, file_path);
+    pref_load(config, config_file);
+    free (config_file);
 }
 
 void
@@ -143,8 +168,7 @@ conf_load()
     char *swap_path = resolve_variables(env, CONF_VAR_MYIMDB_SWAP_DEFAULT_VALUE);
     register_path_dir(env, CONF_VAR_MYIMDB_SWAP, swap_path);
 
-
-    /* change the paths by the optional config-file in home directory */
+    /* change the paths by an optional config-file in home directory */
     char *soft_link_file = resolve_variables(env, CONF_FILE_PATH_SOFTLINKS);
     if ((access(soft_link_file, F_OK ) != -1)) {
         pref_t soft_link_config;
@@ -162,10 +186,13 @@ conf_load()
     free (etc_path);
     free (swap_path);
 
+    load_config_file(env, &swapbuf_config, CONF_FILE_PATH_SWAPBUF_CONFIG);
+
     printf("%s: %s\n", CONF_VAR_MYIMDB_HOME, get_by_key(env, CONF_VAR_MYIMDB_HOME));
     printf("%s: %s\n", CONF_VAR_MYIMDB_BIN,  get_by_key(env, CONF_VAR_MYIMDB_BIN));
     printf("%s: %s\n", CONF_VAR_MYIMDB_ETC,  get_by_key(env, CONF_VAR_MYIMDB_ETC));
     printf("%s: %s\n", CONF_VAR_MYIMDB_SWAP,  get_by_key(env, CONF_VAR_MYIMDB_SWAP));
+    printf("%s: %s\n", CONF_SETTING_SWAP_BUFFER_HOTSTORE_LIM,  pref_get_str(&swapbuf_config, CONF_SETTING_SWAP_BUFFER_HOTSTORE_LIM, "1024"));
 
 
   //  printf("working dir: %s\n", dir);
