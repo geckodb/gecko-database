@@ -17,21 +17,65 @@
 					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
-			<Target title="edit_cache">
-				<Option working_dir="/Users/marcus/git/myimdb/cmake-build-debug"/>
-				<Option type="4"/>
-				<MakeCommands>
-					<Build command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
-					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-				</MakeCommands>
-			</Target>
 			<Target title="rebuild_cache">
 				<Option working_dir="/Users/marcus/git/myimdb/cmake-build-debug"/>
 				<Option type="4"/>
 				<MakeCommands>
 					<Build command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="exp_os_paging">
+				<Option output="/Users/marcus/git/myimdb/bin/exp_os_paging" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/marcus/git/myimdb/bin"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/Users/marcus/git/myimdb/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 exp_os_paging"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="exp_os_paging/fast">
+				<Option output="/Users/marcus/git/myimdb/bin/exp_os_paging" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/marcus/git/myimdb/bin"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/Users/marcus/git/myimdb/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 exp_os_paging/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/Users/marcus/git/myimdb/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
 					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
 					<Clean command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
@@ -171,141 +215,172 @@
 			</Target>
 		</Build>
 		<Unit filename="/Users/marcus/git/myimdb/async.c">
+			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/conf.c">
+			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/containers/dict.c">
+			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/containers/dictionaries/fixed_linear_hash_table.c">
+			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/containers/list.c">
+			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/containers/vector.c">
+			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/error.c">
+			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/experiments/vm/os_paging/launcher.c">
+			<Option target="exp_os_paging"/>
+		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/hash.c">
+			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/async.h">
+			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/c11threads.h">
+			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/conf.h">
+			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/containers/dict.h">
+			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/containers/dictionaries/fixed_linear_hash_table.h">
+			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/containers/list.h">
+			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/containers/vector.h">
+			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/defs.h">
+			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/error.h">
+			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/hash.h">
+			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/macros.h">
+			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/msg.h">
+			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/pref.h">
+			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/require.h">
+			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/storage/attribute.h">
+			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/storage/memory.h">
+			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/storage/rowstore.h">
+			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/storage/schema.h">
+			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/storage/table.h">
+			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/types.h">
+			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
@@ -314,11 +389,13 @@
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/pref.c">
+			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/require.c">
+			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
@@ -330,26 +407,31 @@
 			<Option target="sample_lin_hash"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/storage/attribute.c">
+			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/storage/memory.c">
+			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/storage/schema.c">
+			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/storage/table.c">
+			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/types.c">
+			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>

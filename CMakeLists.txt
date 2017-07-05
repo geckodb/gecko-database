@@ -3,7 +3,7 @@ project(myimdb)
 
 include_directories("include")
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -std=c11 -Wall -Werror")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -std=c11 -Wall -Werror")
 
 set(CMAKE_BINARY_DIR
         ${CMAKE_SOURCE_DIR}/bin)
@@ -52,3 +52,4 @@ set(SOURCE_FILES
 add_executable(myimdb main.c ${SOURCE_FILES})
 add_executable(sample_lin_hash samples/containers/dictionaries/linear_hash_table_sample.c ${SOURCE_FILES})
 add_executable(sample_linuxwc samples/containers/dictionaries/linear_hash_table_linuxwc.c ${SOURCE_FILES})
+add_executable(exp_os_paging experiments/vm/os_paging/launcher.c ${SOURCE_FILES})
