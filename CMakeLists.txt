@@ -1,9 +1,20 @@
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.5)
 project(myimdb)
 
 include_directories("include")
+include_directories("/usr/local/include/")
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -std=c11 -Wall -Werror")
+find_package(OpenSSL REQUIRED)
+include_directories(${OPENSSL_INCLUDE_DIR})
+
+message("OPENSSL_INCLUDE_DIR: ${OPENSSL_INCLUDE_DIR}")
+message("OPENSSL_LIBRARIES: ${OPENSSL_LIBRARIES}")
+message("OPENSSL_ROOT_DIR: ${OPENSSL_ROOT_DIR}")
+
+find_package(Curses REQUIRED)
+include_directories(${CURSES_INCLUDE_DIR})
+
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -std=c11 -Wall -Werror")
 
 set(CMAKE_BINARY_DIR
         ${CMAKE_SOURCE_DIR}/bin)
@@ -53,3 +64,28 @@ add_executable(myimdb main.c ${SOURCE_FILES})
 add_executable(sample_lin_hash samples/containers/dictionaries/linear_hash_table_sample.c ${SOURCE_FILES})
 add_executable(sample_linuxwc samples/containers/dictionaries/linear_hash_table_linuxwc.c ${SOURCE_FILES})
 add_executable(exp_os_paging experiments/vm/os_paging/launcher.c ${SOURCE_FILES})
+add_executable(
+        tpch-convert utils/tpch_convert/launcher.c
+        tableimg.c
+        error.c
+        require.c
+        containers/vector.c
+        )
+add_executable(
+        tableimg utils/tableimg/launcher.c
+        tableimg.c
+        error.c
+        require.c
+        containers/vector.c
+)
+
+target_link_libraries(
+        tpch-convert
+        ${OPENSSL_LIBRARIES}
+)
+
+target_link_libraries(
+        tableimg
+        ${OPENSSL_LIBRARIES}
+        ${CURSES_LIBRARIES}
+)

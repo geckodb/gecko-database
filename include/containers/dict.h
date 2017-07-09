@@ -37,6 +37,7 @@ typedef struct dict_t {
     void (*clear)(struct dict_t *self);
     bool (*empty)(const struct dict_t *self);
     bool (*contains_key)(const struct dict_t *self, const void *key);
+    const vector_t *(*keyset)(const struct dict_t *self);
     const void *(*get)(const struct dict_t *self, const void *key);
     vector_t *(*gets)(const struct dict_t *self, size_t num_keys, const void *keys);
     bool (*remove)(struct dict_t *self, size_t num_keys, const void *keys);
@@ -56,6 +57,7 @@ bool dict_free(dict_t *dict);
 void dict_clear(dict_t *dict);
 bool dict_empty(const dict_t *dict);
 bool dict_contains_key(const dict_t *dict, const void *key);
+const vector_t *dict_keyset(const dict_t *dict);
 const void *dict_get(const dict_t *dict, const void *key);
 vector_t *dict_gets(const dict_t *dict, size_t num_keys, const void *keys);
 bool dict_remove(dict_t *dict, size_t num_keys, const void *keys);

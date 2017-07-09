@@ -27,6 +27,50 @@
 					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
+			<Target title="tpch-convert">
+				<Option output="/Users/marcus/git/myimdb/bin/tpch-convert" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/marcus/git/myimdb/bin"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/Users/marcus/git/myimdb/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 tpch-convert"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="tpch-convert/fast">
+				<Option output="/Users/marcus/git/myimdb/bin/tpch-convert" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/marcus/git/myimdb/bin"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/Users/marcus/git/myimdb/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 tpch-convert/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
 			<Target title="exp_os_paging">
 				<Option output="/Users/marcus/git/myimdb/bin/exp_os_paging" prefix_auto="0" extension_auto="0"/>
 				<Option working_dir="/Users/marcus/git/myimdb/bin"/>
@@ -120,6 +164,50 @@
 				</Compiler>
 				<MakeCommands>
 					<Build command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 sample_linuxwc/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="tableimg">
+				<Option output="/Users/marcus/git/myimdb/bin/tableimg" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/marcus/git/myimdb/bin"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/Users/marcus/git/myimdb/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 tableimg"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="tableimg/fast">
+				<Option output="/Users/marcus/git/myimdb/bin/tableimg" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/marcus/git/myimdb/bin"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/Users/marcus/git/myimdb/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 tableimg/fast"/>
 					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
 					<Clean command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
@@ -245,14 +333,18 @@
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/containers/vector.c">
+			<Option target="tpch-convert"/>
 			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/error.c">
+			<Option target="tpch-convert"/>
 			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
@@ -395,8 +487,10 @@
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/require.c">
+			<Option target="tpch-convert"/>
 			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
@@ -430,11 +524,21 @@
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/tableimg.c">
+			<Option target="tpch-convert"/>
+			<Option target="tableimg"/>
+		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/types.c">
 			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/utils/tableimg/launcher.c">
+			<Option target="tableimg"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/utils/tpch_convert/launcher.c">
+			<Option target="tpch-convert"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>

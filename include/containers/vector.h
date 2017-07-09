@@ -46,32 +46,113 @@ typedef struct {
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-vector_t *vector_create(size_t element_size, size_t capacity);
+vector_t *
+vector_create(
+        size_t element_size,
+        size_t capacity
+);
 
-vector_t *vector_create_ex(size_t element_size, size_t capacity, vector_flags flags, float grow_factor);
+vector_t *
+vector_create_ex(
+        size_t element_size,
+        size_t capacity,
+        vector_flags flags,
+        float grow_factor
+);
 
-bool vector_resize(vector_t *vec, size_t num_elements);
+bool
+vector_resize(
+        vector_t *vec,
+        size_t num_elements
+);
 
-vector_t *vector_cpy(vector_t *proto);
+vector_t *
+vector_cpy(
+        vector_t *proto
+);
 
-bool vector_free(vector_t *vec);
+bool
+vector_free(
+        vector_t *vec
+);
 
-bool vector_free_ex(vector_t *vec, void *capture, bool (*func)(void *capture, void *begin, void *end));
+bool
+vector_free_ex(
+        vector_t *vec,
+        void *capture,
+        bool (*func)(void *capture, void *begin, void *end)
+);
 
-void *vector_get(vector_t *vec);
+void *
+vector_get(
+        vector_t *vec
+);
 
-void *vector_at(const vector_t *vec, size_t pos);
+void *
+vector_at(
+        const vector_t *vec,
+        size_t pos
+);
 
-void *vector_peek(const vector_t *vec);
+void *
+vector_peek(
+        const vector_t *vec
+);
 
-bool vector_set(vector_t *vec, size_t idx, size_t num_elements, const void *data);
+bool
+vector_set(
+        vector_t *vec,
+        size_t idx,
+        size_t num_elements,
+        const void *data
+);
 
-bool vector_add(vector_t *vec, size_t num_elements, const void *data);
+bool
+vector_add(
+        vector_t *vec,
+        size_t num_elements,
+        const void *data
+);
 
-bool vector_comp(const vector_t *lhs, const vector_t *rhs, bool (*comp)(const void *a, const void *b));
+bool
+vector_comp(
+        const vector_t *lhs,
+        const vector_t *rhs,
+        bool (*comp)(const void *a, const void *b)
+);
 
-bool vector_foreach(vector_t *vec, void *capture, bool (*func)(void *capture, void *begin, void *end));
+bool
+vector_foreach(
+        vector_t *vec,
+        void *capture,
+        bool (*func)(void *capture, void *begin, void *end)
+);
 
-size_t vector_count(vector_t *vec, void *capture, bool (*pred)(void *capture, void *it));
+size_t
+vector_count(
+        vector_t *vec,
+        void *capture,
+        bool (*pred)(void *capture, void *it)
+);
 
-bool vector_contains(vector_t *vec, void *needle);
+bool
+vector_contains(
+        vector_t *vec,
+        void *needle
+);
+
+// ---------------------------------------------------------------------------------------------------------------------
+// C O N V E N I E N C E  F U N C T I O N S
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool
+vector_free__str(
+        vector_t *vec
+);
+
+bool
+free_strings(
+        void *capture,
+        void *begin,
+        void *end
+);

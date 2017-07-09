@@ -34,7 +34,8 @@ pref_load(
 
     pref->last_read = time(NULL);
     pref->dict = hash_table_create_ex(&(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen},
-                                   sizeof(char *), sizeof(char *), NUM_INIT_CONFIG_STATEMENTS, 1.7f, 0.75f,
+                                   sizeof(char *), sizeof(char *), NUM_INIT_CONFIG_STATEMENTS,
+                                   NUM_INIT_CONFIG_STATEMENTS, 1.7f, 0.75f,
                                    str_equals, clean_up, true);
 
     vector_t *lines = read_lines(file);
@@ -102,8 +103,7 @@ next_line:
         }
     }
 
-    vector_foreach(lines, NULL, free_strings);
-    vector_free(lines);
+    vector_free__str(lines);
 }
 
 void

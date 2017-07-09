@@ -76,7 +76,7 @@ dict_t *hash_table_create(const hash_function_t *hash_function, size_t key_size,
                           size_t num_slots, float grow_factor, float max_load_factor);
 
 dict_t *hash_table_create_ex(const hash_function_t *hash_function, size_t key_size, size_t elem_size,
-                          size_t num_slots, float grow_factor, float max_load_factor,
+                          size_t num_slots, size_t approx_num_keys, float grow_factor, float max_load_factor,
                           bool (*equals)(const void *key_lhs, const void *key_rhs),
                           void (*cleanup)(void *key, void *value), bool key_is_str);
 

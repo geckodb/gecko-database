@@ -48,7 +48,7 @@
     })
 
 bool is_empty_key(const char *a) {
-    return (strlen(a) == 0);
+    return (a == NULL || strlen(a) == 0);
 }
 
 bool key_comp(const char *a, const char *b) {
@@ -117,7 +117,8 @@ bool key_comp(const char *a, const char *b) {
         .counters = (other)->counters,                                                                                 \
         .equals = (other)->equals,                                                                                     \
         .cleanup = (other)->cleanup,                                                                                   \
-        .key_is_str = (other)->key_is_str                                                                              \
+        .key_is_str = (other)->key_is_str,                                                                             \
+        .keyset = (other)->keyset                                                                                      \
     };})
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -136,6 +137,7 @@ typedef struct {
     bool (*equals)(const void *key_lhs, const void *key_rhs);
     void (*cleanup)(void *key, void *value);
     bool key_is_str;
+    vector_t *keyset;
 } hash_table_extra_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -145,6 +147,7 @@ typedef struct {
 void this_clear(struct dict_t *self);
 bool this_empty(const struct dict_t *self);
 bool this_contains_key(const struct dict_t *self, const void *key);
+const vector_t *this_keyset(const struct dict_t *self);
 const void *this_get(const struct dict_t *self, const void *key);
 vector_t *this_gets(const struct dict_t *self, size_t num_keys, const void *keys);
 bool this_remove(struct dict_t *self, size_t num_keys, const void *keys);
@@ -172,12 +175,12 @@ static inline void swap(hash_table_extra_t *a, hash_table_extra_t *b);
 dict_t *hash_table_create(const hash_function_t *hash_function, size_t key_size, size_t elem_size,
                           size_t num_slots, float grow_factor, float max_load_factor)
 {
-    return hash_table_create_ex(hash_function, key_size, elem_size, num_slots, grow_factor, max_load_factor,
-                                NULL, NULL, false);
+    return hash_table_create_ex(hash_function, key_size, elem_size, num_slots, num_slots,
+                                grow_factor, max_load_factor, NULL, NULL, false);
 }
 
 dict_t *hash_table_create_ex(const hash_function_t *hash_function, size_t key_size, size_t elem_size,
-                          size_t num_slots, float grow_factor, float max_load_factor,
+                          size_t num_slots, size_t approx_num_keys, float grow_factor, float max_load_factor,
                           bool (*equals)(const void *key_lhs, const void *key_rhs),
                           void (*cleanup)(void *key, void *value), bool key_is_str)
 {
@@ -190,10 +193,11 @@ dict_t *hash_table_create_ex(const hash_function_t *hash_function, size_t key_si
         .tag = dict_type_linear_hash_table,
         .key_size = key_size,
         .elem_size = elem_size,
-
+        .free_dict = hash_table_free,
         .clear = this_clear,
         .empty = this_empty,
         .contains_key = this_contains_key,
+        .keyset = this_keyset,
         .get = this_get,
         .gets = this_gets,
         .remove = this_remove,
@@ -219,7 +223,8 @@ dict_t *hash_table_create_ex(const hash_function_t *hash_function, size_t key_si
         .mutex = PTHREAD_MUTEX_INITIALIZER,
         .equals = equals,
         .cleanup = cleanup,
-        .key_is_str = key_is_str
+        .key_is_str = key_is_str,
+        .keyset = vector_create(key_size, approx_num_keys)
     };
 
     if (key_is_str) {
@@ -263,18 +268,26 @@ bool hash_table_free(dict_t *dict)
                 if (slot_is_empty(dict, extra, slot_id)) {
                     void *key = slot_get_key(extra->slots, slot_id, dict->key_size, dict->elem_size);
                     void *value = slot_get_value(extra->slots, slot_id, dict->key_size, dict->elem_size);
+
+                    assert (key != NULL);
+                    assert (value != NULL);
+
                     extra->cleanup(key, value);
                 }
             }
         }
 
-        free(extra->slots);
-        if (extra->key_is_str) {
-            free(*(char **)extra->empty_indicator);
-        } else {
-            free(extra->empty_indicator);
+        if (extra->keyset != NULL) {
+            vector_free(extra->keyset);
         }
 
+        free(extra->slots);
+        if (extra->key_is_str) {
+            free(*(char **) extra->empty_indicator);
+        }
+
+        free(extra->empty_indicator);
+        free(extra);
         free(dict);
         return true;
     } else return false;
@@ -341,20 +354,6 @@ clean_up(
     free (*val_string);
 }
 
-bool
-free_strings(
-        void *capture,
-        void *begin,
-        void *end)
-{
-    bool result = require_non_null(begin) && require_non_null(end) && require_less_than(begin, end);
-    for (char **it = (char **) begin; it < (char **) end; it++) {
-        free (*it);
-    }
-
-    return result;
-};
-
 // ---------------------------------------------------------------------------------------------------------------------
 // H E L P E R   I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
@@ -377,6 +376,13 @@ bool this_contains_key(const struct dict_t *self, const void *key)
 {
     require_instanceof_this(self);
     return (this_get(self, key) != NULL);
+}
+
+const vector_t *this_keyset(const struct dict_t *self)
+{
+    require_instanceof_this(self);
+    hash_table_extra_t *extra = (hash_table_extra_t *) self->extra;
+    return extra->keyset;
 }
 
 const void *this_get(const struct dict_t *self, const void *key)
@@ -497,11 +503,15 @@ void this_puts(struct dict_t *self, size_t num_elements, const void *keys, const
         const void *key   = keys + (num_elements * self->key_size);
         const void *value = values + (num_elements * self->elem_size);
 
+        assert (key != NULL);
+        assert (value != NULL);
+
         size_t hash_code = calc_hash_code(self, extra, key);
         size_t slot_id = convert_to_slot_id(hash_code, extra);
         size_t round_trip_slot_id = calc_round_trip(slot_id, extra);
 
         bool slot_found = test_slot(self, extra, slot_id);
+        bool new_key    = false;
         if (!slot_found) {
             while ((round_trip_slot_id != slot_id) && !slot_found) {
                 const void *old_key = get_key(self, extra, slot_id);
@@ -512,6 +522,7 @@ void this_puts(struct dict_t *self, size_t num_elements, const void *keys, const
                     //break;
                 } else {
                     extra->counters.num_updates++;
+                    new_key = true;
                     break;
                 }
                 slot_found = test_slot(self, extra, slot_id);
@@ -528,6 +539,9 @@ void this_puts(struct dict_t *self, size_t num_elements, const void *keys, const
             assert (extra->num_inuse < extra->num_slots);
             extra->num_inuse++;
             extra->counters.num_put_calls++;
+            if (new_key) {
+                vector_add(extra->keyset, 1, key);
+            }
         }
     }
 }
@@ -547,6 +561,10 @@ void this_for_each(struct dict_t *self, void *capture, void (*consumer)(void *ca
 
     while (slot_idx--) {
         void *slot_data = (extra->slots + (slot_idx * slot_size));
+
+        if (extra->key_is_str) {
+            assert (((char **) slot_data) != NULL);
+        }
         if (!is_slot_empty(self, extra, slot_data, extra->empty_indicator))
             consumer (capture, slot_data, (slot_data + self->key_size));
     }

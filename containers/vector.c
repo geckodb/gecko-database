@@ -78,7 +78,10 @@ bool vector_free(vector_t *vec)
 {
     bool non_null = require_non_null(vec);
     if (non_null) {
-        free (vec->data);
+        if (require_non_null(vec->data)) {
+            free (vec->data);
+        }
+        free (vec);
     }
     return non_null;
 }
@@ -210,6 +213,28 @@ break_inner_loop:
 
     return true;
 }
+
+
+bool
+vector_free__str(
+    vector_t *vec)
+{
+    return vector_foreach(vec, NULL, free_strings) && vector_free(vec);
+}
+
+bool
+free_strings(
+        void *capture,
+        void *begin,
+        void *end)
+{
+    bool result = require_non_null(begin) && require_non_null(end) && require_less_than(begin, end);
+    for (char **it = (char **) begin; it < (char **) end; it++) {
+        free (*it);
+    }
+
+    return result;
+};
 
 // ---------------------------------------------------------------------------------------------------------------------
 // H E L P E R  I M P L E M E N T A T I O N

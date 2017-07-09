@@ -156,7 +156,7 @@ void
 conf_load()
 {
     dict_t *env = hash_table_create_ex(&(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen},
-                                       sizeof(char *), sizeof(char *), NUM_INIT_ENV_VARS, 1.7f, 0.75f,
+                                       sizeof(char *), sizeof(char *), NUM_INIT_ENV_VARS, NUM_INIT_ENV_VARS, 1.7f, 0.75f,
                                        str_equals, clean_up, true);
 
     get_home_dir(env);
@@ -180,8 +180,7 @@ conf_load()
         update_dir(env, &soft_link_config, CONF_VAR_MYIMDB_ETC, "etc_path", etc_path);
         update_dir(env, &soft_link_config, CONF_VAR_MYIMDB_SWAP, "swap_path", swap_path);
 
-        warn("Call to 'pref_free' cannot be executed: NOT IMPLEMENTED (%s)", to_string(conf_load));
-        // pref_free(&soft_link_config);    // TODO: Uncomment, when hash table free is implemented
+        pref_free(&soft_link_config);
     }
 
     free (bin_path);
@@ -204,7 +203,7 @@ conf_load()
 
 
   //  printf("working dir: %s\n", dir);
-    abort();
+    exit(0);
 }
 
 const char *
