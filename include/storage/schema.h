@@ -53,7 +53,7 @@ bool schema_set(schema_t *schema, size_t attr_idx, const attribute_t *attr);
 
 size_t schema_num_attributes(const schema_t *schema);
 
-data_type schema_get(const schema_t *schema, size_t attr_idx);
+type schema_get(const schema_t *schema, size_t attr_idx);
 
 const attribute_t *schema_get_by_name(const schema_t *schema, const char *name);
 

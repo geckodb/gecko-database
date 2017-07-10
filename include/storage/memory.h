@@ -17,9 +17,9 @@
 // I N C L U D E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <defs.h>
+#include <stdinc.h>
 #include <containers/vector.h>
-#include <containers/dictionaries/fixed_linear_hash_table.h>
+#include <containers/dicts/hash_table.h>
 #include <containers/list.h>
 #include <math.h>
 

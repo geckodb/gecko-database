@@ -4,7 +4,7 @@
 #include <defs.h>
 #include <time.h>
 #include <containers/dict.h>
-#include <containers/dictionaries/fixed_linear_hash_table.h>
+#include <containers/dictionaries/hash_table.h>
 
 typedef struct test_data_t {
     size_t a, b, c;

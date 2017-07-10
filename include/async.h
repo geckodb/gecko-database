@@ -18,7 +18,7 @@
 // I N C L U D E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <defs.h>
+#include <stdinc.h>
 #include <stdatomic.h>
 #include "c11threads.h"
 

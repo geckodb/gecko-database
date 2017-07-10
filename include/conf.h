@@ -1,6 +1,6 @@
 #pragma once
 
-#include "defs.h"
+#include <stdinc.h>
 
 #define NUM_INIT_ENV_VARS       10
 

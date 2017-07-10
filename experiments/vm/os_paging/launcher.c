@@ -7,7 +7,7 @@
 #include <unistd.h>
 #include <defs.h>
 #include <containers/dict.h>
-#include <containers/dictionaries/fixed_linear_hash_table.h>
+#include <containers/dictionaries/hash_table.h>
 #include <containers/vector.h>
 
 char * exec_cmd(const char *cmd) {

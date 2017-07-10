@@ -18,7 +18,6 @@
 #include <limits.h>
 
 #include <error.h>
-#include <macros.h>
 #include <msg.h>
 #include <require.h>
 #include <storage/memory.h>

@@ -40,7 +40,7 @@ typedef struct {
 } attribute_flags_t;
 
 typedef struct {
-    data_type type;
+    type type;
     size_t length;
     const char *name;
     attribute_flags_t flags;
@@ -50,7 +50,7 @@ typedef struct {
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-attribute_t *attribute_create(data_type type, size_t length, const char *name, attribute_flags flags);
+attribute_t *attribute_create(type type, size_t length, const char *name, attribute_flags flags);
 
 attribute_t *attribute_cpy(const attribute_t *proto);
 

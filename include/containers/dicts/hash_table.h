@@ -44,8 +44,8 @@
 // I N C L U D E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <defs.h>
-#include <hash.h>
+#include <stdinc.h>
+#include <pref.h>
 #include <containers/dict.h>
 
 typedef struct {

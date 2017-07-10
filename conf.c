@@ -1,10 +1,4 @@
-#include <conf.h>
-#include <pref.h>
-#include <zconf.h>
-#include <error.h>
-#include <hash.h>
-#include <containers/dictionaries/fixed_linear_hash_table.h>
-#include <macros.h>
+#include <containers/dicts/hash_table.h>
 
 #define BADCWD          "Unable to get working directory (file name might exceed limit of %d)"
 #define NOCONFIG        "Configuration map for '%s' is not set. Did you call 'conf_load'?"

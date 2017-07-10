@@ -1,7 +1,6 @@
 #pragma once
 
-#include <defs.h>
-#include <execinfo.h>
+#include <stdinc.h>
 
 typedef enum {
     err_no_error,

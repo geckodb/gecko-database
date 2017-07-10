@@ -1,6 +1,6 @@
 #pragma once
 
-#include <time.h>
+#include <stdinc.h>
 #include <containers/dict.h>
 
 #define NUM_INIT_CONFIG_STATEMENTS    10

@@ -4,7 +4,7 @@
 #include <defs.h>
 #include <time.h>
 #include <containers/vector.h>
-#include <containers/dictionaries/fixed_linear_hash_table.h>
+#include <containers/dictionaries/hash_table.h>
 
 const size_t SIZEOF_KEY = 100;
 const size_t NUM_SLOTS = 10000;

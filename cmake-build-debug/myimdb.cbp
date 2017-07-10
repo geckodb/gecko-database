@@ -27,6 +27,94 @@
 					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
+			<Target title="expr">
+				<Option output="/Users/marcus/git/myimdb/bin/expr" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/marcus/git/myimdb/bin"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/Users/marcus/git/myimdb/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 expr"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="expr/fast">
+				<Option output="/Users/marcus/git/myimdb/bin/expr" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/marcus/git/myimdb/bin"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/Users/marcus/git/myimdb/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 expr/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="dbstdio">
+				<Option output="/Users/marcus/git/myimdb/bin/dbstdio" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/marcus/git/myimdb/bin"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/Users/marcus/git/myimdb/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 dbstdio"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="dbstdio/fast">
+				<Option output="/Users/marcus/git/myimdb/bin/dbstdio" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/marcus/git/myimdb/bin"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/Users/marcus/git/myimdb/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 dbstdio/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
 			<Target title="tpch-convert">
 				<Option output="/Users/marcus/git/myimdb/bin/tpch-convert" prefix_auto="0" extension_auto="0"/>
 				<Option working_dir="/Users/marcus/git/myimdb/bin"/>
@@ -303,36 +391,68 @@
 			</Target>
 		</Build>
 		<Unit filename="/Users/marcus/git/myimdb/async.c">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
 			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
+			<Option target="sample_lin_hash"/>
+			<Option target="myimdb"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/attr.c">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
+			<Option target="exp_os_paging"/>
+			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/conf.c">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
 			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/containers/dict.c">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
 			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
-		<Unit filename="/Users/marcus/git/myimdb/containers/dictionaries/fixed_linear_hash_table.c">
+		<Unit filename="/Users/marcus/git/myimdb/containers/dicts/hash_table.c">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
 			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/containers/list.c">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
 			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/containers/vector.c">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
 			<Option target="tpch-convert"/>
 			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
@@ -341,6 +461,8 @@
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/error.c">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
 			<Option target="tpch-convert"/>
 			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
@@ -351,142 +473,312 @@
 		<Unit filename="/Users/marcus/git/myimdb/experiments/vm/os_paging/launcher.c">
 			<Option target="exp_os_paging"/>
 		</Unit>
-		<Unit filename="/Users/marcus/git/myimdb/hash.c">
+		<Unit filename="/Users/marcus/git/myimdb/field.c">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
 			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
+			<Option target="sample_lin_hash"/>
+			<Option target="myimdb"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/fragment.c">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
+			<Option target="exp_os_paging"/>
+			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
+			<Option target="sample_lin_hash"/>
+			<Option target="myimdb"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/hash.c">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
+			<Option target="exp_os_paging"/>
+			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/async.h">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
 			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
+			<Option target="sample_lin_hash"/>
+			<Option target="myimdb"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/include/attr.h">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
+			<Option target="exp_os_paging"/>
+			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/c11threads.h">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
 			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/conf.h">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
 			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/containers/dict.h">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
 			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
-		<Unit filename="/Users/marcus/git/myimdb/include/containers/dictionaries/fixed_linear_hash_table.h">
+		<Unit filename="/Users/marcus/git/myimdb/include/containers/dicts/hash_table.h">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
 			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/containers/list.h">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
 			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/containers/vector.h">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
 			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
-			<Option target="sample_lin_hash"/>
-			<Option target="myimdb"/>
-		</Unit>
-		<Unit filename="/Users/marcus/git/myimdb/include/defs.h">
-			<Option target="exp_os_paging"/>
-			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/error.h">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
 			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
+			<Option target="sample_lin_hash"/>
+			<Option target="myimdb"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/include/field.h">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
+			<Option target="exp_os_paging"/>
+			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
+			<Option target="sample_lin_hash"/>
+			<Option target="myimdb"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/include/fragment.h">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
+			<Option target="exp_os_paging"/>
+			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/hash.h">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
 			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
-			<Option target="sample_lin_hash"/>
-			<Option target="myimdb"/>
-		</Unit>
-		<Unit filename="/Users/marcus/git/myimdb/include/macros.h">
-			<Option target="exp_os_paging"/>
-			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/msg.h">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
 			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
+			<Option target="sample_lin_hash"/>
+			<Option target="myimdb"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/include/pred.h">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
+			<Option target="exp_os_paging"/>
+			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/pref.h">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
 			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/require.h">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
 			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
+			<Option target="sample_lin_hash"/>
+			<Option target="myimdb"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/include/schema.h">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
+			<Option target="exp_os_paging"/>
+			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
+			<Option target="sample_lin_hash"/>
+			<Option target="myimdb"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/include/stdinc.h">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
+			<Option target="exp_os_paging"/>
+			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/storage/attribute.h">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
 			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/storage/memory.h">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
 			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/storage/rowstore.h">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
 			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/storage/schema.h">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
 			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/storage/table.h">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
 			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
-		<Unit filename="/Users/marcus/git/myimdb/include/types.h">
+		<Unit filename="/Users/marcus/git/myimdb/include/tableimg.h">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
 			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
+			<Option target="sample_lin_hash"/>
+			<Option target="myimdb"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/include/tuplet.h">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
+			<Option target="exp_os_paging"/>
+			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/main.c">
 			<Option target="myimdb"/>
 		</Unit>
-		<Unit filename="/Users/marcus/git/myimdb/pref.c">
+		<Unit filename="/Users/marcus/git/myimdb/pred.c">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
 			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
+			<Option target="sample_lin_hash"/>
+			<Option target="myimdb"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/pref.c">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
+			<Option target="exp_os_paging"/>
+			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/require.c">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
 			<Option target="tpch-convert"/>
 			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
@@ -500,37 +792,49 @@
 		<Unit filename="/Users/marcus/git/myimdb/samples/containers/dictionaries/linear_hash_table_sample.c">
 			<Option target="sample_lin_hash"/>
 		</Unit>
-		<Unit filename="/Users/marcus/git/myimdb/storage/attribute.c">
+		<Unit filename="/Users/marcus/git/myimdb/samples/core/fragment.c">
+			<Option target="dbstdio"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/samples/core/pred.c">
+			<Option target="expr"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/schema.c">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
 			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/storage/memory.c">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
 			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
-			<Option target="sample_lin_hash"/>
-			<Option target="myimdb"/>
-		</Unit>
-		<Unit filename="/Users/marcus/git/myimdb/storage/schema.c">
-			<Option target="exp_os_paging"/>
-			<Option target="sample_linuxwc"/>
-			<Option target="sample_lin_hash"/>
-			<Option target="myimdb"/>
-		</Unit>
-		<Unit filename="/Users/marcus/git/myimdb/storage/table.c">
-			<Option target="exp_os_paging"/>
-			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/tableimg.c">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
 			<Option target="tpch-convert"/>
-			<Option target="tableimg"/>
-		</Unit>
-		<Unit filename="/Users/marcus/git/myimdb/types.c">
 			<Option target="exp_os_paging"/>
 			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
+			<Option target="sample_lin_hash"/>
+			<Option target="myimdb"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/tuplet.c">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
+			<Option target="exp_os_paging"/>
+			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>

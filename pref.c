@@ -1,9 +1,5 @@
 #include <pref.h>
-#include <error.h>
-#include <require.h>
-#include <unistd.h>
-#include <containers/dictionaries/fixed_linear_hash_table.h>
-#include <ctype.h>
+#include <containers/dicts/hash_table.h>
 
 #define NOSUCHFILE          "unable to load configuration file '%s' (file not found)"
 

@@ -16,14 +16,7 @@
 // I N C L U D E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <containers/dictionaries/fixed_linear_hash_table.h>
-#include <require.h>
-#include <msg.h>
-#include <limits.h>
-#include <pthread.h>
-#include <assert.h>
-#include <math.h>
-#include <containers/vector.h>
+#include <containers/dicts/hash_table.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 // C O N S T A N T S
