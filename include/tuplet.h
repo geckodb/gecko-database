@@ -3,33 +3,33 @@
 #include <stdinc.h>
 #include <fragment.h>
 
-struct SCHEMA;
+struct schema_t;
 
-typedef struct TUPLET {
-    struct FRAGMENT *fragment; /*<! fragment in which this tuplet exists */
+typedef struct tuplet_t {
+    struct fragment_t *fragment; /*<! fragment in which this tuplet exists */
     size_t id; /*<! number of this tuplet inside the fragment */
 
     /* operations */
-    void (*_next)(struct TUPLET *self); /* seeks to the next tuplet inside this fragment */
-    struct FIELD *(*_open)(struct TUPLET *self, ATTR_ID attr_id); /*<! access the field data of this tuplet */
-    void (*_update)(struct TUPLET *self, const void *data); /*<! updates all fields of this tuplet and moves to next */
-    void (*_set_null)(struct TUPLET *self); /*<! updates all fields of this tuplet to NULL, and moves to next */
-    void (*_delete)(struct TUPLET *self); /* request to delete this tuplet from fragment */
+    void (*_next)(struct tuplet_t *self); /* seeks to the next tuplet inside this fragment */
+    struct field_t *(*_open)(struct tuplet_t *self, ATTR_ID attr_id); /*<! access the field data of this tuplet */
+    void (*_update)(struct tuplet_t *self, const void *data); /*<! updates all fields of this tuplet and moves to next */
+    void (*_set_null)(struct tuplet_t *self); /*<! updates all fields of this tuplet to NULL, and moves to next */
+    void (*_delete)(struct tuplet_t *self); /* request to delete this tuplet from fragment */
 
-} TUPLET;
+} tuplet_t;
 
-TUPLET *gs_tuplet_open(struct FRAGMENT *frag);
+tuplet_t *gs_tuplet_open(struct fragment_t *frag);
 
-TUPLET *gs_tuplet_next(TUPLET *tuplet);
+tuplet_t *gs_tuplet_next(tuplet_t *tuplet);
 
-void *gs_tuplet_read_unsafe(TUPLET *tuplet);
+void *gs_tuplet_read_unsafe(tuplet_t *tuplet);
 
-void gs_tuplet_update_unsafe(TUPLET *tuplet, const void *data);
+void gs_tuplet_update_unsafe(tuplet_t *tuplet, const void *data);
 
-void gs_tuplet_set_null(TUPLET *tuplet);
+void gs_tuplet_set_null(tuplet_t *tuplet);
 
-bool gs_tuplet_is_null(TUPLET *tuplet);
+bool gs_tuplet_is_null(tuplet_t *tuplet);
 
-void gs_tuplet_close(TUPLET *tuplet);
+void gs_tuplet_close(tuplet_t *tuplet);
 
-void *gs_update(void *dst, SCHEMA *frag, ATTR_ID attr_id, void *src);
+void *gs_update(void *dst, schema_t *frag, ATTR_ID attr_id, void *src);

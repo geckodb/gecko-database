@@ -51,7 +51,7 @@ void write_header(
         .timestamp_created = (uint64_t) time(NULL),
     };
 
-    CHECKSUM_CONTEXT raw_data_checksum;
+    checksum_context_t raw_data_checksum;
     begin_checksum(&raw_data_checksum);
     update_checksum(&raw_data_checksum, tuple_data, tuple_data + tuple_size * num_tuples);
     end_checksum(header.raw_table_data_checksum, &raw_data_checksum);
@@ -65,7 +65,7 @@ void write_var_header(
     const char *table_name,
     const char *table_spec_ref,
     const char *comment,
-    const ATTR *attr,
+    const attr_t *attr,
     size_t num_attr
 )
 {
@@ -74,7 +74,7 @@ void write_var_header(
     fwrite(table_spec_ref, strlen(table_spec_ref), 1, file);
     fwrite(comment, strlen(comment), 1, file);
 
-    fwrite(attr, sizeof(ATTR), num_attr, file);
+    fwrite(attr, sizeof(attr_t), num_attr, file);
 }
 
 size_t get_var_header_size(
@@ -86,12 +86,12 @@ size_t get_var_header_size(
 )
 {
     return strlen(database_name) + strlen(table_name) + strlen(table_spec_ref) + strlen(comment) +
-            num_attr * sizeof(ATTR);
+            num_attr * sizeof(attr_t);
 }
 
 timg_error_t write_table_data(
     FILE *file,
-    SCHEMA *schema,
+    schema_t *schema,
     const void *tuple_data,
     size_t num_tuples,
     enum tuplet_format format_in,
@@ -102,7 +102,7 @@ timg_error_t write_table_data(
     size_t field_offs = 0;
     size_t field_size = 0;
     const void   *cursor    = NULL;
-    ATTR  *attr      = (ATTR  *) schema->attr->data;
+    attr_t  *attr      = (attr_t  *) schema->attr->data;
 
     switch (format_in) {
         case TF_NSM:
@@ -173,7 +173,7 @@ timg_error_t check_write_args(
         const char *table_name,
         const char *table_spec_ref,
         const char *comment,
-        SCHEMA *schema,
+        schema_t *schema,
         const void *tuple_data)
 {
     if ((file == NULL ) || (database_name == NULL) || (table_name == NULL) || (table_spec_ref == NULL) ||
@@ -189,7 +189,7 @@ timg_error_t tableimg_fwrite(
         const char *tab_name,
         const char *spec_ref,
         const char *comment,
-        SCHEMA *schema,
+        schema_t *schema,
         const void *tab_data,
         size_t num_tuples,
         enum tuplet_format in,
@@ -204,7 +204,7 @@ timg_error_t tableimg_fwrite(
         return result;
 
     size_t       size       = get_tuple_size(schema);
-    ATTR *attr       = (ATTR *) schema->attr->data;
+    attr_t *attr       = (attr_t *) schema->attr->data;
     size_t       num_attr   = schema->attr->num_elements;
 
     write_header(file, version, db_name, tab_name, spec_ref, comment, tab_data, num_tuples, out, num_attr, size);
@@ -243,7 +243,7 @@ timg_error_t tableimg_header_load(
     var_header->table_name = malloc(header->table_name_len + 1);
     var_header->table_spec_ref = malloc(header->table_spec_ref_len + 1);
     var_header->comment = malloc(header->comment_len + 1);
-    var_header->attributes = malloc(header->num_attributes_len * sizeof(ATTR));
+    var_header->attributes = malloc(header->num_attributes_len * sizeof(attr_t));
 
     fread(var_header->database_name, header->database_name_len, 1, file);
     fread(var_header->table_name, header->table_name_len, 1, file);
@@ -253,7 +253,7 @@ timg_error_t tableimg_header_load(
     var_header->database_name[header->database_name_len] = var_header->table_name[header->table_name_len] =
             var_header->table_spec_ref[header->table_spec_ref_len] = var_header->comment[header->comment_len] = '\0';
 
-    fread(var_header->attributes, sizeof(ATTR), header->num_attributes_len, file);
+    fread(var_header->attributes, sizeof(attr_t), header->num_attributes_len, file);
 
     return TIMG_ERR_OK;
 }

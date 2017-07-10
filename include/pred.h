@@ -30,21 +30,21 @@ enum comp_type {
     CT_LESS, CT_LESSEQ, CT_EQUALS, CT_GREATEREQ, CT_GREATER
 };
 
-typedef struct EXPR_NOT {
-    struct EXPR *expr;
-} EXPR_NOT;
+typedef struct expr_not_t {
+    struct expr_t *expr;
+} expr_not_t;
 
-typedef struct EXPR_CONST {
+typedef struct expr_const_t {
     bool value;
-} EXPR_CONST;
+} expr_const_t;
 
-struct FIELD;
+struct field_t;
 
-typedef struct EXPR_VAR {
+typedef struct expr_var_t {
     enum comp_type comp;
-    struct FIELD *lhs;
-    struct FIELD *rhs;
-} EXPR_VAR;
+    struct field_t *lhs;
+    struct field_t *rhs;
+} expr_var_t;
 
 enum expr_type {
     ET_NOT,
@@ -52,38 +52,38 @@ enum expr_type {
     ET_VAR
 };
 
-typedef struct EXPR {
+typedef struct expr_t {
     enum expr_type type;
-    struct FIELD *field;
+    struct field_t *field;
     void *expr;
-} EXPR;
+} expr_t;
 
-typedef struct PRED_TREE {
-    struct PRED_TREE *or, *and; /*<! alternatives and mandatories related to this predicate */
-    EXPR *expr; /*<! expression of this predicate */
-} PRED_TREE;
+typedef struct pred_tree_t {
+    struct pred_tree_t *or, *and; /*<! alternatives and mandatories related to this predicate */
+    expr_t *expr; /*<! expression of this predicate */
+} pred_tree_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   D E C L A R A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-PRED_TREE *gs_pred_tree_create(EXPR *expr);
+pred_tree_t *gs_pred_tree_create(expr_t *expr);
 
-PRED_TREE *gs_pred_tree_and(PRED_TREE *subj, PRED_TREE *other);
+pred_tree_t *gs_pred_tree_and(pred_tree_t *subj, pred_tree_t *other);
 
-PRED_TREE *gs_pred_tree_or(PRED_TREE *subj, PRED_TREE *other);
+pred_tree_t *gs_pred_tree_or(pred_tree_t *subj, pred_tree_t *other);
 
-bool gs_pred_tree_eval(PRED_TREE *tree);
+bool gs_pred_tree_eval(pred_tree_t *tree);
 
-EXPR *gs_pred_expr_create_var(enum expr_type type, struct FIELD *field_lhs, struct FIELD *field_rhs);
+expr_t *gs_pred_expr_create_var(enum expr_type type, struct field_t *field_lhs, struct field_t *field_rhs);
 
-EXPR *gs_pred_expr_create_const(enum expr_type type, struct FIELD *field, const void *value);
+expr_t *gs_pred_expr_create_const(enum expr_type type, struct field_t *field, const void *value);
 
-void gs_pred_expr_bind(EXPR *expr, const void *value);
+void gs_pred_expr_bind(expr_t *expr, const void *value);
 
-void gs_pred_expr_bind2(EXPR *expr, const void *value_lhs, const void *value_rhs);
+void gs_pred_expr_bind2(expr_t *expr, const void *value_lhs, const void *value_rhs);
 
-bool gs_pred_eval(EXPR *expr);
+bool gs_pred_eval(expr_t *expr);
 
-EXPR *gs_pred_expr_create_not(EXPR *other);
+expr_t *gs_pred_expr_create_not(expr_t *other);
 

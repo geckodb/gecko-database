@@ -455,7 +455,7 @@ int main() {
 
     const size_t NUM_TUPLES = 4;
 
-    SCHEMA *schema = gs_schema_create();
+    schema_t *schema = gs_schema_create();
 
     ATTR_ID attr_1 = gs_attr_create_uint64 ("My Attribute",       schema);
     ATTR_ID attr_2 = gs_attr_create_string("My Attribute 2", 42, schema);

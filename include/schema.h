@@ -6,6 +6,6 @@
 
 typedef struct {
     vector_t *attr;
-} SCHEMA;
+} schema_t;
 
-ATTR *gs_schema_attr_by_id(SCHEMA *frag, ATTR_ID attr_id);
+attr_t *gs_schema_attr_by_id(schema_t *frag, ATTR_ID attr_id);

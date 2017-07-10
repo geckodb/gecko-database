@@ -130,10 +130,10 @@ void show_file_info(char *file)
         printf("md5 checksum.......: ");
         for(int i = 0; i < MD5_DIGEST_LENGTH; i++) printf("%02x", header.raw_table_data_checksum[i]);
         printf("\n\n");
-        printf("SCHEMA\n");
+        printf("schema_t\n");
         printf("--------------------------------------------------------------------------------\n");
         for (int i = 0; i < header.num_attributes_len; i++) {
-            ATTR attr = var_header.attributes[i];
+            attr_t attr = var_header.attributes[i];
             printf("attribute name.....: %s\n", attr.name);
             if (attr.type_rep > 1)
                 printf("data type..........: %s (%zu)\n", gs_type_str(attr.type), attr.type_rep);
@@ -208,7 +208,7 @@ print_h_line(
         timg_var_header_t *var_header)
 {
     for (size_t attr_idx = 0; attr_idx < header->num_attributes_len; attr_idx++) {
-        ATTR attr = var_header->attributes[attr_idx];
+        attr_t attr = var_header->attributes[attr_idx];
         size_t column_width = max(strlen(attr.name), attr.str_format_mlen);
 
         printf("+");
@@ -229,7 +229,7 @@ print_table_header(
     print_h_line(header, var_header);
 
     for (size_t attr_idx = 0; attr_idx < header->num_attributes_len; attr_idx++) {
-        ATTR attr = var_header->attributes[attr_idx];
+        attr_t attr = var_header->attributes[attr_idx];
         size_t column_width = max(strlen(attr.name), attr.str_format_mlen);
         sprintf(format_buffer, "| %%-%zus ", column_width);
         printf(format_buffer, attr.name);
@@ -249,7 +249,7 @@ void print_table_using_nsm(
 
     for (size_t tuple_id = 0; tuple_id < header->num_tuples; tuple_id++) {
         for (size_t attr_idx = 0; attr_idx < header->num_attributes_len; attr_idx++) {
-//            ATTR attr = var_header->attr[attr_idx];
+//            attr_t attr = var_header->attr[attr_idx];
 //            size_t column_width = max(strlen(attr.name), attr.str_format_mlen);
 
          /*   switch (attr.type) {

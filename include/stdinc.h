@@ -89,7 +89,7 @@ typedef struct {
     uint8_t unique   : 1;
 } ATTR_FLAGS;
 
-typedef MD5_CTX CHECKSUM_CONTEXT;
+typedef MD5_CTX checksum_context_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // M A C R O S

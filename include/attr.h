@@ -11,7 +11,7 @@ typedef struct {
     size_t foreign_id;
     size_t str_format_mlen;
     unsigned char checksum[MD5_DIGEST_LENGTH];
-} ATTR;
+} attr_t;
 
 
 

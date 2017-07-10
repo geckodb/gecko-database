@@ -683,47 +683,7 @@
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
-		<Unit filename="/Users/marcus/git/myimdb/include/storage/attribute.h">
-			<Option target="expr"/>
-			<Option target="dbstdio"/>
-			<Option target="tpch-convert"/>
-			<Option target="exp_os_paging"/>
-			<Option target="sample_linuxwc"/>
-			<Option target="tableimg"/>
-			<Option target="sample_lin_hash"/>
-			<Option target="myimdb"/>
-		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/storage/memory.h">
-			<Option target="expr"/>
-			<Option target="dbstdio"/>
-			<Option target="tpch-convert"/>
-			<Option target="exp_os_paging"/>
-			<Option target="sample_linuxwc"/>
-			<Option target="tableimg"/>
-			<Option target="sample_lin_hash"/>
-			<Option target="myimdb"/>
-		</Unit>
-		<Unit filename="/Users/marcus/git/myimdb/include/storage/rowstore.h">
-			<Option target="expr"/>
-			<Option target="dbstdio"/>
-			<Option target="tpch-convert"/>
-			<Option target="exp_os_paging"/>
-			<Option target="sample_linuxwc"/>
-			<Option target="tableimg"/>
-			<Option target="sample_lin_hash"/>
-			<Option target="myimdb"/>
-		</Unit>
-		<Unit filename="/Users/marcus/git/myimdb/include/storage/schema.h">
-			<Option target="expr"/>
-			<Option target="dbstdio"/>
-			<Option target="tpch-convert"/>
-			<Option target="exp_os_paging"/>
-			<Option target="sample_linuxwc"/>
-			<Option target="tableimg"/>
-			<Option target="sample_lin_hash"/>
-			<Option target="myimdb"/>
-		</Unit>
-		<Unit filename="/Users/marcus/git/myimdb/include/storage/table.h">
 			<Option target="expr"/>
 			<Option target="dbstdio"/>
 			<Option target="tpch-convert"/>

@@ -30,31 +30,31 @@
 // T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-typedef struct FRAGMENT {
+typedef struct fragment_t {
     void *tuplet_data;
     size_t ntuplets;
     enum tuplet_format format;
 
     /* operations */
-    struct FRAGMENT *(*_scan)(const PRED_TREE *pred, size_t batch_size, size_t nthreads);
-    void (*_dispose)(struct FRAGMENT *self);
-} FRAGMENT;
+    struct fragment_t *(*_scan)(const pred_tree_t *pred, size_t batch_size, size_t nthreads);
+    void (*_dispose)(struct fragment_t *self);
+} fragment_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // M A R C O S
 // ---------------------------------------------------------------------------------------------------------------------
 
 #define DECLARE_ATTRIBUTE_CREATE(type_name,internal_type)                                                              \
-ATTR_ID gs_attr_create_##type_name(const char *name, SCHEMA *schema);
+ATTR_ID gs_attr_create_##type_name(const char *name, schema_t *schema);
 
 #define DECLARE_ATTRIBUTE_ARRAY_CREATE(type_name,internal_type)                                                        \
-ATTR_ID gs_attr_create_##type_name(const char *name, size_t length, SCHEMA *schema);
+ATTR_ID gs_attr_create_##type_name(const char *name, size_t length, schema_t *schema);
 
 #define DECLARE_TUPLET_INSERT(type_name, c_type, internal_type)                                                        \
-void *gs_insert_##type_name(void *dst, SCHEMA *schema, ATTR_ID attr_id, const c_type *src);
+void *gs_insert_##type_name(void *dst, schema_t *schema, ATTR_ID attr_id, const c_type *src);
 
 #define DECLARE_ARRAY_FIELD_INSERT(type_name, c_type, internal_type)                                                   \
-void *gs_insert_##type_name(void *dst, SCHEMA *schema, ATTR_ID attr_id, const c_type *src);
+void *gs_insert_##type_name(void *dst, schema_t *schema, ATTR_ID attr_id, const c_type *src);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   D E C L A R A T I O N
@@ -64,11 +64,11 @@ __BEGIN_DECLS
 
 // O P E R A T I O N S   O N   T A B L E S -----------------------------------------------------------------------------
 
-SCHEMA *gs_schema_create();
+schema_t *gs_schema_create();
 
-FRAGMENT *gs_fragment_alloc(SCHEMA *frag, size_t num_tuplets, enum tuplet_format format);
+fragment_t *gs_fragment_alloc(schema_t *frag, size_t num_tuplets, enum tuplet_format format);
 
-void gs_fragment_free(FRAGMENT *frag);
+void gs_fragment_free(fragment_t *frag);
 
 DECLARE_ATTRIBUTE_CREATE(bool, FT_BOOL)
 
@@ -94,9 +94,9 @@ DECLARE_ATTRIBUTE_CREATE(float64, FT_FLOAT64)
 
 DECLARE_ATTRIBUTE_ARRAY_CREATE(string, FT_CHAR)
 
-void gs_checksum_nsm(SCHEMA *tab, const void *tuplets, size_t ntuplets);
+void gs_checksum_nsm(schema_t *tab, const void *tuplets, size_t ntuplets);
 
-void gs_checksum_dms(SCHEMA *tab, const void *tuplets, size_t ntuplets);
+void gs_checksum_dms(schema_t *tab, const void *tuplets, size_t ntuplets);
 
 
 // O P E R A T I O N S   O N   R E C O R D S ---------------------------------------------------------------------------
@@ -125,7 +125,7 @@ DECLARE_TUPLET_INSERT(float64, double, FT_FLOAT64)
 
 DECLARE_ARRAY_FIELD_INSERT(string, char, FT_CHAR)
 
-size_t gs_tuplet_printlen(const ATTR *attr, const void *field_data);
+size_t gs_tuplet_printlen(const attr_t *attr, const void *field_data);
 
 // F I E L D   T Y P E   O P E R A T I O N S ---------------------------------------------------------------------------
 
@@ -157,24 +157,24 @@ __END_DECLS
 
 
 void gs_checksum_nsm(
-        SCHEMA *tab,
+        schema_t *tab,
         const void *tuplets,
         size_t ntuplets);
 
 void gs_checksum_dms(
-        SCHEMA *tab,
+        schema_t *tab,
         const void *tuplets,
         size_t ntuplets);
 
-void begin_checksum(CHECKSUM_CONTEXT *context);
+void begin_checksum(checksum_context_t *context);
 
-void update_checksum(CHECKSUM_CONTEXT *context, const void *begin, const void *end);
+void update_checksum(checksum_context_t *context, const void *begin, const void *end);
 
-void end_checksum(unsigned char *checksum_out, CHECKSUM_CONTEXT *context);
+void end_checksum(unsigned char *checksum_out, checksum_context_t *context);
 
 size_t get_field_size(
-        const ATTR *attr,
+        const attr_t *attr,
         size_t             attr_idx);
 
 size_t get_tuple_size(
-        SCHEMA *schema);
+        schema_t *schema);

@@ -40,11 +40,7 @@ set(SOURCE_FILES
         include/require.h
         include/schema.h
         include/stdinc.h
-        include/storage/attribute.h
         include/storage/memory.h
-        include/storage/rowstore.h
-        include/storage/schema.h
-        include/storage/table.h
         include/tableimg.h
         include/tuplet.h
 

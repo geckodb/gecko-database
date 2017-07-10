@@ -48,7 +48,7 @@ typedef struct
     char             *table_name;
     char             *table_spec_ref;
     char             *comment;
-    ATTR         *attributes;
+    attr_t         *attributes;
 } timg_var_header_t;
 
 typedef enum {
@@ -89,7 +89,7 @@ timg_error_t tableimg_fwrite(
         const char *table_name,
         const char *table_spec_ref,
         const char *comment,
-        SCHEMA *frag,
+        schema_t *frag,
         const void *tuple_data,
         size_t num_tuples,
         enum tuplet_format format_in,

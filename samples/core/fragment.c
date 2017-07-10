@@ -8,15 +8,15 @@ int main() {
 
     const size_t NUM_TUPLETS = 4;
 
-    SCHEMA *schema = gs_schema_create();
+    schema_t *schema = gs_schema_create();
 
     ATTR_ID attr_1 = gs_attr_create_uint64("My Attribute", schema);
     ATTR_ID attr_2 = gs_attr_create_string("My Attribute 2", 42, schema);
     ATTR_ID attr_3 = gs_attr_create_bool("My Attribute Bool", schema);
 
-    FRAGMENT *fragment = gs_fragment_alloc(schema, NUM_TUPLETS, TF_NSM);
-    TUPLET *tuplet = gs_tuplet_open(fragment);
-    struct FIELD *field = gs_field_open(tuplet);
+    fragment_t *fragment = gs_fragment_alloc(schema, NUM_TUPLETS, TF_NSM);
+    tuplet_t *tuplet = gs_tuplet_open(fragment);
+    struct field_t *field = gs_field_open(tuplet);
     gs_field_close(field);
 
     void *cont = NULL;
