@@ -4,11 +4,15 @@ size_t tableimg_rawsize(
         timg_header_t *header,
         timg_var_header_t *var_header)
 {
+    /*
     size_t total = 0;
     for (size_t i = 0; i < header->num_attributes_len; i++) {
         total += get_field_size(var_header->attributes, i);
     }
     return (total * header->num_tuples);
+     */
+    panic(NOTIMPLEMENTED, to_string(tableimg_rawsize))
+    return 0;
 }
 
 
@@ -52,9 +56,9 @@ void write_header(
     };
 
     checksum_context_t raw_data_checksum;
-    begin_checksum(&raw_data_checksum);
-    update_checksum(&raw_data_checksum, tuple_data, tuple_data + tuple_size * num_tuples);
-    end_checksum(header.raw_table_data_checksum, &raw_data_checksum);
+    gs_checksum_begin(&raw_data_checksum);
+    gs_checksum_update(&raw_data_checksum, tuple_data, tuple_data + tuple_size * num_tuples);
+    gs_checksum_end(header.raw_table_data_checksum, &raw_data_checksum);
 
     fwrite(&header, sizeof(timg_header_t), 1, file);
 }
@@ -102,7 +106,7 @@ timg_error_t write_table_data(
     size_t field_offs = 0;
     size_t field_size = 0;
     const void   *cursor    = NULL;
-    attr_t  *attr      = (attr_t  *) schema->attr->data;
+//    attr_t  *attr      = (attr_t  *) schema->attr->data;
 
     switch (format_in) {
         case TF_NSM:
@@ -114,8 +118,9 @@ timg_error_t write_table_data(
                 case TF_DSM:
                     for (size_t attr_idx = 0; attr_idx < num_attr; attr_idx++) {
                         cursor     = tuple_data;
-                        field_offs = get_tuple_size(schema);
-                        field_size = get_field_size(attr, attr_idx);
+                        panic(NOTIMPLEMENTED, to_string(get_tuple_size) " and " to_string(get_field_size))
+                        //field_offs = get_tuple_size(schema);
+                        //field_size = get_field_size(attr, attr_idx);
                         for (size_t tuple_idx = 0; tuple_idx < num_tuples; tuple_idx++) {
                             fwrite(cursor + field_offs, field_size, 1, file);
                             cursor += tuple_size;
@@ -135,10 +140,11 @@ timg_error_t write_table_data(
                         for (size_t attr_idx = 0; attr_idx < num_attr; attr_idx++) {
                             field_offs = 0;
 
-                            for (size_t prev_attr_idx = 0; prev_attr_idx < attr_idx; prev_attr_idx++) {
-                                field_offs = num_tuples * get_field_size(attr, attr_idx);
-                            }
-                            field_size = get_field_size(attr, attr_idx);
+                            panic(NOTIMPLEMENTED, to_string(get_field_size) " and " to_string(get_field_size))
+                            //for (size_t prev_attr_idx = 0; prev_attr_idx < attr_idx; prev_attr_idx++) {
+                            //    field_offs = num_tuples * get_field_size(attr, attr_idx);
+                            //}
+                            //field_size = get_field_size(attr, attr_idx);
                             field_offs += tuple_idx * field_size;
                             fwrite(cursor + field_offs, field_size, 1, file);
                         }
@@ -203,7 +209,8 @@ timg_error_t tableimg_fwrite(
     if ((result = test_file_io(file)) != TIMG_ERR_OK)
         return result;
 
-    size_t       size       = get_tuple_size(schema);
+    panic(NOTIMPLEMENTED, to_string(tableimg_fwrite))
+    size_t       size       = 0; //get_tuple_size(schema);
     attr_t *attr       = (attr_t *) schema->attr->data;
     size_t       num_attr   = schema->attr->num_elements;
 

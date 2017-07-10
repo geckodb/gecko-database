@@ -2,7 +2,7 @@
 
 #include <stdinc.h>
 #include <attr.h>
-#include <fragment.h>
+#include <frag.h>
 
 #define TIMG_MAGIC_WORD_MAX 100
 #define TIMG_MAGIC_WORD     "mptimg"

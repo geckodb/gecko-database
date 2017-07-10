@@ -31,13 +31,16 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 typedef struct fragment_t {
+    schema_t *schema;
     void *tuplet_data;
     size_t ntuplets;
+    size_t tuplet_size; /*<! size in byte of a single tuplet */
     enum tuplet_format format;
 
     /* operations */
-    struct fragment_t *(*_scan)(const pred_tree_t *pred, size_t batch_size, size_t nthreads);
+    struct fragment_t *(*_scan)(struct fragment_t *self, const pred_tree_t *pred, size_t batch_size, size_t nthreads);
     void (*_dispose)(struct fragment_t *self);
+    struct tuplet_t *(*_open)(struct fragment_t *self); /*<! factory function to create impl-specific tuplet */
 } fragment_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -45,16 +48,16 @@ typedef struct fragment_t {
 // ---------------------------------------------------------------------------------------------------------------------
 
 #define DECLARE_ATTRIBUTE_CREATE(type_name,internal_type)                                                              \
-ATTR_ID gs_attr_create_##type_name(const char *name, schema_t *schema);
+attr_id_t gs_attr_create_##type_name(const char *name, schema_t *schema);
 
 #define DECLARE_ATTRIBUTE_ARRAY_CREATE(type_name,internal_type)                                                        \
-ATTR_ID gs_attr_create_##type_name(const char *name, size_t length, schema_t *schema);
+attr_id_t gs_attr_create_##type_name(const char *name, size_t length, schema_t *schema);
 
 #define DECLARE_TUPLET_INSERT(type_name, c_type, internal_type)                                                        \
-void *gs_insert_##type_name(void *dst, schema_t *schema, ATTR_ID attr_id, const c_type *src);
+void *gs_insert_##type_name(void *dst, schema_t *schema, attr_id_t attr_id, const c_type *src);
 
 #define DECLARE_ARRAY_FIELD_INSERT(type_name, c_type, internal_type)                                                   \
-void *gs_insert_##type_name(void *dst, schema_t *schema, ATTR_ID attr_id, const c_type *src);
+void *gs_insert_##type_name(void *dst, schema_t *schema, attr_id_t attr_id, const c_type *src);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   D E C L A R A T I O N
@@ -98,6 +101,13 @@ void gs_checksum_nsm(schema_t *tab, const void *tuplets, size_t ntuplets);
 
 void gs_checksum_dms(schema_t *tab, const void *tuplets, size_t ntuplets);
 
+void gs_checksum_begin(checksum_context_t *context);
+
+void gs_checksum_update(checksum_context_t *context, const void *begin, const void *end);
+
+void gs_checksum_end(unsigned char *checksum_out, checksum_context_t *context);
+
+
 
 // O P E R A T I O N S   O N   R E C O R D S ---------------------------------------------------------------------------
 
@@ -134,47 +144,3 @@ size_t gs_sizeof(enum field_type type);
 const char *gs_type_str(enum field_type t);
 
 __END_DECLS
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-void gs_checksum_nsm(
-        schema_t *tab,
-        const void *tuplets,
-        size_t ntuplets);
-
-void gs_checksum_dms(
-        schema_t *tab,
-        const void *tuplets,
-        size_t ntuplets);
-
-void begin_checksum(checksum_context_t *context);
-
-void update_checksum(checksum_context_t *context, const void *begin, const void *end);
-
-void end_checksum(unsigned char *checksum_out, checksum_context_t *context);
-
-size_t get_field_size(
-        const attr_t *attr,
-        size_t             attr_idx);
-
-size_t get_tuple_size(
-        schema_t *schema);

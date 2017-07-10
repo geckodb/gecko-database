@@ -483,7 +483,27 @@
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
-		<Unit filename="/Users/marcus/git/myimdb/fragment.c">
+		<Unit filename="/Users/marcus/git/myimdb/frag.c">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
+			<Option target="exp_os_paging"/>
+			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
+			<Option target="sample_lin_hash"/>
+			<Option target="myimdb"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/frags/frag_dsm.c">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
+			<Option target="exp_os_paging"/>
+			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
+			<Option target="sample_lin_hash"/>
+			<Option target="myimdb"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/frags/frag_nsm.c">
 			<Option target="expr"/>
 			<Option target="dbstdio"/>
 			<Option target="tpch-convert"/>
@@ -603,7 +623,27 @@
 			<Option target="sample_lin_hash"/>
 			<Option target="myimdb"/>
 		</Unit>
-		<Unit filename="/Users/marcus/git/myimdb/include/fragment.h">
+		<Unit filename="/Users/marcus/git/myimdb/include/frag.h">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
+			<Option target="exp_os_paging"/>
+			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
+			<Option target="sample_lin_hash"/>
+			<Option target="myimdb"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/include/frags/frag_dsm.h">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
+			<Option target="exp_os_paging"/>
+			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
+			<Option target="sample_lin_hash"/>
+			<Option target="myimdb"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/include/frags/frag_nsm.h">
 			<Option target="expr"/>
 			<Option target="dbstdio"/>
 			<Option target="tpch-convert"/>
@@ -624,6 +664,16 @@
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/msg.h">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
+			<Option target="exp_os_paging"/>
+			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
+			<Option target="sample_lin_hash"/>
+			<Option target="myimdb"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/include/operators/scan.h">
 			<Option target="expr"/>
 			<Option target="dbstdio"/>
 			<Option target="tpch-convert"/>
@@ -716,6 +766,16 @@
 		<Unit filename="/Users/marcus/git/myimdb/main.c">
 			<Option target="myimdb"/>
 		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/operators/scan.c">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
+			<Option target="exp_os_paging"/>
+			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
+			<Option target="sample_lin_hash"/>
+			<Option target="myimdb"/>
+		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/pred.c">
 			<Option target="expr"/>
 			<Option target="dbstdio"/>
@@ -752,11 +812,11 @@
 		<Unit filename="/Users/marcus/git/myimdb/samples/containers/dictionaries/linear_hash_table_sample.c">
 			<Option target="sample_lin_hash"/>
 		</Unit>
-		<Unit filename="/Users/marcus/git/myimdb/samples/core/fragment.c">
-			<Option target="dbstdio"/>
-		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/samples/core/pred.c">
 			<Option target="expr"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/samples/stddb.c">
+			<Option target="dbstdio"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/schema.c">
 			<Option target="expr"/>
@@ -769,16 +829,6 @@
 			<Option target="myimdb"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/storage/memory.c">
-			<Option target="expr"/>
-			<Option target="dbstdio"/>
-			<Option target="tpch-convert"/>
-			<Option target="exp_os_paging"/>
-			<Option target="sample_linuxwc"/>
-			<Option target="tableimg"/>
-			<Option target="sample_lin_hash"/>
-			<Option target="myimdb"/>
-		</Unit>
-		<Unit filename="/Users/marcus/git/myimdb/tableimg.c">
 			<Option target="expr"/>
 			<Option target="dbstdio"/>
 			<Option target="tpch-convert"/>

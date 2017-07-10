@@ -673,53 +673,149 @@ field.c.s:
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/field.c.s
 .PHONY : field.c.s
 
-fragment.o: fragment.c.o
+frag.o: frag.c.o
 
-.PHONY : fragment.o
+.PHONY : frag.o
 
 # target to build an object file
-fragment.c.o:
-	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/fragment.c.o
-	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/fragment.c.o
-	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/fragment.c.o
-	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/fragment.c.o
-	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/fragment.c.o
-	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/fragment.c.o
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/fragment.c.o
-	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/fragment.c.o
-.PHONY : fragment.c.o
+frag.c.o:
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/frag.c.o
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/frag.c.o
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/frag.c.o
+	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/frag.c.o
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/frag.c.o
+	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/frag.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frag.c.o
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/frag.c.o
+.PHONY : frag.c.o
 
-fragment.i: fragment.c.i
+frag.i: frag.c.i
 
-.PHONY : fragment.i
+.PHONY : frag.i
 
 # target to preprocess a source file
-fragment.c.i:
-	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/fragment.c.i
-	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/fragment.c.i
-	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/fragment.c.i
-	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/fragment.c.i
-	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/fragment.c.i
-	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/fragment.c.i
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/fragment.c.i
-	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/fragment.c.i
-.PHONY : fragment.c.i
+frag.c.i:
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/frag.c.i
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/frag.c.i
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/frag.c.i
+	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/frag.c.i
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/frag.c.i
+	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/frag.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frag.c.i
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/frag.c.i
+.PHONY : frag.c.i
 
-fragment.s: fragment.c.s
+frag.s: frag.c.s
 
-.PHONY : fragment.s
+.PHONY : frag.s
 
 # target to generate assembly for a file
-fragment.c.s:
-	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/fragment.c.s
-	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/fragment.c.s
-	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/fragment.c.s
-	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/fragment.c.s
-	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/fragment.c.s
-	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/fragment.c.s
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/fragment.c.s
-	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/fragment.c.s
-.PHONY : fragment.c.s
+frag.c.s:
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/frag.c.s
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/frag.c.s
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/frag.c.s
+	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/frag.c.s
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/frag.c.s
+	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/frag.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frag.c.s
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/frag.c.s
+.PHONY : frag.c.s
+
+frags/frag_dsm.o: frags/frag_dsm.c.o
+
+.PHONY : frags/frag_dsm.o
+
+# target to build an object file
+frags/frag_dsm.c.o:
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/frags/frag_dsm.c.o
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/frags/frag_dsm.c.o
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/frags/frag_dsm.c.o
+	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/frags/frag_dsm.c.o
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/frags/frag_dsm.c.o
+	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/frags/frag_dsm.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frags/frag_dsm.c.o
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/frags/frag_dsm.c.o
+.PHONY : frags/frag_dsm.c.o
+
+frags/frag_dsm.i: frags/frag_dsm.c.i
+
+.PHONY : frags/frag_dsm.i
+
+# target to preprocess a source file
+frags/frag_dsm.c.i:
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/frags/frag_dsm.c.i
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/frags/frag_dsm.c.i
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/frags/frag_dsm.c.i
+	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/frags/frag_dsm.c.i
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/frags/frag_dsm.c.i
+	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/frags/frag_dsm.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frags/frag_dsm.c.i
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/frags/frag_dsm.c.i
+.PHONY : frags/frag_dsm.c.i
+
+frags/frag_dsm.s: frags/frag_dsm.c.s
+
+.PHONY : frags/frag_dsm.s
+
+# target to generate assembly for a file
+frags/frag_dsm.c.s:
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/frags/frag_dsm.c.s
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/frags/frag_dsm.c.s
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/frags/frag_dsm.c.s
+	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/frags/frag_dsm.c.s
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/frags/frag_dsm.c.s
+	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/frags/frag_dsm.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frags/frag_dsm.c.s
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/frags/frag_dsm.c.s
+.PHONY : frags/frag_dsm.c.s
+
+frags/frag_nsm.o: frags/frag_nsm.c.o
+
+.PHONY : frags/frag_nsm.o
+
+# target to build an object file
+frags/frag_nsm.c.o:
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/frags/frag_nsm.c.o
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/frags/frag_nsm.c.o
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/frags/frag_nsm.c.o
+	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/frags/frag_nsm.c.o
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/frags/frag_nsm.c.o
+	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/frags/frag_nsm.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frags/frag_nsm.c.o
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/frags/frag_nsm.c.o
+.PHONY : frags/frag_nsm.c.o
+
+frags/frag_nsm.i: frags/frag_nsm.c.i
+
+.PHONY : frags/frag_nsm.i
+
+# target to preprocess a source file
+frags/frag_nsm.c.i:
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/frags/frag_nsm.c.i
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/frags/frag_nsm.c.i
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/frags/frag_nsm.c.i
+	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/frags/frag_nsm.c.i
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/frags/frag_nsm.c.i
+	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/frags/frag_nsm.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frags/frag_nsm.c.i
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/frags/frag_nsm.c.i
+.PHONY : frags/frag_nsm.c.i
+
+frags/frag_nsm.s: frags/frag_nsm.c.s
+
+.PHONY : frags/frag_nsm.s
+
+# target to generate assembly for a file
+frags/frag_nsm.c.s:
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/frags/frag_nsm.c.s
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/frags/frag_nsm.c.s
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/frags/frag_nsm.c.s
+	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/frags/frag_nsm.c.s
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/frags/frag_nsm.c.s
+	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/frags/frag_nsm.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frags/frag_nsm.c.s
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/frags/frag_nsm.c.s
+.PHONY : frags/frag_nsm.c.s
 
 hash.o: hash.c.o
 
@@ -795,6 +891,54 @@ main.s: main.c.s
 main.c.s:
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/main.c.s
 .PHONY : main.c.s
+
+operators/scan.o: operators/scan.c.o
+
+.PHONY : operators/scan.o
+
+# target to build an object file
+operators/scan.c.o:
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/operators/scan.c.o
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/operators/scan.c.o
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/operators/scan.c.o
+	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/operators/scan.c.o
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/operators/scan.c.o
+	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/operators/scan.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/operators/scan.c.o
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/operators/scan.c.o
+.PHONY : operators/scan.c.o
+
+operators/scan.i: operators/scan.c.i
+
+.PHONY : operators/scan.i
+
+# target to preprocess a source file
+operators/scan.c.i:
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/operators/scan.c.i
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/operators/scan.c.i
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/operators/scan.c.i
+	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/operators/scan.c.i
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/operators/scan.c.i
+	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/operators/scan.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/operators/scan.c.i
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/operators/scan.c.i
+.PHONY : operators/scan.c.i
+
+operators/scan.s: operators/scan.c.s
+
+.PHONY : operators/scan.s
+
+# target to generate assembly for a file
+operators/scan.c.s:
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/operators/scan.c.s
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/operators/scan.c.s
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/operators/scan.c.s
+	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/operators/scan.c.s
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/operators/scan.c.s
+	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/operators/scan.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/operators/scan.c.s
+	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/operators/scan.c.s
+.PHONY : operators/scan.c.s
 
 pred.o: pred.c.o
 
@@ -994,33 +1138,6 @@ samples/containers/dictionaries/linear_hash_table_sample.c.s:
 	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/samples/containers/dictionaries/linear_hash_table_sample.c.s
 .PHONY : samples/containers/dictionaries/linear_hash_table_sample.c.s
 
-samples/core/fragment.o: samples/core/fragment.c.o
-
-.PHONY : samples/core/fragment.o
-
-# target to build an object file
-samples/core/fragment.c.o:
-	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/samples/core/fragment.c.o
-.PHONY : samples/core/fragment.c.o
-
-samples/core/fragment.i: samples/core/fragment.c.i
-
-.PHONY : samples/core/fragment.i
-
-# target to preprocess a source file
-samples/core/fragment.c.i:
-	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/samples/core/fragment.c.i
-.PHONY : samples/core/fragment.c.i
-
-samples/core/fragment.s: samples/core/fragment.c.s
-
-.PHONY : samples/core/fragment.s
-
-# target to generate assembly for a file
-samples/core/fragment.c.s:
-	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/samples/core/fragment.c.s
-.PHONY : samples/core/fragment.c.s
-
 samples/core/pred.o: samples/core/pred.c.o
 
 .PHONY : samples/core/pred.o
@@ -1047,6 +1164,33 @@ samples/core/pred.s: samples/core/pred.c.s
 samples/core/pred.c.s:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/samples/core/pred.c.s
 .PHONY : samples/core/pred.c.s
+
+samples/stddb.o: samples/stddb.c.o
+
+.PHONY : samples/stddb.o
+
+# target to build an object file
+samples/stddb.c.o:
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/samples/stddb.c.o
+.PHONY : samples/stddb.c.o
+
+samples/stddb.i: samples/stddb.c.i
+
+.PHONY : samples/stddb.i
+
+# target to preprocess a source file
+samples/stddb.c.i:
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/samples/stddb.c.i
+.PHONY : samples/stddb.c.i
+
+samples/stddb.s: samples/stddb.c.s
+
+.PHONY : samples/stddb.s
+
+# target to generate assembly for a file
+samples/stddb.c.s:
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/samples/stddb.c.s
+.PHONY : samples/stddb.c.s
 
 schema.o: schema.c.o
 
@@ -1143,54 +1287,6 @@ storage/memory.c.s:
 	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/storage/memory.c.s
 	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/storage/memory.c.s
 .PHONY : storage/memory.c.s
-
-tableimg.o: tableimg.c.o
-
-.PHONY : tableimg.o
-
-# target to build an object file
-tableimg.c.o:
-	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/tableimg.c.o
-	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/tableimg.c.o
-	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/tableimg.c.o
-	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/tableimg.c.o
-	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/tableimg.c.o
-	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/tableimg.c.o
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/tableimg.c.o
-	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/tableimg.c.o
-.PHONY : tableimg.c.o
-
-tableimg.i: tableimg.c.i
-
-.PHONY : tableimg.i
-
-# target to preprocess a source file
-tableimg.c.i:
-	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/tableimg.c.i
-	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/tableimg.c.i
-	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/tableimg.c.i
-	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/tableimg.c.i
-	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/tableimg.c.i
-	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/tableimg.c.i
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/tableimg.c.i
-	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/tableimg.c.i
-.PHONY : tableimg.c.i
-
-tableimg.s: tableimg.c.s
-
-.PHONY : tableimg.s
-
-# target to generate assembly for a file
-tableimg.c.s:
-	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/tableimg.c.s
-	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/tableimg.c.s
-	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/tableimg.c.s
-	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/tableimg.c.s
-	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/tableimg.c.s
-	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/tableimg.c.s
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/tableimg.c.s
-	$(MAKE) -f CMakeFiles/myimdb.dir/build.make CMakeFiles/myimdb.dir/tableimg.c.s
-.PHONY : tableimg.c.s
 
 tuplet.o: tuplet.c.o
 
@@ -1340,15 +1436,24 @@ help:
 	@echo "... field.o"
 	@echo "... field.i"
 	@echo "... field.s"
-	@echo "... fragment.o"
-	@echo "... fragment.i"
-	@echo "... fragment.s"
+	@echo "... frag.o"
+	@echo "... frag.i"
+	@echo "... frag.s"
+	@echo "... frags/frag_dsm.o"
+	@echo "... frags/frag_dsm.i"
+	@echo "... frags/frag_dsm.s"
+	@echo "... frags/frag_nsm.o"
+	@echo "... frags/frag_nsm.i"
+	@echo "... frags/frag_nsm.s"
 	@echo "... hash.o"
 	@echo "... hash.i"
 	@echo "... hash.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... operators/scan.o"
+	@echo "... operators/scan.i"
+	@echo "... operators/scan.s"
 	@echo "... pred.o"
 	@echo "... pred.i"
 	@echo "... pred.s"
@@ -1364,21 +1469,18 @@ help:
 	@echo "... samples/containers/dictionaries/linear_hash_table_sample.o"
 	@echo "... samples/containers/dictionaries/linear_hash_table_sample.i"
 	@echo "... samples/containers/dictionaries/linear_hash_table_sample.s"
-	@echo "... samples/core/fragment.o"
-	@echo "... samples/core/fragment.i"
-	@echo "... samples/core/fragment.s"
 	@echo "... samples/core/pred.o"
 	@echo "... samples/core/pred.i"
 	@echo "... samples/core/pred.s"
+	@echo "... samples/stddb.o"
+	@echo "... samples/stddb.i"
+	@echo "... samples/stddb.s"
 	@echo "... schema.o"
 	@echo "... schema.i"
 	@echo "... schema.s"
 	@echo "... storage/memory.o"
 	@echo "... storage/memory.i"
 	@echo "... storage/memory.s"
-	@echo "... tableimg.o"
-	@echo "... tableimg.i"
-	@echo "... tableimg.s"
 	@echo "... tuplet.o"
 	@echo "... tuplet.i"
 	@echo "... tuplet.s"

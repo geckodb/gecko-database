@@ -30,9 +30,11 @@ set(SOURCE_FILES
         include/containers/dicts/hash_table.h
         include/containers/list.h
         include/containers/vector.h
+        include/frags/frag_dsm.h
+        include/frags/frag_nsm.h
         include/error.h
         include/field.h
-        include/fragment.h
+        include/frag.h
         include/hash.h
         include/msg.h
         include/pred.h
@@ -43,6 +45,7 @@ set(SOURCE_FILES
         include/storage/memory.h
         include/tableimg.h
         include/tuplet.h
+        include/operators/scan.h
 
         async.c
         attr.c
@@ -51,17 +54,20 @@ set(SOURCE_FILES
         containers/dicts/hash_table.c
         containers/list.c
         containers/vector.c
+        frags/frag_dsm.c
+        frags/frag_nsm.c
         error.c
         field.c
-        fragment.c
+        frag.c
         hash.c
         pred.c
         pref.c
         require.c
         schema.c
         storage/memory.c
-        tableimg.c
-        tuplet.c)
+        tuplet.c
+        operators/scan.c
+        )
 
 add_executable(
         myimdb main.c
@@ -91,12 +97,16 @@ add_executable(
         ${SOURCE_FILES})
 
 add_executable(
-        dbstdio samples/core/fragment.c
+        dbstdio samples/stddb.c
         ${SOURCE_FILES})
 
 add_executable(
         expr samples/core/pred.c
         ${SOURCE_FILES})
+
+target_link_libraries(
+        myimdb
+        ${OPENSSL_LIBRARIES})
 
 target_link_libraries(
         tpch-convert

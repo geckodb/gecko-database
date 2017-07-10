@@ -1,7 +1,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <fragment.h>
+#include <frag.h>
 #include <field.h>
 
 int main() {
@@ -10,9 +10,9 @@ int main() {
 
     schema_t *schema = gs_schema_create();
 
-    ATTR_ID attr_1 = gs_attr_create_uint64("My Attribute", schema);
-    ATTR_ID attr_2 = gs_attr_create_string("My Attribute 2", 42, schema);
-    ATTR_ID attr_3 = gs_attr_create_bool("My Attribute Bool", schema);
+    attr_id_t attr_1 = gs_attr_create_uint64("My Attribute", schema);
+    attr_id_t attr_2 = gs_attr_create_string("My Attribute 2", 42, schema);
+    attr_id_t attr_3 = gs_attr_create_bool("My Attribute Bool", schema);
 
     fragment_t *fragment = gs_fragment_alloc(schema, NUM_TUPLETS, TF_NSM);
     tuplet_t *tuplet = gs_tuplet_open(fragment);
@@ -45,3 +45,4 @@ int main() {
 
     return EXIT_SUCCESS;
 }
+
