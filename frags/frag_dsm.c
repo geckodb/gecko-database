@@ -10,14 +10,15 @@ void this_tuplet_update(tuplet_t *self, const void *data);
 void this_tuplet_set_null(tuplet_t *self);
 void this_tuplet_delete(tuplet_t *self);
 
-fragment_t *gs_fragment_dsm_alloc(schema_t *schema, size_t num_tuplets)
+fragment_t *gs_fragment_dsm_alloc(schema_t *schema, size_t tuplet_capacity)
 {
     fragment_t *fragment = malloc(sizeof(fragment_t));
     *fragment = (fragment_t) {
             .schema = schema,
             .format = TF_DSM,
-            .ntuplets = num_tuplets,
-            .tuplet_data = malloc (gs_tuplet_size_by_schema(schema) * num_tuplets),
+            .ntuplets = 0,
+            .ncapacity = tuplet_capacity,
+            .tuplet_data = malloc (gs_tuplet_size_by_schema(schema) * tuplet_capacity),
             .tuplet_size = gs_tuplet_size_by_schema(schema),
             ._dispose = this_fragment_dsm_dipose,
             ._scan = scan_mediator,

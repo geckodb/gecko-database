@@ -57,19 +57,22 @@ void gs_checksum_end(unsigned char *checksum_out, checksum_context_t *context)
 }
 
 
-fragment_t *gs_fragment_alloc(schema_t *schema, size_t num_tuplets, enum tuplet_format format)
+fragment_t *gs_fragment_alloc(schema_t *schema, size_t tuplet_capacity, enum tuplet_format format)
 {
+    require((tuplet_capacity > 0), "capacity of tuplets must be non zero");
+
     fragment_t *result;
     switch (format) {
         case TF_NSM:
-            result = gs_fragment_nsm_alloc(schema, num_tuplets);
+            result = gs_fragment_nsm_alloc(schema, tuplet_capacity);
             break;
         case TF_DSM:
-            result = gs_fragment_dsm_alloc(schema, num_tuplets);
+            result = gs_fragment_dsm_alloc(schema, tuplet_capacity);
             break;
         default:
             panic(BADARG, " tuplet format");
     }
+
     panic_if((result->_dispose == NULL), NOTIMPLEMENTED, "fragment_t::dispose");
     panic_if((result->_scan == NULL), NOTIMPLEMENTED, "fragment_t::scan");
     panic_if((result->_open == NULL), NOTIMPLEMENTED, "fragment_t::open");

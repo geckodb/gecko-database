@@ -71,6 +71,16 @@
 					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
+			<Target title="doc">
+				<Option working_dir="/Users/marcus/git/myimdb/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 doc"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/marcus/git/myimdb/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
 			<Target title="dbstdio">
 				<Option output="/Users/marcus/git/myimdb/bin/dbstdio" prefix_auto="0" extension_auto="0"/>
 				<Option working_dir="/Users/marcus/git/myimdb/bin"/>

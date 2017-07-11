@@ -42,6 +42,14 @@
 *.idb
 *.pdb
 
+# Binaries
+
+bin/
+
+# Dokumention
+doc/html
+doc/latex
+
 # Kernel Module Compile Results
 *.mod*
 *.cmd

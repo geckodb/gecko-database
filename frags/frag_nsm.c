@@ -23,14 +23,15 @@ static inline void this_field_set_null(field_t *self);
 static inline bool this_field_is_null(field_t *self);
 static inline void this_field_close(field_t *self);
 
-fragment_t *gs_fragment_nsm_alloc(schema_t *schema, size_t num_tuplets)
+fragment_t *gs_fragment_nsm_alloc(schema_t *schema, size_t tuplet_capacity)
 {
     fragment_t *fragment = malloc(sizeof(fragment_t));
     *fragment = (fragment_t) {
             .schema = schema,
             .format = TF_NSM,
-            .ntuplets = num_tuplets,
-            .tuplet_data = malloc (gs_tuplet_size_by_schema(schema) * num_tuplets),
+            .ntuplets = 0,
+            .ncapacity = tuplet_capacity,
+            .tuplet_data = malloc (gs_tuplet_size_by_schema(schema) * tuplet_capacity),
             .tuplet_size = gs_tuplet_size_by_schema(schema),
             ._scan = scan_mediator,
             ._dispose = this_fragment_nsm_dipose,
@@ -150,7 +151,7 @@ static inline field_t *this_field_next(field_t *self)
         self->attr_id = next_attr_id;
         result = self;
     } else {
-        tuplet_t *tuplet = gs_tuplet_next(self->tuplet);
+        tuplet_t *tuplet = gs_tuplet_seek(self->tuplet);
         free (self);
         result = (tuplet != NULL ? gs_field_open(tuplet) : NULL);
     }

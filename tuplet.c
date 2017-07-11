@@ -1,16 +1,58 @@
 #include <tuplet.h>
 #include <field.h>
 
-tuplet_t *gs_tuplet_open(struct fragment_t *frag)
-{
-    require_non_null(frag);
-    require_non_null(frag->_open);
-    tuplet_t *result = frag->_open(frag);
-    panic_if((result == NULL), UNEXPECTED, "fragment_t::open return NULL");
-    return result;
+#define DEFINE_TUPLET_INSERT(type_name, c_type, internal_type)                                                         \
+void *gs_insert_##type_name(void *dst, schema_t *schema, attr_id_t attr_id, const c_type *src)                         \
+{                                                                                                                      \
+    assert (attr_id < schema->attr->num_elements);                                                                     \
+    attr_t *attr = vector_at(schema->attr, attr_id);                                                                   \
+    assert (internal_type == attr->type);                                                                              \
+    attr->str_format_mlen = max(attr->str_format_mlen, gs_tuplet_printlen(attr, src));                                 \
+    panic(NOTIMPLEMENTED, "this")    \
+    size_t field_size = 0;/*gs_field_size(attr, 0);*/                                                                  \
+   /* memcpy(dst, src, get_field_size(attr, 0));   */                                                                  \
+    return dst + field_size;                                                                                           \
 }
 
-tuplet_t *gs_tuplet_next(tuplet_t *tuplet)
+#define DEFINE_ARRAY_FIELD_INSERT(type_name, c_type, internal_type)                                                    \
+void *gs_insert_##type_name(void *dst, schema_t *schema, attr_id_t attr_id, const c_type *src)                         \
+{                                                                                                                      \
+    assert (attr_id < schema->attr->num_elements);                                                                     \
+    attr_t *attr = vector_at(schema->attr, attr_id);                                                                   \
+    assert (internal_type == attr->type);                                                                              \
+    attr->str_format_mlen = max(attr->str_format_mlen, gs_tuplet_printlen(attr, src));                                 \
+    assert (strlen(src) < attr->type_rep);                                                                             \
+    strcpy(dst, src);                                                                                                  \
+    /*return dst + get_field_size(attr, 0); */                                                                         \
+    panic(NOTIMPLEMENTED, "this")   \
+return 0;   \
+}
+
+DEFINE_TUPLET_INSERT(bool, bool, FT_BOOL)
+DEFINE_TUPLET_INSERT(int8, int8_t, FT_INT8)
+DEFINE_TUPLET_INSERT(int16, int16_t, FT_INT16)
+DEFINE_TUPLET_INSERT(int32, int32_t, FT_INT32)
+DEFINE_TUPLET_INSERT(int64, int64_t, FT_INT64)
+DEFINE_TUPLET_INSERT(uint8, uint8_t, FT_UINT8)
+DEFINE_TUPLET_INSERT(uint16, uint16_t, FT_UINT16)
+DEFINE_TUPLET_INSERT(uint32, uint32_t, FT_UINT32)
+DEFINE_TUPLET_INSERT(uint64, uint64_t, FT_UINT64)
+DEFINE_TUPLET_INSERT(float32, float, FT_FLOAT32)
+DEFINE_TUPLET_INSERT(float64, double, FT_FLOAT64)
+DEFINE_ARRAY_FIELD_INSERT(string, char, FT_CHAR)
+
+tuplet_t *gs_tuplet_open(struct fragment_t *frag)
+{
+    if (frag->ntuplets > 0) {
+        require_non_null(frag);
+        require_non_null(frag->_open);
+        tuplet_t *result = frag->_open(frag);
+        panic_if((result == NULL), UNEXPECTED, "fragment_t::open return NULL");
+        return result;
+    } else return 0;
+}
+
+tuplet_t *gs_tuplet_seek(tuplet_t *tuplet)
 {
     require_non_null(tuplet);
     require_non_null(tuplet->_next);

@@ -11,6 +11,9 @@ message("OPENSSL_INCLUDE_DIR: ${OPENSSL_INCLUDE_DIR}")
 message("OPENSSL_LIBRARIES: ${OPENSSL_LIBRARIES}")
 message("OPENSSL_ROOT_DIR: ${OPENSSL_ROOT_DIR}")
 
+find_package(Doxygen)
+option(BUILD_DOCUMENTATION "API documentation requires Doxygen" ${DOXYGEN_FOUND})
+
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -std=c11 -Wall -Werror")
 
 set(CMAKE_BINARY_DIR
@@ -119,3 +122,12 @@ target_link_libraries(
 target_link_libraries(
         dbstdio
         ${OPENSSL_LIBRARIES})
+
+if(DOXYGEN_FOUND)
+    #configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+    add_custom_target(doc
+            ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+            COMMENT "Generating API documentation with Doxygen" VERBATIM
+            )
+endif(DOXYGEN_FOUND)

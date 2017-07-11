@@ -31,11 +31,12 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 typedef struct fragment_t {
-    schema_t *schema;
-    void *tuplet_data;
-    size_t ntuplets;
-    size_t tuplet_size; /*<! size in byte of a single tuplet */
-    enum tuplet_format format;
+    schema_t *schema; /*!< schema of this fragment */
+    void *tuplet_data; /*!< data inside this fragment; the record format (e.g., NSM/DSM) is implementation-specific */
+    size_t ntuplets; /*!< number of tuplets stored in this fragment */
+    size_t ncapacity; /*!< number of tuplets that can be stored in this fragment, before a resize-opp is required */
+    size_t tuplet_size; /*!< size in byte of a single tuplet */
+    enum tuplet_format format; /*!< the tuplet format that defined whether NSM or DSM is used*/
 
     /* operations */
     struct fragment_t *(*_scan)(struct fragment_t *self, const pred_tree_t *pred, size_t batch_size, size_t nthreads);
@@ -53,23 +54,15 @@ attr_id_t gs_attr_create_##type_name(const char *name, schema_t *schema);
 #define DECLARE_ATTRIBUTE_ARRAY_CREATE(type_name,internal_type)                                                        \
 attr_id_t gs_attr_create_##type_name(const char *name, size_t length, schema_t *schema);
 
-#define DECLARE_TUPLET_INSERT(type_name, c_type, internal_type)                                                        \
-void *gs_insert_##type_name(void *dst, schema_t *schema, attr_id_t attr_id, const c_type *src);
-
-#define DECLARE_ARRAY_FIELD_INSERT(type_name, c_type, internal_type)                                                   \
-void *gs_insert_##type_name(void *dst, schema_t *schema, attr_id_t attr_id, const c_type *src);
-
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   D E C L A R A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
 __BEGIN_DECLS
 
-// O P E R A T I O N S   O N   T A B L E S -----------------------------------------------------------------------------
-
 schema_t *gs_schema_create();
 
-fragment_t *gs_fragment_alloc(schema_t *frag, size_t num_tuplets, enum tuplet_format format);
+fragment_t *gs_fragment_alloc(schema_t *frag, size_t tuplet_capacity, enum tuplet_format format);
 
 void gs_fragment_free(fragment_t *frag);
 
@@ -106,36 +99,6 @@ void gs_checksum_begin(checksum_context_t *context);
 void gs_checksum_update(checksum_context_t *context, const void *begin, const void *end);
 
 void gs_checksum_end(unsigned char *checksum_out, checksum_context_t *context);
-
-
-
-// O P E R A T I O N S   O N   R E C O R D S ---------------------------------------------------------------------------
-
-DECLARE_TUPLET_INSERT(bool, bool, FT_BOOL)
-
-DECLARE_TUPLET_INSERT(int8, int8_t, FT_INT8)
-
-DECLARE_TUPLET_INSERT(int16, int16_t, FT_INT16)
-
-DECLARE_TUPLET_INSERT(int32, int32_t, FT_INT32)
-
-DECLARE_TUPLET_INSERT(int64, int64_t, FT_INT64)
-
-DECLARE_TUPLET_INSERT(uint8, uint8_t, FT_UINT8)
-
-DECLARE_TUPLET_INSERT(uint16, uint16_t, FT_UINT16)
-
-DECLARE_TUPLET_INSERT(uint32, uint32_t, FT_UINT32)
-
-DECLARE_TUPLET_INSERT(uint64, uint64_t, FT_UINT64)
-
-DECLARE_TUPLET_INSERT(float32, float, FT_FLOAT32)
-
-DECLARE_TUPLET_INSERT(float64, double, FT_FLOAT64)
-
-DECLARE_ARRAY_FIELD_INSERT(string, char, FT_CHAR)
-
-size_t gs_tuplet_printlen(const attr_t *attr, const void *field_data);
 
 // F I E L D   T Y P E   O P E R A T I O N S ---------------------------------------------------------------------------
 
