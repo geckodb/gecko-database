@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(myimdb)
+project(gridstore)
 
 include_directories("include")
 include_directories("/usr/local/include/")
@@ -49,6 +49,7 @@ set(SOURCE_FILES
         include/tableimg.h
         include/tuplet.h
         include/operators/scan.h
+        include/shell.h
 
         async.c
         attr.c
@@ -70,10 +71,11 @@ set(SOURCE_FILES
         storage/memory.c
         tuplet.c
         operators/scan.c
+        shell.c
         )
 
 add_executable(
-        myimdb main.c
+        gs main.c
         ${SOURCE_FILES})
 
 add_executable(
@@ -108,7 +110,7 @@ add_executable(
         ${SOURCE_FILES})
 
 target_link_libraries(
-        myimdb
+        gs
         ${OPENSSL_LIBRARIES})
 
 target_link_libraries(
