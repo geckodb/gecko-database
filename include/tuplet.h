@@ -3,11 +3,11 @@
 #include <stdinc.h>
 #include <frag.h>
 
-#define DECLARE_TUPLET_INSERT(type_name, c_type, internal_type)                                                        \
-void *gs_insert_##type_name(void *dst, schema_t *schema, attr_id_t attr_id, const c_type *src);
-
-#define DECLARE_ARRAY_FIELD_INSERT(type_name, c_type, internal_type)                                                   \
-void *gs_insert_##type_name(void *dst, schema_t *schema, attr_id_t attr_id, const c_type *src);
+//#define DECLARE_TUPLET_INSERT(type_name, c_type, internal_type)                                                        \
+//void *gs_insert_##type_name(void *dst, schema_t *schema, attr_id_t attr_id, const c_type *src);
+//
+//#define DECLARE_ARRAY_FIELD_INSERT(type_name, c_type, internal_type)                                                   \
+//void *gs_insert_##type_name(void *dst, schema_t *schema, attr_id_t attr_id, const c_type *src);
 
 
 struct schema_t;
@@ -31,10 +31,10 @@ typedef struct tuplet_t {
 /*!
  * @brief Opens the first tuplet that is located in the fragment <i>frag</i>.
  *
- * To navigate from one tuplet to another, the function <i>gs_tuplet_seek</i> should be used.
+ * To navigate from one tuplet to another, the function gs_tuplet_next() should be used.
  *
  * The returned tuplet is allocated on the heap. To release these resources, the tuplet must be either closed
- * explicitly by calling gs_tuplet_close(tuplet_t *tuplet) or it gets automatically released when <i>gs_tuplet_seek</i>
+ * explicitly by calling gs_tuplet_close() or it gets automatically released when gs_tuplet_next()
  * reaches the end of the fragment.
  *
  * In case the
@@ -49,7 +49,7 @@ tuplet_t *gs_tuplet_open(struct fragment_t *frag);
  *
  * Tuplets are allocated on the heap. When no further operations on tuplets are needed, they must be closed in order
  * to release resources (i.e., freeing space on the heap and fragment-specific resources). A closing operation is
- * either scheduled by a call to <i>gs_tuplet_close</i> or when <i>gs_tuplet_seek</i> reaches the end of the fragment.
+ * either scheduled by a call to gs_tuplet_close() or when gs_tuplet_next() reaches the end of the fragment.
  * However, which resources are actually freed is fragment-type specific. It is not defined how a fragment behaves when
  * tuplets are not closed correctly.
  *
@@ -57,9 +57,29 @@ tuplet_t *gs_tuplet_open(struct fragment_t *frag);
  */
 void gs_tuplet_close(tuplet_t *tuplet);
 
-tuplet_t *gs_tuplet_seek(tuplet_t *tuplet);
+/*!
+ * @brief Returns the successor of a given tuplet inside its fragment.
+ *
+ * For navigation from one tuplet to another this function should be used. The order in which tuplets are enumerated
+ * is fragment-specific and it's not guaranteed that the tuplet identifier of the input tuplet is less than the tuplet
+ * identifier of its successor. However, its guaranteed that all tuplets inside a fragment are returned if the first
+ * tuplet was received by a call to gs_tuplet_open() and gs_tuplet_next() is called until gs_tuplet_next() returns
+ * <b>NULL</b>.
+ *
+ * @param tuplet A valid tuplet inside a fragment (must be non-null)
+ * @return The successor of the input tuplet, or <b>NULL</b> if the end of the enumeration was reached.
+ */
+tuplet_t *gs_tuplet_next(tuplet_t *tuplet);
 
-
+/*!
+ * @brief Resets the tuplet pointer to the begin of the first tuplet in its fragment.
+ *
+ * The input tuplet is closed automatically via a call to gs_tuplet_close(). Afterwards the first tuplet is identified
+ * by calling gs_tuplet_open() and returned to the caller.
+ *
+ * @param tuplet A valid tuplet inside a fragment (mus be non-null)
+ * @return The first tuplet in the fragment of the input tuplet.
+ */
 tuplet_t *gs_tuplet_rewind(tuplet_t *tuplet);
 
 void gs_tuplet_set_null(tuplet_t *tuplet);
@@ -77,29 +97,29 @@ size_t gs_tuplet_printlen(const attr_t *attr, const void *field_data);
 size_t gs_tuplet_size_by_schema(const schema_t *schema);
 
 
-
-DECLARE_TUPLET_INSERT(bool, bool, FT_BOOL)
-
-DECLARE_TUPLET_INSERT(int8, int8_t, FT_INT8)
-
-DECLARE_TUPLET_INSERT(int16, int16_t, FT_INT16)
-
-DECLARE_TUPLET_INSERT(int32, int32_t, FT_INT32)
-
-DECLARE_TUPLET_INSERT(int64, int64_t, FT_INT64)
-
-DECLARE_TUPLET_INSERT(uint8, uint8_t, FT_UINT8)
-
-DECLARE_TUPLET_INSERT(uint16, uint16_t, FT_UINT16)
-
-DECLARE_TUPLET_INSERT(uint32, uint32_t, FT_UINT32)
-
-DECLARE_TUPLET_INSERT(uint64, uint64_t, FT_UINT64)
-
-DECLARE_TUPLET_INSERT(float32, float, FT_FLOAT32)
-
-DECLARE_TUPLET_INSERT(float64, double, FT_FLOAT64)
-
-DECLARE_ARRAY_FIELD_INSERT(string, char, FT_CHAR)
+//
+//DECLARE_TUPLET_INSERT(bool, bool, FT_BOOL)
+//
+//DECLARE_TUPLET_INSERT(int8, int8_t, FT_INT8)
+//
+//DECLARE_TUPLET_INSERT(int16, int16_t, FT_INT16)
+//
+//DECLARE_TUPLET_INSERT(int32, int32_t, FT_INT32)
+//
+//DECLARE_TUPLET_INSERT(int64, int64_t, FT_INT64)
+//
+//DECLARE_TUPLET_INSERT(uint8, uint8_t, FT_UINT8)
+//
+//DECLARE_TUPLET_INSERT(uint16, uint16_t, FT_UINT16)
+//
+//DECLARE_TUPLET_INSERT(uint32, uint32_t, FT_UINT32)
+//
+//DECLARE_TUPLET_INSERT(uint64, uint64_t, FT_UINT64)
+//
+//DECLARE_TUPLET_INSERT(float32, float, FT_FLOAT32)
+//
+//DECLARE_TUPLET_INSERT(float64, double, FT_FLOAT64)
+//
+//DECLARE_ARRAY_FIELD_INSERT(string, char, FT_CHAR)
 
 size_t gs_tuplet_printlen(const attr_t *attr, const void *field_data);

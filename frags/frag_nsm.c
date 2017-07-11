@@ -7,6 +7,9 @@
 
 static inline void this_fragment_nsm_dipose(fragment_t *self);
 static inline tuplet_t *this_fragment_nsm_open(fragment_t *self);
+static inline tuplet_t *this_fragment_insert(struct fragment_t *self, size_t ntuplets);
+
+static inline tuplet_t *fragment_nsm_open_internal(fragment_t *self, size_t pos);
 
 static inline tuplet_t *this_tuplet_next(tuplet_t *self);
 static inline field_t *this_tuplet_open(tuplet_t *self);
@@ -36,6 +39,7 @@ fragment_t *gs_fragment_nsm_alloc(schema_t *schema, size_t tuplet_capacity)
             ._scan = scan_mediator,
             ._dispose = this_fragment_nsm_dipose,
             ._open = this_fragment_nsm_open,
+            ._insert = this_fragment_insert
     };
     return fragment;
 }
@@ -46,13 +50,13 @@ void this_fragment_nsm_dipose(fragment_t *self)
     free (self);
 }
 
-tuplet_t *this_fragment_nsm_open(fragment_t *self)
+tuplet_t *fragment_nsm_open_internal(fragment_t *self, size_t pos)
 {
     tuplet_t *result = NULL;
     if (self->ntuplets > 0) {
         result = require_good_malloc(sizeof(result));
         *result = (tuplet_t) {
-            .id = 0,
+            .id = pos,
             .fragment = self,
             .attr_base = self->tuplet_data,
             ._next = this_tuplet_next,
@@ -65,6 +69,29 @@ tuplet_t *this_fragment_nsm_open(fragment_t *self)
         };
     }
     return result;
+}
+
+tuplet_t *this_fragment_nsm_open(fragment_t *self)
+{
+    return fragment_nsm_open_internal(self, 0);
+}
+
+static inline tuplet_t *this_fragment_insert(struct fragment_t *self, size_t ntuplets)
+{
+    assert (self);
+    assert (ntuplets > 0);
+    size_t new_size = (self->ntuplets + ntuplets);
+    size_t return_tuplet_id = self->ntuplets;
+    if (new_size > self->ncapacity) {
+        size_t new_capacity = self->ncapacity;
+        while (new_capacity < new_size) {
+            new_capacity = max(1, ceil(new_capacity * 1.7f));
+        }
+        self->tuplet_data = realloc(self->tuplet_data, new_capacity * self->tuplet_size);
+        self->ncapacity = new_capacity;
+    }
+    self->ntuplets += ntuplets;
+    return fragment_nsm_open_internal(self, return_tuplet_id);
 }
 
 // - T U P L E T   I M P L E M E N T A T I O N -------------------------------------------------------------------------
@@ -151,7 +178,7 @@ static inline field_t *this_field_next(field_t *self)
         self->attr_id = next_attr_id;
         result = self;
     } else {
-        tuplet_t *tuplet = gs_tuplet_seek(self->tuplet);
+        tuplet_t *tuplet = gs_tuplet_next(self->tuplet);
         free (self);
         result = (tuplet != NULL ? gs_field_open(tuplet) : NULL);
     }

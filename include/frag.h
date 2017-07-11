@@ -41,7 +41,13 @@ typedef struct fragment_t {
     /* operations */
     struct fragment_t *(*_scan)(struct fragment_t *self, const pred_tree_t *pred, size_t batch_size, size_t nthreads);
     void (*_dispose)(struct fragment_t *self);
-    struct tuplet_t *(*_open)(struct fragment_t *self); /*<! factory function to create impl-specific tuplet */
+
+    /*!< factory function to create impl-specific tuplet */
+    struct tuplet_t *(*_open)(struct fragment_t *self);
+
+    /*!< inserts a number of (uninitialized) ntuplets into this fragment and returns a tuplet pointer to the first
+     * tuplets of these newly added tuplets. */
+    struct tuplet_t *(*_insert)(struct fragment_t *self, size_t ntuplets);
 } fragment_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -63,6 +69,8 @@ __BEGIN_DECLS
 schema_t *gs_schema_create();
 
 fragment_t *gs_fragment_alloc(schema_t *frag, size_t tuplet_capacity, enum tuplet_format format);
+
+struct tuplet_t *gs_fragment_insert(fragment_t *frag, size_t ntuplets);
 
 void gs_fragment_free(fragment_t *frag);
 

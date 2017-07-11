@@ -72,11 +72,19 @@ fragment_t *gs_fragment_alloc(schema_t *schema, size_t tuplet_capacity, enum tup
         default:
             panic(BADARG, " tuplet format");
     }
-
     panic_if((result->_dispose == NULL), NOTIMPLEMENTED, "fragment_t::dispose");
     panic_if((result->_scan == NULL), NOTIMPLEMENTED, "fragment_t::scan");
     panic_if((result->_open == NULL), NOTIMPLEMENTED, "fragment_t::open");
+    panic_if((result->_insert == NULL), NOTIMPLEMENTED, "fragment_t::insert");
     return result;
+}
+
+struct tuplet_t *gs_fragment_insert(fragment_t *frag, size_t ntuplets)
+{
+    assert (frag);
+    assert (ntuplets > 0);
+    assert (frag->_insert);
+    return frag->_insert(frag, ntuplets);
 }
 
 void gs_fragment_free(fragment_t *frag)

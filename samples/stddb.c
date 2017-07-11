@@ -6,28 +6,28 @@
 
 int main() {
 
-    const size_t NUM_TUPLETS = 4;
+   // const size_t NUM_TUPLETS = 4;
 
     schema_t *schema = gs_schema_create();
 
-    attr_id_t attr_1 = gs_attr_create_uint64("My Attribute", schema);
-    attr_id_t attr_2 = gs_attr_create_string("My Attribute 2", 42, schema);
-    attr_id_t attr_3 = gs_attr_create_bool("My Attribute Bool", schema);
+    gs_attr_create_uint64("My Attribute", schema);
+    gs_attr_create_string("My Attribute 2", 42, schema);
+    gs_attr_create_bool("My Attribute Bool", schema);
 
-    fragment_t *fragment = gs_fragment_alloc(schema, NUM_TUPLETS, TF_NSM);
-    tuplet_t *tuplet = gs_tuplet_open(fragment);
+    fragment_t *fragment;
+    tuplet_t *tuplet;
+
+    fragment = gs_fragment_alloc(schema, 1, TF_NSM);
+    tuplet   = gs_fragment_insert(fragment, 4);
+
     struct field_t *field = gs_field_open(tuplet);
-    gs_field_close(field);
 
-    void *cont = NULL;
+    //UINT64 int_value;
+    //CHAR *str_value;
+    //BOOL bol_value;
 
-    UINT64 int_value;
-    CHAR *str_value;
-    BOOL bol_value;
 
-    void *data = NULL;
-
-    int_value = 1;                cont = gs_insert_uint64(data, schema, attr_1, &int_value);
+/*    int_value = 1;                cont = gs_insert_uint64(data, schema, attr_1, &int_value);
     str_value = "Hello\n";        cont = gs_insert_string(cont, schema, attr_2, str_value);
     bol_value = true;             cont = gs_insert_bool  (cont, schema, attr_3, &bol_value);
 
@@ -41,7 +41,11 @@ int main() {
 
     int_value = 42;               cont = gs_insert_uint64(data, schema, attr_1, &int_value);
     str_value = "There\n";        cont = gs_insert_string(cont, schema, attr_2, str_value);
-    bol_value = true;             cont = gs_insert_bool  (cont, schema, attr_3, &bol_value);
+    bol_value = true;             cont = gs_insert_bool  (cont, schema, attr_3, &bol_value);*/
+
+    gs_field_close(field);
+    gs_tuplet_close(tuplet);
+
 
     return EXIT_SUCCESS;
 }
