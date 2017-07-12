@@ -90,23 +90,35 @@ add_executable(
         samples/containers/dictionaries/linear_hash_table_sample.c
         ${SOURCE_FILES})
 
+target_link_libraries(
+        sample_lin_hash
+        ${OPENSSL_LIBRARIES})
+
 add_executable(
         sample_linuxwc
         samples/containers/dictionaries/linear_hash_table_linuxwc.c
         ${SOURCE_FILES})
 
-add_executable(
-        exp_os_paging
-        experiments/vm/os_paging/launcher.c
-        ${SOURCE_FILES})
+target_link_libraries(
+        sample_linuxwc
+        ${OPENSSL_LIBRARIES})
 
-add_executable(
-        tpch-convert utils/tpch_convert/launcher.c
-        ${SOURCE_FILES})
+#add_executable(
+#        exp_os_paging
+#        experiments/vm/os_paging/launcher.c
+#        ${SOURCE_FILES})
 
-add_executable(
-        tableimg utils/tableimg/launcher.c
-        ${SOURCE_FILES})
+#target_link_libraries(
+#        exp_os_paging
+#        ${OPENSSL_LIBRARIES})
+
+#add_executable(
+#        tpch-convert utils/tpch_convert/launcher.c
+#        ${SOURCE_FILES})
+
+#add_executable(
+#        tableimg utils/tableimg/launcher.c
+#        ${SOURCE_FILES})
 
 add_executable(
         dbstdio samples/stddb.c
@@ -132,13 +144,13 @@ target_link_libraries(
         gs
         ${OPENSSL_LIBRARIES})
 
-target_link_libraries(
-        tpch-convert
-        ${OPENSSL_LIBRARIES})
+#target_link_libraries(
+#        tpch-convert
+#        ${OPENSSL_LIBRARIES})
 
-target_link_libraries(
-        tableimg
-        ${OPENSSL_LIBRARIES})
+#target_link_libraries(
+#        tableimg
+#        ${OPENSSL_LIBRARIES})
 
 target_link_libraries(
         dbstdio

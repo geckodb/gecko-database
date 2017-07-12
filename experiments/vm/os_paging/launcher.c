@@ -5,9 +5,9 @@
 #include <sys/statvfs.h>
 
 #include <unistd.h>
-#include <defs.h>
+#include <stdinc.h>
 #include <containers/dict.h>
-#include <containers/dictionaries/hash_table.h>
+#include <containers/dicts/hash_table.h>
 #include <containers/vector.h>
 
 char * exec_cmd(const char *cmd) {

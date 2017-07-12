@@ -1,10 +1,10 @@
 
 #include <stddef.h>
 #include <stdlib.h>
-#include <defs.h>
+#include <stdinc.h>
 #include <time.h>
 #include <containers/dict.h>
-#include <containers/dictionaries/hash_table.h>
+#include <containers/dicts/hash_table.h>
 
 typedef struct test_data_t {
     size_t a, b, c;

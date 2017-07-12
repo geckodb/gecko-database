@@ -1,10 +1,10 @@
 
 #include <stddef.h>
 #include <stdlib.h>
-#include <defs.h>
+#include <stdinc.h>
 #include <time.h>
 #include <containers/vector.h>
-#include <containers/dictionaries/hash_table.h>
+#include <containers/dicts/hash_table.h>
 
 const size_t SIZEOF_KEY = 100;
 const size_t NUM_SLOTS = 10000;
