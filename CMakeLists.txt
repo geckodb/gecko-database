@@ -125,6 +125,10 @@ add_executable(
         ${SOURCE_FILES})
 
 target_link_libraries(
+        expr
+        ${OPENSSL_LIBRARIES})
+
+target_link_libraries(
         gs
         ${OPENSSL_LIBRARIES})
 
