@@ -112,9 +112,9 @@ target_link_libraries(
 #        exp_os_paging
 #        ${OPENSSL_LIBRARIES})
 
-#add_executable(
-#        tpch-convert utils/tpch_convert/launcher.c
-#        ${SOURCE_FILES})
+add_executable(
+        tpch-convert utils/tpch_convert/launcher.c
+        ${SOURCE_FILES})
 
 #add_executable(
 #        tableimg utils/tableimg/launcher.c
@@ -144,9 +144,9 @@ target_link_libraries(
         gs
         ${OPENSSL_LIBRARIES})
 
-#target_link_libraries(
-#        tpch-convert
-#        ${OPENSSL_LIBRARIES})
+target_link_libraries(
+        tpch-convert
+        ${OPENSSL_LIBRARIES})
 
 #target_link_libraries(
 #        tableimg

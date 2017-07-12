@@ -1,6 +1,6 @@
 #include <field.h>
 
-field_t * gs_field_next(field_t *field)
+bool gs_field_next(field_t *field)
 {
     assert (field);
     return field->_next(field);
@@ -16,6 +16,12 @@ void gs_field_update(field_t *field, const void *data)
 {
     assert (field);
     return field->_update(field, data);
+}
+
+bool gs_field_write(field_t *field, const void *data)
+{
+    gs_field_update(field, data);
+    return gs_field_next(field);
 }
 
 void gs_field_set_null(field_t *field)

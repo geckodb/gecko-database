@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <tableimg.h>
+#include <field.h>
 
 #define MAX_LINE_LEN                 2048
 #define ALL_LINES_VECTOR_INIT_CAP   10000
@@ -436,7 +437,7 @@ int main() {
            "A table image file is an easy to use serialization tuplet_format that supports NSM and DSM physical layouts.\n\n"
            "For details on the binary tuplet_format, take a look at the source of tpch convert (/utils/tpch-convert/laucher.c)");
 
-    serialization_config_t config = {
+ /*   serialization_config_t config = {
         .dest_file = "bench/olap/tpch/database/customer.timg",
         .format    = TF_DSM
     };
@@ -451,41 +452,42 @@ int main() {
                   free_customer_tuple_t,
                   serialize_customer_table);
     // bench/olap/tpch/database
-
+*/
 
     const size_t NUM_TUPLES = 4;
 
     schema_t *schema = gs_schema_create();
 
-    ATTR_ID attr_1 = gs_attr_create_uint64 ("My Attribute",       schema);
-    ATTR_ID attr_2 = gs_attr_create_string("My Attribute 2", 42, schema);
-    ATTR_ID attr_3 = gs_attr_create_bool  ("My Attribute Bool",  schema);
+    gs_attr_create_uint64 ("My Attribute",       schema);
+    gs_attr_create_string("My Attribute 2", 42, schema);
+    gs_attr_create_bool  ("My Attribute Bool",  schema);
 
-    void *data = gs_fragment_alloc(schema, NUM_TUPLES);
+    fragment_t *fragment = gs_fragment_alloc(schema, NUM_TUPLES, TF_NSM);
+    tuplet_t   *tuplet   = gs_fragment_insert(fragment, NUM_TUPLES);
+    field_t    *field    = gs_field_open(tuplet);
 
-    void *cont = NULL;
     uint64_t int_value;
     char *str_value;
     bool bol_value;
 
-    int_value = 1;                cont = gs_update_uint64(data, schema, attr_1, &int_value);
-    str_value = "Hello\n";        cont = gs_update_string(cont, schema, attr_2, str_value);
-    bol_value = true;             cont = gs_update_bool  (cont, schema, attr_3, &bol_value);
+    int_value = 1;          gs_field_write(field, &int_value);
+    str_value = "Hello\n";  gs_field_write(field, str_value);
+    bol_value = true;       gs_field_write(field, &bol_value);
 
-    int_value = 2;                cont = gs_update_uint64(data, schema, attr_1, &int_value);
-    str_value = "World\n";        cont = gs_update_string(cont, schema, attr_2, str_value);
-    bol_value = true;            cont = gs_update_bool  (cont, schema, attr_3, &bol_value);
+    int_value = 2;          gs_field_write(field, &int_value);
+    str_value = "World\n";  gs_field_write(field, str_value);
+    bol_value = true;       gs_field_write(field, &bol_value);
 
-    int_value = 3;                cont = gs_update_uint64(data, schema, attr_1, &int_value);
-    str_value = "Hi\n";           cont = gs_update_string(cont, schema, attr_2, str_value);
-    bol_value = true;             cont = gs_update_bool  (cont, schema, attr_3, &bol_value);
+    int_value = 3;          gs_field_write(field, &int_value);
+    str_value = "Hi\n";     gs_field_write(field, str_value);
+    bol_value = true;       gs_field_write(field, &bol_value);
 
-    int_value = 42;                cont = gs_update_uint64(data, schema, attr_1, &int_value);
-    str_value = "There\n";        cont = gs_update_string(cont, schema, attr_2, str_value);
-    bol_value = true;            cont = gs_update_bool  (cont, schema, attr_3, &bol_value);
+    int_value = 42;         gs_field_write(field, &int_value);
+    str_value = "There\n";  gs_field_write(field, str_value);
+    bol_value = true;       gs_field_write(field, &bol_value);
 
-    FILE *file_ptr = fopen("/Users/marcus/temp/demo.timg", "w");
-    tableimg_fwrite(file_ptr,
+  //  FILE *file_ptr = fopen("/Users/marcus/temp/demo.timg", "w");
+   /* tableimg_fwrite(file_ptr,
                     TIMG_VER_1,
                     "My Demo Database",
                     "My Table Name",
@@ -496,7 +498,7 @@ int main() {
                     NUM_TUPLES,
                     TF_NSM,
                     TF_NSM
-    );
+    );*/
 
     return EXIT_SUCCESS;
 }

@@ -19,12 +19,14 @@ static inline void this_tuplet_delete(tuplet_t *self);
 static inline void this_tuplet_close(tuplet_t *self);
 static inline bool this_tuplet_is_null(tuplet_t *self);
 
-static inline field_t *this_field_next(field_t *self);
+static inline bool this_field_next(field_t *self);
 static inline const void *this_field_read(field_t *self);
 static inline void this_field_update(field_t *self, const void *data);
 static inline void this_field_set_null(field_t *self);
 static inline bool this_field_is_null(field_t *self);
 static inline void this_field_close(field_t *self);
+
+static inline void field_set_values(field_t *field, attr_id_t attr_id, tuplet_t *tuplet, void *attr_base);
 
 fragment_t *gs_fragment_nsm_alloc(schema_t *schema, size_t tuplet_capacity)
 {
@@ -109,6 +111,12 @@ static inline tuplet_t *this_tuplet_next(tuplet_t *self)
     }
 }
 
+static inline void field_set_values(field_t *field, attr_id_t attr_id, tuplet_t *tuplet, void *attr_base) {
+    field->attr_id = attr_id;
+    field->tuplet = tuplet;
+    field->attr_base = attr_base;
+}
+
 static inline field_t *this_tuplet_open(tuplet_t *self)
 {
     assert (self);
@@ -117,9 +125,6 @@ static inline field_t *this_tuplet_open(tuplet_t *self)
 
     field_t *result = require_good_malloc(sizeof(field_t));
     *result = (field_t) {
-        .attr_id = 0,
-        .tuplet = self,
-        .field = self->attr_base,
         ._next = this_field_next,
         ._read = this_field_read,
         ._update = this_field_update,
@@ -127,6 +132,7 @@ static inline field_t *this_tuplet_open(tuplet_t *self)
         ._is_null = this_field_is_null,
         ._close = this_field_close
     };
+    field_set_values(result, 0, self, self->attr_base);
     return result;
 }
 
@@ -167,34 +173,37 @@ static inline bool this_tuplet_is_null(tuplet_t *self)
 
 // - F I E L D   I M P L E M E N T A T I O N ---------------------------------------------------------------------------
 
-static inline field_t *this_field_next(field_t *self)
+static inline bool this_field_next(field_t *self)
 {
     assert (self);
-    field_t *result = NULL;
     const attr_id_t next_attr_id = self->attr_id + 1;
     if (next_attr_id < self->tuplet->fragment->schema->attr->num_elements) {
         size_t skip_size = gs_field_size(self);
-        self->field += skip_size;
+        self->attr_base += skip_size;
         self->attr_id = next_attr_id;
-        result = self;
+        return true;
     } else {
         tuplet_t *tuplet = gs_tuplet_next(self->tuplet);
-        free (self);
-        result = (tuplet != NULL ? gs_field_open(tuplet) : NULL);
+        if (tuplet != NULL) {
+            field_set_values(self, 0, tuplet, tuplet->attr_base);
+            return true;
+        } else {
+            gs_field_close(self);
+            return false;
+        }
     }
-    return result;
 }
 
 static inline const void *this_field_read(field_t *self)
 {
     assert (self);
-    return self->field;
+    return self->attr_base;
 }
 
 static inline void this_field_update(field_t *self, const void *data)
 {
     assert (self && data);
-    memcpy(self->field, data, gs_field_size(self));
+    memcpy(self->attr_base, data, gs_field_size(self));
 }
 
 static inline void this_field_set_null(field_t *self)

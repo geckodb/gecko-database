@@ -20,7 +20,7 @@ typedef struct tuplet_t {
     /* operations */
     struct tuplet_t *(*_next)(struct tuplet_t *self); /* seeks to the next tuplet inside this fragment */
     void (*_close)(struct tuplet_t *self); /* frees resources of this tuplet */
-    struct field_t *(*_open)(struct tuplet_t *self); /*<! access the field data of this tuplet */
+    struct field_t *(*_open)(struct tuplet_t *self); /*<! access the attr_base data of this tuplet */
     void (*_update)(struct tuplet_t *self, const void *data); /*<! updates all fields of this tuplet and moves to next */
     void (*_set_null)(struct tuplet_t *self); /*<! updates all fields of this tuplet to NULL, and moves to next */
     void (*_delete)(struct tuplet_t *self); /* request to delete this tuplet from fragment */
