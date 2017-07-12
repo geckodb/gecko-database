@@ -830,6 +830,54 @@ frags/frag_nsm.c.s:
 	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/frags/frag_nsm.c.s
 .PHONY : frags/frag_nsm.c.s
 
+gridstore.o: gridstore.c.o
+
+.PHONY : gridstore.o
+
+# target to build an object file
+gridstore.c.o:
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/gridstore.c.o
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/gridstore.c.o
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/gridstore.c.o
+	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/gridstore.c.o
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/gridstore.c.o
+	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/gridstore.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/gridstore.c.o
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/gridstore.c.o
+.PHONY : gridstore.c.o
+
+gridstore.i: gridstore.c.i
+
+.PHONY : gridstore.i
+
+# target to preprocess a source file
+gridstore.c.i:
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/gridstore.c.i
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/gridstore.c.i
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/gridstore.c.i
+	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/gridstore.c.i
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/gridstore.c.i
+	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/gridstore.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/gridstore.c.i
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/gridstore.c.i
+.PHONY : gridstore.c.i
+
+gridstore.s: gridstore.c.s
+
+.PHONY : gridstore.s
+
+# target to generate assembly for a file
+gridstore.c.s:
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/gridstore.c.s
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/gridstore.c.s
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/gridstore.c.s
+	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/gridstore.c.s
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/gridstore.c.s
+	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/gridstore.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/gridstore.c.s
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/gridstore.c.s
+.PHONY : gridstore.c.s
+
 hash.o: hash.c.o
 
 .PHONY : hash.o
@@ -1507,6 +1555,9 @@ help:
 	@echo "... frags/frag_nsm.o"
 	@echo "... frags/frag_nsm.i"
 	@echo "... frags/frag_nsm.s"
+	@echo "... gridstore.o"
+	@echo "... gridstore.i"
+	@echo "... gridstore.s"
 	@echo "... hash.o"
 	@echo "... hash.i"
 	@echo "... hash.s"

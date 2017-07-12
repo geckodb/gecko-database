@@ -71,7 +71,7 @@ vector_t *vector_cpy(vector_t *proto)
     return result;
 }
 
-bool vector_free(vector_t *vec)
+bool vector_free(struct vector_t *vec)
 {
     bool non_null = require_non_null(vec);
     if (non_null) {

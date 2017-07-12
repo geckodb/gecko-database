@@ -35,7 +35,7 @@ typedef enum {
     auto_resize = 1 << 1,
 } vector_flags;
 
-typedef struct {
+typedef struct vector_t {
     size_t sizeof_element, num_elements, element_capacity;
     vector_flags flags;
     float grow_factor;
@@ -73,7 +73,7 @@ vector_cpy(
 
 bool
 vector_free(
-        vector_t *vec
+        struct vector_t *vec
 );
 
 bool

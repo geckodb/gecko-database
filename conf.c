@@ -1,3 +1,4 @@
+#include <containers/dict.h>
 #include <containers/dicts/hash_table.h>
 
 #define BADCWD          "Unable to get working directory (file name might exceed limit of %d)"
@@ -146,8 +147,7 @@ load_config_file(
     free (config_file);
 }
 
-void
-conf_load()
+dict_t *conf_load()
 {
     dict_t *env = hash_table_create_ex(&(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen},
                                        sizeof(char *), sizeof(char *), NUM_INIT_ENV_VARS, NUM_INIT_ENV_VARS, 1.7f, 0.75f,
@@ -174,7 +174,7 @@ conf_load()
         update_dir(env, &soft_link_config, CONF_VAR_MYIMDB_ETC, "etc_path", etc_path);
         update_dir(env, &soft_link_config, CONF_VAR_MYIMDB_SWAP, "swap_path", swap_path);
 
-        pref_free(&soft_link_config);
+       // pref_free(&soft_link_config); // TODO: freeing up pref_free causes freeing up unallocated pointer
     }
 
     free (bin_path);
@@ -195,9 +195,12 @@ conf_load()
     printf("%s: %s\n", CONF_SETTING_SWAP_BUFFER_PAGE_HUGE_MSPACE, pref_get_str(&swapbuf_config, CONF_SETTING_SWAP_BUFFER_PAGE_HUGE_MSPACE, "huge"));
     printf("%s: %s\n", CONF_SETTING_SWAP_BUFFER_MMAP_SWAP_DIR,    pref_get_str(&swapbuf_config, CONF_SETTING_SWAP_BUFFER_MMAP_SWAP_DIR, "a dir"));
 
+    return env;
+}
 
-  //  printf("working dir: %s\n", dir);
-    exit(0);
+void conf_free(struct dict_t * conf)
+{
+    hash_table_free(conf);
 }
 
 const char *
@@ -217,10 +220,4 @@ conf_get_size_t(
 ) {
     WARN_IF((swapbuf_config.dict == NULL), NOCONFIG, settings_key);
     pref_get_size_t(out, &swapbuf_config, settings_key, &default_value);
-}
-
-void
-conf_free()
-{
-
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdinc.h>
+#include <containers/dict.h>
 
 #define NUM_INIT_ENV_VARS       10
 
@@ -33,8 +34,8 @@
 #define CONF_SETTING_SWAP_BUFFER_PAGE_HUGE_MSPACE   "swap_buffer.page.huge_mspace"
 #define CONF_SETTING_SWAP_BUFFER_MMAP_SWAP_DIR      "swap_buffer.mmap.swap_dir"
 
-void
-conf_load();
+struct dict_t *conf_load();
+void conf_free(struct dict_t * conf);
 
 const char *
 conf_get_str(
@@ -49,5 +50,3 @@ conf_get_size_t(
         size_t default_value
 );
 
-void
-conf_free();

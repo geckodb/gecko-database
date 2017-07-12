@@ -130,7 +130,7 @@ typedef struct {
     bool (*equals)(const void *key_lhs, const void *key_rhs);
     void (*cleanup)(void *key, void *value);
     bool key_is_str;
-    vector_t *keyset;
+    struct vector_t *keyset;
 } hash_table_extra_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -140,9 +140,9 @@ typedef struct {
 void this_clear(struct dict_t *self);
 bool this_empty(const struct dict_t *self);
 bool this_contains_key(const struct dict_t *self, const void *key);
-const vector_t *this_keyset(const struct dict_t *self);
+const struct vector_t *this_keyset(const struct dict_t *self);
 const void *this_get(const struct dict_t *self, const void *key);
-vector_t *this_gets(const struct dict_t *self, size_t num_keys, const void *keys);
+struct vector_t *this_gets(const struct dict_t *self, size_t num_keys, const void *keys);
 bool this_remove(struct dict_t *self, size_t num_keys, const void *keys);
 void this_put(struct dict_t *self, const void *key, const void *value);
 void this_puts(struct dict_t *self, size_t num_elements, const void *keys, const void *values);
@@ -217,7 +217,7 @@ dict_t *hash_table_create_ex(const hash_function_t *hash_function, size_t key_si
         .equals = equals,
         .cleanup = cleanup,
         .key_is_str = key_is_str,
-        .keyset = vector_create(key_size, approx_num_keys)
+        .keyset = (struct vector_t*) vector_create(key_size, approx_num_keys)
     };
 
     if (key_is_str) {
@@ -371,7 +371,7 @@ bool this_contains_key(const struct dict_t *self, const void *key)
     return (this_get(self, key) != NULL);
 }
 
-const vector_t *this_keyset(const struct dict_t *self)
+const struct vector_t *this_keyset(const struct dict_t *self)
 {
     require_instanceof_this(self);
     hash_table_extra_t *extra = (hash_table_extra_t *) self->extra;
@@ -387,7 +387,7 @@ const void *this_get(const struct dict_t *self, const void *key)
     return result;
 }
 
-vector_t *this_gets(const struct dict_t *self, size_t num_keys, const void *keys)
+struct vector_t *this_gets(const struct dict_t *self, size_t num_keys, const void *keys)
 {
     require_instanceof_this(self);
     require_nonnull(keys);

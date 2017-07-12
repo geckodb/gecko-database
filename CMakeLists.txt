@@ -11,6 +11,9 @@ message("OPENSSL_INCLUDE_DIR: ${OPENSSL_INCLUDE_DIR}")
 message("OPENSSL_LIBRARIES: ${OPENSSL_LIBRARIES}")
 message("OPENSSL_ROOT_DIR: ${OPENSSL_ROOT_DIR}")
 
+find_package(Curses REQUIRED)
+include_directories(${CURSES_INCLUDE_DIR})
+
 find_package(Doxygen)
 option(BUILD_DOCUMENTATION "API documentation requires Doxygen" ${DOXYGEN_FOUND})
 
@@ -50,6 +53,7 @@ set(SOURCE_FILES
         include/tuplet.h
         include/operators/scan.h
         include/shell.h
+        include/gridstore.h
 
         async.c
         attr.c
@@ -72,11 +76,14 @@ set(SOURCE_FILES
         tuplet.c
         operators/scan.c
         shell.c
+        gridstore.c
         )
 
 add_executable(
         gs main.c
         ${SOURCE_FILES})
+
+target_link_libraries(gs ${CURSES_LIBRARIES})
 
 add_executable(
         sample_lin_hash

@@ -523,6 +523,16 @@
 			<Option target="sample_lin_hash"/>
 			<Option target="gs"/>
 		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/gridstore.c">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
+			<Option target="exp_os_paging"/>
+			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
+			<Option target="sample_lin_hash"/>
+			<Option target="gs"/>
+		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/hash.c">
 			<Option target="expr"/>
 			<Option target="dbstdio"/>
@@ -654,6 +664,16 @@
 			<Option target="gs"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/frags/frag_nsm.h">
+			<Option target="expr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
+			<Option target="exp_os_paging"/>
+			<Option target="sample_linuxwc"/>
+			<Option target="tableimg"/>
+			<Option target="sample_lin_hash"/>
+			<Option target="gs"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/include/gridstore.h">
 			<Option target="expr"/>
 			<Option target="dbstdio"/>
 			<Option target="tpch-convert"/>
