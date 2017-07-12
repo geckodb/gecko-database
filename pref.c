@@ -26,7 +26,7 @@ pref_load(
     require_non_null(pref);
     require_non_null(file);
 
-    panic_if((access(file, F_OK ) == -1), NOSUCHFILE, file);
+   // panic_if((access(file, F_OK ) == -1), NOSUCHFILE, file); // TODO: Hack
 
     pref->last_read = time(NULL);
     pref->dict = hash_table_create_ex(&(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen},

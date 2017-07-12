@@ -3,7 +3,7 @@
 #include <pref.h>
 #include <conf.h>
 
-#define TUPLE_PER_BLOCK     80
+#define TUPLE_PER_BLOCK     30000
 
 typedef struct {
     size_t         a;
@@ -32,7 +32,7 @@ int main() {
 
     for (int i = 0; i < 1000; i++) {
         anti_buf_t *buffer = buf_create();
-        cursor_t *cursor = buf_alloc(buffer, TUPLE_PER_BLOCK * sizeof(hardcoded_tuple_t), 10,
+        cursor_t *cursor = buf_alloc(buffer, TUPLE_PER_BLOCK * sizeof(hardcoded_tuple_t), 30,
                                      positioning_first_nomerge);
         buf_open(cursor);
         while (buf_next(cursor)) {
@@ -46,6 +46,10 @@ int main() {
             }
         }
         buf_close(cursor);
+
+
+        buf_dump(stdout, buffer, false);
+        exit(1);
 
         pref_t pref;
         pref_load(&pref, "/Users/marcus/temp/test.conf", NULL, NULL);
@@ -77,6 +81,8 @@ int main() {
         }
         buf_close(cursor);
         buf_release(cursor);
+
+
 
 //        cursor_t *  cursor2 = buf_alloc(buffer, HOTSTORE_SIZELIMIT, 10,
 //                                       positioning_first_nomerge);

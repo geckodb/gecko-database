@@ -828,7 +828,12 @@ buf_dump(
     anti_buf_t *   buf,
     bool           hex_view)
 {
-    page_dump(out, buf, NULL, hex_view); // TODO: for all pages...
+    for(const void *it = list_begin(buf->page_anticache.hot_store_page_ids); it != NULL; it = list_next(it)) {
+        const page_id_t page_id = *(const page_id_t *) it;
+        const page_t *page = *(const page_t **) dict_get(buf->page_anticache.hot_store, &page_id);
+
+        page_dump(out, buf, page, hex_view);
+    }
 }
 
 bool buf_free(
@@ -2245,8 +2250,8 @@ buf_init(
             sizeof(page_id_t), sizeof(void *), HOTSTORE_INITCAP,
             HOTSTORE_GROW_FACTOR, HOTSTORE_MAX_FILL_FAC);
     buf->config = (buf_config_t) {
-            .free_space_reg_capacity = 10000,
-            .lane_reg_capacity = 10000
+            .free_space_reg_capacity = 100,
+            .lane_reg_capacity = 100
     };
     conf_get_size_t(&buf->config.hotstore_size_limit,   CONF_SETTING_SWAP_BUFFER_HOTSTORE_LIM,  8589934592);
     conf_get_size_t(&buf->config.ram_page_size_default, CONF_SETTING_SWAP_BUFFER_PAGE_SIZE_DEF,  858993459);

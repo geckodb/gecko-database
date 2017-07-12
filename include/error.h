@@ -49,9 +49,9 @@ void trace_print(FILE *file);
 
 #define warn(msg, args...)                                                                                             \
     {                                                                                                                  \
-        begin_write("WARNING");                                                                                        \
+        /*begin_write("WARNING");                                                                                        \
         fprintf(stderr, msg, args);                                                                                    \
-        end_write();                                                                                                   \
+        end_write();  */                                                                                                 \
     }
 
 #define panic_if(expr, msg, args...)                                                                                   \

@@ -272,3 +272,4 @@ buf_dump(
         anti_buf_t *  buf,
         bool          hex_view
 );
+
