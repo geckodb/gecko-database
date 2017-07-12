@@ -56,17 +56,6 @@ CMAKE_BINARY_DIR = /Users/marcus/git/myimdb
 #=============================================================================
 # Targets provided globally by CMake.
 
-# Special rule for the target rebuild_cache
-rebuild_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/Applications/CLion.app/Contents/bin/cmake/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
-.PHONY : rebuild_cache
-
-# Special rule for the target rebuild_cache
-rebuild_cache/fast: rebuild_cache
-
-.PHONY : rebuild_cache/fast
-
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
@@ -77,6 +66,17 @@ edit_cache:
 edit_cache/fast: edit_cache
 
 .PHONY : edit_cache/fast
+
+# Special rule for the target rebuild_cache
+rebuild_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
+	/Applications/CLion.app/Contents/bin/cmake/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+.PHONY : rebuild_cache
+
+# Special rule for the target rebuild_cache
+rebuild_cache/fast: rebuild_cache
+
+.PHONY : rebuild_cache/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -135,6 +135,45 @@ doc: cmake_check_build_system
 doc/fast:
 	$(MAKE) -f CMakeFiles/doc.dir/build.make CMakeFiles/doc.dir/build
 .PHONY : doc/fast
+
+#=============================================================================
+# Target rules for targets named buffmgr
+
+# Build rule for target.
+buffmgr: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 buffmgr
+.PHONY : buffmgr
+
+# fast build rule for target.
+buffmgr/fast:
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/build
+.PHONY : buffmgr/fast
+
+#=============================================================================
+# Target rules for targets named gs
+
+# Build rule for target.
+gs: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 gs
+.PHONY : gs
+
+# fast build rule for target.
+gs/fast:
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/build
+.PHONY : gs/fast
+
+#=============================================================================
+# Target rules for targets named sample_lin_hash
+
+# Build rule for target.
+sample_lin_hash: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 sample_lin_hash
+.PHONY : sample_lin_hash
+
+# fast build rule for target.
+sample_lin_hash/fast:
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/build
+.PHONY : sample_lin_hash/fast
 
 #=============================================================================
 # Target rules for targets named dbstdio
@@ -201,32 +240,6 @@ tableimg/fast:
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/build
 .PHONY : tableimg/fast
 
-#=============================================================================
-# Target rules for targets named sample_lin_hash
-
-# Build rule for target.
-sample_lin_hash: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 sample_lin_hash
-.PHONY : sample_lin_hash
-
-# fast build rule for target.
-sample_lin_hash/fast:
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/build
-.PHONY : sample_lin_hash/fast
-
-#=============================================================================
-# Target rules for targets named gs
-
-# Build rule for target.
-gs: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 gs
-.PHONY : gs
-
-# fast build rule for target.
-gs/fast:
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/build
-.PHONY : gs/fast
-
 async.o: async.c.o
 
 .PHONY : async.o
@@ -234,13 +247,14 @@ async.o: async.c.o
 # target to build an object file
 async.c.o:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/async.c.o
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/async.c.o
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/async.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/async.c.o
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/async.c.o
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/async.c.o
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/async.c.o
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/async.c.o
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/async.c.o
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/async.c.o
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/async.c.o
 .PHONY : async.c.o
 
 async.i: async.c.i
@@ -250,13 +264,14 @@ async.i: async.c.i
 # target to preprocess a source file
 async.c.i:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/async.c.i
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/async.c.i
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/async.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/async.c.i
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/async.c.i
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/async.c.i
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/async.c.i
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/async.c.i
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/async.c.i
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/async.c.i
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/async.c.i
 .PHONY : async.c.i
 
 async.s: async.c.s
@@ -266,13 +281,14 @@ async.s: async.c.s
 # target to generate assembly for a file
 async.c.s:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/async.c.s
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/async.c.s
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/async.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/async.c.s
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/async.c.s
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/async.c.s
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/async.c.s
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/async.c.s
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/async.c.s
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/async.c.s
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/async.c.s
 .PHONY : async.c.s
 
 attr.o: attr.c.o
@@ -282,13 +298,14 @@ attr.o: attr.c.o
 # target to build an object file
 attr.c.o:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/attr.c.o
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/attr.c.o
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/attr.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/attr.c.o
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/attr.c.o
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/attr.c.o
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/attr.c.o
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/attr.c.o
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/attr.c.o
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/attr.c.o
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/attr.c.o
 .PHONY : attr.c.o
 
 attr.i: attr.c.i
@@ -298,13 +315,14 @@ attr.i: attr.c.i
 # target to preprocess a source file
 attr.c.i:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/attr.c.i
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/attr.c.i
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/attr.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/attr.c.i
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/attr.c.i
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/attr.c.i
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/attr.c.i
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/attr.c.i
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/attr.c.i
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/attr.c.i
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/attr.c.i
 .PHONY : attr.c.i
 
 attr.s: attr.c.s
@@ -314,13 +332,14 @@ attr.s: attr.c.s
 # target to generate assembly for a file
 attr.c.s:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/attr.c.s
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/attr.c.s
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/attr.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/attr.c.s
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/attr.c.s
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/attr.c.s
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/attr.c.s
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/attr.c.s
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/attr.c.s
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/attr.c.s
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/attr.c.s
 .PHONY : attr.c.s
 
 conf.o: conf.c.o
@@ -330,13 +349,14 @@ conf.o: conf.c.o
 # target to build an object file
 conf.c.o:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/conf.c.o
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/conf.c.o
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/conf.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/conf.c.o
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/conf.c.o
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/conf.c.o
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/conf.c.o
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/conf.c.o
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/conf.c.o
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/conf.c.o
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/conf.c.o
 .PHONY : conf.c.o
 
 conf.i: conf.c.i
@@ -346,13 +366,14 @@ conf.i: conf.c.i
 # target to preprocess a source file
 conf.c.i:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/conf.c.i
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/conf.c.i
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/conf.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/conf.c.i
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/conf.c.i
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/conf.c.i
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/conf.c.i
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/conf.c.i
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/conf.c.i
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/conf.c.i
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/conf.c.i
 .PHONY : conf.c.i
 
 conf.s: conf.c.s
@@ -362,13 +383,14 @@ conf.s: conf.c.s
 # target to generate assembly for a file
 conf.c.s:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/conf.c.s
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/conf.c.s
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/conf.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/conf.c.s
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/conf.c.s
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/conf.c.s
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/conf.c.s
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/conf.c.s
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/conf.c.s
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/conf.c.s
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/conf.c.s
 .PHONY : conf.c.s
 
 containers/dict.o: containers/dict.c.o
@@ -378,13 +400,14 @@ containers/dict.o: containers/dict.c.o
 # target to build an object file
 containers/dict.c.o:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/containers/dict.c.o
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/containers/dict.c.o
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/containers/dict.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/dict.c.o
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/containers/dict.c.o
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/containers/dict.c.o
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/containers/dict.c.o
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/containers/dict.c.o
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/containers/dict.c.o
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/dict.c.o
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/containers/dict.c.o
 .PHONY : containers/dict.c.o
 
 containers/dict.i: containers/dict.c.i
@@ -394,13 +417,14 @@ containers/dict.i: containers/dict.c.i
 # target to preprocess a source file
 containers/dict.c.i:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/containers/dict.c.i
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/containers/dict.c.i
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/containers/dict.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/dict.c.i
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/containers/dict.c.i
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/containers/dict.c.i
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/containers/dict.c.i
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/containers/dict.c.i
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/containers/dict.c.i
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/dict.c.i
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/containers/dict.c.i
 .PHONY : containers/dict.c.i
 
 containers/dict.s: containers/dict.c.s
@@ -410,13 +434,14 @@ containers/dict.s: containers/dict.c.s
 # target to generate assembly for a file
 containers/dict.c.s:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/containers/dict.c.s
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/containers/dict.c.s
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/containers/dict.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/dict.c.s
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/containers/dict.c.s
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/containers/dict.c.s
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/containers/dict.c.s
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/containers/dict.c.s
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/containers/dict.c.s
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/dict.c.s
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/containers/dict.c.s
 .PHONY : containers/dict.c.s
 
 containers/dicts/hash_table.o: containers/dicts/hash_table.c.o
@@ -426,13 +451,14 @@ containers/dicts/hash_table.o: containers/dicts/hash_table.c.o
 # target to build an object file
 containers/dicts/hash_table.c.o:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/containers/dicts/hash_table.c.o
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/containers/dicts/hash_table.c.o
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/containers/dicts/hash_table.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/dicts/hash_table.c.o
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/containers/dicts/hash_table.c.o
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/containers/dicts/hash_table.c.o
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/containers/dicts/hash_table.c.o
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/containers/dicts/hash_table.c.o
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/containers/dicts/hash_table.c.o
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/dicts/hash_table.c.o
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/containers/dicts/hash_table.c.o
 .PHONY : containers/dicts/hash_table.c.o
 
 containers/dicts/hash_table.i: containers/dicts/hash_table.c.i
@@ -442,13 +468,14 @@ containers/dicts/hash_table.i: containers/dicts/hash_table.c.i
 # target to preprocess a source file
 containers/dicts/hash_table.c.i:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/containers/dicts/hash_table.c.i
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/containers/dicts/hash_table.c.i
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/containers/dicts/hash_table.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/dicts/hash_table.c.i
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/containers/dicts/hash_table.c.i
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/containers/dicts/hash_table.c.i
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/containers/dicts/hash_table.c.i
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/containers/dicts/hash_table.c.i
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/containers/dicts/hash_table.c.i
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/dicts/hash_table.c.i
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/containers/dicts/hash_table.c.i
 .PHONY : containers/dicts/hash_table.c.i
 
 containers/dicts/hash_table.s: containers/dicts/hash_table.c.s
@@ -458,13 +485,14 @@ containers/dicts/hash_table.s: containers/dicts/hash_table.c.s
 # target to generate assembly for a file
 containers/dicts/hash_table.c.s:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/containers/dicts/hash_table.c.s
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/containers/dicts/hash_table.c.s
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/containers/dicts/hash_table.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/dicts/hash_table.c.s
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/containers/dicts/hash_table.c.s
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/containers/dicts/hash_table.c.s
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/containers/dicts/hash_table.c.s
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/containers/dicts/hash_table.c.s
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/containers/dicts/hash_table.c.s
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/dicts/hash_table.c.s
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/containers/dicts/hash_table.c.s
 .PHONY : containers/dicts/hash_table.c.s
 
 containers/list.o: containers/list.c.o
@@ -474,13 +502,14 @@ containers/list.o: containers/list.c.o
 # target to build an object file
 containers/list.c.o:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/containers/list.c.o
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/containers/list.c.o
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/containers/list.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/list.c.o
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/containers/list.c.o
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/containers/list.c.o
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/containers/list.c.o
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/containers/list.c.o
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/containers/list.c.o
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/list.c.o
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/containers/list.c.o
 .PHONY : containers/list.c.o
 
 containers/list.i: containers/list.c.i
@@ -490,13 +519,14 @@ containers/list.i: containers/list.c.i
 # target to preprocess a source file
 containers/list.c.i:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/containers/list.c.i
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/containers/list.c.i
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/containers/list.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/list.c.i
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/containers/list.c.i
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/containers/list.c.i
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/containers/list.c.i
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/containers/list.c.i
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/containers/list.c.i
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/list.c.i
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/containers/list.c.i
 .PHONY : containers/list.c.i
 
 containers/list.s: containers/list.c.s
@@ -506,13 +536,14 @@ containers/list.s: containers/list.c.s
 # target to generate assembly for a file
 containers/list.c.s:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/containers/list.c.s
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/containers/list.c.s
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/containers/list.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/list.c.s
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/containers/list.c.s
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/containers/list.c.s
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/containers/list.c.s
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/containers/list.c.s
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/containers/list.c.s
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/list.c.s
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/containers/list.c.s
 .PHONY : containers/list.c.s
 
 containers/vector.o: containers/vector.c.o
@@ -522,13 +553,14 @@ containers/vector.o: containers/vector.c.o
 # target to build an object file
 containers/vector.c.o:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/containers/vector.c.o
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/containers/vector.c.o
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/containers/vector.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/vector.c.o
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/containers/vector.c.o
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/containers/vector.c.o
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/containers/vector.c.o
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/containers/vector.c.o
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/containers/vector.c.o
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/vector.c.o
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/containers/vector.c.o
 .PHONY : containers/vector.c.o
 
 containers/vector.i: containers/vector.c.i
@@ -538,13 +570,14 @@ containers/vector.i: containers/vector.c.i
 # target to preprocess a source file
 containers/vector.c.i:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/containers/vector.c.i
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/containers/vector.c.i
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/containers/vector.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/vector.c.i
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/containers/vector.c.i
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/containers/vector.c.i
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/containers/vector.c.i
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/containers/vector.c.i
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/containers/vector.c.i
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/vector.c.i
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/containers/vector.c.i
 .PHONY : containers/vector.c.i
 
 containers/vector.s: containers/vector.c.s
@@ -554,13 +587,14 @@ containers/vector.s: containers/vector.c.s
 # target to generate assembly for a file
 containers/vector.c.s:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/containers/vector.c.s
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/containers/vector.c.s
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/containers/vector.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/vector.c.s
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/containers/vector.c.s
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/containers/vector.c.s
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/containers/vector.c.s
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/containers/vector.c.s
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/containers/vector.c.s
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/vector.c.s
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/containers/vector.c.s
 .PHONY : containers/vector.c.s
 
 error.o: error.c.o
@@ -570,13 +604,14 @@ error.o: error.c.o
 # target to build an object file
 error.c.o:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/error.c.o
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/error.c.o
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/error.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/error.c.o
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/error.c.o
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/error.c.o
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/error.c.o
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/error.c.o
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/error.c.o
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/error.c.o
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/error.c.o
 .PHONY : error.c.o
 
 error.i: error.c.i
@@ -586,13 +621,14 @@ error.i: error.c.i
 # target to preprocess a source file
 error.c.i:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/error.c.i
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/error.c.i
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/error.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/error.c.i
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/error.c.i
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/error.c.i
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/error.c.i
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/error.c.i
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/error.c.i
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/error.c.i
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/error.c.i
 .PHONY : error.c.i
 
 error.s: error.c.s
@@ -602,13 +638,14 @@ error.s: error.c.s
 # target to generate assembly for a file
 error.c.s:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/error.c.s
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/error.c.s
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/error.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/error.c.s
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/error.c.s
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/error.c.s
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/error.c.s
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/error.c.s
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/error.c.s
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/error.c.s
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/error.c.s
 .PHONY : error.c.s
 
 experiments/vm/os_paging/launcher.o: experiments/vm/os_paging/launcher.c.o
@@ -645,13 +682,14 @@ field.o: field.c.o
 # target to build an object file
 field.c.o:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/field.c.o
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/field.c.o
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/field.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/field.c.o
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/field.c.o
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/field.c.o
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/field.c.o
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/field.c.o
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/field.c.o
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/field.c.o
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/field.c.o
 .PHONY : field.c.o
 
 field.i: field.c.i
@@ -661,13 +699,14 @@ field.i: field.c.i
 # target to preprocess a source file
 field.c.i:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/field.c.i
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/field.c.i
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/field.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/field.c.i
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/field.c.i
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/field.c.i
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/field.c.i
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/field.c.i
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/field.c.i
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/field.c.i
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/field.c.i
 .PHONY : field.c.i
 
 field.s: field.c.s
@@ -677,13 +716,14 @@ field.s: field.c.s
 # target to generate assembly for a file
 field.c.s:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/field.c.s
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/field.c.s
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/field.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/field.c.s
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/field.c.s
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/field.c.s
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/field.c.s
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/field.c.s
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/field.c.s
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/field.c.s
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/field.c.s
 .PHONY : field.c.s
 
 frag.o: frag.c.o
@@ -693,13 +733,14 @@ frag.o: frag.c.o
 # target to build an object file
 frag.c.o:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/frag.c.o
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/frag.c.o
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/frag.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frag.c.o
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/frag.c.o
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/frag.c.o
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/frag.c.o
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/frag.c.o
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/frag.c.o
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frag.c.o
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/frag.c.o
 .PHONY : frag.c.o
 
 frag.i: frag.c.i
@@ -709,13 +750,14 @@ frag.i: frag.c.i
 # target to preprocess a source file
 frag.c.i:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/frag.c.i
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/frag.c.i
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/frag.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frag.c.i
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/frag.c.i
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/frag.c.i
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/frag.c.i
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/frag.c.i
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/frag.c.i
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frag.c.i
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/frag.c.i
 .PHONY : frag.c.i
 
 frag.s: frag.c.s
@@ -725,13 +767,14 @@ frag.s: frag.c.s
 # target to generate assembly for a file
 frag.c.s:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/frag.c.s
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/frag.c.s
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/frag.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frag.c.s
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/frag.c.s
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/frag.c.s
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/frag.c.s
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/frag.c.s
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/frag.c.s
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frag.c.s
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/frag.c.s
 .PHONY : frag.c.s
 
 frags/frag_dsm.o: frags/frag_dsm.c.o
@@ -741,13 +784,14 @@ frags/frag_dsm.o: frags/frag_dsm.c.o
 # target to build an object file
 frags/frag_dsm.c.o:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/frags/frag_dsm.c.o
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/frags/frag_dsm.c.o
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/frags/frag_dsm.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frags/frag_dsm.c.o
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/frags/frag_dsm.c.o
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/frags/frag_dsm.c.o
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/frags/frag_dsm.c.o
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/frags/frag_dsm.c.o
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/frags/frag_dsm.c.o
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frags/frag_dsm.c.o
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/frags/frag_dsm.c.o
 .PHONY : frags/frag_dsm.c.o
 
 frags/frag_dsm.i: frags/frag_dsm.c.i
@@ -757,13 +801,14 @@ frags/frag_dsm.i: frags/frag_dsm.c.i
 # target to preprocess a source file
 frags/frag_dsm.c.i:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/frags/frag_dsm.c.i
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/frags/frag_dsm.c.i
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/frags/frag_dsm.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frags/frag_dsm.c.i
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/frags/frag_dsm.c.i
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/frags/frag_dsm.c.i
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/frags/frag_dsm.c.i
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/frags/frag_dsm.c.i
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/frags/frag_dsm.c.i
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frags/frag_dsm.c.i
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/frags/frag_dsm.c.i
 .PHONY : frags/frag_dsm.c.i
 
 frags/frag_dsm.s: frags/frag_dsm.c.s
@@ -773,13 +818,14 @@ frags/frag_dsm.s: frags/frag_dsm.c.s
 # target to generate assembly for a file
 frags/frag_dsm.c.s:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/frags/frag_dsm.c.s
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/frags/frag_dsm.c.s
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/frags/frag_dsm.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frags/frag_dsm.c.s
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/frags/frag_dsm.c.s
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/frags/frag_dsm.c.s
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/frags/frag_dsm.c.s
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/frags/frag_dsm.c.s
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/frags/frag_dsm.c.s
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frags/frag_dsm.c.s
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/frags/frag_dsm.c.s
 .PHONY : frags/frag_dsm.c.s
 
 frags/frag_nsm.o: frags/frag_nsm.c.o
@@ -789,13 +835,14 @@ frags/frag_nsm.o: frags/frag_nsm.c.o
 # target to build an object file
 frags/frag_nsm.c.o:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/frags/frag_nsm.c.o
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/frags/frag_nsm.c.o
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/frags/frag_nsm.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frags/frag_nsm.c.o
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/frags/frag_nsm.c.o
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/frags/frag_nsm.c.o
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/frags/frag_nsm.c.o
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/frags/frag_nsm.c.o
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/frags/frag_nsm.c.o
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frags/frag_nsm.c.o
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/frags/frag_nsm.c.o
 .PHONY : frags/frag_nsm.c.o
 
 frags/frag_nsm.i: frags/frag_nsm.c.i
@@ -805,13 +852,14 @@ frags/frag_nsm.i: frags/frag_nsm.c.i
 # target to preprocess a source file
 frags/frag_nsm.c.i:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/frags/frag_nsm.c.i
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/frags/frag_nsm.c.i
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/frags/frag_nsm.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frags/frag_nsm.c.i
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/frags/frag_nsm.c.i
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/frags/frag_nsm.c.i
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/frags/frag_nsm.c.i
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/frags/frag_nsm.c.i
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/frags/frag_nsm.c.i
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frags/frag_nsm.c.i
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/frags/frag_nsm.c.i
 .PHONY : frags/frag_nsm.c.i
 
 frags/frag_nsm.s: frags/frag_nsm.c.s
@@ -821,13 +869,14 @@ frags/frag_nsm.s: frags/frag_nsm.c.s
 # target to generate assembly for a file
 frags/frag_nsm.c.s:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/frags/frag_nsm.c.s
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/frags/frag_nsm.c.s
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/frags/frag_nsm.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frags/frag_nsm.c.s
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/frags/frag_nsm.c.s
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/frags/frag_nsm.c.s
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/frags/frag_nsm.c.s
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/frags/frag_nsm.c.s
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/frags/frag_nsm.c.s
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frags/frag_nsm.c.s
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/frags/frag_nsm.c.s
 .PHONY : frags/frag_nsm.c.s
 
 gridstore.o: gridstore.c.o
@@ -837,13 +886,14 @@ gridstore.o: gridstore.c.o
 # target to build an object file
 gridstore.c.o:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/gridstore.c.o
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/gridstore.c.o
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/gridstore.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/gridstore.c.o
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/gridstore.c.o
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/gridstore.c.o
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/gridstore.c.o
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/gridstore.c.o
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/gridstore.c.o
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/gridstore.c.o
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/gridstore.c.o
 .PHONY : gridstore.c.o
 
 gridstore.i: gridstore.c.i
@@ -853,13 +903,14 @@ gridstore.i: gridstore.c.i
 # target to preprocess a source file
 gridstore.c.i:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/gridstore.c.i
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/gridstore.c.i
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/gridstore.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/gridstore.c.i
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/gridstore.c.i
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/gridstore.c.i
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/gridstore.c.i
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/gridstore.c.i
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/gridstore.c.i
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/gridstore.c.i
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/gridstore.c.i
 .PHONY : gridstore.c.i
 
 gridstore.s: gridstore.c.s
@@ -869,13 +920,14 @@ gridstore.s: gridstore.c.s
 # target to generate assembly for a file
 gridstore.c.s:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/gridstore.c.s
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/gridstore.c.s
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/gridstore.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/gridstore.c.s
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/gridstore.c.s
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/gridstore.c.s
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/gridstore.c.s
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/gridstore.c.s
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/gridstore.c.s
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/gridstore.c.s
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/gridstore.c.s
 .PHONY : gridstore.c.s
 
 hash.o: hash.c.o
@@ -885,13 +937,14 @@ hash.o: hash.c.o
 # target to build an object file
 hash.c.o:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/hash.c.o
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/hash.c.o
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/hash.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/hash.c.o
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/hash.c.o
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/hash.c.o
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/hash.c.o
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/hash.c.o
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/hash.c.o
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/hash.c.o
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/hash.c.o
 .PHONY : hash.c.o
 
 hash.i: hash.c.i
@@ -901,13 +954,14 @@ hash.i: hash.c.i
 # target to preprocess a source file
 hash.c.i:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/hash.c.i
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/hash.c.i
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/hash.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/hash.c.i
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/hash.c.i
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/hash.c.i
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/hash.c.i
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/hash.c.i
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/hash.c.i
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/hash.c.i
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/hash.c.i
 .PHONY : hash.c.i
 
 hash.s: hash.c.s
@@ -917,13 +971,14 @@ hash.s: hash.c.s
 # target to generate assembly for a file
 hash.c.s:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/hash.c.s
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/hash.c.s
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/hash.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/hash.c.s
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/hash.c.s
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/hash.c.s
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/hash.c.s
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/hash.c.s
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/hash.c.s
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/hash.c.s
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/hash.c.s
 .PHONY : hash.c.s
 
 main.o: main.c.o
@@ -960,13 +1015,14 @@ operators/scan.o: operators/scan.c.o
 # target to build an object file
 operators/scan.c.o:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/operators/scan.c.o
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/operators/scan.c.o
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/operators/scan.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/operators/scan.c.o
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/operators/scan.c.o
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/operators/scan.c.o
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/operators/scan.c.o
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/operators/scan.c.o
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/operators/scan.c.o
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/operators/scan.c.o
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/operators/scan.c.o
 .PHONY : operators/scan.c.o
 
 operators/scan.i: operators/scan.c.i
@@ -976,13 +1032,14 @@ operators/scan.i: operators/scan.c.i
 # target to preprocess a source file
 operators/scan.c.i:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/operators/scan.c.i
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/operators/scan.c.i
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/operators/scan.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/operators/scan.c.i
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/operators/scan.c.i
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/operators/scan.c.i
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/operators/scan.c.i
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/operators/scan.c.i
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/operators/scan.c.i
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/operators/scan.c.i
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/operators/scan.c.i
 .PHONY : operators/scan.c.i
 
 operators/scan.s: operators/scan.c.s
@@ -992,13 +1049,14 @@ operators/scan.s: operators/scan.c.s
 # target to generate assembly for a file
 operators/scan.c.s:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/operators/scan.c.s
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/operators/scan.c.s
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/operators/scan.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/operators/scan.c.s
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/operators/scan.c.s
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/operators/scan.c.s
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/operators/scan.c.s
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/operators/scan.c.s
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/operators/scan.c.s
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/operators/scan.c.s
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/operators/scan.c.s
 .PHONY : operators/scan.c.s
 
 pred.o: pred.c.o
@@ -1008,13 +1066,14 @@ pred.o: pred.c.o
 # target to build an object file
 pred.c.o:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/pred.c.o
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/pred.c.o
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/pred.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/pred.c.o
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/pred.c.o
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/pred.c.o
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/pred.c.o
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/pred.c.o
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/pred.c.o
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/pred.c.o
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/pred.c.o
 .PHONY : pred.c.o
 
 pred.i: pred.c.i
@@ -1024,13 +1083,14 @@ pred.i: pred.c.i
 # target to preprocess a source file
 pred.c.i:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/pred.c.i
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/pred.c.i
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/pred.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/pred.c.i
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/pred.c.i
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/pred.c.i
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/pred.c.i
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/pred.c.i
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/pred.c.i
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/pred.c.i
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/pred.c.i
 .PHONY : pred.c.i
 
 pred.s: pred.c.s
@@ -1040,13 +1100,14 @@ pred.s: pred.c.s
 # target to generate assembly for a file
 pred.c.s:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/pred.c.s
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/pred.c.s
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/pred.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/pred.c.s
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/pred.c.s
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/pred.c.s
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/pred.c.s
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/pred.c.s
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/pred.c.s
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/pred.c.s
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/pred.c.s
 .PHONY : pred.c.s
 
 pref.o: pref.c.o
@@ -1056,13 +1117,14 @@ pref.o: pref.c.o
 # target to build an object file
 pref.c.o:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/pref.c.o
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/pref.c.o
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/pref.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/pref.c.o
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/pref.c.o
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/pref.c.o
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/pref.c.o
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/pref.c.o
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/pref.c.o
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/pref.c.o
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/pref.c.o
 .PHONY : pref.c.o
 
 pref.i: pref.c.i
@@ -1072,13 +1134,14 @@ pref.i: pref.c.i
 # target to preprocess a source file
 pref.c.i:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/pref.c.i
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/pref.c.i
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/pref.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/pref.c.i
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/pref.c.i
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/pref.c.i
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/pref.c.i
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/pref.c.i
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/pref.c.i
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/pref.c.i
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/pref.c.i
 .PHONY : pref.c.i
 
 pref.s: pref.c.s
@@ -1088,13 +1151,14 @@ pref.s: pref.c.s
 # target to generate assembly for a file
 pref.c.s:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/pref.c.s
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/pref.c.s
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/pref.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/pref.c.s
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/pref.c.s
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/pref.c.s
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/pref.c.s
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/pref.c.s
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/pref.c.s
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/pref.c.s
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/pref.c.s
 .PHONY : pref.c.s
 
 require.o: require.c.o
@@ -1104,13 +1168,14 @@ require.o: require.c.o
 # target to build an object file
 require.c.o:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/require.c.o
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/require.c.o
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/require.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/require.c.o
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/require.c.o
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/require.c.o
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/require.c.o
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/require.c.o
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/require.c.o
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/require.c.o
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/require.c.o
 .PHONY : require.c.o
 
 require.i: require.c.i
@@ -1120,13 +1185,14 @@ require.i: require.c.i
 # target to preprocess a source file
 require.c.i:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/require.c.i
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/require.c.i
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/require.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/require.c.i
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/require.c.i
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/require.c.i
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/require.c.i
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/require.c.i
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/require.c.i
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/require.c.i
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/require.c.i
 .PHONY : require.c.i
 
 require.s: require.c.s
@@ -1136,14 +1202,42 @@ require.s: require.c.s
 # target to generate assembly for a file
 require.c.s:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/require.c.s
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/require.c.s
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/require.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/require.c.s
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/require.c.s
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/require.c.s
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/require.c.s
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/require.c.s
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/require.c.s
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/require.c.s
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/require.c.s
 .PHONY : require.c.s
+
+samples/buffmgr/launcher.o: samples/buffmgr/launcher.c.o
+
+.PHONY : samples/buffmgr/launcher.o
+
+# target to build an object file
+samples/buffmgr/launcher.c.o:
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/samples/buffmgr/launcher.c.o
+.PHONY : samples/buffmgr/launcher.c.o
+
+samples/buffmgr/launcher.i: samples/buffmgr/launcher.c.i
+
+.PHONY : samples/buffmgr/launcher.i
+
+# target to preprocess a source file
+samples/buffmgr/launcher.c.i:
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/samples/buffmgr/launcher.c.i
+.PHONY : samples/buffmgr/launcher.c.i
+
+samples/buffmgr/launcher.s: samples/buffmgr/launcher.c.s
+
+.PHONY : samples/buffmgr/launcher.s
+
+# target to generate assembly for a file
+samples/buffmgr/launcher.c.s:
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/samples/buffmgr/launcher.c.s
+.PHONY : samples/buffmgr/launcher.c.s
 
 samples/containers/dictionaries/linear_hash_table_linuxwc.o: samples/containers/dictionaries/linear_hash_table_linuxwc.c.o
 
@@ -1260,13 +1354,14 @@ schema.o: schema.c.o
 # target to build an object file
 schema.c.o:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/schema.c.o
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/schema.c.o
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/schema.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/schema.c.o
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/schema.c.o
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/schema.c.o
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/schema.c.o
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/schema.c.o
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/schema.c.o
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/schema.c.o
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/schema.c.o
 .PHONY : schema.c.o
 
 schema.i: schema.c.i
@@ -1276,13 +1371,14 @@ schema.i: schema.c.i
 # target to preprocess a source file
 schema.c.i:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/schema.c.i
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/schema.c.i
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/schema.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/schema.c.i
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/schema.c.i
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/schema.c.i
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/schema.c.i
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/schema.c.i
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/schema.c.i
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/schema.c.i
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/schema.c.i
 .PHONY : schema.c.i
 
 schema.s: schema.c.s
@@ -1292,13 +1388,14 @@ schema.s: schema.c.s
 # target to generate assembly for a file
 schema.c.s:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/schema.c.s
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/schema.c.s
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/schema.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/schema.c.s
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/schema.c.s
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/schema.c.s
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/schema.c.s
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/schema.c.s
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/schema.c.s
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/schema.c.s
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/schema.c.s
 .PHONY : schema.c.s
 
 shell.o: shell.c.o
@@ -1307,13 +1404,6 @@ shell.o: shell.c.o
 
 # target to build an object file
 shell.c.o:
-	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/shell.c.o
-	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/shell.c.o
-	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/shell.c.o
-	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/shell.c.o
-	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/shell.c.o
-	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/shell.c.o
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/shell.c.o
 	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/shell.c.o
 .PHONY : shell.c.o
 
@@ -1323,13 +1413,6 @@ shell.i: shell.c.i
 
 # target to preprocess a source file
 shell.c.i:
-	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/shell.c.i
-	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/shell.c.i
-	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/shell.c.i
-	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/shell.c.i
-	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/shell.c.i
-	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/shell.c.i
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/shell.c.i
 	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/shell.c.i
 .PHONY : shell.c.i
 
@@ -1339,13 +1422,6 @@ shell.s: shell.c.s
 
 # target to generate assembly for a file
 shell.c.s:
-	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/shell.c.s
-	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/shell.c.s
-	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/shell.c.s
-	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/shell.c.s
-	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/shell.c.s
-	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/shell.c.s
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/shell.c.s
 	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/shell.c.s
 .PHONY : shell.c.s
 
@@ -1356,13 +1432,14 @@ storage/memory.o: storage/memory.c.o
 # target to build an object file
 storage/memory.c.o:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/storage/memory.c.o
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/storage/memory.c.o
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/storage/memory.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/storage/memory.c.o
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/storage/memory.c.o
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/storage/memory.c.o
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/storage/memory.c.o
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/storage/memory.c.o
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/storage/memory.c.o
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/storage/memory.c.o
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/storage/memory.c.o
 .PHONY : storage/memory.c.o
 
 storage/memory.i: storage/memory.c.i
@@ -1372,13 +1449,14 @@ storage/memory.i: storage/memory.c.i
 # target to preprocess a source file
 storage/memory.c.i:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/storage/memory.c.i
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/storage/memory.c.i
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/storage/memory.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/storage/memory.c.i
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/storage/memory.c.i
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/storage/memory.c.i
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/storage/memory.c.i
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/storage/memory.c.i
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/storage/memory.c.i
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/storage/memory.c.i
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/storage/memory.c.i
 .PHONY : storage/memory.c.i
 
 storage/memory.s: storage/memory.c.s
@@ -1388,13 +1466,14 @@ storage/memory.s: storage/memory.c.s
 # target to generate assembly for a file
 storage/memory.c.s:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/storage/memory.c.s
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/storage/memory.c.s
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/storage/memory.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/storage/memory.c.s
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/storage/memory.c.s
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/storage/memory.c.s
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/storage/memory.c.s
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/storage/memory.c.s
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/storage/memory.c.s
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/storage/memory.c.s
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/storage/memory.c.s
 .PHONY : storage/memory.c.s
 
 tuplet.o: tuplet.c.o
@@ -1404,13 +1483,14 @@ tuplet.o: tuplet.c.o
 # target to build an object file
 tuplet.c.o:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/tuplet.c.o
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/tuplet.c.o
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/tuplet.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/tuplet.c.o
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/tuplet.c.o
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/tuplet.c.o
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/tuplet.c.o
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/tuplet.c.o
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/tuplet.c.o
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/tuplet.c.o
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/tuplet.c.o
 .PHONY : tuplet.c.o
 
 tuplet.i: tuplet.c.i
@@ -1420,13 +1500,14 @@ tuplet.i: tuplet.c.i
 # target to preprocess a source file
 tuplet.c.i:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/tuplet.c.i
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/tuplet.c.i
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/tuplet.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/tuplet.c.i
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/tuplet.c.i
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/tuplet.c.i
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/tuplet.c.i
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/tuplet.c.i
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/tuplet.c.i
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/tuplet.c.i
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/tuplet.c.i
 .PHONY : tuplet.c.i
 
 tuplet.s: tuplet.c.s
@@ -1436,13 +1517,14 @@ tuplet.s: tuplet.c.s
 # target to generate assembly for a file
 tuplet.c.s:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/tuplet.c.s
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/tuplet.c.s
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/tuplet.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/tuplet.c.s
 	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/tuplet.c.s
 	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/tuplet.c.s
 	$(MAKE) -f CMakeFiles/exp_os_paging.dir/build.make CMakeFiles/exp_os_paging.dir/tuplet.c.s
 	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/tuplet.c.s
 	$(MAKE) -f CMakeFiles/tableimg.dir/build.make CMakeFiles/tableimg.dir/tuplet.c.s
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/tuplet.c.s
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/tuplet.c.s
 .PHONY : tuplet.c.s
 
 utils/tableimg/launcher.o: utils/tableimg/launcher.c.o
@@ -1505,17 +1587,18 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
+	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... expr"
 	@echo "... doc"
+	@echo "... buffmgr"
+	@echo "... gs"
+	@echo "... sample_lin_hash"
 	@echo "... dbstdio"
 	@echo "... tpch-convert"
 	@echo "... exp_os_paging"
-	@echo "... edit_cache"
 	@echo "... sample_linuxwc"
 	@echo "... tableimg"
-	@echo "... sample_lin_hash"
-	@echo "... gs"
 	@echo "... async.o"
 	@echo "... async.i"
 	@echo "... async.s"
@@ -1576,6 +1659,9 @@ help:
 	@echo "... require.o"
 	@echo "... require.i"
 	@echo "... require.s"
+	@echo "... samples/buffmgr/launcher.o"
+	@echo "... samples/buffmgr/launcher.i"
+	@echo "... samples/buffmgr/launcher.s"
 	@echo "... samples/containers/dictionaries/linear_hash_table_linuxwc.o"
 	@echo "... samples/containers/dictionaries/linear_hash_table_linuxwc.i"
 	@echo "... samples/containers/dictionaries/linear_hash_table_linuxwc.s"

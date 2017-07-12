@@ -52,7 +52,6 @@ set(SOURCE_FILES
         include/tableimg.h
         include/tuplet.h
         include/operators/scan.h
-        include/shell.h
         include/gridstore.h
 
         async.c
@@ -75,12 +74,13 @@ set(SOURCE_FILES
         storage/memory.c
         tuplet.c
         operators/scan.c
-        shell.c
         gridstore.c
         )
 
 add_executable(
         gs main.c
+        shell.c
+        include/shell.h
         ${SOURCE_FILES})
 
 target_link_libraries(gs ${CURSES_LIBRARIES})
@@ -111,6 +111,14 @@ add_executable(
 add_executable(
         dbstdio samples/stddb.c
         ${SOURCE_FILES})
+
+add_executable(
+        buffmgr samples/buffmgr/launcher.c
+        ${SOURCE_FILES})
+
+target_link_libraries(
+        buffmgr
+        ${OPENSSL_LIBRARIES})
 
 add_executable(
         expr samples/core/pred.c
