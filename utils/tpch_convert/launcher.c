@@ -298,6 +298,7 @@ bool parse_customers(void *capture, void *begin, void *end)
         const char *tuple_str = *it;
         tpch_customer_tuple_str_t tuple;
         char *running        = strdup(tuple_str);
+        char *tofree         = running;
         tuple.C_CUSTKEY      = strdup(strsep (&running, "|"));
         tuple.C_NAME         = strdup(strsep (&running, "|"));
         tuple.C_ADDRESS      = strdup(strsep (&running, "|"));
@@ -314,6 +315,7 @@ bool parse_customers(void *capture, void *begin, void *end)
         assert (strlen(tuple.C_COMMENT)     < TPCH_TEXT_N_117);
 
         vector_add(result, 1, &tuple);
+        free (tofree);
     }
     return true;
 }
@@ -404,14 +406,15 @@ void for_each_line(
     bool serialize(void *capture, void *begin, void *end))
 {
     vector_t *all_lines = vector_create(sizeof(char *), ALL_LINES_VECTOR_INIT_CAP);
-    char *line = malloc(MAX_LINE_LEN);
+    char line[MAX_LINE_LEN];
     FILE *file_ptr = fopen(file, "r");
 
     while (fgets(line, MAX_LINE_LEN, file_ptr) != NULL) {
         char *line_cpy = strdup(line);
         vector_add(all_lines, 1, &line_cpy);
     }
-    free (line);
+
+    fclose(file_ptr);
 
     vector_t *parse_result = vector_create(tuple_str_t_size, ALL_LINES_VECTOR_INIT_CAP);
     vector_foreach(all_lines, parse_result, parse);
