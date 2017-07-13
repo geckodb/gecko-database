@@ -14,12 +14,15 @@
 # EXTERNAL cache entries
 ########################
 
+//API documentation requires Doxygen
+BUILD_DOCUMENTATION:BOOL=ON
+
 //Path to a program.
 CMAKE_AR:FILEPATH=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ar
 
 //Choose the type of build, options are: None(CMAKE_CXX_FLAGS or
 // CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.
-CMAKE_BUILD_TYPE:CHAR=
+CMAKE_BUILD_TYPE:STRING=
 
 //Enable/Disable color output during build.
 CMAKE_COLOR_MAKEFILE:BOOL=ON
@@ -28,54 +31,54 @@ CMAKE_COLOR_MAKEFILE:BOOL=ON
 CMAKE_CXX_COMPILER:FILEPATH=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++
 
 //Flags used by the compiler during all build types.
-CMAKE_CXX_FLAGS:CHAR=
+CMAKE_CXX_FLAGS:STRING=
 
 //Flags used by the compiler during debug builds.
-CMAKE_CXX_FLAGS_DEBUG:CHAR=-g
+CMAKE_CXX_FLAGS_DEBUG:STRING=-g
 
 //Flags used by the compiler during release builds for minimum
 // size.
-CMAKE_CXX_FLAGS_MINSIZEREL:CHAR=-Os -DNDEBUG
+CMAKE_CXX_FLAGS_MINSIZEREL:STRING=-Os -DNDEBUG
 
 //Flags used by the compiler during release builds.
-CMAKE_CXX_FLAGS_RELEASE:CHAR=-O3 -DNDEBUG
+CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG
 
 //Flags used by the compiler during release builds with debug info.
-CMAKE_CXX_FLAGS_RELWITHDEBINFO:CHAR=-O2 -g -DNDEBUG
+CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG
 
 //C compiler
 CMAKE_C_COMPILER:FILEPATH=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc
 
 //Flags used by the compiler during all build types.
-CMAKE_C_FLAGS:CHAR=
+CMAKE_C_FLAGS:STRING=
 
 //Flags used by the compiler during debug builds.
-CMAKE_C_FLAGS_DEBUG:CHAR=-g
+CMAKE_C_FLAGS_DEBUG:STRING=-g
 
 //Flags used by the compiler during release builds for minimum
 // size.
-CMAKE_C_FLAGS_MINSIZEREL:CHAR=-Os -DNDEBUG
+CMAKE_C_FLAGS_MINSIZEREL:STRING=-Os -DNDEBUG
 
 //Flags used by the compiler during release builds.
-CMAKE_C_FLAGS_RELEASE:CHAR=-O3 -DNDEBUG
+CMAKE_C_FLAGS_RELEASE:STRING=-O3 -DNDEBUG
 
 //Flags used by the compiler during release builds with debug info.
-CMAKE_C_FLAGS_RELWITHDEBINFO:CHAR=-O2 -g -DNDEBUG
+CMAKE_C_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG
 
 //Flags used by the linker.
-CMAKE_EXE_LINKER_FLAGS:CHAR=
+CMAKE_EXE_LINKER_FLAGS:STRING=
 
 //Flags used by the linker during debug builds.
-CMAKE_EXE_LINKER_FLAGS_DEBUG:CHAR=
+CMAKE_EXE_LINKER_FLAGS_DEBUG:STRING=
 
 //Flags used by the linker during release minsize builds.
-CMAKE_EXE_LINKER_FLAGS_MINSIZEREL:CHAR=
+CMAKE_EXE_LINKER_FLAGS_MINSIZEREL:STRING=
 
 //Flags used by the linker during release builds.
-CMAKE_EXE_LINKER_FLAGS_RELEASE:CHAR=
+CMAKE_EXE_LINKER_FLAGS_RELEASE:STRING=
 
 //Flags used by the linker during Release with Debug Info builds.
-CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO:CHAR=
+CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO:STRING=
 
 //Enable/Disable output of compile commands during generation.
 CMAKE_EXPORT_COMPILE_COMMANDS:BOOL=OFF
@@ -93,19 +96,19 @@ CMAKE_LINKER:FILEPATH=/Applications/Xcode.app/Contents/Developer/Toolchains/Xcod
 CMAKE_MAKE_PROGRAM:FILEPATH=/usr/bin/make
 
 //Flags used by the linker during the creation of modules.
-CMAKE_MODULE_LINKER_FLAGS:CHAR=
+CMAKE_MODULE_LINKER_FLAGS:STRING=
 
 //Flags used by the linker during debug builds.
-CMAKE_MODULE_LINKER_FLAGS_DEBUG:CHAR=
+CMAKE_MODULE_LINKER_FLAGS_DEBUG:STRING=
 
 //Flags used by the linker during release minsize builds.
-CMAKE_MODULE_LINKER_FLAGS_MINSIZEREL:CHAR=
+CMAKE_MODULE_LINKER_FLAGS_MINSIZEREL:STRING=
 
 //Flags used by the linker during release builds.
-CMAKE_MODULE_LINKER_FLAGS_RELEASE:CHAR=
+CMAKE_MODULE_LINKER_FLAGS_RELEASE:STRING=
 
 //Flags used by the linker during Release with Debug Info builds.
-CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO:CHAR=
+CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO:STRING=
 
 //Path to a program.
 CMAKE_NM:FILEPATH=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/nm
@@ -117,36 +120,36 @@ CMAKE_OBJCOPY:FILEPATH=CMAKE_OBJCOPY-NOTFOUND
 CMAKE_OBJDUMP:FILEPATH=CMAKE_OBJDUMP-NOTFOUND
 
 //Build architectures for OSX
-CMAKE_OSX_ARCHITECTURES:CHAR=
+CMAKE_OSX_ARCHITECTURES:STRING=
 
 //Minimum OS X version to target for deployment (at runtime); newer
 // APIs weak linked. Set to empty string for default value.
-CMAKE_OSX_DEPLOYMENT_TARGET:CHAR=
+CMAKE_OSX_DEPLOYMENT_TARGET:STRING=
 
 //The product will be built against the headers and libraries located
 // inside the indicated SDK.
 CMAKE_OSX_SYSROOT:PATH=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk
 
 //Value Computed by CMake
-CMAKE_PROJECT_NAME:STATIC=myimdb
+CMAKE_PROJECT_NAME:STATIC=gridstore
 
 //Path to a program.
 CMAKE_RANLIB:FILEPATH=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib
 
 //Flags used by the linker during the creation of dll's.
-CMAKE_SHARED_LINKER_FLAGS:CHAR=
+CMAKE_SHARED_LINKER_FLAGS:STRING=
 
 //Flags used by the linker during debug builds.
-CMAKE_SHARED_LINKER_FLAGS_DEBUG:CHAR=
+CMAKE_SHARED_LINKER_FLAGS_DEBUG:STRING=
 
 //Flags used by the linker during release minsize builds.
-CMAKE_SHARED_LINKER_FLAGS_MINSIZEREL:CHAR=
+CMAKE_SHARED_LINKER_FLAGS_MINSIZEREL:STRING=
 
 //Flags used by the linker during release builds.
-CMAKE_SHARED_LINKER_FLAGS_RELEASE:CHAR=
+CMAKE_SHARED_LINKER_FLAGS_RELEASE:STRING=
 
 //Flags used by the linker during Release with Debug Info builds.
-CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO:CHAR=
+CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO:STRING=
 
 //If set, runtime paths are not added when installing shared libraries,
 // but are added when building.
@@ -156,19 +159,19 @@ CMAKE_SKIP_INSTALL_RPATH:BOOL=NO
 CMAKE_SKIP_RPATH:BOOL=NO
 
 //Flags used by the linker during the creation of static libraries.
-CMAKE_STATIC_LINKER_FLAGS:CHAR=
+CMAKE_STATIC_LINKER_FLAGS:STRING=
 
 //Flags used by the linker during debug builds.
-CMAKE_STATIC_LINKER_FLAGS_DEBUG:CHAR=
+CMAKE_STATIC_LINKER_FLAGS_DEBUG:STRING=
 
 //Flags used by the linker during release minsize builds.
-CMAKE_STATIC_LINKER_FLAGS_MINSIZEREL:CHAR=
+CMAKE_STATIC_LINKER_FLAGS_MINSIZEREL:STRING=
 
 //Flags used by the linker during release builds.
-CMAKE_STATIC_LINKER_FLAGS_RELEASE:CHAR=
+CMAKE_STATIC_LINKER_FLAGS_RELEASE:STRING=
 
 //Flags used by the linker during Release with Debug Info builds.
-CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO:CHAR=
+CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO:STRING=
 
 //Path to a program.
 CMAKE_STRIP:FILEPATH=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip
@@ -178,6 +181,42 @@ CMAKE_STRIP:FILEPATH=/Applications/Xcode.app/Contents/Developer/Toolchains/Xcode
 // during the make.  This is useful for debugging only. With Visual
 // Studio IDE projects all commands are done without /nologo.
 CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
+
+//Path to a library.
+CURSES_CURSES_LIBRARY:FILEPATH=/usr/lib/libcurses.dylib
+
+//Path to a library.
+CURSES_FORM_LIBRARY:FILEPATH=/usr/lib/libform.dylib
+
+//Path to a file.
+CURSES_INCLUDE_PATH:PATH=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk/usr/include
+
+//Path to a library.
+CURSES_NCURSES_LIBRARY:FILEPATH=/usr/lib/libncurses.dylib
+
+//Graphviz Dot tool for using Doxygen
+DOXYGEN_DOT_EXECUTABLE:FILEPATH=/usr/local/bin/dot
+
+//Doxygen documentation generation tool (http://www.doxygen.org)
+DOXYGEN_EXECUTABLE:FILEPATH=/usr/local/bin/doxygen
+
+//Path to a library.
+OPENSSL_CRYPTO_LIBRARY:FILEPATH=/usr/lib/libcrypto.dylib
+
+//Path to a file.
+OPENSSL_INCLUDE_DIR:PATH=/usr/local/include
+
+//Path to a library.
+OPENSSL_SSL_LIBRARY:FILEPATH=/usr/lib/libssl.dylib
+
+//pkg-config executable
+PKG_CONFIG_EXECUTABLE:FILEPATH=/usr/local/bin/pkg-config
+
+//Value Computed by CMake
+gridstore_BINARY_DIR:STATIC=/Users/marcus/git/myimdb/sbin
+
+//Value Computed by CMake
+gridstore_SOURCE_DIR:STATIC=/Users/marcus/git/myimdb
 
 //Value Computed by CMake
 myimdb_BINARY_DIR:STATIC=/Users/marcus/git/myimdb/sbin
@@ -317,4 +356,67 @@ CMAKE_STRIP-ADVANCED:INTERNAL=1
 CMAKE_UNAME:INTERNAL=/usr/bin/uname
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CURSES_CURSES_LIBRARY
+CURSES_CURSES_LIBRARY-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CURSES_INCLUDE_PATH
+CURSES_INCLUDE_PATH-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CURSES_NCURSES_LIBRARY
+CURSES_NCURSES_LIBRARY-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: DOXYGEN_DOT_EXECUTABLE
+DOXYGEN_DOT_EXECUTABLE-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: DOXYGEN_EXECUTABLE
+DOXYGEN_EXECUTABLE-ADVANCED:INTERNAL=1
+//Details about finding Curses
+FIND_PACKAGE_MESSAGE_DETAILS_Curses:INTERNAL=[/usr/lib/libcurses.dylib][/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk/usr/include][v()]
+//Details about finding Doxygen
+FIND_PACKAGE_MESSAGE_DETAILS_Doxygen:INTERNAL=[/usr/local/bin/doxygen][v1.8.11()]
+//Details about finding OpenSSL
+FIND_PACKAGE_MESSAGE_DETAILS_OpenSSL:INTERNAL=[/usr/lib/libssl.dylib;/usr/lib/libcrypto.dylib][/usr/local/include][v1.0.2l()]
+//ADVANCED property for variable: OPENSSL_CRYPTO_LIBRARY
+OPENSSL_CRYPTO_LIBRARY-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: OPENSSL_INCLUDE_DIR
+OPENSSL_INCLUDE_DIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: OPENSSL_SSL_LIBRARY
+OPENSSL_SSL_LIBRARY-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: PKG_CONFIG_EXECUTABLE
+PKG_CONFIG_EXECUTABLE-ADVANCED:INTERNAL=1
+_OPENSSL_CFLAGS:INTERNAL=
+_OPENSSL_CFLAGS_I:INTERNAL=
+_OPENSSL_CFLAGS_OTHER:INTERNAL=
+_OPENSSL_FOUND:INTERNAL=1
+_OPENSSL_INCLUDEDIR:INTERNAL=
+_OPENSSL_INCLUDE_DIRS:INTERNAL=
+_OPENSSL_LDFLAGS:INTERNAL=-lssl;-lcrypto;-lz
+_OPENSSL_LDFLAGS_OTHER:INTERNAL=
+_OPENSSL_LIBDIR:INTERNAL=
+_OPENSSL_LIBRARIES:INTERNAL=ssl;crypto;z
+_OPENSSL_LIBRARY_DIRS:INTERNAL=
+_OPENSSL_LIBS:INTERNAL=
+_OPENSSL_LIBS_L:INTERNAL=
+_OPENSSL_LIBS_OTHER:INTERNAL=
+_OPENSSL_LIBS_PATHS:INTERNAL=
+_OPENSSL_PREFIX:INTERNAL=
+_OPENSSL_STATIC_CFLAGS:INTERNAL=
+_OPENSSL_STATIC_CFLAGS_I:INTERNAL=
+_OPENSSL_STATIC_CFLAGS_OTHER:INTERNAL=
+_OPENSSL_STATIC_INCLUDE_DIRS:INTERNAL=
+_OPENSSL_STATIC_LDFLAGS:INTERNAL=-lssl;-lcrypto;-lz
+_OPENSSL_STATIC_LDFLAGS_OTHER:INTERNAL=
+_OPENSSL_STATIC_LIBDIR:INTERNAL=
+_OPENSSL_STATIC_LIBRARIES:INTERNAL=ssl;crypto;z
+_OPENSSL_STATIC_LIBRARY_DIRS:INTERNAL=
+_OPENSSL_STATIC_LIBS:INTERNAL=
+_OPENSSL_STATIC_LIBS_L:INTERNAL=
+_OPENSSL_STATIC_LIBS_OTHER:INTERNAL=
+_OPENSSL_STATIC_LIBS_PATHS:INTERNAL=
+_OPENSSL_VERSION:INTERNAL=0.9.8zh
+_OPENSSL_openssl_INCLUDEDIR:INTERNAL=
+_OPENSSL_openssl_LIBDIR:INTERNAL=
+_OPENSSL_openssl_PREFIX:INTERNAL=
+_OPENSSL_openssl_VERSION:INTERNAL=
+__pkg_config_checked__OPENSSL:INTERNAL=1
+openssl_INCLUDEDIR:INTERNAL=
+openssl_LIBDIR:INTERNAL=
+openssl_PREFIX:INTERNAL=
+prefix_result:INTERNAL=/usr/lib
 

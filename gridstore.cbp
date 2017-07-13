@@ -866,7 +866,37 @@
          <Option target="sample_lin_hash"/>
          <Option target="gs"/>
       </Unit>
+      <Unit filename="/Users/marcus/git/myimdb/utils/tpch_convert/common.h">
+         <Option target="tpch-convert"/>
+      </Unit>
       <Unit filename="/Users/marcus/git/myimdb/utils/tpch_convert/launcher.c">
+         <Option target="tpch-convert"/>
+      </Unit>
+      <Unit filename="/Users/marcus/git/myimdb/utils/tpch_convert/tables/customer.h">
+         <Option target="tpch-convert"/>
+      </Unit>
+      <Unit filename="/Users/marcus/git/myimdb/utils/tpch_convert/tables/lineitem.h">
+         <Option target="tpch-convert"/>
+      </Unit>
+      <Unit filename="/Users/marcus/git/myimdb/utils/tpch_convert/tables/nation.h">
+         <Option target="tpch-convert"/>
+      </Unit>
+      <Unit filename="/Users/marcus/git/myimdb/utils/tpch_convert/tables/orders.h">
+         <Option target="tpch-convert"/>
+      </Unit>
+      <Unit filename="/Users/marcus/git/myimdb/utils/tpch_convert/tables/part.h">
+         <Option target="tpch-convert"/>
+      </Unit>
+      <Unit filename="/Users/marcus/git/myimdb/utils/tpch_convert/tables/partsupp.h">
+         <Option target="tpch-convert"/>
+      </Unit>
+      <Unit filename="/Users/marcus/git/myimdb/utils/tpch_convert/tables/region.h">
+         <Option target="tpch-convert"/>
+      </Unit>
+      <Unit filename="/Users/marcus/git/myimdb/utils/tpch_convert/tables/supplier.h">
+         <Option target="tpch-convert"/>
+      </Unit>
+      <Unit filename="/Users/marcus/git/myimdb/utils/tpch_convert/types.h">
          <Option target="tpch-convert"/>
       </Unit>
       <Unit filename="/Users/marcus/git/myimdb/CMakeLists.txt">

@@ -122,6 +122,16 @@ target_link_libraries(
 
 add_executable(
         tpch-convert utils/tpch_convert/launcher.c
+        utils/tpch_convert/common.h
+        utils/tpch_convert/types.h
+        utils/tpch_convert/tables/customer.h
+        utils/tpch_convert/tables/lineitem.h
+        utils/tpch_convert/tables/nation.h
+        utils/tpch_convert/tables/orders.h
+        utils/tpch_convert/tables/part.h
+        utils/tpch_convert/tables/partsupp.h
+        utils/tpch_convert/tables/region.h
+        utils/tpch_convert/tables/supplier.h
         ${SOURCE_FILES})
 
 #add_executable(
