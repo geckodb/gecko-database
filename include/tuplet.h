@@ -13,7 +13,7 @@
 struct schema_t;
 
 typedef struct tuplet_t {
-    struct fragment_t *fragment; /*<! fragment in which this tuplet exists */
+    struct frag_t *fragment; /*<! fragment in which this tuplet exists */
     size_t id; /*<! number of this tuplet inside the fragment */
     void *attr_base; /*<! pointer in fragment where first attribute of this tuplet is located */
 
@@ -42,7 +42,7 @@ typedef struct tuplet_t {
  * @param [in] frag The fragment. Must be non-null.
  * @return A pointer to the first tuplet in <i>frag</i>, or <b>NULL</b> if the fragment does not contains any tuplets.
  * */
-tuplet_t *gs_tuplet_open(struct fragment_t *frag);
+tuplet_t *gs_tuplet_open(struct frag_t *frag);
 
 /*!
  * @brief Closes a tuplet and frees up resources bound to this tuplet.

@@ -14,7 +14,7 @@ int main() {
     gs_attr_create_string("My Attribute 2", 42, schema);
     gs_attr_create_bool("My Attribute Bool", schema);
 
-    fragment_t *fragment;
+    frag_t *fragment;
     tuplet_t *tuplet;
 
     fragment = gs_fragment_alloc(schema, 1, TF_NSM);

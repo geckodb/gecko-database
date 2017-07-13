@@ -30,7 +30,7 @@
 // T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-typedef struct fragment_t {
+typedef struct frag_t {
     schema_t *schema; /*!< schema of this fragment */
     void *tuplet_data; /*!< data inside this fragment; the record format (e.g., NSM/DSM) is implementation-specific */
     size_t ntuplets; /*!< number of tuplets stored in this fragment */
@@ -39,16 +39,21 @@ typedef struct fragment_t {
     enum tuplet_format format; /*!< the tuplet format that defined whether NSM or DSM is used*/
 
     /* operations */
-    struct fragment_t *(*_scan)(struct fragment_t *self, const pred_tree_t *pred, size_t batch_size, size_t nthreads);
-    void (*_dispose)(struct fragment_t *self);
+    struct frag_t *(*_scan)(struct frag_t *self, const pred_tree_t *pred, size_t batch_size, size_t nthreads);
+    void (*_dispose)(struct frag_t *self);
 
     /*!< factory function to create impl-specific tuplet */
-    struct tuplet_t *(*_open)(struct fragment_t *self);
+    struct tuplet_t *(*_open)(struct frag_t *self);
 
     /*!< inserts a number of (uninitialized) ntuplets into this fragment and returns a tuplet pointer to the first
      * tuplets of these newly added tuplets. */
-    struct tuplet_t *(*_insert)(struct fragment_t *self, size_t ntuplets);
-} fragment_t;
+    struct tuplet_t *(*_insert)(struct frag_t *self, size_t ntuplets);
+} frag_t;
+
+typedef struct frag_printer_t
+{
+
+} frag_printer_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // M A R C O S
@@ -70,11 +75,11 @@ schema_t *gs_schema_create();
 
 void gs_schema_free(schema_t *schema);
 
-fragment_t *gs_fragment_alloc(schema_t *schema, size_t tuplet_capacity, enum tuplet_format format);
+frag_t *gs_fragment_alloc(schema_t *schema, size_t tuplet_capacity, enum tuplet_format format);
 
-struct tuplet_t *gs_fragment_insert(fragment_t *frag, size_t ntuplets);
+struct tuplet_t *gs_fragment_insert(frag_t *frag, size_t ntuplets);
 
-void gs_fragment_free(fragment_t *frag);
+void gs_fragment_free(frag_t *frag);
 
 DECLARE_ATTRIBUTE_CREATE(bool, FT_BOOL)
 

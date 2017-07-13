@@ -57,11 +57,11 @@ void gs_checksum_end(unsigned char *checksum_out, checksum_context_t *context)
 }
 
 
-fragment_t *gs_fragment_alloc(schema_t *schema, size_t tuplet_capacity, enum tuplet_format format)
+frag_t *gs_fragment_alloc(schema_t *schema, size_t tuplet_capacity, enum tuplet_format format)
 {
     require((tuplet_capacity > 0), "capacity of tuplets must be non zero");
 
-    fragment_t *result;
+    frag_t *result;
     switch (format) {
         case TF_NSM:
             result = gs_fragment_nsm_alloc(schema, tuplet_capacity);
@@ -72,14 +72,14 @@ fragment_t *gs_fragment_alloc(schema_t *schema, size_t tuplet_capacity, enum tup
         default:
             panic(BADARG, " tuplet format");
     }
-    panic_if((result->_dispose == NULL), NOTIMPLEMENTED, "fragment_t::dispose");
-    panic_if((result->_scan == NULL), NOTIMPLEMENTED, "fragment_t::scan");
-    panic_if((result->_open == NULL), NOTIMPLEMENTED, "fragment_t::open");
-    panic_if((result->_insert == NULL), NOTIMPLEMENTED, "fragment_t::insert");
+    panic_if((result->_dispose == NULL), NOTIMPLEMENTED, "frag_t::dispose");
+    panic_if((result->_scan == NULL), NOTIMPLEMENTED, "frag_t::scan");
+    panic_if((result->_open == NULL), NOTIMPLEMENTED, "frag_t::open");
+    panic_if((result->_insert == NULL), NOTIMPLEMENTED, "frag_t::insert");
     return result;
 }
 
-struct tuplet_t *gs_fragment_insert(fragment_t *frag, size_t ntuplets)
+struct tuplet_t *gs_fragment_insert(frag_t *frag, size_t ntuplets)
 {
     assert (frag);
     assert (ntuplets > 0);
@@ -87,7 +87,7 @@ struct tuplet_t *gs_fragment_insert(fragment_t *frag, size_t ntuplets)
     return frag->_insert(frag, ntuplets);
 }
 
-void gs_fragment_free(fragment_t *frag)
+void gs_fragment_free(frag_t *frag)
 {
     assert(frag);
     assert(frag->tuplet_data);

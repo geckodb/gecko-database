@@ -42,13 +42,13 @@
 //DEFINE_TUPLET_INSERT(float64, double, FT_FLOAT64)
 //DEFINE_ARRAY_FIELD_INSERT(string, char, FT_CHAR)
 
-tuplet_t *gs_tuplet_open(struct fragment_t *frag)
+tuplet_t *gs_tuplet_open(struct frag_t *frag)
 {
     if (frag->ntuplets > 0) {
         require_non_null(frag);
         require_non_null(frag->_open);
         tuplet_t *result = frag->_open(frag);
-        panic_if((result == NULL), UNEXPECTED, "fragment_t::open return NULL");
+        panic_if((result == NULL), UNEXPECTED, "frag_t::open return NULL");
         return result;
     } else return NULL;
 }
@@ -64,7 +64,7 @@ tuplet_t *gs_tuplet_rewind(tuplet_t *tuplet)
 {
     require_non_null(tuplet);
     require_non_null(tuplet->_close);
-    fragment_t *frag = tuplet->fragment;
+    frag_t *frag = tuplet->fragment;
     tuplet->_close(tuplet);
     return gs_tuplet_open(frag);
 }

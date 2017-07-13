@@ -5,12 +5,12 @@
 #include <containers/vector.h>
 #include <attr.h>
 
-static inline void this_fragment_nsm_dipose(fragment_t *self);
-static inline tuplet_t *this_fragment_nsm_open(fragment_t *self);
-static inline tuplet_t *this_fragment_insert(struct fragment_t *self, size_t ntuplets);
+static inline void this_fragment_nsm_dipose(frag_t *self);
+static inline tuplet_t *this_fragment_nsm_open(frag_t *self);
+static inline tuplet_t *this_fragment_insert(struct frag_t *self, size_t ntuplets);
 
-static inline void tuplet_rebase(tuplet_t *tuplet, fragment_t *frag, size_t pos);
-static inline tuplet_t *fragment_nsm_open_internal(fragment_t *self, size_t pos);
+static inline void tuplet_rebase(tuplet_t *tuplet, frag_t *frag, size_t pos);
+static inline tuplet_t *fragment_nsm_open_internal(frag_t *self, size_t pos);
 
 static inline bool this_tuplet_next(tuplet_t *self);
 static inline field_t *this_tuplet_open(tuplet_t *self);
@@ -29,12 +29,12 @@ static inline void this_field_close(field_t *self);
 
 static inline void field_rebase(field_t *field, tuplet_t *tuplet);
 
-fragment_t *gs_fragment_nsm_alloc(schema_t *schema, size_t tuplet_capacity)
+frag_t *gs_fragment_nsm_alloc(schema_t *schema, size_t tuplet_capacity)
 {
-    fragment_t *fragment = malloc(sizeof(fragment_t));
+    frag_t *fragment = malloc(sizeof(frag_t));
     size_t tuplet_size   = gs_tuplet_size_by_schema(schema);
     size_t required_size = tuplet_size * tuplet_capacity;
-    *fragment = (fragment_t) {
+    *fragment = (frag_t) {
             .schema = schema,
             .format = TF_NSM,
             .ntuplets = 0,
@@ -49,13 +49,13 @@ fragment_t *gs_fragment_nsm_alloc(schema_t *schema, size_t tuplet_capacity)
     return fragment;
 }
 
-void this_fragment_nsm_dipose(fragment_t *self)
+void this_fragment_nsm_dipose(frag_t *self)
 {
     free (self->tuplet_data);
     free (self);
 }
 
-static inline void tuplet_rebase(tuplet_t *tuplet, fragment_t *frag, size_t pos)
+static inline void tuplet_rebase(tuplet_t *tuplet, frag_t *frag, size_t pos)
 {
     assert (tuplet);
     tuplet->id = pos;
@@ -63,7 +63,7 @@ static inline void tuplet_rebase(tuplet_t *tuplet, fragment_t *frag, size_t pos)
     tuplet->attr_base = frag->tuplet_data + (pos * frag->tuplet_size);
 }
 
-static inline tuplet_t *fragment_nsm_open_internal(fragment_t *self, size_t pos)
+static inline tuplet_t *fragment_nsm_open_internal(frag_t *self, size_t pos)
 {
     tuplet_t *result = NULL;
     if (self->ntuplets > 0) {
@@ -82,12 +82,12 @@ static inline tuplet_t *fragment_nsm_open_internal(fragment_t *self, size_t pos)
     return result;
 }
 
-tuplet_t *this_fragment_nsm_open(fragment_t *self)
+tuplet_t *this_fragment_nsm_open(frag_t *self)
 {
     return fragment_nsm_open_internal(self, 0);
 }
 
-static inline tuplet_t *this_fragment_insert(struct fragment_t *self, size_t ntuplets)
+static inline tuplet_t *this_fragment_insert(struct frag_t *self, size_t ntuplets)
 {
     assert (self);
     assert (ntuplets > 0);

@@ -4,4 +4,4 @@
 #include <frag.h>
 #include <pred.h>
 
-struct fragment_t *scan_mediator(struct fragment_t *self, const pred_tree_t *pred, size_t batch_size, size_t nthreads);
+struct frag_t *scan_mediator(struct frag_t *self, const pred_tree_t *pred, size_t batch_size, size_t nthreads);

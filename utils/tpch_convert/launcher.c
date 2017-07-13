@@ -437,7 +437,7 @@ int main() {
            "A table image file is an easy to use serialization tuplet_format that supports NSM and DSM physical layouts.\n\n"
            "For details on the binary tuplet_format, take a look at the source of tpch convert (/utils/tpch-convert/laucher.c)");
 
- /*   serialization_config_t config = {
+    serialization_config_t config = {
         .dest_file = "bench/olap/tpch/database/customer.timg",
         .format    = TF_DSM
     };
@@ -451,8 +451,7 @@ int main() {
                   convert_customer_tuple,
                   free_customer_tuple_t,
                   serialize_customer_table);
-    // bench/olap/tpch/database
-*/
+
 
     const size_t NUM_TUPLES = 4;
 
@@ -462,7 +461,7 @@ int main() {
     gs_attr_create_string("My Attribute 2", 42, schema);
     gs_attr_create_bool  ("My Attribute Bool",  schema);
 
-    fragment_t *fragment = gs_fragment_alloc(schema, NUM_TUPLES, TF_NSM);
+    frag_t *fragment = gs_fragment_alloc(schema, NUM_TUPLES, TF_NSM);
     tuplet_t   *tuplet   = gs_fragment_insert(fragment, NUM_TUPLES);
     field_t    *field    = gs_field_open(tuplet);
 
@@ -485,6 +484,8 @@ int main() {
     int_value = 42;         gs_field_write(field, &int_value);
     str_value = "There\n";  gs_field_write(field, str_value);
     bol_value = true;       gs_field_write(field, &bol_value);
+
+
 
     gs_schema_free(schema);
     gs_fragment_free(fragment);
