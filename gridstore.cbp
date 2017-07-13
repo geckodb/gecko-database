@@ -428,7 +428,7 @@
 			<Option target="sample_lin_hash"/>
 			<Option target="gs"/>
 		</Unit>
-		<Unit filename="/Users/marcus/git/myimdb/attr_base.c">
+		<Unit filename="/Users/marcus/git/myimdb/attr_value_ptr.c">
 			<Option target="expr"/>
 			<Option target="tpch-convert"/>
 			<Option target="buffmgr"/>
@@ -563,7 +563,7 @@
 			<Option target="sample_lin_hash"/>
 			<Option target="gs"/>
 		</Unit>
-		<Unit filename="/Users/marcus/git/myimdb/include/attr_base.h">
+		<Unit filename="/Users/marcus/git/myimdb/include/attr_value_ptr.h">
 			<Option target="expr"/>
 			<Option target="tpch-convert"/>
 			<Option target="buffmgr"/>

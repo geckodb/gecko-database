@@ -3,18 +3,18 @@
 #include <tuplet.h>
 
 typedef struct field_t {
-    tuplet_t *tuplet; /*<! tuplet to which this attr_base belongs to */
+    tuplet_t *tuplet; /*<! tuplet to which this attr_value_ptr belongs to */
 
     attr_id_t attr_id; /*<! current attribute id to which this tuplet is seeked */
-    void *attr_base; /*<! pointer in data in 'tuplet_base' of attr_base content of attribute 'attr_id */
+    void *attr_value_ptr; /*<! pointer in data in 'tuplet_base' of attr_value_ptr content of attribute 'attr_id */
 
     /* operations */
-    bool (*_next)(struct field_t *self); /* seeks to the next attr_base inside this tuplet */
-    const void *(*_read)(struct field_t *self); /* access current attr_base 'attr_id' of this tuplet */
-    void (*_update)(struct field_t *self, const void *data); /* update data of current attr_base 'attr_id' */
-    void (*_set_null)(struct field_t *self); /* set the attr_base for 'attr_id' to NULL */
-    bool (*_is_null)(struct field_t *self); /* returns true iff attr_base of 'attr_id' is null */
-    void (*_close)(struct field_t *self); /* close request for this attr_base */
+    bool (*_next)(struct field_t *self); /* seeks to the next attr_value_ptr inside this tuplet */
+    const void *(*_read)(struct field_t *self); /* access current attr_value_ptr 'attr_id' of this tuplet */
+    void (*_update)(struct field_t *self, const void *data); /* update data of current attr_value_ptr 'attr_id' */
+    void (*_set_null)(struct field_t *self); /* set the attr_value_ptr for 'attr_id' to NULL */
+    bool (*_is_null)(struct field_t *self); /* returns true iff attr_value_ptr of 'attr_id' is null */
+    void (*_close)(struct field_t *self); /* close request for this attr_value_ptr */
 } field_t;
 
 bool gs_field_next(field_t *field);
@@ -37,4 +37,4 @@ field_t *gs_field_open(tuplet_t *tuplet);
 
 size_t gs_field_size(field_t *field);
 
-size_t get_field_size_by_id(const attr_t *attr, attr_id_t attr_idx);
+size_t gs_attr_total_size(const attr_t *attr);

@@ -50,10 +50,10 @@ size_t gs_field_size(field_t *field)
 {
     assert (field);
     const attr_t *attr = gs_schema_attr_by_id(field->tuplet->fragment->schema, field->attr_id);
-    return (get_field_size_by_id(attr, field->attr_id));
+    return (gs_attr_total_size(attr));
 }
 
-size_t get_field_size_by_id(const attr_t *attr, attr_id_t attr_idx)
+size_t gs_attr_total_size(const attr_t *attr)
 {
-    return attr[attr_idx].type_rep * gs_sizeof(attr[attr_idx].type);
+    return attr->type_rep * gs_sizeof(attr->type);
 }

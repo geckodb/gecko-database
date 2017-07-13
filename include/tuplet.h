@@ -18,9 +18,9 @@ typedef struct tuplet_t {
     void *attr_base; /*<! pointer in fragment where first attribute of this tuplet is located */
 
     /* operations */
-    struct tuplet_t *(*_next)(struct tuplet_t *self); /* seeks to the next tuplet inside this fragment */
+    bool (*_next)(struct tuplet_t *self); /* seeks to the next tuplet inside this fragment */
     void (*_close)(struct tuplet_t *self); /* frees resources of this tuplet */
-    struct field_t *(*_open)(struct tuplet_t *self); /*<! access the attr_base data of this tuplet */
+    struct field_t *(*_open)(struct tuplet_t *self); /*<! access the attr_value_ptr data of this tuplet */
     void (*_update)(struct tuplet_t *self, const void *data); /*<! updates all fields of this tuplet and moves to next */
     void (*_set_null)(struct tuplet_t *self); /*<! updates all fields of this tuplet to NULL, and moves to next */
     void (*_delete)(struct tuplet_t *self); /* request to delete this tuplet from fragment */
@@ -58,18 +58,22 @@ tuplet_t *gs_tuplet_open(struct fragment_t *frag);
 void gs_tuplet_close(tuplet_t *tuplet);
 
 /*!
- * @brief Returns the successor of a given tuplet inside its fragment.
+ * @brief Moves the input tuplet cursor to its successor inside its fragment.
  *
  * For navigation from one tuplet to another this function should be used. The order in which tuplets are enumerated
  * is fragment-specific and it's not guaranteed that the tuplet identifier of the input tuplet is less than the tuplet
  * identifier of its successor. However, its guaranteed that all tuplets inside a fragment are returned if the first
  * tuplet was received by a call to gs_tuplet_open() and gs_tuplet_next() is called until gs_tuplet_next() returns
- * <b>NULL</b>.
+ * <b>false</b>.
+ *
+ * If the end of the fragment is reached, this functions returns <b>false</b> and the input tuplet is automatically
+ * closed via a call to gs_tuplet_close().
  *
  * @param tuplet A valid tuplet inside a fragment (must be non-null)
- * @return The successor of the input tuplet, or <b>NULL</b> if the end of the enumeration was reached.
+ * @return <b>true</b> is the tuplet cursor was moved to its successor and the end of the fragment was not reached,
+ * or <b>false</b> otherwise.
  */
-tuplet_t *gs_tuplet_next(tuplet_t *tuplet);
+bool gs_tuplet_next(tuplet_t *tuplet);
 
 /*!
  * @brief Resets the tuplet pointer to the begin of the first tuplet in its fragment.

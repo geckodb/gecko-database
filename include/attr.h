@@ -4,7 +4,7 @@
 
 typedef struct {
     size_t id;
-    char name[_ATTR_NUMMAX];
+    char name[ATTR_NAME_MAXLEN];
     enum field_type type;
     size_t type_rep;
     ATTR_FLAGS flags;

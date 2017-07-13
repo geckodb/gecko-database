@@ -1,5 +1,6 @@
 #include <tuplet.h>
 #include <field.h>
+#include <schema.h>
 //
 //#define DEFINE_TUPLET_INSERT(type_name, c_type, internal_type)                                                         \
 //void *gs_insert_##type_name(void *dst, schema_t *schema, attr_id_t attr_id, const c_type *src)                         \
@@ -52,7 +53,7 @@ tuplet_t *gs_tuplet_open(struct fragment_t *frag)
     } else return NULL;
 }
 
-tuplet_t *gs_tuplet_next(tuplet_t *tuplet)
+bool gs_tuplet_next(tuplet_t *tuplet)
 {
     require_non_null(tuplet);
     require_non_null(tuplet->_next);
@@ -153,7 +154,8 @@ size_t gs_tuplet_size_by_schema(const schema_t *schema)
 {
     size_t total = 0;
     for (size_t attr_idx = 0; attr_idx < schema->attr->num_elements; attr_idx++) {
-        total += get_field_size_by_id((attr_t *) schema->attr->data, attr_idx);
+        attr_t *attr = gs_schema_attr_by_id(schema, attr_idx);
+        total += gs_attr_total_size(attr);
     }
     return total;
 }

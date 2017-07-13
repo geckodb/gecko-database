@@ -6,8 +6,8 @@
 attr_id_t _attr_create(const char *name, enum field_type data_type, size_t data_type_rep, ATTR_FLAGS attr_flags,
                      attr_t *foreign_key_to, schema_t *schema)
 {
-    if (name == NULL || schema == NULL ||strlen(name) + 1 > _ATTR_NUMMAX)
-        return -1;
+    panic_if((name == NULL || schema == NULL || strlen(name) + 1 > ATTR_NAME_MAXLEN), BADARG,
+             "null pointer or attribute name limit exceeded");
 
     attr_t attr = {
             .id     = schema->attr->num_elements,

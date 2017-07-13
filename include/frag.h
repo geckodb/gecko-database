@@ -68,6 +68,8 @@ __BEGIN_DECLS
 
 schema_t *gs_schema_create();
 
+void gs_schema_free(schema_t *schema);
+
 fragment_t *gs_fragment_alloc(schema_t *schema, size_t tuplet_capacity, enum tuplet_format format);
 
 struct tuplet_t *gs_fragment_insert(fragment_t *frag, size_t ntuplets);

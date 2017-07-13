@@ -9,9 +9,10 @@ static inline void this_fragment_nsm_dipose(fragment_t *self);
 static inline tuplet_t *this_fragment_nsm_open(fragment_t *self);
 static inline tuplet_t *this_fragment_insert(struct fragment_t *self, size_t ntuplets);
 
+static inline void tuplet_rebase(tuplet_t *tuplet, fragment_t *frag, size_t pos);
 static inline tuplet_t *fragment_nsm_open_internal(fragment_t *self, size_t pos);
 
-static inline tuplet_t *this_tuplet_next(tuplet_t *self);
+static inline bool this_tuplet_next(tuplet_t *self);
 static inline field_t *this_tuplet_open(tuplet_t *self);
 static inline void this_tuplet_update(tuplet_t *self, const void *data);
 static inline void this_tuplet_set_null(tuplet_t *self);
@@ -26,18 +27,20 @@ static inline void this_field_set_null(field_t *self);
 static inline bool this_field_is_null(field_t *self);
 static inline void this_field_close(field_t *self);
 
-static inline void field_set_values(field_t *field, attr_id_t attr_id, tuplet_t *tuplet, void *attr_base);
+static inline void field_rebase(field_t *field, tuplet_t *tuplet);
 
 fragment_t *gs_fragment_nsm_alloc(schema_t *schema, size_t tuplet_capacity)
 {
     fragment_t *fragment = malloc(sizeof(fragment_t));
+    size_t tuplet_size   = gs_tuplet_size_by_schema(schema);
+    size_t required_size = tuplet_size * tuplet_capacity;
     *fragment = (fragment_t) {
             .schema = schema,
             .format = TF_NSM,
             .ntuplets = 0,
             .ncapacity = tuplet_capacity,
-            .tuplet_data = malloc (gs_tuplet_size_by_schema(schema) * tuplet_capacity),
-            .tuplet_size = gs_tuplet_size_by_schema(schema),
+            .tuplet_data = require_good_malloc (required_size),
+            .tuplet_size = tuplet_size,
             ._scan = scan_mediator,
             ._dispose = this_fragment_nsm_dipose,
             ._open = this_fragment_nsm_open,
@@ -52,15 +55,20 @@ void this_fragment_nsm_dipose(fragment_t *self)
     free (self);
 }
 
-tuplet_t *fragment_nsm_open_internal(fragment_t *self, size_t pos)
+static inline void tuplet_rebase(tuplet_t *tuplet, fragment_t *frag, size_t pos)
+{
+    assert (tuplet);
+    tuplet->id = pos;
+    tuplet->fragment = frag;
+    tuplet->attr_base = frag->tuplet_data + (pos * frag->tuplet_size);
+}
+
+static inline tuplet_t *fragment_nsm_open_internal(fragment_t *self, size_t pos)
 {
     tuplet_t *result = NULL;
     if (self->ntuplets > 0) {
-        result = require_good_malloc(sizeof(result));
+        result = require_good_malloc(sizeof(tuplet_t));
         *result = (tuplet_t) {
-            .id = pos,
-            .fragment = self,
-            .attr_base = self->tuplet_data,
             ._next = this_tuplet_next,
             ._open = this_tuplet_open,
             ._update = this_tuplet_update,
@@ -69,6 +77,7 @@ tuplet_t *fragment_nsm_open_internal(fragment_t *self, size_t pos)
             ._close = this_tuplet_close,
             ._is_null = this_tuplet_is_null
         };
+        tuplet_rebase(result, self, pos);
     }
     return result;
 }
@@ -98,23 +107,23 @@ static inline tuplet_t *this_fragment_insert(struct fragment_t *self, size_t ntu
 
 // - T U P L E T   I M P L E M E N T A T I O N -------------------------------------------------------------------------
 
-static inline tuplet_t *this_tuplet_next(tuplet_t *self)
+static inline bool this_tuplet_next(tuplet_t *self)
 {
     assert (self);
-    self->attr_base += self->fragment->tuplet_size;
-    if (++self->id < self->fragment->ntuplets) {
-        self->attr_base = self->fragment->tuplet_data + self->id * self->fragment->tuplet_size;
-        return self;
+    size_t next_pos = self->id + 1;
+    if (next_pos < self->fragment->ntuplets) {
+        tuplet_rebase(self, self->fragment, next_pos);
+        return true;
     } else {
-        free (self);
-        return NULL;
+        gs_tuplet_close(self);
+        return false;
     }
 }
 
-static inline void field_set_values(field_t *field, attr_id_t attr_id, tuplet_t *tuplet, void *attr_base) {
-    field->attr_id = attr_id;
+static inline void field_rebase(field_t *field, tuplet_t *tuplet) {
+    field->attr_id = 0;
     field->tuplet = tuplet;
-    field->attr_base = attr_base;
+    field->attr_value_ptr = tuplet->attr_base;
 }
 
 static inline field_t *this_tuplet_open(tuplet_t *self)
@@ -132,7 +141,7 @@ static inline field_t *this_tuplet_open(tuplet_t *self)
         ._is_null = this_field_is_null,
         ._close = this_field_close
     };
-    field_set_values(result, 0, self, self->attr_base);
+    field_rebase(result, self);
     return result;
 }
 
@@ -179,13 +188,13 @@ static inline bool this_field_next(field_t *self)
     const attr_id_t next_attr_id = self->attr_id + 1;
     if (next_attr_id < self->tuplet->fragment->schema->attr->num_elements) {
         size_t skip_size = gs_field_size(self);
-        self->attr_base += skip_size;
+        self->attr_value_ptr += skip_size;
         self->attr_id = next_attr_id;
         return true;
     } else {
-        tuplet_t *tuplet = gs_tuplet_next(self->tuplet);
-        if (tuplet != NULL) {
-            field_set_values(self, 0, tuplet, tuplet->attr_base);
+        bool valid_tuplet = gs_tuplet_next(self->tuplet);
+        if (valid_tuplet) {
+            field_rebase(self, self->tuplet);
             return true;
         } else {
             gs_field_close(self);
@@ -197,13 +206,13 @@ static inline bool this_field_next(field_t *self)
 static inline const void *this_field_read(field_t *self)
 {
     assert (self);
-    return self->attr_base;
+    return self->attr_value_ptr;
 }
 
 static inline void this_field_update(field_t *self, const void *data)
 {
     assert (self && data);
-    memcpy(self->attr_base, data, gs_field_size(self));
+    memcpy(self->attr_value_ptr, data, gs_field_size(self));
 }
 
 static inline void this_field_set_null(field_t *self)

@@ -574,50 +574,50 @@ error.c.s:
 	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/error.c.s
 .PHONY : error.c.s
 
-attr_base.o: attr_base.c.o
+attr_value_ptr.o: attr_value_ptr.c.o
 
-.PHONY : attr_base.o
+.PHONY : attr_value_ptr.o
 
 # target to build an object file
-attr_base.c.o:
-	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/attr_base.c.o
-	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/attr_base.c.o
-	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/attr_base.c.o
-	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/attr_base.c.o
-	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/attr_base.c.o
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/attr_base.c.o
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/attr_base.c.o
-.PHONY : attr_base.c.o
+attr_value_ptr.c.o:
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/attr_value_ptr.c.o
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/attr_value_ptr.c.o
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/attr_value_ptr.c.o
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/attr_value_ptr.c.o
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/attr_value_ptr.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/attr_value_ptr.c.o
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/attr_value_ptr.c.o
+.PHONY : attr_value_ptr.c.o
 
-attr_base.i: attr_base.c.i
+attr_value_ptr.i: attr_value_ptr.c.i
 
-.PHONY : attr_base.i
+.PHONY : attr_value_ptr.i
 
 # target to preprocess a source file
-attr_base.c.i:
-	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/attr_base.c.i
-	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/attr_base.c.i
-	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/attr_base.c.i
-	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/attr_base.c.i
-	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/attr_base.c.i
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/attr_base.c.i
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/attr_base.c.i
-.PHONY : attr_base.c.i
+attr_value_ptr.c.i:
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/attr_value_ptr.c.i
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/attr_value_ptr.c.i
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/attr_value_ptr.c.i
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/attr_value_ptr.c.i
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/attr_value_ptr.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/attr_value_ptr.c.i
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/attr_value_ptr.c.i
+.PHONY : attr_value_ptr.c.i
 
-attr_base.s: attr_base.c.s
+attr_value_ptr.s: attr_value_ptr.c.s
 
-.PHONY : attr_base.s
+.PHONY : attr_value_ptr.s
 
 # target to generate assembly for a file
-attr_base.c.s:
-	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/attr_base.c.s
-	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/attr_base.c.s
-	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/attr_base.c.s
-	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/attr_base.c.s
-	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/attr_base.c.s
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/attr_base.c.s
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/attr_base.c.s
-.PHONY : attr_base.c.s
+attr_value_ptr.c.s:
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/attr_value_ptr.c.s
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/attr_value_ptr.c.s
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/attr_value_ptr.c.s
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/attr_value_ptr.c.s
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/attr_value_ptr.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/attr_value_ptr.c.s
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/attr_value_ptr.c.s
+.PHONY : attr_value_ptr.c.s
 
 frag.o: frag.c.o
 
@@ -1415,9 +1415,9 @@ help:
 	@echo "... error.o"
 	@echo "... error.i"
 	@echo "... error.s"
-	@echo "... attr_base.o"
-	@echo "... attr_base.i"
-	@echo "... attr_base.s"
+	@echo "... attr_value_ptr.o"
+	@echo "... attr_value_ptr.i"
+	@echo "... attr_value_ptr.s"
 	@echo "... frag.o"
 	@echo "... frag.i"
 	@echo "... frag.s"

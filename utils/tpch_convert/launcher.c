@@ -486,6 +486,9 @@ int main() {
     str_value = "There\n";  gs_field_write(field, str_value);
     bol_value = true;       gs_field_write(field, &bol_value);
 
+    gs_schema_free(schema);
+    gs_fragment_free(fragment);
+
   //  FILE *file_ptr = fopen("/Users/marcus/temp/demo.timg", "w");
    /* tableimg_fwrite(file_ptr,
                     TIMG_VER_1,
