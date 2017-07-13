@@ -199,77 +199,26 @@ typedef struct {
 } cursor_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
-// D E F A U L T S
-// ---------------------------------------------------------------------------------------------------------------------
-
-//static buf_config_t DEFAULT_BUF_CONFIG = {
-//        .hotstore_size_limit        = HOTSTORE_SIZELIMIT,
-//        .ram_page_size_default      = PAGESIZE_DEFAULT,
-//        .ram_page_size_max          = PAGESIZE_MAX,
-//        .free_space_reg_capacity    = FREESPACE_REG_CAPACITY,
-//        .lane_reg_capacity          = LANE_REG_CAPACITY,
-//        .swap_dir                   = SWAP_DIR_DEFAULT
-//};
-
-// ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-anti_buf_t *
-buf_create();
+anti_buf_t *buf_create();
 
-bool
-buf_free(
-        anti_buf_t *  buf
-);
+bool buf_free(anti_buf_t *buf);
 
-cursor_t *
-buf_alloc(
-        anti_buf_t *  buf,
-        size_t        size,
-        size_t        nlanes,
-        block_pos     strat
-);
+cursor_t *buf_alloc(anti_buf_t *buf, size_t size, size_t nlanes, block_pos strat);
 
-void
-buf_release(
-        cursor_t *    cur
-);
+void buf_release(cursor_t *cur);
 
-void
-buf_open(
-        cursor_t *    cur
-);
+void buf_open(cursor_t *cur);
 
-bool
-buf_next(
-        cursor_t *    cur
-);
+bool buf_next(cursor_t *cur);
 
-void
-buf_close(
-        cursor_t *    cur
-);
+void buf_close(cursor_t *cur);
 
-void
-buf_read(
-        cursor_t *    cur,
-        void *        capture,
-        void          (*consumer)(void *capture, const void *data)
-);
+void buf_read(cursor_t *cur, void *capture, void (*consumer)(void *capture, const void *data));
 
-void
-buf_memcpy(
-        cursor_t *    dst,
-        size_t        offset,
-        const void *  src,
-        size_t        size
-);
+void buf_memcpy(cursor_t *dst, size_t offset, const void *src, size_t size);
 
-void
-buf_dump(
-        FILE *        out,
-        anti_buf_t *  buf,
-        bool          hex_view
-);
+void buf_dump(FILE *out, anti_buf_t *buf, bool hex_view);
 

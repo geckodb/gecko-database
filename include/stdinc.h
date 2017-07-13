@@ -158,5 +158,5 @@ typedef MD5_CTX checksum_context_t;
 #endif
 
 #ifndef CHAR
-#define CHAR    char
+#define CHAR      char
 #endif

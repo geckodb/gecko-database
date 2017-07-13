@@ -86,23 +86,9 @@ bool hash_table_free(dict_t *dict);
 void hash_reset_counters(dict_t *dict);
 void hash_table_info(dict_t *dict, linear_hash_table_info_t *info);
 
-bool
-str_equals(
-        const void *lhs,
-        const void *rhs
-);
-
-void
-clean_up(
-        void *key,
-        void *value
-);
-
-bool free_strings(
-        void *capture,
-        void *begin,
-        void *end
-);
+bool str_equals(const void *lhs, const void *rhs);
+void clean_up(void *key, void *value);
+bool free_strings(void *capture, void *begin, void *end);
 
 
 

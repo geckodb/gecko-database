@@ -3,13 +3,6 @@
 #include <stdinc.h>
 #include <frag.h>
 
-//#define DECLARE_TUPLET_INSERT(type_name, c_type, internal_type)                                                        \
-//void *gs_insert_##type_name(void *dst, schema_t *schema, attr_id_t attr_id, const c_type *src);
-//
-//#define DECLARE_ARRAY_FIELD_INSERT(type_name, c_type, internal_type)                                                   \
-//void *gs_insert_##type_name(void *dst, schema_t *schema, attr_id_t attr_id, const c_type *src);
-
-
 struct schema_t;
 
 typedef struct tuplet_t {
@@ -90,8 +83,6 @@ void gs_tuplet_set_null(tuplet_t *tuplet);
 
 bool gs_tuplet_is_null(tuplet_t *tuplet);
 
-
-
 size_t gs_tuplet_size(tuplet_t *tuplet);
 
 void *gs_update(void *dst, schema_t *frag, attr_id_t attr_id, void *src);
@@ -99,31 +90,5 @@ void *gs_update(void *dst, schema_t *frag, attr_id_t attr_id, void *src);
 size_t gs_tuplet_size_by_schema(const schema_t *schema);
 
 enum field_type gs_tuplet_get_field_type(tuplet_t *tuplet, attr_id_t id);
-
-
-//
-//DECLARE_TUPLET_INSERT(bool, bool, FT_BOOL)
-//
-//DECLARE_TUPLET_INSERT(int8, int8_t, FT_INT8)
-//
-//DECLARE_TUPLET_INSERT(int16, int16_t, FT_INT16)
-//
-//DECLARE_TUPLET_INSERT(int32, int32_t, FT_INT32)
-//
-//DECLARE_TUPLET_INSERT(int64, int64_t, FT_INT64)
-//
-//DECLARE_TUPLET_INSERT(uint8, uint8_t, FT_UINT8)
-//
-//DECLARE_TUPLET_INSERT(uint16, uint16_t, FT_UINT16)
-//
-//DECLARE_TUPLET_INSERT(uint32, uint32_t, FT_UINT32)
-//
-//DECLARE_TUPLET_INSERT(uint64, uint64_t, FT_UINT64)
-//
-//DECLARE_TUPLET_INSERT(float32, float, FT_FLOAT32)
-//
-//DECLARE_TUPLET_INSERT(float64, double, FT_FLOAT64)
-//
-//DECLARE_ARRAY_FIELD_INSERT(string, char, FT_CHAR)
 
 size_t gs_tuplet_printlen(const attr_t *attr, const void *field_data);
