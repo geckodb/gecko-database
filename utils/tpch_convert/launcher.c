@@ -255,6 +255,9 @@ typedef struct
     char             *R_COMMENT;
 } tpch_region_tuple_str_t;
 
+bool
+serialize_customer_table_nsm(serialization_config_t *config, tpch_customer_tuple_t *begin, tpch_customer_tuple_t *end);
+
 uint64_t to_uint64(const char* str)
 {
     uint64_t fact   = 1;
@@ -365,28 +368,62 @@ bool free_customer_tuple_t(void *capture, void *begin, void *end) {
     return true;
 }
 
+bool serialize_customer_table_nsm(serialization_config_t *config, tpch_customer_tuple_t *begin, tpch_customer_tuple_t *end) {
+
+    schema_t *schema = gs_schema_create();
+
+    assert (sizeof(tpch_identifier_t) == sizeof(UINT32));
+    assert (sizeof(tpch_text_t) == sizeof(CHAR * ));
+    assert (sizeof(tpch_decimal_t) == sizeof(INT64));
+
+    gs_attr_create_uint32("c_custkey", schema);
+    gs_attr_create_string("c_name", TPCH_TEXT_N_25, schema);
+    gs_attr_create_string("c_address", TPCH_TEXT_N_40, schema);
+    gs_attr_create_uint32("c_nationkey", schema);
+    gs_attr_create_string("c_phone", TPCH_TEXT_N_15, schema);
+    gs_attr_create_uint64("c_acctbal", schema);
+    gs_attr_create_string("c_mktsegment", TPCH_TEXT_N_10, schema);
+    gs_attr_create_string("c_comment", TPCH_TEXT_N_117, schema);
+
+    size_t num_tuplets = (end - begin);
+    frag_t *fragment = gs_fragment_alloc(schema, num_tuplets, TF_NSM);
+    tuplet_t *tuplet = gs_fragment_insert(fragment, num_tuplets);
+    field_t *field = gs_field_open(tuplet);
+
+    for (tpch_customer_tuple_t *it = begin; it < end; it++) {
+        gs_field_write(field, &it->C_CUSTKEY);
+        gs_field_write(field, &it->C_NAME);
+        gs_field_write(field, &it->C_ADDRESS);
+        gs_field_write(field, &it->C_NATIONKEY);
+        gs_field_write(field, &it->C_PHONE);
+        gs_field_write(field, &it->C_ACCTBAL);
+        gs_field_write(field, &it->C_MKTSEGMENT);
+        gs_field_write(field, &it->C_COMMENT);
+    }
+
+    gs_schema_free(schema);
+    gs_fragment_free(fragment);
+
+    return false;
+}
+
+bool serialize_customer_table_dsm(serialization_config_t *config, tpch_customer_tuple_t *begin, tpch_customer_tuple_t *end) {
+    panic(NOTIMPLEMENTED, "this");
+    return false;
+}
+
 bool serialize_customer_table(void *capture, void *begin, void *end) {
-//    serialization_config_t *config = (serialization_config_t *) capture;
-
-
-    /*switch (config->tuplet_format) {
+    serialization_config_t *config = (serialization_config_t *) capture;
+    switch (config->format) {
         case TF_NSM:
-            for (tpch_customer_tuple_t *it = begin; it < (tpch_customer_tuple_t*) end; it++) {
-                fwrite(&header, sizeof(timg_header_t), 1, file_ptr);
-            }
-            fwrite(&header, sizeof(timg_header_t), 1, file_ptr);
+            return serialize_customer_table_nsm(config, (tpch_customer_tuple_t *)begin, (tpch_customer_tuple_t *)end);
             break;
         case TF_DSM:
-            for (tpch_customer_tuple_t *it = begin; it < (tpch_customer_tuple_t*) end; it++)
-                printf("%d\n", it->C_CUSTKEY);
-            for (tpch_customer_tuple_t *it = begin; it < (tpch_customer_tuple_t*) end; it++)
-                printf("%s\n", it->C_NAME);
-
+            return serialize_customer_table_dsm(config, (tpch_customer_tuple_t *)begin, (tpch_customer_tuple_t *)end);
             break;
         default:
-            perror("Unknown serialization tuplet_format requested.");
-            abort();
-    }*/
+            panic(BADBRANCH, &config->format);
+    }
     return true;
 }
 
@@ -441,8 +478,8 @@ int main() {
            "For details on the binary tuplet_format, take a look at the source of tpch convert (/utils/tpch-convert/laucher.c)");
 
     serialization_config_t config = {
-        .dest_file = "bench/olap/tpch/database/customer.timg",
-        .format    = TF_DSM
+        .dest_file = "workloads/olap/tpch/database/customer.timg",
+        .format    = TF_NSM
     };
 
     for_each_line("../sbin/tpch-dbgen/customer.tbl",
