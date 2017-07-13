@@ -66,6 +66,8 @@ vector_resize(
         size_t num_elements
 );
 
+void vector_memset(vector_t *vec, size_t pos_start, size_t num_elements, unsigned char data);
+
 vector_t *
 vector_cpy(
         vector_t *proto

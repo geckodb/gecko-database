@@ -61,6 +61,14 @@ bool vector_resize(vector_t *vec, size_t num_elements)
     } else return false;
 }
 
+void vector_memset(vector_t *vec, size_t pos_start, size_t num_elements, unsigned char data)
+{
+    require_nonnull(vec);
+    require((num_elements > 0), "illegal argument");
+    require((pos_start + num_elements <= vec->num_elements), "out of bounds");
+    memset(vec->data + (pos_start * vec->sizeof_element), data, (num_elements * vec->sizeof_element));
+}
+
 vector_t *vector_cpy(vector_t *proto)
 {
     vector_t *result = NULL;

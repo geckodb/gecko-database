@@ -664,6 +664,96 @@ frag.c.s:
 	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/frag.c.s
 .PHONY : frag.c.s
 
+frag_printer.o: frag_printer.c.o
+
+.PHONY : frag_printer.o
+
+# target to build an object file
+frag_printer.c.o:
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/frag_printer.c.o
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/frag_printer.c.o
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/frag_printer.c.o
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/frag_printer.c.o
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/frag_printer.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frag_printer.c.o
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/frag_printer.c.o
+.PHONY : frag_printer.c.o
+
+frag_printer.i: frag_printer.c.i
+
+.PHONY : frag_printer.i
+
+# target to preprocess a source file
+frag_printer.c.i:
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/frag_printer.c.i
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/frag_printer.c.i
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/frag_printer.c.i
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/frag_printer.c.i
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/frag_printer.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frag_printer.c.i
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/frag_printer.c.i
+.PHONY : frag_printer.c.i
+
+frag_printer.s: frag_printer.c.s
+
+.PHONY : frag_printer.s
+
+# target to generate assembly for a file
+frag_printer.c.s:
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/frag_printer.c.s
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/frag_printer.c.s
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/frag_printer.c.s
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/frag_printer.c.s
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/frag_printer.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frag_printer.c.s
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/frag_printer.c.s
+.PHONY : frag_printer.c.s
+
+frag_printers/console_printer.o: frag_printers/console_printer.c.o
+
+.PHONY : frag_printers/console_printer.o
+
+# target to build an object file
+frag_printers/console_printer.c.o:
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/frag_printers/console_printer.c.o
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/frag_printers/console_printer.c.o
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/frag_printers/console_printer.c.o
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/frag_printers/console_printer.c.o
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/frag_printers/console_printer.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frag_printers/console_printer.c.o
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/frag_printers/console_printer.c.o
+.PHONY : frag_printers/console_printer.c.o
+
+frag_printers/console_printer.i: frag_printers/console_printer.c.i
+
+.PHONY : frag_printers/console_printer.i
+
+# target to preprocess a source file
+frag_printers/console_printer.c.i:
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/frag_printers/console_printer.c.i
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/frag_printers/console_printer.c.i
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/frag_printers/console_printer.c.i
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/frag_printers/console_printer.c.i
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/frag_printers/console_printer.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frag_printers/console_printer.c.i
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/frag_printers/console_printer.c.i
+.PHONY : frag_printers/console_printer.c.i
+
+frag_printers/console_printer.s: frag_printers/console_printer.c.s
+
+.PHONY : frag_printers/console_printer.s
+
+# target to generate assembly for a file
+frag_printers/console_printer.c.s:
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/frag_printers/console_printer.c.s
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/frag_printers/console_printer.c.s
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/frag_printers/console_printer.c.s
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/frag_printers/console_printer.c.s
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/frag_printers/console_printer.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frag_printers/console_printer.c.s
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/frag_printers/console_printer.c.s
+.PHONY : frag_printers/console_printer.c.s
+
 frags/frag_dsm.o: frags/frag_dsm.c.o
 
 .PHONY : frags/frag_dsm.o
@@ -1303,6 +1393,51 @@ storage/memory.c.s:
 	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/storage/memory.c.s
 .PHONY : storage/memory.c.s
 
+timer.o: timer.c.o
+
+.PHONY : timer.o
+
+# target to build an object file
+timer.c.o:
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/timer.c.o
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/timer.c.o
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/timer.c.o
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/timer.c.o
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/timer.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/timer.c.o
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/timer.c.o
+.PHONY : timer.c.o
+
+timer.i: timer.c.i
+
+.PHONY : timer.i
+
+# target to preprocess a source file
+timer.c.i:
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/timer.c.i
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/timer.c.i
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/timer.c.i
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/timer.c.i
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/timer.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/timer.c.i
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/timer.c.i
+.PHONY : timer.c.i
+
+timer.s: timer.c.s
+
+.PHONY : timer.s
+
+# target to generate assembly for a file
+timer.c.s:
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/timer.c.s
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/timer.c.s
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/timer.c.s
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/timer.c.s
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/timer.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/timer.c.s
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/timer.c.s
+.PHONY : timer.c.s
+
 tuplet.o: tuplet.c.o
 
 .PHONY : tuplet.o
@@ -1347,6 +1482,51 @@ tuplet.c.s:
 	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/tuplet.c.s
 	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/tuplet.c.s
 .PHONY : tuplet.c.s
+
+unsafe.o: unsafe.c.o
+
+.PHONY : unsafe.o
+
+# target to build an object file
+unsafe.c.o:
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/unsafe.c.o
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/unsafe.c.o
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/unsafe.c.o
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/unsafe.c.o
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/unsafe.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/unsafe.c.o
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/unsafe.c.o
+.PHONY : unsafe.c.o
+
+unsafe.i: unsafe.c.i
+
+.PHONY : unsafe.i
+
+# target to preprocess a source file
+unsafe.c.i:
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/unsafe.c.i
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/unsafe.c.i
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/unsafe.c.i
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/unsafe.c.i
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/unsafe.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/unsafe.c.i
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/unsafe.c.i
+.PHONY : unsafe.c.i
+
+unsafe.s: unsafe.c.s
+
+.PHONY : unsafe.s
+
+# target to generate assembly for a file
+unsafe.c.s:
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/unsafe.c.s
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/unsafe.c.s
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/unsafe.c.s
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/unsafe.c.s
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/unsafe.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/unsafe.c.s
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/unsafe.c.s
+.PHONY : unsafe.c.s
 
 utils/tpch_convert/launcher.o: utils/tpch_convert/launcher.c.o
 
@@ -1421,6 +1601,12 @@ help:
 	@echo "... frag.o"
 	@echo "... frag.i"
 	@echo "... frag.s"
+	@echo "... frag_printer.o"
+	@echo "... frag_printer.i"
+	@echo "... frag_printer.s"
+	@echo "... frag_printers/console_printer.o"
+	@echo "... frag_printers/console_printer.i"
+	@echo "... frag_printers/console_printer.s"
 	@echo "... frags/frag_dsm.o"
 	@echo "... frags/frag_dsm.i"
 	@echo "... frags/frag_dsm.s"
@@ -1472,9 +1658,15 @@ help:
 	@echo "... storage/memory.o"
 	@echo "... storage/memory.i"
 	@echo "... storage/memory.s"
+	@echo "... timer.o"
+	@echo "... timer.i"
+	@echo "... timer.s"
 	@echo "... tuplet.o"
 	@echo "... tuplet.i"
 	@echo "... tuplet.s"
+	@echo "... unsafe.o"
+	@echo "... unsafe.i"
+	@echo "... unsafe.s"
 	@echo "... utils/tpch_convert/launcher.o"
 	@echo "... utils/tpch_convert/launcher.i"
 	@echo "... utils/tpch_convert/launcher.s"

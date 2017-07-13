@@ -1,6 +1,8 @@
 #include <frag.h>
 #include <frags/frag_nsm.h>
 #include <frags/frag_dsm.h>
+#include <frag_printer.h>
+#include <schema.h>
 
 void gs_checksum_nsm(schema_t *tab, const void *tuplets, size_t ntuplets)
 {
@@ -87,12 +89,46 @@ struct tuplet_t *gs_fragment_insert(frag_t *frag, size_t ntuplets)
     return frag->_insert(frag, ntuplets);
 }
 
+void gs_frag_print(FILE *file, frag_t *frag, size_t row_offset, size_t limit)
+{
+    gs_frag_print_ex(file, FPTT_CONSOLE_PRINTER, frag, row_offset, limit);
+}
+
+void gs_frag_print_ex(FILE *file, enum frag_printer_type_tag type, frag_t *frag, size_t row_offset, size_t limit)
+{
+    gs_frag_printer_print(file, type, frag, row_offset, limit);
+}
+
 void gs_fragment_free(frag_t *frag)
 {
     assert(frag);
     assert(frag->tuplet_data);
     free (frag->tuplet_data);
     free (frag);
+}
+
+size_t gs_fragment_num_of_attributes(const frag_t *frag)
+{
+    assert (frag);
+    return gs_schema_num_attributes(frag->schema);
+}
+
+size_t gs_fragment_num_of_tuplets(const frag_t *frag)
+{
+    assert (frag);
+    return frag->ntuplets;
+}
+
+schema_t *gs_fragment_get_schema(const frag_t *frag)
+{
+    assert(frag);
+    return frag->schema;
+}
+
+enum field_type gs_fragment_get_field_type(const frag_t *frag, attr_id_t id)
+{
+    assert (frag);
+    return gs_schema_attr_type(frag->schema, id);
 }
 
 size_t gs_sizeof(enum field_type type)

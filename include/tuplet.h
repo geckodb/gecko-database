@@ -96,9 +96,9 @@ size_t gs_tuplet_size(tuplet_t *tuplet);
 
 void *gs_update(void *dst, schema_t *frag, attr_id_t attr_id, void *src);
 
-size_t gs_tuplet_printlen(const attr_t *attr, const void *field_data);
-
 size_t gs_tuplet_size_by_schema(const schema_t *schema);
+
+enum field_type gs_tuplet_get_field_type(tuplet_t *tuplet, attr_id_t id);
 
 
 //

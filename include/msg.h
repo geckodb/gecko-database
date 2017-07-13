@@ -23,3 +23,4 @@
 #define BADHOTSTOREOBJ   "Page with id '%du' is not located in hot store"
 #define BADINTERNAL      "Internal error: %s"
 #define BADBOUNDS        "Out of bounds access: %s"
+#define BADTAG           "Casting error. Object is not instance of required type."

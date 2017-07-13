@@ -24,7 +24,14 @@
 #include <pred.h>
 #include <schema.h>
 #include <tuplet.h>
+#include <frag_printer.h>
 #include <containers/vector.h>
+
+// ---------------------------------------------------------------------------------------------------------------------
+// F O R W A R D I N G
+// ---------------------------------------------------------------------------------------------------------------------
+
+enum frag_printer_type_tag;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // T Y P E S
@@ -50,11 +57,6 @@ typedef struct frag_t {
     struct tuplet_t *(*_insert)(struct frag_t *self, size_t ntuplets);
 } frag_t;
 
-typedef struct frag_printer_t
-{
-
-} frag_printer_t;
-
 // ---------------------------------------------------------------------------------------------------------------------
 // M A R C O S
 // ---------------------------------------------------------------------------------------------------------------------
@@ -79,7 +81,19 @@ frag_t *gs_fragment_alloc(schema_t *schema, size_t tuplet_capacity, enum tuplet_
 
 struct tuplet_t *gs_fragment_insert(frag_t *frag, size_t ntuplets);
 
+void gs_frag_print(FILE *file, frag_t *frag, size_t row_offset, size_t limit);
+
+void gs_frag_print_ex(FILE *file, enum frag_printer_type_tag printer_type, frag_t *frag, size_t row_offset, size_t limit);
+
 void gs_fragment_free(frag_t *frag);
+
+size_t gs_fragment_num_of_attributes(const frag_t *frag);
+
+size_t gs_fragment_num_of_tuplets(const frag_t *frag);
+
+schema_t *gs_fragment_get_schema(const frag_t *frag);
+
+enum field_type gs_fragment_get_field_type(const frag_t *frag, attr_id_t id);
 
 DECLARE_ATTRIBUTE_CREATE(bool, FT_BOOL)
 

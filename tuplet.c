@@ -103,53 +103,6 @@ void *gs_update(void *dst, schema_t *frag, attr_id_t attr_id, void *src)
     return NULL;
 }
 
-size_t gs_tuplet_printlen(const attr_t *attr, const void *field_data)
-{
-    char buffer[2048];
-
-    switch (attr->type) {
-        case FT_BOOL:
-            return (*((bool *) field_data) == true? strlen("true") : strlen("false"));
-        case FT_INT8:
-            sprintf(buffer, "%d", *(INT8 *) field_data);
-            break;
-        case FT_INT16:
-            sprintf(buffer, "%d", *(INT16 *) field_data);
-            break;
-        case FT_INT32:
-            sprintf(buffer, "%d", *(INT32 *) field_data);
-            break;
-        case FT_INT64:
-            sprintf(buffer, "%lld", *(INT64 *) field_data);
-            break;
-        case FT_UINT8:
-            sprintf(buffer, "%u", *(UINT8 *) field_data);
-            break;
-        case FT_UINT16:
-            sprintf(buffer, "%u", *(UINT16 *) field_data);
-            break;
-        case FT_UINT32:
-            sprintf(buffer, "%u", *(UINT32 *) field_data);
-            break;
-        case FT_UINT64:
-            sprintf(buffer, "%llu", *(UINT64 *) field_data);
-            break;
-        case FT_FLOAT32:
-            sprintf(buffer, "%f", *(FLOAT32 *) field_data);
-            break;
-        case FT_FLOAT64:
-            sprintf(buffer, "%f", *(FLOAT64 *) field_data);
-            break;
-        case FT_CHAR:
-            return strlen((CHAR *) field_data);
-            break;
-        default:
-            perror("Unknown type");
-            abort();
-    }
-    return strlen(buffer);
-}
-
 size_t gs_tuplet_size_by_schema(const schema_t *schema)
 {
     size_t total = 0;
@@ -158,4 +111,10 @@ size_t gs_tuplet_size_by_schema(const schema_t *schema)
         total += gs_attr_total_size(attr);
     }
     return total;
+}
+
+enum field_type gs_tuplet_get_field_type(tuplet_t *tuplet, attr_id_t id)
+{
+    assert(tuplet);
+    return gs_fragment_get_field_type(tuplet->fragment, id);
 }

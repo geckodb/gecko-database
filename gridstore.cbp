@@ -446,6 +446,24 @@
          <Option target="sample_lin_hash"/>
          <Option target="gs"/>
       </Unit>
+      <Unit filename="/Users/marcus/git/myimdb/frag_printer.c">
+         <Option target="expr"/>
+         <Option target="tpch-convert"/>
+         <Option target="buffmgr"/>
+         <Option target="dbstdio"/>
+         <Option target="sample_linuxwc"/>
+         <Option target="sample_lin_hash"/>
+         <Option target="gs"/>
+      </Unit>
+      <Unit filename="/Users/marcus/git/myimdb/frag_printers/console_printer.c">
+         <Option target="expr"/>
+         <Option target="tpch-convert"/>
+         <Option target="buffmgr"/>
+         <Option target="dbstdio"/>
+         <Option target="sample_linuxwc"/>
+         <Option target="sample_lin_hash"/>
+         <Option target="gs"/>
+      </Unit>
       <Unit filename="/Users/marcus/git/myimdb/frags/frag_dsm.c">
          <Option target="expr"/>
          <Option target="tpch-convert"/>
@@ -581,6 +599,24 @@
          <Option target="sample_lin_hash"/>
          <Option target="gs"/>
       </Unit>
+      <Unit filename="/Users/marcus/git/myimdb/include/frag_printer.h">
+         <Option target="expr"/>
+         <Option target="tpch-convert"/>
+         <Option target="buffmgr"/>
+         <Option target="dbstdio"/>
+         <Option target="sample_linuxwc"/>
+         <Option target="sample_lin_hash"/>
+         <Option target="gs"/>
+      </Unit>
+      <Unit filename="/Users/marcus/git/myimdb/include/frag_printers/console_printer.h">
+         <Option target="expr"/>
+         <Option target="tpch-convert"/>
+         <Option target="buffmgr"/>
+         <Option target="dbstdio"/>
+         <Option target="sample_linuxwc"/>
+         <Option target="sample_lin_hash"/>
+         <Option target="gs"/>
+      </Unit>
       <Unit filename="/Users/marcus/git/myimdb/include/frags/frag_dsm.h">
          <Option target="expr"/>
          <Option target="tpch-convert"/>
@@ -701,7 +737,25 @@
          <Option target="sample_lin_hash"/>
          <Option target="gs"/>
       </Unit>
+      <Unit filename="/Users/marcus/git/myimdb/include/timer.h">
+         <Option target="expr"/>
+         <Option target="tpch-convert"/>
+         <Option target="buffmgr"/>
+         <Option target="dbstdio"/>
+         <Option target="sample_linuxwc"/>
+         <Option target="sample_lin_hash"/>
+         <Option target="gs"/>
+      </Unit>
       <Unit filename="/Users/marcus/git/myimdb/include/tuplet.h">
+         <Option target="expr"/>
+         <Option target="tpch-convert"/>
+         <Option target="buffmgr"/>
+         <Option target="dbstdio"/>
+         <Option target="sample_linuxwc"/>
+         <Option target="sample_lin_hash"/>
+         <Option target="gs"/>
+      </Unit>
+      <Unit filename="/Users/marcus/git/myimdb/include/unsafe.h">
          <Option target="expr"/>
          <Option target="tpch-convert"/>
          <Option target="buffmgr"/>
@@ -785,7 +839,25 @@
          <Option target="sample_lin_hash"/>
          <Option target="gs"/>
       </Unit>
+      <Unit filename="/Users/marcus/git/myimdb/timer.c">
+         <Option target="expr"/>
+         <Option target="tpch-convert"/>
+         <Option target="buffmgr"/>
+         <Option target="dbstdio"/>
+         <Option target="sample_linuxwc"/>
+         <Option target="sample_lin_hash"/>
+         <Option target="gs"/>
+      </Unit>
       <Unit filename="/Users/marcus/git/myimdb/tuplet.c">
+         <Option target="expr"/>
+         <Option target="tpch-convert"/>
+         <Option target="buffmgr"/>
+         <Option target="dbstdio"/>
+         <Option target="sample_linuxwc"/>
+         <Option target="sample_lin_hash"/>
+         <Option target="gs"/>
+      </Unit>
+      <Unit filename="/Users/marcus/git/myimdb/unsafe.c">
          <Option target="expr"/>
          <Option target="tpch-convert"/>
          <Option target="buffmgr"/>

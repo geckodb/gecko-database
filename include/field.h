@@ -38,3 +38,9 @@ field_t *gs_field_open(tuplet_t *tuplet);
 size_t gs_field_size(field_t *field);
 
 size_t gs_attr_total_size(const attr_t *attr);
+
+size_t gs_field_get_printlen(const field_t *field);
+
+enum field_type gs_field_get_type(const field_t *field);
+
+char *gs_field_to_string(const field_t *field);

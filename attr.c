@@ -24,6 +24,24 @@ attr_id_t _attr_create(const char *name, enum field_type data_type, size_t data_
     return attr.id;
 }
 
+const char *gs_attr_get_name(attr_t *attr)
+{
+    assert (attr);
+    return attr->name;
+}
+
+size_t gs_attr_get_str_format_max_len(attr_t *attr)
+{
+    assert (attr);
+    return attr->str_format_mlen;
+}
+
+enum field_type gs_attr_get_type(const attr_t *attr)
+{
+    assert (attr);
+    return attr->type;
+}
+
 attr_id_t _attr_default(const char *name, enum field_type data_type, size_t data_type_rep, schema_t *schema)
 {
     return _attr_create(name, data_type, data_type_rep,

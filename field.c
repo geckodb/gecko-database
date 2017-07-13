@@ -1,5 +1,6 @@
 #include <field.h>
 #include <schema.h>
+#include <unsafe.h>
 
 bool gs_field_next(field_t *field)
 {
@@ -58,4 +59,27 @@ size_t gs_field_size(field_t *field)
 size_t gs_attr_total_size(const attr_t *attr)
 {
     return attr->type_rep * gs_sizeof(attr->type);
+}
+
+enum field_type gs_field_get_type(const field_t *field)
+{
+    assert(field);
+    return gs_tuplet_get_field_type(field->tuplet, field->attr_id);
+}
+
+size_t gs_field_get_printlen(const field_t *field)
+{
+    assert (field);
+    assert (field->attr_value_ptr);
+    enum field_type type = gs_field_get_type(field);
+    const void *field_data = field->attr_value_ptr;
+    return gs_unsafe_field_get_println(type, field_data);
+}
+
+
+char *gs_field_to_string(const field_t *field)
+{
+    assert (field);
+    enum field_type type = gs_field_get_type(field);
+    return gs_unsafe_field_to_string(type, field->attr_value_ptr);
 }
