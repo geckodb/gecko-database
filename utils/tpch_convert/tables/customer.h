@@ -128,11 +128,7 @@ static inline bool serialize_customer_table(void *capture, void *begin, void *en
     tuplet_t *tuplet = gs_fragment_insert(fragment, num_tuplets);
     field_t *field = gs_field_open(tuplet);
 
-    size_t j = 0;
     for (tpch_customer_tuple_t *it = begin; it < (tpch_customer_tuple_t *) end; it++) {
-
-        printf("%zu: %d | %s | %s | %d | %s ...\n", j++, it->C_CUSTKEY, it->C_NAME, it->C_ADDRESS, it->C_NATIONKEY, it->C_PHONE);
-
         gs_field_write(field, &it->C_CUSTKEY);
         gs_field_write(field, it->C_NAME);
         gs_field_write(field, it->C_ADDRESS);
@@ -143,11 +139,11 @@ static inline bool serialize_customer_table(void *capture, void *begin, void *en
         gs_field_write(field, it->C_COMMENT);
     }
 
-    printf("DONE\n");
+    // printf("DONE\n");
 
-    printf("\n");
-    gs_frag_print(stdout, fragment, 0, 100);
-    printf("\n");
+  //  printf("\n");
+    //  gs_frag_print(stdout, fragment, 0, 100);
+    //  printf("\n");
 
     gs_schema_free(schema);
     gs_fragment_free(fragment);

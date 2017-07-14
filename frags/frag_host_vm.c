@@ -6,6 +6,13 @@
 #include <attr.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
+// M A C R O S
+// ---------------------------------------------------------------------------------------------------------------------
+
+#define REQUIRE_VALID_TUPLET_FORMAT(format)                                                                            \
+    require((format == TF_NSM || format == TF_DSM), "unknown tuplet serialization format")
+
+// ---------------------------------------------------------------------------------------------------------------------
 // H E L P E R   P R O T O T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -24,6 +31,8 @@ static inline void tuplet_close(tuplet_t *self);
 static inline bool tuplet_is_null(tuplet_t *self);
 
 static inline void field_rebase(field_t *field, tuplet_t *tuplet);
+static inline size_t field_nsm_jmp_size(field_t *field);
+static inline size_t field_dsm_jmp_size(field_t *field, size_t dst_tuplet_slot_id, size_t dst_attr_id);
 static inline bool field_next(field_t *self);
 static inline const void *field_read(field_t *self);
 static inline void field_update(field_t *self, const void *data);
@@ -70,9 +79,16 @@ void frag_dipose(frag_t *self)
 static inline void tuplet_rebase(tuplet_t *tuplet, frag_t *frag, size_t slot_id)
 {
     assert (tuplet);
+    REQUIRE_VALID_TUPLET_FORMAT(frag->format);
+
     tuplet->slot_id = slot_id;
     tuplet->fragment = frag;
-    tuplet->attr_base = frag->tuplet_data + (slot_id * frag->tuplet_size);
+
+    size_t offset = slot_id * (frag->format == TF_NSM ?
+                               (frag->tuplet_size) :
+                               gs_attr_total_size(gs_schema_attr_by_id(frag->schema, 0)));
+
+    tuplet->attr_base = frag->tuplet_data + offset;
 }
 
 static inline tuplet_t *frag_open_internal(frag_t *self, size_t pos)
@@ -194,13 +210,42 @@ static inline bool tuplet_is_null(tuplet_t *self)
 
 // - F I E L D   I M P L E M E N T A T I O N ---------------------------------------------------------------------------
 
+static inline size_t field_nsm_jmp_size(field_t *field)
+{
+    return gs_field_size(field);
+}
+
+static inline size_t field_dsm_jmp_size(field_t *field, size_t dst_tuplet_slot_id, size_t dst_attr_id)
+{
+    size_t skip_size = 0;
+    for (size_t attr_id = 0; attr_id < dst_attr_id; attr_id++) {
+        skip_size += field->tuplet->fragment->ntuplets *
+                     gs_attr_total_size(gs_schema_attr_by_id(field->tuplet->fragment->schema, attr_id));
+    }
+    skip_size += dst_tuplet_slot_id *
+            gs_attr_total_size(gs_schema_attr_by_id(field->tuplet->fragment->schema, dst_attr_id));
+    return skip_size;
+}
+
 static inline bool field_next(field_t *self)
 {
     assert (self);
+    assert (self->tuplet);
+    assert (self->tuplet->fragment);
+
+    enum tuplet_format format = self->tuplet->fragment->format;
+    REQUIRE_VALID_TUPLET_FORMAT(format);
+
     const attr_id_t next_attr_id = self->attr_id + 1;
     if (next_attr_id < self->tuplet->fragment->schema->attr->num_elements) {
-        size_t skip_size = gs_field_size(self);
-        self->attr_value_ptr += skip_size;
+
+        size_t skip_size = (format == TF_NSM ?
+                            field_nsm_jmp_size(self) :
+                            field_dsm_jmp_size(self, self->tuplet->slot_id, next_attr_id));
+
+        self->attr_value_ptr = (format == TF_NSM ? self->attr_value_ptr: self->tuplet->fragment->tuplet_data) +
+                               skip_size;
+
         self->attr_id = next_attr_id;
         return true;
     } else {

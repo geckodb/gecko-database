@@ -619,6 +619,51 @@ field.c.s:
 	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/field.c.s
 .PHONY : field.c.s
 
+field_type.o: field_type.c.o
+
+.PHONY : field_type.o
+
+# target to build an object file
+field_type.c.o:
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/field_type.c.o
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/field_type.c.o
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/field_type.c.o
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/field_type.c.o
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/field_type.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/field_type.c.o
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/field_type.c.o
+.PHONY : field_type.c.o
+
+field_type.i: field_type.c.i
+
+.PHONY : field_type.i
+
+# target to preprocess a source file
+field_type.c.i:
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/field_type.c.i
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/field_type.c.i
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/field_type.c.i
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/field_type.c.i
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/field_type.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/field_type.c.i
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/field_type.c.i
+.PHONY : field_type.c.i
+
+field_type.s: field_type.c.s
+
+.PHONY : field_type.s
+
+# target to generate assembly for a file
+field_type.c.s:
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/field_type.c.s
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/field_type.c.s
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/field_type.c.s
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/field_type.c.s
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/field_type.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/field_type.c.s
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/field_type.c.s
+.PHONY : field_type.c.s
+
 frag.o: frag.c.o
 
 .PHONY : frag.o
@@ -754,95 +799,50 @@ frag_printers/console_printer.c.s:
 	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/frag_printers/console_printer.c.s
 .PHONY : frag_printers/console_printer.c.s
 
-frags/frag_dsm.o: frags/frag_dsm.c.o
+frags/frag_host_vm.o: frags/frag_host_vm.c.o
 
-.PHONY : frags/frag_dsm.o
-
-# target to build an object file
-frags/frag_dsm.c.o:
-	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/frags/frag_dsm.c.o
-	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/frags/frag_dsm.c.o
-	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/frags/frag_dsm.c.o
-	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/frags/frag_dsm.c.o
-	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/frags/frag_dsm.c.o
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frags/frag_dsm.c.o
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/frags/frag_dsm.c.o
-.PHONY : frags/frag_dsm.c.o
-
-frags/frag_dsm.i: frags/frag_dsm.c.i
-
-.PHONY : frags/frag_dsm.i
-
-# target to preprocess a source file
-frags/frag_dsm.c.i:
-	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/frags/frag_dsm.c.i
-	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/frags/frag_dsm.c.i
-	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/frags/frag_dsm.c.i
-	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/frags/frag_dsm.c.i
-	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/frags/frag_dsm.c.i
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frags/frag_dsm.c.i
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/frags/frag_dsm.c.i
-.PHONY : frags/frag_dsm.c.i
-
-frags/frag_dsm.s: frags/frag_dsm.c.s
-
-.PHONY : frags/frag_dsm.s
-
-# target to generate assembly for a file
-frags/frag_dsm.c.s:
-	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/frags/frag_dsm.c.s
-	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/frags/frag_dsm.c.s
-	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/frags/frag_dsm.c.s
-	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/frags/frag_dsm.c.s
-	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/frags/frag_dsm.c.s
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frags/frag_dsm.c.s
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/frags/frag_dsm.c.s
-.PHONY : frags/frag_dsm.c.s
-
-frags/frag_nsm.o: frags/frag_nsm.c.o
-
-.PHONY : frags/frag_nsm.o
+.PHONY : frags/frag_host_vm.o
 
 # target to build an object file
-frags/frag_nsm.c.o:
-	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/frags/frag_nsm.c.o
-	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/frags/frag_nsm.c.o
-	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/frags/frag_nsm.c.o
-	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/frags/frag_nsm.c.o
-	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/frags/frag_nsm.c.o
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frags/frag_nsm.c.o
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/frags/frag_nsm.c.o
-.PHONY : frags/frag_nsm.c.o
+frags/frag_host_vm.c.o:
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/frags/frag_host_vm.c.o
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/frags/frag_host_vm.c.o
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/frags/frag_host_vm.c.o
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/frags/frag_host_vm.c.o
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/frags/frag_host_vm.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frags/frag_host_vm.c.o
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/frags/frag_host_vm.c.o
+.PHONY : frags/frag_host_vm.c.o
 
-frags/frag_nsm.i: frags/frag_nsm.c.i
+frags/frag_host_vm.i: frags/frag_host_vm.c.i
 
-.PHONY : frags/frag_nsm.i
+.PHONY : frags/frag_host_vm.i
 
 # target to preprocess a source file
-frags/frag_nsm.c.i:
-	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/frags/frag_nsm.c.i
-	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/frags/frag_nsm.c.i
-	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/frags/frag_nsm.c.i
-	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/frags/frag_nsm.c.i
-	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/frags/frag_nsm.c.i
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frags/frag_nsm.c.i
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/frags/frag_nsm.c.i
-.PHONY : frags/frag_nsm.c.i
+frags/frag_host_vm.c.i:
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/frags/frag_host_vm.c.i
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/frags/frag_host_vm.c.i
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/frags/frag_host_vm.c.i
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/frags/frag_host_vm.c.i
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/frags/frag_host_vm.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frags/frag_host_vm.c.i
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/frags/frag_host_vm.c.i
+.PHONY : frags/frag_host_vm.c.i
 
-frags/frag_nsm.s: frags/frag_nsm.c.s
+frags/frag_host_vm.s: frags/frag_host_vm.c.s
 
-.PHONY : frags/frag_nsm.s
+.PHONY : frags/frag_host_vm.s
 
 # target to generate assembly for a file
-frags/frag_nsm.c.s:
-	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/frags/frag_nsm.c.s
-	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/frags/frag_nsm.c.s
-	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/frags/frag_nsm.c.s
-	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/frags/frag_nsm.c.s
-	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/frags/frag_nsm.c.s
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frags/frag_nsm.c.s
-	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/frags/frag_nsm.c.s
-.PHONY : frags/frag_nsm.c.s
+frags/frag_host_vm.c.s:
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/frags/frag_host_vm.c.s
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/frags/frag_host_vm.c.s
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/frags/frag_host_vm.c.s
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/frags/frag_host_vm.c.s
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/frags/frag_host_vm.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/frags/frag_host_vm.c.s
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/frags/frag_host_vm.c.s
+.PHONY : frags/frag_host_vm.c.s
 
 gridstore.o: gridstore.c.o
 
@@ -1598,6 +1598,9 @@ help:
 	@echo "... field.o"
 	@echo "... field.i"
 	@echo "... field.s"
+	@echo "... field_type.o"
+	@echo "... field_type.i"
+	@echo "... field_type.s"
 	@echo "... frag.o"
 	@echo "... frag.i"
 	@echo "... frag.s"
@@ -1607,12 +1610,9 @@ help:
 	@echo "... frag_printers/console_printer.o"
 	@echo "... frag_printers/console_printer.i"
 	@echo "... frag_printers/console_printer.s"
-	@echo "... frags/frag_dsm.o"
-	@echo "... frags/frag_dsm.i"
-	@echo "... frags/frag_dsm.s"
-	@echo "... frags/frag_nsm.o"
-	@echo "... frags/frag_nsm.i"
-	@echo "... frags/frag_nsm.s"
+	@echo "... frags/frag_host_vm.o"
+	@echo "... frags/frag_host_vm.i"
+	@echo "... frags/frag_host_vm.s"
 	@echo "... gridstore.o"
 	@echo "... gridstore.i"
 	@echo "... gridstore.s"
