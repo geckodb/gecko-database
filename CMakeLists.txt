@@ -17,7 +17,7 @@ include_directories(${CURSES_INCLUDE_DIR})
 find_package(Doxygen)
 option(BUILD_DOCUMENTATION "API documentation requires Doxygen" ${DOXYGEN_FOUND})
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -std=c11 -Wall -Werror")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -std=c11 -Wall -Werror")
 
 set(CMAKE_BINARY_DIR
         ${CMAKE_SOURCE_DIR}/bin)
@@ -57,6 +57,7 @@ set(SOURCE_FILES
         include/frag_printers/console_printer.h
         include/unsafe.h
         include/timer.h
+        include/field_type.h
 
         async.c
         attr.c
@@ -83,6 +84,7 @@ set(SOURCE_FILES
         frag_printers/console_printer.c
         unsafe.c
         timer.c
+        field_type.c
         )
 
 add_executable(

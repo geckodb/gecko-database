@@ -131,7 +131,7 @@ void gs_checksum_end(unsigned char *checksum_out, checksum_context_t *context);
 
 // F I E L D   T Y P E   O P E R A T I O N S ---------------------------------------------------------------------------
 
-size_t gs_sizeof(enum field_type type);
+size_t gs_field_type_sizeof(enum field_type type);
 
 const char *gs_type_str(enum field_type t);
 

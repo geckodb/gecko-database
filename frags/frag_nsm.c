@@ -9,7 +9,7 @@ static inline void this_fragment_nsm_dipose(frag_t *self);
 static inline tuplet_t *this_fragment_nsm_open(frag_t *self);
 static inline tuplet_t *this_fragment_insert(struct frag_t *self, size_t ntuplets);
 
-static inline void tuplet_rebase(tuplet_t *tuplet, frag_t *frag, size_t pos);
+static inline void tuplet_rebase(tuplet_t *tuplet, frag_t *frag, size_t slot_id);
 static inline tuplet_t *fragment_nsm_open_internal(frag_t *self, size_t pos);
 
 static inline bool this_tuplet_next(tuplet_t *self);
@@ -55,12 +55,12 @@ void this_fragment_nsm_dipose(frag_t *self)
     free (self);
 }
 
-static inline void tuplet_rebase(tuplet_t *tuplet, frag_t *frag, size_t pos)
+static inline void tuplet_rebase(tuplet_t *tuplet, frag_t *frag, size_t slot_id)
 {
     assert (tuplet);
-    tuplet->id = pos;
+    tuplet->slot_id = slot_id;
     tuplet->fragment = frag;
-    tuplet->attr_base = frag->tuplet_data + (pos * frag->tuplet_size);
+    tuplet->attr_base = frag->tuplet_data + (slot_id * frag->tuplet_size);
 }
 
 static inline tuplet_t *fragment_nsm_open_internal(frag_t *self, size_t pos)
@@ -110,7 +110,7 @@ static inline tuplet_t *this_fragment_insert(struct frag_t *self, size_t ntuplet
 static inline bool this_tuplet_next(tuplet_t *self)
 {
     assert (self);
-    size_t next_pos = self->id + 1;
+    size_t next_pos = self->slot_id + 1;
     if (next_pos < self->fragment->ntuplets) {
         tuplet_rebase(self, self->fragment, next_pos);
         return true;

@@ -35,7 +35,7 @@ int main() {
 
     serialization_config_t config = {
         .dest_file = "workloads/olap/tpch/database/customer.timg",
-        .format    = TF_NSM
+        .format    = TF_DSM
     };
 
     timer_t timer;
