@@ -36,8 +36,7 @@ set(SOURCE_FILES
         include/containers/dicts/hash_table.h
         include/containers/list.h
         include/containers/vector.h
-        include/frags/frag_dsm.h
-        include/frags/frag_nsm.h
+        include/frags/frag_host_vm.h
         include/error.h
         include/field.h
         include/frag.h
@@ -66,8 +65,7 @@ set(SOURCE_FILES
         containers/dicts/hash_table.c
         containers/list.c
         containers/vector.c
-        frags/frag_dsm.c
-        frags/frag_nsm.c
+        frags/frag_host_vm.c
         error.c
         field.c
         frag.c

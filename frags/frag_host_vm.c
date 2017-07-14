@@ -1,55 +1,67 @@
-#include <frags/frag_nsm.h>
+#include <frags/frag_host_vm.h>
 #include <operators/scan.h>
 #include <field.h>
 #include <schema.h>
 #include <containers/vector.h>
 #include <attr.h>
 
-static inline void this_fragment_nsm_dipose(frag_t *self);
-static inline tuplet_t *this_fragment_nsm_open(frag_t *self);
-static inline tuplet_t *this_fragment_insert(struct frag_t *self, size_t ntuplets);
+// ---------------------------------------------------------------------------------------------------------------------
+// H E L P E R   P R O T O T Y P E S
+// ---------------------------------------------------------------------------------------------------------------------
+
+static inline tuplet_t *frag_nsm_open(frag_t *self);
+static inline tuplet_t *frag_insert(struct frag_t *self, size_t ntuplets);
+static inline void frag_dipose(frag_t *self);
 
 static inline void tuplet_rebase(tuplet_t *tuplet, frag_t *frag, size_t slot_id);
-static inline tuplet_t *fragment_nsm_open_internal(frag_t *self, size_t pos);
-
-static inline bool this_tuplet_next(tuplet_t *self);
-static inline field_t *this_tuplet_open(tuplet_t *self);
-static inline void this_tuplet_update(tuplet_t *self, const void *data);
-static inline void this_tuplet_set_null(tuplet_t *self);
-static inline void this_tuplet_delete(tuplet_t *self);
-static inline void this_tuplet_close(tuplet_t *self);
-static inline bool this_tuplet_is_null(tuplet_t *self);
-
-static inline bool this_field_next(field_t *self);
-static inline const void *this_field_read(field_t *self);
-static inline void this_field_update(field_t *self, const void *data);
-static inline void this_field_set_null(field_t *self);
-static inline bool this_field_is_null(field_t *self);
-static inline void this_field_close(field_t *self);
+static inline bool tuplet_next(tuplet_t *self);
+static inline tuplet_t *frag_open_internal(frag_t *self, size_t pos);
+static inline field_t *tuplet_open(tuplet_t *self);
+static inline void tuplet_update(tuplet_t *self, const void *data);
+static inline void tuplet_set_null(tuplet_t *self);
+static inline void tuplet_delete(tuplet_t *self);
+static inline void tuplet_close(tuplet_t *self);
+static inline bool tuplet_is_null(tuplet_t *self);
 
 static inline void field_rebase(field_t *field, tuplet_t *tuplet);
+static inline bool field_next(field_t *self);
+static inline const void *field_read(field_t *self);
+static inline void field_update(field_t *self, const void *data);
+static inline void field_set_null(field_t *self);
+static inline bool field_is_null(field_t *self);
+static inline void field_close(field_t *self);
 
-frag_t *gs_fragment_nsm_alloc(schema_t *schema, size_t tuplet_capacity)
+// ---------------------------------------------------------------------------------------------------------------------
+// I N T E R F A C E   I M P L E M E N T A T I O N
+// ---------------------------------------------------------------------------------------------------------------------
+
+frag_t *gs_frag_host_vm_alloc(schema_t *schema, size_t tuplet_capacity, enum tuplet_format format)
 {
     frag_t *fragment = malloc(sizeof(frag_t));
     size_t tuplet_size   = gs_tuplet_size_by_schema(schema);
     size_t required_size = tuplet_size * tuplet_capacity;
     *fragment = (frag_t) {
             .schema = schema,
-            .format = TF_NSM,
+            .format = format,
             .ntuplets = 0,
             .ncapacity = tuplet_capacity,
             .tuplet_data = require_good_malloc (required_size),
             .tuplet_size = tuplet_size,
             ._scan = scan_mediator,
-            ._dispose = this_fragment_nsm_dipose,
-            ._open = this_fragment_nsm_open,
-            ._insert = this_fragment_insert
+            ._dispose = frag_dipose,
+            ._open = frag_nsm_open,
+            ._insert = frag_insert
     };
     return fragment;
 }
 
-void this_fragment_nsm_dipose(frag_t *self)
+// ---------------------------------------------------------------------------------------------------------------------
+// H E L P E R  I M P L E M E N T A T I O N
+// ---------------------------------------------------------------------------------------------------------------------
+
+// - F R A G M E N T   I M P L E M E N T A T I O N ---------------------------------------------------------------------
+
+void frag_dipose(frag_t *self)
 {
     free (self->tuplet_data);
     free (self);
@@ -63,31 +75,31 @@ static inline void tuplet_rebase(tuplet_t *tuplet, frag_t *frag, size_t slot_id)
     tuplet->attr_base = frag->tuplet_data + (slot_id * frag->tuplet_size);
 }
 
-static inline tuplet_t *fragment_nsm_open_internal(frag_t *self, size_t pos)
+static inline tuplet_t *frag_open_internal(frag_t *self, size_t pos)
 {
     tuplet_t *result = NULL;
     if (self->ntuplets > 0) {
         result = require_good_malloc(sizeof(tuplet_t));
         *result = (tuplet_t) {
-            ._next = this_tuplet_next,
-            ._open = this_tuplet_open,
-            ._update = this_tuplet_update,
-            ._set_null = this_tuplet_set_null,
-            ._delete = this_tuplet_delete,
-            ._close = this_tuplet_close,
-            ._is_null = this_tuplet_is_null
+            ._next = tuplet_next,
+            ._open = tuplet_open,
+            ._update = tuplet_update,
+            ._set_null = tuplet_set_null,
+            ._delete = tuplet_delete,
+            ._close = tuplet_close,
+            ._is_null = tuplet_is_null
         };
         tuplet_rebase(result, self, pos);
     }
     return result;
 }
 
-tuplet_t *this_fragment_nsm_open(frag_t *self)
+tuplet_t *frag_nsm_open(frag_t *self)
 {
-    return fragment_nsm_open_internal(self, 0);
+    return frag_open_internal(self, 0);
 }
 
-static inline tuplet_t *this_fragment_insert(struct frag_t *self, size_t ntuplets)
+static inline tuplet_t *frag_insert(struct frag_t *self, size_t ntuplets)
 {
     assert (self);
     assert (ntuplets > 0);
@@ -102,12 +114,12 @@ static inline tuplet_t *this_fragment_insert(struct frag_t *self, size_t ntuplet
         self->ncapacity = new_capacity;
     }
     self->ntuplets += ntuplets;
-    return fragment_nsm_open_internal(self, return_tuplet_id);
+    return frag_open_internal(self, return_tuplet_id);
 }
 
 // - T U P L E T   I M P L E M E N T A T I O N -------------------------------------------------------------------------
 
-static inline bool this_tuplet_next(tuplet_t *self)
+static inline bool tuplet_next(tuplet_t *self)
 {
     assert (self);
     size_t next_pos = self->slot_id + 1;
@@ -126,7 +138,7 @@ static inline void field_rebase(field_t *field, tuplet_t *tuplet) {
     field->attr_value_ptr = tuplet->attr_base;
 }
 
-static inline field_t *this_tuplet_open(tuplet_t *self)
+static inline field_t *tuplet_open(tuplet_t *self)
 {
     assert (self);
     assert (self->fragment);
@@ -134,55 +146,55 @@ static inline field_t *this_tuplet_open(tuplet_t *self)
 
     field_t *result = require_good_malloc(sizeof(field_t));
     *result = (field_t) {
-        ._next = this_field_next,
-        ._read = this_field_read,
-        ._update = this_field_update,
-        ._set_null = this_field_set_null,
-        ._is_null = this_field_is_null,
-        ._close = this_field_close
+        ._next = field_next,
+        ._read = field_read,
+        ._update = field_update,
+        ._set_null = field_set_null,
+        ._is_null = field_is_null,
+        ._close = field_close
     };
     field_rebase(result, self);
     return result;
 }
 
-static inline void this_tuplet_update(tuplet_t *self, const void *data)
+static inline void tuplet_update(tuplet_t *self, const void *data)
 {
     assert (self);
     assert (data);
     memcpy(self->attr_base, data, self->fragment->tuplet_size);
 }
 
-static inline void this_tuplet_set_null(tuplet_t *self)
+static inline void tuplet_set_null(tuplet_t *self)
 {
     assert (self);
     // TODO: Implement
     panic(NOTIMPLEMENTED, "null values are currently not supported");
 }
 
-static inline void this_tuplet_delete(tuplet_t *self)
+static inline void tuplet_delete(tuplet_t *self)
 {
     assert (self);
     // TODO: Implement
     panic(NOTIMPLEMENTED, "tuplet delete requests are currently not supported");
 }
 
-static inline void this_tuplet_close(tuplet_t *self)
+static inline void tuplet_close(tuplet_t *self)
 {
     assert (self != NULL);
     free (self);
 }
 
-static inline bool this_tuplet_is_null(tuplet_t *self)
+static inline bool tuplet_is_null(tuplet_t *self)
 {
     assert (self);
     // TODO: Implement
-    panic(NOTIMPLEMENTED, to_string(this_tuplet_is_null));
+    panic(NOTIMPLEMENTED, to_string(tuplet_is_null));
     return false;
 }
 
 // - F I E L D   I M P L E M E N T A T I O N ---------------------------------------------------------------------------
 
-static inline bool this_field_next(field_t *self)
+static inline bool field_next(field_t *self)
 {
     assert (self);
     const attr_id_t next_attr_id = self->attr_id + 1;
@@ -203,34 +215,34 @@ static inline bool this_field_next(field_t *self)
     }
 }
 
-static inline const void *this_field_read(field_t *self)
+static inline const void *field_read(field_t *self)
 {
     assert (self);
     return self->attr_value_ptr;
 }
 
-static inline void this_field_update(field_t *self, const void *data)
+static inline void field_update(field_t *self, const void *data)
 {
     assert (self && data);
     memcpy(self->attr_value_ptr, data, gs_field_size(self));
 }
 
-static inline void this_field_set_null(field_t *self)
+static inline void field_set_null(field_t *self)
 {
     assert (self);
     // TODO: Implement
-    panic(NOTIMPLEMENTED, to_string(this_field_set_null));
+    panic(NOTIMPLEMENTED, to_string(field_set_null));
 }
 
-static inline bool this_field_is_null(field_t *self)
+static inline bool field_is_null(field_t *self)
 {
     assert (self);
     // TODO: Implement
-    panic(NOTIMPLEMENTED, to_string(this_field_set_null));
+    panic(NOTIMPLEMENTED, to_string(field_set_null));
     return false;
 }
 
-static inline void this_field_close(field_t *self)
+static inline void field_close(field_t *self)
 {
     assert (self);
     free (self);

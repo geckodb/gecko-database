@@ -1,6 +1,5 @@
 #include <frag.h>
-#include <frags/frag_nsm.h>
-#include <frags/frag_dsm.h>
+#include <frags/frag_host_vm.h>
 #include <frag_printer.h>
 #include <schema.h>
 
@@ -63,17 +62,8 @@ frag_t *gs_fragment_alloc(schema_t *schema, size_t tuplet_capacity, enum tuplet_
 {
     require((tuplet_capacity > 0), "capacity of tuplets must be non zero");
 
-    frag_t *result;
-    switch (format) {
-        case TF_NSM:
-            result = gs_fragment_nsm_alloc(schema, tuplet_capacity);
-            break;
-        case TF_DSM:
-            result = gs_fragment_dsm_alloc(schema, tuplet_capacity);
-            break;
-        default:
-            panic(BADARG, " tuplet format");
-    }
+    frag_t *result = gs_frag_host_vm_alloc(schema, tuplet_capacity, format);
+
     panic_if((result->_dispose == NULL), NOTIMPLEMENTED, "frag_t::dispose");
     panic_if((result->_scan == NULL), NOTIMPLEMENTED, "frag_t::scan");
     panic_if((result->_open == NULL), NOTIMPLEMENTED, "frag_t::open");

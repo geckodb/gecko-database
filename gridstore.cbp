@@ -473,16 +473,7 @@
 			<Option target="sample_lin_hash"/>
 			<Option target="gs"/>
 		</Unit>
-		<Unit filename="/Users/marcus/git/myimdb/frags/frag_dsm.c">
-			<Option target="expr"/>
-			<Option target="tpch-convert"/>
-			<Option target="buffmgr"/>
-			<Option target="dbstdio"/>
-			<Option target="sample_linuxwc"/>
-			<Option target="sample_lin_hash"/>
-			<Option target="gs"/>
-		</Unit>
-		<Unit filename="/Users/marcus/git/myimdb/frags/frag_nsm.c">
+		<Unit filename="/Users/marcus/git/myimdb/frags/frag_host_vm.c">
 			<Option target="expr"/>
 			<Option target="tpch-convert"/>
 			<Option target="buffmgr"/>
@@ -635,16 +626,7 @@
 			<Option target="sample_lin_hash"/>
 			<Option target="gs"/>
 		</Unit>
-		<Unit filename="/Users/marcus/git/myimdb/include/frags/frag_dsm.h">
-			<Option target="expr"/>
-			<Option target="tpch-convert"/>
-			<Option target="buffmgr"/>
-			<Option target="dbstdio"/>
-			<Option target="sample_linuxwc"/>
-			<Option target="sample_lin_hash"/>
-			<Option target="gs"/>
-		</Unit>
-		<Unit filename="/Users/marcus/git/myimdb/include/frags/frag_nsm.h">
+		<Unit filename="/Users/marcus/git/myimdb/include/frags/frag_host_vm.h">
 			<Option target="expr"/>
 			<Option target="tpch-convert"/>
 			<Option target="buffmgr"/>
