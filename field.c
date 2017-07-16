@@ -51,7 +51,7 @@ field_t *gs_field_open(tuplet_t *tuplet)
 size_t gs_field_size(field_t *field)
 {
     assert (field);
-    panic_if((field->attr_id >= field->tuplet->fragment->schema->attr->num_elements), BADBOUNDS, "attribute slot_id invalid");
+    panic_if((field->attr_id >= field->tuplet->fragment->schema->attr->num_elements), BADBOUNDS, "attribute tuplet_id invalid");
     const attr_t *attr = gs_schema_attr_by_id(field->tuplet->fragment->schema, field->attr_id);
     return (gs_attr_total_size(attr));
 }

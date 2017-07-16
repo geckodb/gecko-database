@@ -57,12 +57,23 @@ void gs_checksum_end(unsigned char *checksum_out, checksum_context_t *context)
     MD5_Final (checksum_out,context);
 }
 
+size_t find_type_match(enum frag_impl_type_t type)
+{
+    size_t len = ARRAY_LEN_OF(frag_type_pool);
+    for (size_t i = 0; i < len; i++) {
+        if (frag_type_pool[i].binding == type) {
+            return i;
+        }
+    }
+    panic(BADFRAGTYPE, type);
+}
 
-frag_t *gs_fragment_alloc(schema_t *schema, size_t tuplet_capacity, enum tuplet_format format)
+
+frag_t *gs_fragment_alloc(schema_t *schema, size_t tuplet_capacity, enum frag_impl_type_t type)
 {
     require((tuplet_capacity > 0), "capacity of tuplets must be non zero");
 
-    frag_t *result = gs_frag_host_vm_alloc(schema, tuplet_capacity, format);
+    frag_t *result = frag_type_pool[find_type_match(type)]._create(schema, tuplet_capacity);
 
     panic_if((result->_dispose == NULL), NOTIMPLEMENTED, "frag_t::dispose");
     panic_if((result->_scan == NULL), NOTIMPLEMENTED, "frag_t::scan");

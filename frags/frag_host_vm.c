@@ -16,11 +16,13 @@
 // H E L P E R   P R O T O T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
+static inline frag_t *frag_create(schema_t *schema, size_t tuplet_capacity, enum tuplet_format format);
+
 static inline tuplet_t *frag_nsm_open(frag_t *self);
 static inline tuplet_t *frag_insert(struct frag_t *self, size_t ntuplets);
 static inline void frag_dipose(frag_t *self);
 
-static inline void tuplet_rebase(tuplet_t *tuplet, frag_t *frag, size_t slot_id);
+static inline void tuplet_rebase(tuplet_t *tuplet, frag_t *frag, tuplet_id_t tuplet_id);
 static inline bool tuplet_next(tuplet_t *self);
 static inline tuplet_t *frag_open_internal(frag_t *self, size_t pos);
 static inline field_t *tuplet_open(tuplet_t *self);
@@ -44,13 +46,27 @@ static inline void field_close(field_t *self);
 // I N T E R F A C E   I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-frag_t *gs_frag_host_vm_alloc(schema_t *schema, size_t tuplet_capacity, enum tuplet_format format)
+struct frag_t *gs_frag_host_vm_nsm_create(schema_t *schema, size_t tuplet_capacity)
+{
+    return frag_create(schema, tuplet_capacity, TF_NSM);
+}
+
+struct frag_t *gs_frag_host_vm_dsm_create(schema_t *schema, size_t tuplet_capacity)
+{
+    return frag_create(schema, tuplet_capacity, TF_DSM);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// H E L P E R  I M P L E M E N T A T I O N
+// ---------------------------------------------------------------------------------------------------------------------
+
+static inline frag_t *frag_create(schema_t *schema, size_t tuplet_capacity, enum tuplet_format format)
 {
     frag_t *fragment = malloc(sizeof(frag_t));
     size_t tuplet_size   = gs_tuplet_size_by_schema(schema);
     size_t required_size = tuplet_size * tuplet_capacity;
     *fragment = (frag_t) {
-            .schema = schema,
+            .schema = gs_schema_cpy(schema),
             .format = format,
             .ntuplets = 0,
             .ncapacity = tuplet_capacity,
@@ -73,18 +89,19 @@ frag_t *gs_frag_host_vm_alloc(schema_t *schema, size_t tuplet_capacity, enum tup
 void frag_dipose(frag_t *self)
 {
     free (self->tuplet_data);
+    gs_schema_free(self->schema);
     free (self);
 }
 
-static inline void tuplet_rebase(tuplet_t *tuplet, frag_t *frag, size_t slot_id)
+static inline void tuplet_rebase(tuplet_t *tuplet, frag_t *frag, tuplet_id_t tuplet_id)
 {
     assert (tuplet);
     REQUIRE_VALID_TUPLET_FORMAT(frag->format);
 
-    tuplet->slot_id = slot_id;
+    tuplet->tuplet_id = tuplet_id;
     tuplet->fragment = frag;
 
-    size_t offset = slot_id * (frag->format == TF_NSM ?
+    size_t offset = tuplet_id * (frag->format == TF_NSM ?
                                (frag->tuplet_size) :
                                gs_attr_total_size(gs_schema_attr_by_id(frag->schema, 0)));
 
@@ -138,9 +155,9 @@ static inline tuplet_t *frag_insert(struct frag_t *self, size_t ntuplets)
 static inline bool tuplet_next(tuplet_t *self)
 {
     assert (self);
-    size_t next_pos = self->slot_id + 1;
-    if (next_pos < self->fragment->ntuplets) {
-        tuplet_rebase(self, self->fragment, next_pos);
+    tuplet_id_t next_tuplet_id = self->tuplet_id + 1;
+    if (next_tuplet_id < self->fragment->ntuplets) {
+        tuplet_rebase(self, self->fragment, next_tuplet_id);
         return true;
     } else {
         gs_tuplet_close(self);
@@ -241,7 +258,7 @@ static inline bool field_next(field_t *self)
 
         size_t skip_size = (format == TF_NSM ?
                             field_nsm_jmp_size(self) :
-                            field_dsm_jmp_size(self, self->tuplet->slot_id, next_attr_id));
+                            field_dsm_jmp_size(self, self->tuplet->tuplet_id, next_attr_id));
 
         self->attr_value_ptr = (format == TF_NSM ? self->attr_value_ptr: self->tuplet->fragment->tuplet_data) +
                                skip_size;

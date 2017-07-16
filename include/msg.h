@@ -24,3 +24,4 @@
 #define BADINTERNAL      "Internal error: %s"
 #define BADBOUNDS        "Out of bounds access: %s"
 #define BADTAG           "Casting error. Object is not instance of required type."
+#define BADFRAGTYPE      "Unknown fragment type was requested: %d"

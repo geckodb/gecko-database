@@ -124,7 +124,7 @@ static inline bool serialize_customer_table(void *capture, void *begin, void *en
     gs_attr_create_string("c_comment", TPCH_TEXT_N_117, schema);
 
     size_t num_tuplets = ((tpch_customer_tuple_t *)end - (tpch_customer_tuple_t *)begin);
-    frag_t *fragment = gs_fragment_alloc(schema, num_tuplets, config->format);
+    frag_t *fragment = gs_fragment_alloc(schema, num_tuplets, config->format == TF_NSM ? FIT_HOST_NSM_VM : FIT_HOST_DSM_VM);
     tuplet_t *tuplet = gs_fragment_insert(fragment, num_tuplets);
     field_t *field = gs_field_open(tuplet);
 
@@ -142,7 +142,7 @@ static inline bool serialize_customer_table(void *capture, void *begin, void *en
     // printf("DONE\n");
 
   //  printf("\n");
-    //  gs_frag_print(stdout, fragment, 0, 100);
+      gs_frag_print(stdout, fragment, 0, 100);
     //  printf("\n");
 
     gs_schema_free(schema);

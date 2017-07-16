@@ -13,7 +13,7 @@ static inline void calc_field_print_lens(vector_t *field_print_lens, frag_t *fra
 
 static inline void print_h_line(FILE *file, const frag_t *frag, size_t num_attr, schema_t *schema, vector_t *field_print_lens);
 static inline void print_frag_header(FILE *file, const frag_t *frag, vector_t *field_print_lens, size_t num_attr);
-static inline void print_frag_body(FILE *file, frag_t *frag, vector_t *field_print_lens, size_t num_attr);
+static inline void print_frag_body(FILE *file, frag_t *frag, vector_t *field_print_lens, size_t num_attr, size_t row_offset, size_t limit);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -68,7 +68,7 @@ static inline void console_printer_print(struct frag_printer_t *self, FILE *file
 
     calc_field_print_lens(field_print_lens, frag, num_attr);
     print_frag_header(file, frag, field_print_lens, num_attr);
-    print_frag_body(file, frag, field_print_lens, num_attr);
+    print_frag_body(file, frag, field_print_lens, num_attr, row_offset, limit);
     vector_free(field_print_lens);
 }
 
@@ -108,7 +108,7 @@ static inline void print_frag_header(FILE *file, const frag_t *frag, vector_t *f
     print_h_line(file, frag, num_attr, schema, field_print_lens);
 }
 
-static inline void print_frag_body(FILE *file, frag_t *frag, vector_t *field_print_lens, size_t num_attr)
+static inline void print_frag_body(FILE *file, frag_t *frag, vector_t *field_print_lens, size_t num_attr, size_t row_offset, size_t limit)
 {
     assert (field_print_lens);
 

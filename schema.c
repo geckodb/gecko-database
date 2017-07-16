@@ -22,6 +22,14 @@ void gs_schema_free(schema_t *schema)
     free (schema);
 }
 
+schema_t *gs_schema_cpy(schema_t *schema)
+{
+    assert (schema);
+    schema_t *cpy = require_good_malloc(sizeof(schema_t));
+    cpy->attr = vector_cpy(schema->attr);
+    return cpy;
+}
+
 size_t gs_schema_num_attributes(schema_t *schema)
 {
     assert (schema);

@@ -57,6 +57,8 @@ set(SOURCE_FILES
         include/unsafe.h
         include/timer.h
         include/field_type.h
+        include/grid_table.h
+        include/tuple.h
 
         async.c
         attr.c
@@ -83,6 +85,8 @@ set(SOURCE_FILES
         unsafe.c
         timer.c
         field_type.c
+        grid_table.c
+        tuple.c
         )
 
 add_executable(

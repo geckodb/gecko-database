@@ -602,7 +602,7 @@ hotstore_has_unsafe(
 //static inline bool
 //hotstore_rem_unsafe(
 //        anti_buf_t *      buf,
-//        page_id_t         slot_id
+//        page_id_t         tuplet_id
 //);
 
 static inline page_t *
@@ -649,13 +649,13 @@ coldstore_fetch(
 //static inline void
 //coldstore_add(
 //        anti_buf_t *      buf,
-//        page_id_t         slot_id
+//        page_id_t         tuplet_id
 //);
 //
 //static inline void
 //coldstore_rem(
 //        anti_buf_t *      buf,
-//        page_id_t         slot_id
+//        page_id_t         tuplet_id
 //);
 
 static inline const page_id_t *
@@ -851,7 +851,7 @@ anticache_page_by_id(
     page_id_t         id)
 {
     require_non_null(buf);
-    WARN_IF((id >= buf->page_anticache.next_page_id), "Requested page slot_id '%d' might not from this pool", id);
+    WARN_IF((id >= buf->page_anticache.next_page_id), "Requested page tuplet_id '%d' might not from this pool", id);
 
     page_t *result = NULL;
 
@@ -946,7 +946,7 @@ anticache_add_page_safe(
 //static inline
 //void coldstore_add(
 //    anti_buf_t *buf,
-//    page_id_t slot_id)
+//    page_id_t tuplet_id)
 //{
 //    panic(NOTIMPLEMENTED, to_string(coldstore_add));   // TODO: Implement
 //}
@@ -954,7 +954,7 @@ anticache_add_page_safe(
 //static inline void
 //coldstore_rem(
 //    anti_buf_t *buf,
-//    page_id_t slot_id)
+//    page_id_t tuplet_id)
 //{
 //    panic(NOTIMPLEMENTED, to_string(coldstore_rem));   // TODO: Implement
 //}
@@ -1016,21 +1016,21 @@ hotstore_has_unsafe(
 //static inline bool
 //hotstore_rem_unsafe(
 //        anti_buf_t *buf,
-//        page_id_t slot_id)
+//        page_id_t tuplet_id)
 //{
 //    panic_if((buf == NULL), BADARGNULL, to_string(buf));
 //    panic_if((buf->page_anticache.hot_store == NULL), UNEXPECTED, "page register in buf");
-//    panic_if (!(dict_contains_key(buf->page_anticache.hot_store, &slot_id)), BADPAGEID, slot_id);
+//    panic_if (!(dict_contains_key(buf->page_anticache.hot_store, &tuplet_id)), BADPAGEID, tuplet_id);
 //
 //    const void *it = list_begin(buf->page_anticache.hot_store_page_ids);
 //    do {
-//        if (* (page_id_t *)it == slot_id) {
+//        if (* (page_id_t *)it == tuplet_id) {
 //            list_remove(it);
 //            break;
 //        }
 //    } while ((it = list_next(it)));
 //
-//    return dict_remove(buf->page_anticache.hot_store, 1, &slot_id);
+//    return dict_remove(buf->page_anticache.hot_store, 1, &tuplet_id);
 //}
 
 static inline page_t *

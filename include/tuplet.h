@@ -5,9 +5,11 @@
 
 struct schema_t;
 
+typedef uint32_t tuplet_id_t;
+
 typedef struct tuplet_t {
     struct frag_t *fragment; /*<! fragment in which this tuplet exists */
-    size_t slot_id; /*<! number of this tuplet inside the fragment */
+    tuplet_id_t tuplet_id; /*<! number of this tuplet inside the fragment */
     void *attr_base; /*<! pointer in fragment where first attribute of this tuplet is located */
 
     /* operations */

@@ -26,6 +26,7 @@
 #include <tuplet.h>
 #include <frag_printer.h>
 #include <containers/vector.h>
+#include <frags/frag_host_vm.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 // F O R W A R D I N G
@@ -57,6 +58,19 @@ typedef struct frag_t {
     struct tuplet_t *(*_insert)(struct frag_t *self, size_t ntuplets);
 } frag_t;
 
+enum frag_impl_type_t {
+    FIT_HOST_NSM_VM,
+    FIT_HOST_DSM_VM
+};
+
+static struct frag_type_pool_t {
+    enum frag_impl_type_t binding;
+    frag_t *(*_create)(schema_t *schema, size_t tuplet_capacity);
+} frag_type_pool[] = {
+    { FIT_HOST_NSM_VM, gs_frag_host_vm_nsm_create },
+    { FIT_HOST_DSM_VM, gs_frag_host_vm_dsm_create },
+};
+
 // ---------------------------------------------------------------------------------------------------------------------
 // M A R C O S
 // ---------------------------------------------------------------------------------------------------------------------
@@ -77,7 +91,9 @@ schema_t *gs_schema_create();
 
 void gs_schema_free(schema_t *schema);
 
-frag_t *gs_fragment_alloc(schema_t *schema, size_t tuplet_capacity, enum tuplet_format format);
+schema_t *gs_schema_cpy(schema_t *schema);
+
+frag_t *gs_fragment_alloc(schema_t *schema, size_t tuplet_capacity, enum frag_impl_type_t type);
 
 struct tuplet_t *gs_fragment_insert(frag_t *frag, size_t ntuplets);
 

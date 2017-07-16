@@ -54,45 +54,6 @@ int main() {
     timer_stop(&timer);
     printf("\n\ntime taken %0.4fms\n", timer_diff_ms(&timer));
 
-
-    const size_t NUM_TUPLES = 4;
-
-    schema_t *schema = gs_schema_create();
-
-    gs_attr_create_uint64 ("My Attribute",       schema);
-    gs_attr_create_string("My Attribute 2", 42, schema);
-    gs_attr_create_bool  ("My Attribute Bool",  schema);
-
-    frag_t *fragment = gs_fragment_alloc(schema, NUM_TUPLES, TF_NSM);
-    tuplet_t   *tuplet   = gs_fragment_insert(fragment, NUM_TUPLES);
-    field_t    *field    = gs_field_open(tuplet);
-
-    uint64_t int_value;
-    char *str_value;
-    bool bol_value;
-
-    int_value = 1;          gs_field_write(field, &int_value);
-    str_value = "Hello\n";  gs_field_write(field, str_value);
-    bol_value = true;       gs_field_write(field, &bol_value);
-
-    int_value = 2;          gs_field_write(field, &int_value);
-    str_value = "World\n";  gs_field_write(field, str_value);
-    bol_value = true;       gs_field_write(field, &bol_value);
-
-    int_value = 3;          gs_field_write(field, &int_value);
-    str_value = "Hi\n";     gs_field_write(field, str_value);
-    bol_value = true;       gs_field_write(field, &bol_value);
-
-    int_value = 42;         gs_field_write(field, &int_value);
-    str_value = "There\n";  gs_field_write(field, str_value);
-    bol_value = true;       gs_field_write(field, &bol_value);
-
-
-
-    gs_schema_free(schema);
-    gs_fragment_free(fragment);
-
-
     return EXIT_SUCCESS;
 }
 

@@ -1,5 +1,10 @@
 #pragma once
 
-#include <frag.h>
+#include <stdinc.h>
+#include <schema.h>
 
-frag_t *gs_frag_host_vm_alloc(schema_t *schema, size_t tuplet_capacity, enum tuplet_format format);
+struct frag_t;
+
+struct frag_t *gs_frag_host_vm_nsm_create(schema_t *schema, size_t tuplet_capacity);
+
+struct frag_t *gs_frag_host_vm_dsm_create(schema_t *schema, size_t tuplet_capacity);

@@ -1230,7 +1230,7 @@ DOCSET_PUBLISHER_NAME  = Publisher
 # If the GENERATE_HTMLHELP tag is set to YES then doxygen generates three
 # additional HTML index files: index.hhp, index.hhc, and index.hhk. The
 # index.hhp is a project file that can be read by Microsoft's HTML Help Workshop
-# (see: http://www.microsoft.com/en-us/download/details.aspx?slot_id=21138) on
+# (see: http://www.microsoft.com/en-us/download/details.aspx?tuplet_id=21138) on
 # Windows.
 #
 # The HTML Help Workshop contains a compiler that can convert all HTML output
@@ -1571,7 +1571,7 @@ EXTERNAL_SEARCH_ID     =
 # The EXTRA_SEARCH_MAPPINGS tag can be used to enable searching through doxygen
 # projects other than the one defined by this configuration file, but that are
 # all added to the same external search index. Each project needs to have a
-# unique slot_id set via EXTERNAL_SEARCH_ID. The search mapping then maps the slot_id of
+# unique tuplet_id set via EXTERNAL_SEARCH_ID. The search mapping then maps the tuplet_id of
 # to a relative location where the documentation can be found. The format is:
 # EXTRA_SEARCH_MAPPINGS = tagname1=loc1 tagname2=loc2 ...
 # This tag requires that the tag SEARCHENGINE is set to YES.
