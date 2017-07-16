@@ -2,10 +2,10 @@
 #include <attr.h>
 #include <field.h>
 
-attr_t *gs_schema_attr_by_id(const schema_t *schema, attr_id_t attr_id)
+struct attr_t *gs_schema_attr_by_id(const schema_t *schema, attr_id_t attr_id)
 {
     assert (attr_id < schema->attr->num_elements);
-    return ((attr_t *)vector_at(schema->attr, attr_id));
+    return ((struct attr_t *)vector_at(schema->attr, attr_id));
 }
 
 schema_t *gs_schema_create()
@@ -13,6 +13,20 @@ schema_t *gs_schema_create()
     schema_t *result = malloc(sizeof(schema_t));
     result->attr = vector_create(sizeof(attr_t), 100);
     return result;
+}
+
+schema_t *gs_schema_subset(schema_t *super, vector_t /*of attr_id_t */ *indices)
+{
+    panic_if(indices->num_elements > super->attr->num_elements, BADINTERNAL,
+             "selected indices of super schema illegal.");
+//    schema_t *result = gs_schema_create();
+//    const attr_id_t *indices_data = (const attr_id_t *) vector_get(indices);
+//    for (size_t i = 0; i < indices->num_elements; i++) {
+//        struct attr_t *attr = gs_schema_attr_by_id(super, indices_data[i]);
+//TODO: XXX        gs_schema_
+//    }
+return NULL;
+
 }
 
 void gs_schema_free(schema_t *schema)

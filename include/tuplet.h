@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdinc.h>
+#include <attr.h>
 #include <frag.h>
 
 struct schema_t;

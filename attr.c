@@ -3,6 +3,16 @@
 #include <field.h>
 #include <frag.h>
 
+#define DEFINE_ATTRIBUTE_CREATE(type_name,internal_type)                                                               \
+attr_id_t gs_attr_create_##type_name(const char *name, schema_t *schema) {                                             \
+    return _attr_default(name, internal_type, 1, schema);                                                              \
+}
+
+#define DEFINE_ATTRIBUTE_ARRAY_CREATE(type_name,internal_type)                                                         \
+attr_id_t gs_attr_create_##type_name(const char *name, size_t length, schema_t *schema) {                              \
+    return _attr_default(name, internal_type, length, schema);                                                         \
+}
+
 attr_id_t _attr_create(const char *name, enum field_type data_type, size_t data_type_rep, ATTR_FLAGS attr_flags,
                      attr_t *foreign_key_to, schema_t *schema)
 {
@@ -24,7 +34,7 @@ attr_id_t _attr_create(const char *name, enum field_type data_type, size_t data_
     return attr.id;
 }
 
-const char *gs_attr_get_name(attr_t *attr)
+const char *gs_attr_get_name(struct attr_t *attr)
 {
     assert (attr);
     return attr->name;
@@ -47,16 +57,6 @@ attr_id_t _attr_default(const char *name, enum field_type data_type, size_t data
     return _attr_create(name, data_type, data_type_rep,
                         (ATTR_FLAGS) { .autoinc = 0, .foreign = 0, .nullable = 0, .primary = 0, .unique = 0 },
                         NULL, schema);
-}
-
-#define DEFINE_ATTRIBUTE_CREATE(type_name,internal_type)                                                               \
-attr_id_t gs_attr_create_##type_name(const char *name, schema_t *schema) {                                             \
-    return _attr_default(name, internal_type, 1, schema);                                                              \
-}
-
-#define DEFINE_ATTRIBUTE_ARRAY_CREATE(type_name,internal_type)                                                         \
-attr_id_t gs_attr_create_##type_name(const char *name, size_t length, schema_t *schema) {                              \
-    return _attr_default(name, internal_type, length, schema);                                                         \
 }
 
 DEFINE_ATTRIBUTE_CREATE(bool, FT_BOOL)

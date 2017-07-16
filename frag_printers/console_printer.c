@@ -43,7 +43,7 @@ static inline void calc_field_print_lens(vector_t *field_print_lens, frag_t *fra
         struct field_t *field = gs_field_open(tuplet);
         for (size_t attr_idx = 0; attr_idx < num_attr; attr_idx++) {
             enum field_type type = gs_schema_attr_type(schema, attr_idx);
-            attr_t *attr = gs_schema_attr_by_id(schema, attr_idx);
+            struct attr_t *attr = gs_schema_attr_by_id(schema, attr_idx);
 
             size_t this_print_len_attr  = strlen(gs_attr_get_name(attr));
             size_t this_print_len_value = gs_unsafe_field_get_println(type, gs_field_read(field));
@@ -98,7 +98,7 @@ static inline void print_frag_header(FILE *file, const frag_t *frag, vector_t *f
     print_h_line(file, frag, num_attr, schema, field_print_lens);
 
     for (size_t attr_idx = 0; attr_idx < num_attr; attr_idx++) {
-        attr_t *attr = gs_schema_attr_by_id(schema, attr_idx);
+        struct attr_t *attr = gs_schema_attr_by_id(schema, attr_idx);
         size_t  col_width = *(size_t *) vector_at(field_print_lens, attr_idx);
         sprintf(format_buffer, "| %%-%zus ", col_width);
         printf(format_buffer, gs_attr_get_name(attr));

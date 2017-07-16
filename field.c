@@ -56,7 +56,7 @@ size_t gs_field_size(field_t *field)
     return (gs_attr_total_size(attr));
 }
 
-size_t gs_attr_total_size(const attr_t *attr)
+size_t gs_attr_total_size(const struct attr_t *attr)
 {
     return attr->type_rep * gs_field_type_sizeof(attr->type);
 }

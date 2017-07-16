@@ -72,26 +72,10 @@ static struct frag_type_pool_t {
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
-// M A R C O S
-// ---------------------------------------------------------------------------------------------------------------------
-
-#define DECLARE_ATTRIBUTE_CREATE(type_name,internal_type)                                                              \
-attr_id_t gs_attr_create_##type_name(const char *name, schema_t *schema);
-
-#define DECLARE_ATTRIBUTE_ARRAY_CREATE(type_name,internal_type)                                                        \
-attr_id_t gs_attr_create_##type_name(const char *name, size_t length, schema_t *schema);
-
-// ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   D E C L A R A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
 __BEGIN_DECLS
-
-schema_t *gs_schema_create();
-
-void gs_schema_free(schema_t *schema);
-
-schema_t *gs_schema_cpy(schema_t *schema);
 
 frag_t *gs_fragment_alloc(schema_t *schema, size_t tuplet_capacity, enum frag_impl_type_t type);
 
@@ -110,30 +94,6 @@ size_t gs_fragment_num_of_tuplets(const frag_t *frag);
 schema_t *gs_fragment_get_schema(const frag_t *frag);
 
 enum field_type gs_fragment_get_field_type(const frag_t *frag, attr_id_t id);
-
-DECLARE_ATTRIBUTE_CREATE(bool, FT_BOOL)
-
-DECLARE_ATTRIBUTE_CREATE(int8, FT_INT8)
-
-DECLARE_ATTRIBUTE_CREATE(int16, FT_INT16)
-
-DECLARE_ATTRIBUTE_CREATE(int32, FT_INT32)
-
-DECLARE_ATTRIBUTE_CREATE(int64, FT_INT64)
-
-DECLARE_ATTRIBUTE_CREATE(uint8, FT_UINT8)
-
-DECLARE_ATTRIBUTE_CREATE(uint16, FT_UINT16)
-
-DECLARE_ATTRIBUTE_CREATE(uint32, FT_UINT32)
-
-DECLARE_ATTRIBUTE_CREATE(uint64, FT_UINT64)
-
-DECLARE_ATTRIBUTE_CREATE(float32, FT_FLOAT32)
-
-DECLARE_ATTRIBUTE_CREATE(float64, FT_FLOAT64)
-
-DECLARE_ATTRIBUTE_ARRAY_CREATE(string, FT_CHAR)
 
 void gs_checksum_nsm(schema_t *tab, const void *tuplets, size_t ntuplets);
 

@@ -67,7 +67,7 @@ size_t gs_tuplet_size_by_schema(const schema_t *schema)
 {
     size_t total = 0;
     for (size_t attr_idx = 0; attr_idx < schema->attr->num_elements; attr_idx++) {
-        attr_t *attr = gs_schema_attr_by_id(schema, attr_idx);
+        struct attr_t *attr = gs_schema_attr_by_id(schema, attr_idx);
         total += gs_attr_total_size(attr);
     }
     return total;
