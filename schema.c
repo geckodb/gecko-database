@@ -2,7 +2,7 @@
 #include <attr.h>
 #include <field.h>
 
-struct attr_t *gs_schema_attr_by_id(const schema_t *schema, attr_id_t attr_id)
+const struct attr_t *gs_schema_attr_by_id(const schema_t *schema, attr_id_t attr_id)
 {
     assert (attr_id < schema->attr->num_elements);
     return ((struct attr_t *)vector_at(schema->attr, attr_id));
@@ -17,14 +17,14 @@ schema_t *gs_schema_create()
 
 schema_t *gs_schema_subset(schema_t *super, vector_t /*of attr_id_t */ *indices)
 {
-    panic_if(indices->num_elements > super->attr->num_elements, BADINTERNAL,
+    /*panic_if(indices->num_elements > super->attr->num_elements, BADINTERNAL,
              "selected indices of super schema illegal.");
-//    schema_t *result = gs_schema_create();
-//    const attr_id_t *indices_data = (const attr_id_t *) vector_get(indices);
-//    for (size_t i = 0; i < indices->num_elements; i++) {
-//        struct attr_t *attr = gs_schema_attr_by_id(super, indices_data[i]);
-//TODO: XXX        gs_schema_
-//    }
+    schema_t *result = gs_schema_create();
+    const attr_id_t *indices_data = (const attr_id_t *) vector_get(indices);
+    for (size_t i = 0; i < indices->num_elements; i++) {
+        const struct attr_t *attr = gs_schema_attr_by_id(super, indices_data[i]);
+        //gs_attr_cpy
+    }*/ // TODO
 return NULL;
 
 }
@@ -53,6 +53,6 @@ size_t gs_schema_num_attributes(schema_t *schema)
 enum field_type gs_schema_attr_type(schema_t *schema, attr_id_t id)
 {
     assert(schema);
-    attr_t *attr = gs_schema_attr_by_id(schema, id);
+    const attr_t *attr = gs_schema_attr_by_id(schema, id);
     return attr->type;
 }

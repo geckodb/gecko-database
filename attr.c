@@ -25,7 +25,7 @@ attr_id_t _attr_create(const char *name, enum field_type data_type, size_t data_
             .type_rep = data_type_rep,
             .flags    = attr_flags,
             .str_format_mlen   = 0,
-            .foreign_id = (foreign_key_to != NULL? foreign_key_to->id : -1)
+            .foreign_id = (foreign_key_to != NULL? foreign_key_to->id : -1) // TODO: this
     };
 
     strcpy(attr.name, name);
@@ -34,7 +34,7 @@ attr_id_t _attr_create(const char *name, enum field_type data_type, size_t data_
     return attr.id;
 }
 
-const char *gs_attr_get_name(struct attr_t *attr)
+const char *gs_attr_get_name(const struct attr_t *attr)
 {
     assert (attr);
     return attr->name;
@@ -50,6 +50,14 @@ enum field_type gs_attr_get_type(const attr_t *attr)
 {
     assert (attr);
     return attr->type;
+}
+
+attr_t *gs_attr_cpy(const attr_t *template, schema_t *new_owner)
+{
+    assert (template);
+    assert(new_owner);
+//    _attr_create(template->name, template->type, template->type_rep, template->flags, template.)
+    return NULL; // TODO
 }
 
 attr_id_t _attr_default(const char *name, enum field_type data_type, size_t data_type_rep, schema_t *schema)
