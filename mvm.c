@@ -2,6 +2,9 @@
 #include <debug.h>
 #include <mondrian.h>
 
+#define MVM_MAGIC_WORD     0x4D564D
+#define MVM_MAJOR_VERSION  1
+#define MVM_MINOR_VERSION  1
 #define STRING_CAST(opperand) (const char *) opperand
 
 typedef struct vm_frame_t
@@ -22,7 +25,17 @@ struct mondrian_vm_t
 
 typedef struct program_t
 {
+    struct {
+        u64 magic_word        : 48;
+        u64 mvm_version_minor :  5;
+        u64 mvm_version_major : 11;
+    };
+    char *prog_name;
+    char *prog_author;
+    char *prog_comments;
+
     vector_t *instructions;
+
 } program_t;
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -73,7 +86,7 @@ int mondrian_vm_run(mondrian_vm_t *vm, const program_t *program, int *return_val
         };
         vector_add(vm->frames, 1, &frame);
         while (mondrian_vm_tick(vm));
-        LOG_DEBUG(vm->db, "mvm program %p finished with exit code %d", program, vm->return_value);
+        LOG_DEBUG(vm->db, "mvm program '%s' (%p) finished with exit code %d", program_name(program), program, vm->return_value);
         *return_value = vm->return_value;
         return MONDRIAN_OK;
     }
@@ -103,11 +116,18 @@ int mondrian_vm_free(mondrian_vm_t *vm)
     }
 }
 
-int program_new(program_t **out)
+int program_new(program_t **out, const char *prog_name, const char *prog_author,
+                const char *prog_comment)
 {
     *out = malloc(sizeof(program_t));
     **out = (program_t) {
-        .instructions = vector_create(sizeof(instruction_t), 10)
+        .instructions = vector_create(sizeof(instruction_t), 10),
+        .magic_word   = MVM_MAGIC_WORD,
+        .mvm_version_major = MVM_MAJOR_VERSION,
+        .mvm_version_minor = MVM_MINOR_VERSION,
+        .prog_name = strdup(prog_name),
+        .prog_author = strdup(prog_author),
+        .prog_comments = strdup(prog_comment)
     };
     return ((*out)->instructions != NULL ? MONDRIAN_OK : MONDRIAN_ERROR);
 }
@@ -139,6 +159,11 @@ int program_print(FILE *out, const program_t *program)
                mnemonic, inst.op1, inst.op2, inst.op3, inst.op4);
     }
     return MONDRIAN_OK;
+}
+
+const char *program_name(const program_t *program)
+{
+    return program->prog_name;
 }
 
 int program_free(program_t *program)
@@ -173,11 +198,11 @@ static inline int mondrian_vm_tick(mondrian_vm_t *vm)
         vm->pc += (vm->rollback ? -1 : +1);
         switch (inst->opcode) {
             case MONDRIAN_OPCODE_ABORT:
-                LOG_DEBUG(vm->db, "ABORT  mvm program %p ABORT received", vm->program);
+                LOG_DEBUG(vm->db, "ABORT  mvm program '%s' (%p) ABORT received", program_name(vm->program), vm->program);
                 vm->return_value = MONDRIAN_VM_USER_ABORT;
                 return MONDRIAN_BREAK;
             case MONDRIAN_OPCODE_COMMIT:
-                LOG_DEBUG(vm->db, "COMMIT mvm program %p COMMIT received", vm->program);
+                LOG_DEBUG(vm->db, "COMMIT mvm program '%s' (%p) COMMIT received", program_name(vm->program), vm->program);
                 vm->return_value = MONDRIAN_VM_COMMIT;
                 return MONDRIAN_BREAK;
             case MONDRIAN_OPCODE_PRINT:
@@ -196,8 +221,9 @@ static inline int mondrian_vm_tick(mondrian_vm_t *vm)
             panic("Unknown opcode in program %p: 0x%04x", vm->program, inst->opcode);
         }
         if ((exec_result) != MONDRIAN_OK) {
-            LOG_DEBUG(vm->db, "ABORT  0x%08lx: %s in mvm program %p rejected. Initialize ROLLBACK.",
-                      (vm->pc - 1) * sizeof(instruction_t), opcode_to_mnemonic(inst->opcode), vm->program);
+            LOG_DEBUG(vm->db, "ABORT  0x%08lx: %s in mvm program '%s' (%p) rejected. Initialize ROLLBACK.",
+                      (vm->pc - 1) * sizeof(instruction_t), opcode_to_mnemonic(inst->opcode), program_name(vm->program),
+                      vm->program);
             vm->rollback = true;
             vm->pc--;
         }
@@ -222,7 +248,7 @@ static inline int mondrian_vm_exec_print(u64 op1)
 static inline int mondrian_vm_exec_create_table(mondrian_vm_t *vm, u64 op1)
 {
     if (vm->rollback) {
-        LOG_DEBUG(vm->db, "ROLLBACK CreateTable in %p", vm);
+        LOG_DEBUG(vm->db, "ROLLBACK CreateTable in '%s' (%p)", program_name(vm->program), vm->program);
         return MONDRIAN_OK;
     } else {
         return MONDRIAN_OK;
@@ -232,7 +258,7 @@ static inline int mondrian_vm_exec_create_table(mondrian_vm_t *vm, u64 op1)
 static inline int mondrian_vm_exec_end_table(mondrian_vm_t *vm)
 {
     if (vm->rollback) {
-        LOG_DEBUG(vm->db, "ROLLBACK EndTable in %p", vm);
+        LOG_DEBUG(vm->db, "ROLLBACK EndTable in '%s' (%p)", program_name(vm->program), vm->program);
         return MONDRIAN_OK;
     } else {
         return MONDRIAN_ERROR;
@@ -242,7 +268,7 @@ static inline int mondrian_vm_exec_end_table(mondrian_vm_t *vm)
 static inline int mondrian_vm_exec_add_column(mondrian_vm_t *vm, u64 op1, u64 op2, u64 op3, u64 op4)
 {
     if (vm->rollback) {
-        LOG_DEBUG(vm->db, "ROLLBACK AddColumn in %p", vm);
+        LOG_DEBUG(vm->db, "ROLLBACK AddColumn in '%s' (%p)", program_name(vm->program), vm->program);
         return MONDRIAN_OK;
     } else {
         return MONDRIAN_OK;

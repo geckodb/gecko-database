@@ -47,7 +47,7 @@ int mondrian_exec(mvm_handle_t *out, mondrian_t *instance, const program_t *prog
             .program = program
         };
 
-        LOG_DEBUG(instance, "intent to execute mvm program %p received", program);
+        LOG_DEBUG(instance, "intent to execute mvm program '%s' (%p) received", program_name(program), program);
 
         retval = future_create(args, promise_mondrian_vm_exec, run_policy);
         vm_exec_info info = {
@@ -98,7 +98,7 @@ void *promise_mondrian_vm_exec(promise_result *return_value, const void *capture
     panic_if((mondrian_vm_create(&vm, args->instance) != MONDRIAN_OK),
              "Internal error: unable to create virtual machine for program %p", args->program);
 
-    LOG_DEBUG(args->instance, "mvm program %p is starting...", args->program);
+    LOG_DEBUG(args->instance, "mvm program %s (%p) is starting...", program_name(args->program), args->program);
 
     mondrian_vm_run(vm, args->program, &result);
     *return_value =  (result == 0 ? resolved : rejected);

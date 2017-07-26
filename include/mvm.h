@@ -25,9 +25,14 @@ typedef struct instruction_t
 #define MONDRIAN_OPCODE_COMMIT               0x0000
 #define MONDRIAN_OPCODE_ABORT                0x0001
 #define MONDRIAN_OPCODE_PRINT                0x0002
+
 #define MONDRIAN_OPCODE_ADD_COLUMN           0x0003
 #define MONDRIAN_OPCODE_CREATE_TABLE         0x0004
 #define MONDRIAN_OPCODE_END_TABLE            0x0005
+
+#define MONDRIAN_OPCODE_PUSH                 0x0006
+#define MONDRIAN_OPCODE_POP                  0x0007
+#define MONDRIAN_OPCODE_DUP                  0x0008
 
 
 static struct {
@@ -96,10 +101,10 @@ static struct {
     program_add(prog, &inst);                                                                                          \
 }
 
-#define BEGIN(/* program_t * */ out)                                                                                   \
+#define BEGIN(/* program_t * */ out, /* const char * */ name, /* const char * */ author, /* const char * */ comment )  \
 {                                                                                                                      \
     program_t *prog;                                                                                                   \
-    program_new(&prog);                                                                                                \
+    program_new(&prog, name, author, comment);                                                                         \
     out = prog;
 
 #define END()                                                                                                          \
@@ -114,11 +119,13 @@ int mondrian_vm_reset(mondrian_vm_t *vm);
 
 int mondrian_vm_free(mondrian_vm_t *vm);
 
-int program_new(program_t **out);
+int program_new(program_t **out, const char *prog_name, const char *prog_author, const char *prog_comment);
 
 int program_add(program_t *out, instruction_t *inst);
 
 int program_print(FILE *out, const program_t *program);
+
+const char *program_name(const program_t *program);
 
 int program_free(program_t *program);
 

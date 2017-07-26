@@ -31,7 +31,7 @@ static program_t *prog_print_text(const char *text)
 {
     program_t *program;
 
-    BEGIN             (program)
+    BEGIN             (program, "echo", "Marcus Pinnecke", "Test to echo strings to console")
         mvm_Print     (text)
         mvm_Commit    ()
     END               ()
@@ -44,7 +44,7 @@ static program_t *prog_create_table_okay()
 {
     program_t *program;
 
-    BEGIN                    (program)
+    BEGIN                    (program, "CreateTable", "Marcus Pinnecke", "Test create table (#1)")
         mvm_CreateTable      ("MyTable")
         mvm_AddColumn        ("A1", FT_BOOL,    1, 0);
         mvm_AddColumn        ("A2", FT_CHAR,   42, 0);
@@ -60,7 +60,7 @@ static program_t *prog_create_table_userabort()
 {
     program_t *program;
 
-    BEGIN                    (program)
+    BEGIN                    (program, "CreateTable", "Marcus Pinnecke", "Test create table (#2)")
         mvm_CreateTable      ("MyTable")
         mvm_AddColumn        ("A1", FT_BOOL,    1, 0);
         mvm_AddColumn        ("A2", FT_CHAR,   42, 0);
@@ -77,7 +77,7 @@ static program_t *prog_create_table_autoabort()
 {
     program_t *program;
 
-    BEGIN                    (program)
+    BEGIN                    (program, "CreateTable", "Marcus Pinnecke", "Test create table (#3)")
         mvm_CreateTable      ("MyTable")
         mvm_AddColumn        ("A1", FT_BOOL,    1, 0);
         mvm_AddColumn        ("A1", FT_CHAR,   42, 0);  /* attribute name is given twice, auto abort */
