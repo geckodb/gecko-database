@@ -61,6 +61,12 @@ bool vector_resize(vector_t *vec, size_t num_elements)
     } else return false;
 }
 
+size_t vector_num_elements(const vector_t *vec)
+{
+    require_non_null(vec);
+    return (vec->num_elements);
+}
+
 void vector_memset(vector_t *vec, size_t pos_start, size_t num_elements, unsigned char data)
 {
     require_nonnull(vec);

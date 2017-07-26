@@ -2,6 +2,15 @@
 
 #include <stdinc.h>
 
+#define MONDRIAN_OK                 1
+#define MONDRIAN_CONTINUE           1
+#define MONDRIAN_BREAK              0
+#define MONDRIAN_ERROR              0
+
+#define MONDRIAN_VM_COMMIT          0
+#define MONDRIAN_VM_USER_ABORT      1
+#define MONDRIAN_VM_SYSTEM_ABORT    2
+
 typedef enum {
     err_no_error,
     err_illegal_args,

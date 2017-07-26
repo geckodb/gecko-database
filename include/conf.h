@@ -50,3 +50,17 @@ conf_get_size_t(
         size_t default_value
 );
 
+typedef struct db_config_t {
+    struct {
+        uint32_t port;
+    } inet;
+    struct {
+        bool debug;
+        bool warn;
+        bool error;
+    } log;
+} db_config_t;
+
+#define CONF_INET_PORT          1316
+
+void gs_db_config_load(db_config_t *config);

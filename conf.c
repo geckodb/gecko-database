@@ -1,5 +1,8 @@
 #include <containers/dict.h>
 #include <containers/dicts/hash_table.h>
+#include <conf.h>
+
+
 
 #define BADCWD          "Unable to get working directory (file name might exceed limit of %d)"
 #define NOCONFIG        "Configuration map for '%s' is not set. Did you call 'conf_load'?"
@@ -220,4 +223,11 @@ conf_get_size_t(
 ) {
     WARN_IF((swapbuf_config.dict == NULL), NOCONFIG, settings_key);
     pref_get_size_t(out, &swapbuf_config, settings_key, &default_value);
+}
+
+void gs_db_config_load(db_config_t *config)
+{
+    require_non_null(config);
+    config->inet.port = CONF_INET_PORT;
+    config->log.debug = config->log.warn = config->log.error = true;
 }

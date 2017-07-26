@@ -1,14 +1,14 @@
 #include <shell.h>
 #include <curses.h>
 #include <string.h>
-#include <gridstore.h>
+#include <mondrian.h>
 
 static bool loader_is_running = true;
 static bool shell_is_runnnig = true;
 
 #define GRIDSTORE_VERSION_STR "0.0.0-0001-vanilla"
 
-static gridstore_instance_t GRIDSTORE_INSTANCE;
+static mondrian_t *GRIDSTORE_INSTANCE;
 
 // *** DEBUG INFORMATION AND NON-UNIX SYSTEMS *** uncomment this line to disable curses terminal
 //#define NCURSES
@@ -312,7 +312,7 @@ static bool loader_run_startup() {
     PRINTW("Loader is starting...\n");
     SETUP_COLOR_PAIRS();
 
-    gridstore_init(&GRIDSTORE_INSTANCE);
+    mondrian_open(&GRIDSTORE_INSTANCE);
 
     return true;
 }
@@ -325,7 +325,7 @@ static bool loader_run_main() {
 
 static bool loader_run_shutdown() {
     PRINTW("Loader is shutting down...\n");
-    gridstore_shutdown(&GRIDSTORE_INSTANCE);
+    mondrian_close(GRIDSTORE_INSTANCE);
     return true;
 }
 
@@ -344,7 +344,7 @@ static bool loader_show_internal_failure_message() {
     return true;
 }
 
-void gs_shell_start()
+void gs_shell_start(const char *connection_str)
 {
     bool success;
     INITCR();

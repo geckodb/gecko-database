@@ -3,18 +3,18 @@
 #include <stdinc.h>
 
 enum field_type {
-    FT_BOOL,
-    FT_INT8,
-    FT_INT16,
-    FT_INT32,
-    FT_INT64,
-    FT_UINT8,
-    FT_UINT16,
-    FT_UINT32,
-    FT_UINT64,
-    FT_FLOAT32,
-    FT_FLOAT64,
-    FT_CHAR
+    FT_BOOL     =  0,
+    FT_INT8     =  1,
+    FT_INT16    =  2,
+    FT_INT32    =  3,
+    FT_INT64    =  4,
+    FT_UINT8    =  5,
+    FT_UINT16   =  6,
+    FT_UINT32   =  7,
+    FT_UINT64   =  8,
+    FT_FLOAT32  =  9,
+    FT_FLOAT64  = 10,
+    FT_CHAR     = 11
 };
 
 size_t gs_field_type_sizeof(enum field_type type);

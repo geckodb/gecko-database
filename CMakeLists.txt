@@ -17,7 +17,7 @@ include_directories(${CURSES_INCLUDE_DIR})
 find_package(Doxygen)
 option(BUILD_DOCUMENTATION "API documentation requires Doxygen" ${DOXYGEN_FOUND})
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -std=c11 -Wall -Werror")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -std=c11 -Wall -Werror")
 
 set(CMAKE_BINARY_DIR
         ${CMAKE_SOURCE_DIR}/bin)
@@ -51,7 +51,7 @@ set(SOURCE_FILES
         include/tableimg.h
         include/tuplet.h
         include/operators/scan.h
-        include/gridstore.h
+        include/mondrian.h
         include/frag_printer.h
         include/frag_printers/console_printer.h
         include/unsafe.h
@@ -59,6 +59,12 @@ set(SOURCE_FILES
         include/field_type.h
         include/grid_table.h
         include/tuple.h
+        include/inet/server.h
+        include/debug.h
+        include/global.h
+        include/inet/request.h
+        include/inet/response.h
+        include/mvm.h
 
         async.c
         attr.c
@@ -79,7 +85,7 @@ set(SOURCE_FILES
         storage/memory.c
         tuplet.c
         operators/scan.c
-        gridstore.c
+        mondrian.c
         frag_printer.c
         frag_printers/console_printer.c
         unsafe.c
@@ -87,12 +93,23 @@ set(SOURCE_FILES
         field_type.c
         grid_table.c
         tuple.c
+        inet/server.c
+        debug.c
+        global.c
+        inet/request.c
+        inet/response.c
+        mvm.c
         )
 
 add_executable(
         gs main.c
         shell.c
         include/shell.h
+        ${SOURCE_FILES})
+
+add_executable(
+        mondrian
+        playground/mondrian_virtual_machine.c
         ${SOURCE_FILES})
 
 target_link_libraries(gs ${CURSES_LIBRARIES})
@@ -164,6 +181,10 @@ target_link_libraries(
 
 target_link_libraries(
         gs
+        ${OPENSSL_LIBRARIES})
+
+target_link_libraries(
+        mondrian
         ${OPENSSL_LIBRARIES})
 
 target_link_libraries(

@@ -37,9 +37,18 @@
 #include <ctype.h>
 #include <errno.h>
 
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <string.h>
+#include <sys/stat.h>
+
 #include <openssl/md5.h>
 
 #include <conf.h>
+#include <global.h>
 #include <msg.h>
 #include <error.h>
 #include <require.h>
@@ -60,6 +69,11 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 typedef uint64_t attr_id_t;
+
+typedef uint8_t     u8;
+typedef uint16_t   u16;
+typedef uint32_t   u32;
+typedef uint64_t   u64;
 
 enum tuplet_format {
     TF_NSM  = 1,

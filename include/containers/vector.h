@@ -52,6 +52,8 @@ vector_t *vector_create_ex(size_t element_size, size_t capacity, vector_flags fl
 
 bool vector_resize(vector_t *vec, size_t num_elements);
 
+size_t vector_num_elements(const vector_t *vec);
+
 void vector_memset(vector_t *vec, size_t pos_start, size_t num_elements, unsigned char data);
 
 vector_t *vector_cpy(vector_t *proto);

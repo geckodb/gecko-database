@@ -5,11 +5,12 @@
 
 
 typedef struct {
+    char *table_name;
     vector_t *attr;
     vector_t *mapped_attr_idx;
 } schema_t;
 
-schema_t *gs_schema_create();
+schema_t *gs_schema_create(const char *table_name);
 
 schema_t *gs_schema_subset(schema_t *super, vector_t /*of size_t*/ *indices);
 
