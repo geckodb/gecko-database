@@ -65,6 +65,7 @@ set(SOURCE_FILES
         include/inet/request.h
         include/inet/response.h
         include/mvm.h
+        include/progpool.h
 
         async.c
         attr.c
@@ -99,6 +100,7 @@ set(SOURCE_FILES
         inet/request.c
         inet/response.c
         mvm.c
+        progpool.c
         )
 
 add_executable(

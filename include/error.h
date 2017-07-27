@@ -6,6 +6,7 @@
 #define MONDRIAN_CONTINUE           1
 #define MONDRIAN_BREAK              0
 #define MONDRIAN_ERROR              0
+#define MONDRIAN_NOSUCHELEM         2
 
 #define MONDRIAN_VM_COMMIT          0
 #define MONDRIAN_VM_USER_ABORT      1

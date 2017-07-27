@@ -1529,6 +1529,54 @@ pref.c.s:
 	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/pref.c.s
 .PHONY : pref.c.s
 
+progpool.o: progpool.c.o
+
+.PHONY : progpool.o
+
+# target to build an object file
+progpool.c.o:
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/progpool.c.o
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/progpool.c.o
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/progpool.c.o
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/progpool.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/progpool.c.o
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/progpool.c.o
+	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/progpool.c.o
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/progpool.c.o
+.PHONY : progpool.c.o
+
+progpool.i: progpool.c.i
+
+.PHONY : progpool.i
+
+# target to preprocess a source file
+progpool.c.i:
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/progpool.c.i
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/progpool.c.i
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/progpool.c.i
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/progpool.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/progpool.c.i
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/progpool.c.i
+	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/progpool.c.i
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/progpool.c.i
+.PHONY : progpool.c.i
+
+progpool.s: progpool.c.s
+
+.PHONY : progpool.s
+
+# target to generate assembly for a file
+progpool.c.s:
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/progpool.c.s
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/progpool.c.s
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/progpool.c.s
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/progpool.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/progpool.c.s
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/progpool.c.s
+	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/progpool.c.s
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/progpool.c.s
+.PHONY : progpool.c.s
+
 require.o: require.c.o
 
 .PHONY : require.o
@@ -2155,6 +2203,9 @@ help:
 	@echo "... pref.o"
 	@echo "... pref.i"
 	@echo "... pref.s"
+	@echo "... progpool.o"
+	@echo "... progpool.i"
+	@echo "... progpool.s"
 	@echo "... require.o"
 	@echo "... require.i"
 	@echo "... require.s"

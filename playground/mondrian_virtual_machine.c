@@ -4,87 +4,51 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
-static program_t *prog_print_text(const char *text);
-static program_t *prog_create_table_okay();
-static program_t *prog_create_table_userabort();
-static program_t *prog_create_table_autoabort();
+static program_t *prog_test();
 
 
 //----------------------------------------------------------------------------------------------------------------------
 
-static void run_print_test();
-static void run_create_tables();
+static void run_test();
 
 //----------------------------------------------------------------------------------------------------------------------
 
 int main(void)
 {
-    run_print_test();
-    run_create_tables();
+    run_test();
 
     return 0;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 
-static program_t *prog_print_text(const char *text)
+static program_t *prog_test()
 {
     program_t *program;
 
-    BEGIN             (program, "echo", "Marcus Pinnecke", "Test to echo strings to console")
-        mvm_Print     (text)
-        mvm_Commit    ()
-    END               ()
+    BEGIN                    (program, "programs", "Marcus Pinnecke", "Shows installed programs")
 
-    return program;
-}
+        ADD(                 MVM_OC_PUSH,       ACCESS_GLOBAL)
+        ADD(                 MVM_OC_PUSH,       MODE_SHARED)
+        ADD(                 MVM_OC_ACQ_LOCK,   CONTAINER_PROGPOOL)
+        ADD(                 MVM_OC_VMOVE,      VARIABLE_LOCAL_0)
+
+        ADD(                 MVM_OC_PROGLIST,   0)
+        ADD(                 MVM_OC_VMOVE,      VARIABLE_RCX)
+
+//        ADD(                 MVM_OC_PUSH,       ACCESS_GLOBAL)XXX
+        ADD(                 MVM_OC_TCREATE,    FORCE_NO_FORCE)
 
 
-static program_t *prog_create_table_okay()
-{
-    program_t *program;
+        ADD(                 MVM_OC_PROGINFO,   0)
+        ADD(                 MVM_OC_POP,        0)
+        ADD(                 MVM_OC_DEC,        VARIABLE_RCX)
+        ADD(                 MVM_OC_RJMP_NZ,    -3)
 
-    BEGIN                    (program, "CreateTable", "Marcus Pinnecke", "Test create table (#1)")
-        mvm_CreateTable      ("MyTable")
-        mvm_AddColumn        ("A1", FT_BOOL,    1, 0);
-        mvm_AddColumn        ("A2", FT_CHAR,   42, 0);
-        mvm_AddColumn        ("A3", FT_FLOAT32, 1, 0);
-        mvm_EndTable         ()
-        mvm_Commit           ()
-    END                      ()
+        ADD(                 MVM_OC_VLOAD,      VARIABLE_LOCAL_0)
 
-    return program;
-}
-
-static program_t *prog_create_table_userabort()
-{
-    program_t *program;
-
-    BEGIN                    (program, "CreateTable", "Marcus Pinnecke", "Test create table (#2)")
-        mvm_CreateTable      ("MyTable")
-        mvm_AddColumn        ("A1", FT_BOOL,    1, 0);
-        mvm_AddColumn        ("A2", FT_CHAR,   42, 0);
-        mvm_AddColumn        ("A3", FT_FLOAT32, 1, 0);
-        mvm_Abort            ()
-        mvm_EndTable         ()
-        mvm_Commit           ()
-    END                      ()
-
-    return program;
-}
-
-static program_t *prog_create_table_autoabort()
-{
-    program_t *program;
-
-    BEGIN                    (program, "CreateTable", "Marcus Pinnecke", "Test create table (#3)")
-        mvm_CreateTable      ("MyTable")
-        mvm_AddColumn        ("A1", FT_BOOL,    1, 0);
-        mvm_AddColumn        ("A1", FT_CHAR,   42, 0);  /* attribute name is given twice, auto abort */
-        mvm_AddColumn        ("A3", FT_FLOAT32, 1, 0);
-        mvm_Abort            ()
-        mvm_EndTable         ()
-        mvm_Commit           ()
+        ADD(                 MVM_OC_REL_LOCK,   0)
+        ADD(                 MVM_OC_COMMIT,     0)
     END                      ()
 
     return program;
@@ -92,56 +56,22 @@ static program_t *prog_create_table_autoabort()
 
 //----------------------------------------------------------------------------------------------------------------------
 
-static void run_print_test()
+static void run_test()
 {
     mondrian_t *db;
 
-    program_t *prog1 = prog_print_text("Hello Word!\n");
-    program_t *prog2 = prog_print_text("Hello VM!\n");
+    program_t *prog1 = prog_test();
+    prog_id_t prog_id;
+    mvm_handle_t h1, h2;
 
     program_print(stdout, prog1);
 
     mondrian_open(&db);
-    mvm_handle_t h1, h2, h3;
-
-    mondrian_exec(&h1, db, prog1, future_lazy);
-    mondrian_exec(&h2, db, prog2, future_eager);
-    mondrian_exec(&h3, db, prog1, future_eager);
-
+    mondrian_install(&prog_id, db, prog1);
+    mondrian_exec(&h1, db, prog_id, future_lazy);
+    mondrian_exec(&h2, db, prog_id, future_lazy);
     mondrian_waitfor(&h1);
     mondrian_waitfor(&h2);
-    mondrian_waitfor(&h3);
-
     mondrian_close(db);
-
-    program_free(prog1);
-    program_free(prog2);
-}
-
-static void run_create_tables()
-{
-    mondrian_t *db;
-
-    program_t *prog1 = prog_create_table_userabort();
-    program_t *prog2 = prog_create_table_autoabort();
-    program_t *prog3 = prog_create_table_okay();
-    program_t *prog4 = prog_create_table_okay();    // should abort, since table exists
-
-    program_print(stdout, prog1);
-    program_print(stdout, prog2);
-    program_print(stdout, prog3);
-    program_print(stdout, prog4);
-
-    mondrian_open(&db);
-
-    mondrian_exec(NULL, db, prog1, future_sync);
-    mondrian_exec(NULL, db, prog2, future_sync);
-    mondrian_exec(NULL, db, prog3, future_sync);
-    mondrian_exec(NULL, db, prog4, future_sync);
-
-    //mondrian_waitfor(&h1);
-
-    mondrian_close(db);
-
     program_free(prog1);
 }

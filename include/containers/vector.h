@@ -68,9 +68,13 @@ void *vector_at(const vector_t *vec, size_t pos);
 
 void *vector_peek(const vector_t *vec);
 
+void *vector_pop_unsafe(vector_t *vec);
+
 bool vector_set(vector_t *vec, size_t idx, size_t num_elements, const void *data);
 
 bool vector_add(vector_t *vec, size_t num_elements, const void *data);
+
+void vector_add_unsafe(vector_t *vec, size_t num_elements, const void *data);
 
 bool vector_comp(const vector_t *lhs, const vector_t *rhs, bool (*comp)(const void *a, const void *b));
 
@@ -80,6 +84,10 @@ size_t vector_count(vector_t *vec, void *capture, bool (*pred)(void *capture, vo
 
 bool vector_contains(vector_t *vec, void *needle);
 
+size_t vector_memused(vector_t *vec);
+
+size_t vector_memused__str(vector_t *vec);
+
 // ---------------------------------------------------------------------------------------------------------------------
 // C O N V E N I E N C E  F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
@@ -87,3 +95,5 @@ bool vector_contains(vector_t *vec, void *needle);
 bool vector_free__str(vector_t *vec);
 
 bool free_strings(void *capture, void *begin, void *end);
+
+bool get_sizeof_strings(void *capture, void *begin, void *end);

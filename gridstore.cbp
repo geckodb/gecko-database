@@ -860,6 +860,16 @@
 			<Option target="mondrian"/>
 			<Option target="gs"/>
 		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/include/progpool.h">
+			<Option target="buffmgr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
+			<Option target="sample_linuxwc"/>
+			<Option target="sample_lin_hash"/>
+			<Option target="expr"/>
+			<Option target="mondrian"/>
+			<Option target="gs"/>
+		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/require.h">
 			<Option target="buffmgr"/>
 			<Option target="dbstdio"/>
@@ -1030,6 +1040,16 @@
 			<Option target="gs"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/pref.c">
+			<Option target="buffmgr"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
+			<Option target="sample_linuxwc"/>
+			<Option target="sample_lin_hash"/>
+			<Option target="expr"/>
+			<Option target="mondrian"/>
+			<Option target="gs"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/progpool.c">
 			<Option target="buffmgr"/>
 			<Option target="dbstdio"/>
 			<Option target="tpch-convert"/>

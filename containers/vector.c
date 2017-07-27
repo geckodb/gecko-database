@@ -115,6 +115,14 @@ bool vector_add(vector_t *vec, size_t num_elements, const void *data)
     } else return false;
 }
 
+void vector_add_unsafe(vector_t *vec, size_t num_elements, const void *data)
+{
+    size_t new_num_elements = vec->num_elements + num_elements;
+    void *base = vec->data + vec->num_elements * vec->sizeof_element;
+    memcpy(base, data, num_elements * vec->sizeof_element);
+    vec->num_elements = new_num_elements;
+}
+
 void *vector_get(vector_t *vec)
 {
     return require_non_null(vec) ? vec->data : NULL;
@@ -134,6 +142,11 @@ void *vector_peek(const vector_t *vec)
     if (require_non_null(vec) && require_non_zero(vec->num_elements))
         result = vector_at(vec, vec->num_elements - 1);
     return result;
+}
+
+void *vector_pop_unsafe(vector_t *vec)
+{
+    return (vec->data + (vec->num_elements-- - 1) * vec->sizeof_element);
 }
 
 bool vector_set(vector_t *vec, size_t idx, size_t num_elements, const void *data)
@@ -200,6 +213,19 @@ bool vector_contains(vector_t *vec, void *needle)
     return false;
 }
 
+size_t vector_memused(vector_t *vec)
+{
+    return (vec->element_capacity * vec->sizeof_element);
+}
+
+size_t vector_memused__str(vector_t *vec)
+{
+    size_t memused = vector_memused(vec);
+    size_t total_str_size = 0;
+    vector_foreach(vec, &total_str_size, get_sizeof_strings);
+    return (memused + total_str_size);
+}
+
 bool vector_comp(const vector_t *lhs, const vector_t *rhs, bool (*comp)(const void *a, const void *b))
 {
     if (!require_non_null(lhs) || !require_non_null(rhs))
@@ -246,6 +272,23 @@ free_strings(
 
     return result;
 };
+
+bool
+get_sizeof_strings(
+        void *capture,
+        void *begin,
+        void *end)
+{
+    size_t total_size = 0;
+    bool result = require_non_null(begin) && require_non_null(end) && require_less_than(begin, end);
+    for (char **it = (char **) begin; it < (char **) end; it++) {
+        total_size += (strlen (*it) + 1);
+    }
+    *((size_t *) capture) = total_size;
+    return result;
+};
+
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 // H E L P E R  I M P L E M E N T A T I O N

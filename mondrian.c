@@ -1,6 +1,7 @@
 #include <mondrian.h>
 #include <containers/list.h>
 #include <debug.h>
+#include <progpool.h>
 
 typedef struct vm_exec_info {
     future_t future;
@@ -10,6 +11,7 @@ typedef struct vm_exec_info {
 struct mondrian_t {
     db_config_t config;
     list_t *vm_programs;
+    progpool_t *progpool;
 
     time_t start;
 };
@@ -19,6 +21,8 @@ typedef struct mondrian_vm_exec_args_t {
     const program_t *program;
 } mondrian_vm_exec_args_t;
 
+
+static inline int mondrian_start_vm(mvm_handle_t *out, mondrian_t *instance, const program_t *program, future_eval_policy run_policy);
 
 void *promise_mondrian_vm_exec(promise_result *return_value, const void *capture);
 
@@ -30,38 +34,47 @@ int mondrian_open(mondrian_t **instance)
     *instance = malloc(sizeof(mondrian_t));
     (*instance)->start = time(NULL);
     (*instance)->vm_programs = list_create(sizeof(vm_exec_info));
+    progpool_create(&((*instance)->progpool));
     gs_db_config_load(&(*instance)->config);
     return MONDRIAN_OK;
 }
 
-int mondrian_exec(mvm_handle_t *out, mondrian_t *instance, const program_t *program, future_eval_policy run_policy)
+int mondrian_install(prog_id_t *out, mondrian_t *db, const program_t *program)
 {
-    if (instance == NULL || program == NULL)
+    if (db == NULL || program == NULL) {
+        return MONDRIAN_ERROR;
+    } else {
+        progpool_install(out, db->progpool, program);
+        return MONDRIAN_OK;
+    }
+}
+
+int mondrian_exec(mvm_handle_t *out, mondrian_t *db, prog_id_t prog_id, future_eval_policy run_policy)
+{
+    if (db == NULL) {
+        return MONDRIAN_ERROR;
+    } else {
+        const program_t *program = progpool_get(db->progpool, prog_id);
+        if (program != NULL) {
+            return mondrian_start_vm(out, db, program, run_policy);
+        } else return MONDRIAN_ERROR;
+    }
+}
+
+progpool_t *mondrian_get_progpool(mondrian_t *db)
+{
+    return (db == NULL ? NULL : db->progpool);
+}
+
+int mondrian_exec_by_name(mvm_handle_t *out, mondrian_t *db, const char *prog_name, future_eval_policy run_policy)
+{
+    if (db == NULL || prog_name == NULL)
         return MONDRIAN_ERROR;
     else {
-        future_t retval;
-
-        mondrian_vm_exec_args_t *args = require_good_malloc(sizeof(mondrian_vm_exec_args_t));
-        *args = (mondrian_vm_exec_args_t) {
-            .instance = instance,
-            .program = program
-        };
-
-        LOG_DEBUG(instance, "intent to execute mvm program '%s' (%p) received", program_name(program), program);
-
-        retval = future_create(args, promise_mondrian_vm_exec, run_policy);
-        vm_exec_info info = {
-            .future = retval,
-            .start  = time(NULL)
-        };
-        list_push(instance->vm_programs, &info);
-
-        if (out != NULL) {
-            out->future = retval;
-            out->instance = instance;
-        }
-
-        return MONDRIAN_OK;
+        prog_id_t id;
+        if (progpool_find_by_name(&id, db->progpool, prog_name) == MONDRIAN_OK) {
+            return mondrian_exec(out, db, id, run_policy);
+        } else return MONDRIAN_ERROR;
     }
 }
 
@@ -89,6 +102,37 @@ const db_config_t *mondrian_config(mondrian_t *instance)
 
 //----------------------------------------------------------------------------------------------------------------------
 
+static inline int mondrian_start_vm(mvm_handle_t *out, mondrian_t *instance, const program_t *program, future_eval_policy run_policy)
+{
+    if (instance == NULL || program == NULL)
+        return MONDRIAN_ERROR;
+    else {
+        future_t retval;
+
+        mondrian_vm_exec_args_t *args = require_good_malloc(sizeof(mondrian_vm_exec_args_t));
+        *args = (mondrian_vm_exec_args_t) {
+                .instance = instance,
+                .program = program
+        };
+
+        LOG_DEBUG(instance, "intent to execute mvm job '%s' (%p) received", program_name(program), program);
+
+        retval = future_create(args, promise_mondrian_vm_exec, run_policy);
+        vm_exec_info info = {
+                .future = retval,
+                .start  = time(NULL)
+        };
+        list_push(instance->vm_programs, &info);
+
+        if (out != NULL) {
+            out->future = retval;
+            out->instance = instance;
+        }
+
+        return MONDRIAN_OK;
+    }
+}
+
 void *promise_mondrian_vm_exec(promise_result *return_value, const void *capture)
 {
     assert(capture);
@@ -98,9 +142,9 @@ void *promise_mondrian_vm_exec(promise_result *return_value, const void *capture
     panic_if((mondrian_vm_create(&vm, args->instance) != MONDRIAN_OK),
              "Internal error: unable to create virtual machine for program %p", args->program);
 
-    LOG_DEBUG(args->instance, "mvm program %s (%p) is starting...", program_name(args->program), args->program);
-
+    LOG_DEBUG(args->instance, "mvm job %s (%p) is starting...", program_name(args->program), args->program);
     mondrian_vm_run(vm, args->program, &result);
+    mondrian_vm_free(vm);
     *return_value =  (result == 0 ? resolved : rejected);
     return NULL;
 }

@@ -11,6 +11,11 @@ $(document).ready(function()
         $("#tab_datatypes").tablesorter(); 
         $("#tab_columnflags").tablesorter(); 
         $("#tab_tabletypes").tablesorter(); 
+        $("#tab_jobstates").tablesorter(); 
+        $("#tab_locklatchmodes").tablesorter(); 
+        $("#tab_systemcontainers").tablesorter(); 
+        $("#tab_tablescopes").tablesorter(); 
+
     } 
 ); 
 </script>
@@ -41,23 +46,23 @@ $(document).ready(function()
   </tr>
 </thead>  
 <tbody>
-   <tr>
-    <td>tcreate</td>
-    <td>01</td>
-    <td>force</td>
-    <td>pointer to string &rarr; table handle</td>
-    <td>Creates a new table with the name as given by the string pointer. Leads to an <code>ABORT</code> if a table exists with the given name and <i>force</i> is not set to <i>1</i>. Finishes the program with exit code 2 (<code>ABORT BY SYSTEM</code>), and a rollback is initialized. In case, <i>force</i> is set to <i>1</i> the table is dropped if it exists, and a new table with the given name is added. If successfully, an <i>table handle</i> to access the new table is pushed onto the stack. <b>Note:</b> the instruction <code>tinstall</code> must be placed somewhere below this instruction to complete the operation.</td>
-  </tr>
+    <tr>
+        <td>tcreate</td>
+        <td>0E</td>
+        <td>force</td>
+        <td>&#91;scope, pointer to string &#93; &rarr; table handle</td>
+        <td>Creates a new table within the given <a href=#tablescopes>scope</a> with name as given by the string pointer. Leads to an <code>ABORT</code> if a table exists with the given name and <i>force</i> is not set to <i>1</i>. Finishes the program with exit code 2 (<code>ABORT BY SYSTEM</code>), and a rollback is initialized. In case, <i>force</i> is set to <i>1</i> the table is dropped if it exists, and a new table with the given name is added. If successfully, an <i>table handle</i> to access the new table is pushed onto the stack. <b>Note:</b> the instruction <code>tinstall</code> must be placed somewhere below this instruction to complete the operation.</td>
+    </tr>
     <tr>
         <td>tinstall</td>
-        <td>02</td>
+        <td>13</td>
         <td></td>
         <td>&#91;table type, table handle&#93; &rarr; </td>
         <td>Installs the table given by <i>table handle</i> as a type of <a href="#tabletypes">table type</a>. Removes the <i>table type argument</i> from the stack.</td>
     </tr>
     <tr>
         <td>tdrop</td>
-        <td>03</td>
+        <td>0F</td>
         <td></td>
         <td>table handle &rarr; </td>
         <td>Drops the table given by <i>table handle</i>, and removes the <i>table handle</i> from the stack. In case no table with the given handle is found, an <code>ABORT</code> is invoked and a rollback is initialized. The program exits with exit code 2 (<code>ABORT BY SYSTEM</code>) in this case.</td>
@@ -78,151 +83,260 @@ $(document).ready(function()
     </tr>
     <tr>
         <td>tdup</td>
-        <td>06</td>
+        <td>11</td>
         <td></td>
         <td>&#91;table handle (original), pointer to string&#93; &rarr; table handle (copy)</td>
-        <td>Constructs a copy of the table <i>table handle (original)</i> with the name referenced by <i>pointer to string</i>, and pushes the table handle onto the stack. In case no table with the the id <i>table handle (original)</i> is found or there is another table with the name referenced by <i>pointer to string</i>, an <code>ABORT</code> is invoked and a rollback is initialized. The program exits with exit code 2 (<code>ABORT BY SYSTEM</code>) in this case.</td>
+        <td>Constructs a copy of the table <i>table handle (original)</i> with the name referenced by <i>pointer to string</i>, and pushes the table handle onto the stack. In case no table with the id <i>table handle (original)</i> is found or there is another table with the name referenced by <i>pointer to string</i>, an <code>ABORT</code> is invoked and a rollback is initialized. The program exits with exit code 2 (<code>ABORT BY SYSTEM</code>) in this case.</td>
     </tr>
     <tr>
         <td>byname</td>
-        <td>07</td>
+        <td>02</td>
         <td></td>
         <td>pointer to string &rarr; table handle</td>
         <td>Finds the table handle associated with the name as given by <i>pointer to string</i>, and pushes <i>table handle</i> onto the stack. In case no table with the given name is found, an <code>ABORT</code> is invoked and a rollback is initialized. The program exits with exit code 2 (<code>ABORT BY SYSTEM</code>) in this case.</td>
     </tr>
     <tr>
         <td>tlist</td>
-        <td>08</td>
+        <td>14</td>
         <td></td>
         <td>&rarr; &#91;num, table handle 0, table handle 1, ..., table handle (num-1)&#93;</td>
         <td>Pushes all tables handles onto the stack. The element on top is a number indicating the number of installed tables.</td>
     </tr>
      <tr>
         <td>tinsert</td>
-        <td>09</td>
+        <td>12</td>
         <td></td>
         <td>&#91;num, table handle&#93; &rarr; field handle</td>
         <td>Inserts <i>num</i> (uninitialized) tuplets into the table identified by <i>table handle</i>. Both input arguments are removed from the stack, an <i>field handle</i> is pushed onto the stack. The <i>field handle</i> points to the first field of the first inserted tuplet. In case <i>num</i> is less than or equal to zero, or the <i>table handle</i> is unknown, an <code>ABORT</code> is invoked and a rollback is initialized. The program exits with exit code 2 (<code>ABORT BY SYSTEM</code>) in this case.</td>
     </tr>
     <tr>
         <td>fwrite</td>
-        <td>0A</td>
+        <td>07</td>
         <td></td>
         <td>&#91; data, field handle &#93; &rarr; field handle</td>
         <td>Writes <i>data</i> into the field associated with <i>field handle</i>, moves <i>field handle</i> to the next field and removes <i>data</i> from the stack. Which data type is used for <i>data</i> is inferred by the associated column of the table. In case the field handle is moves beyond the last field of the current tuplet, it is set to the first field in the subsequent tuplet. In case the field handle is moved outside the bounds of the tbale, an <code>ABORT</code> is invoked and a rollback is initialized. The program exits with exit code 2 (<code>ABORT BY SYSTEM</code>) in this case.</td>
     </tr>
     <tr>
-        <td>txnlist</td>
-        <td>0B</td>
+        <td>proglist</td>
+        <td>17</td>
         <td></td>
-        <td>&rarr; &#91;num, transaction handle 0, transaction handle 1, ..., transaction handle (num-1)&#93;</td>
-        <td>Pushes all transaction handles onto the stack. The element on top is a number indicating the number of existing transactions.</td>
+        <td>&rarr; &#91;num, prog id 0, prog id 1, ..., prog id (num-1)&#93;</td>
+        <td>Pushes all program ids onto the stack. The element on top is a number indicating the number of installed programs.</td>
     </tr>
     <tr>
-        <td>txninfo</td>
-        <td>0C</td>
+        <td>proginfo</td>
+        <td>16</td>
         <td></td>
-        <td>transaction handle &rarr; </td>
-        <td>Prints information to stdout about the transaction associated with the handle <i>transaction handle</i>.</td>
+        <td>prog id &rarr; </td>
+        <td>Prints information to stdout about the program associated with <i>prog id</i>.</td> In case the prog id is unknown, an <code>ABORT</code> is invoked and a rollback is initialized. The program exits with exit code 2 (<code>ABORT BY SYSTEM</code>) in this case.</td>
     </tr>
     <tr>
-        <td>txnclean</td>
-        <td>0D</td>
+        <td>progclean</td>
+        <td>15</td>
         <td></td>
         <td>&rarr; </td>
-        <td>Removes finished transactions from the transaction register.</td>
+        <td>Removes uninstalled programs from the program pool.</td>
     </tr>
     <tr>
         <td>sleep</td>
-        <td>0E</td>
+        <td>0C</td>
         <td>time</td>
         <td>&rarr; </td>
         <td>Suspends the thread for this transaction for <i>time</i> milliseconds.</td>
     </tr>
     <tr>
         <td>tinfo</td>
-        <td>0F</td>
+        <td>11</td>
         <td></td>
         <td>table handle &rarr; </td>
         <td>Displays information to stdout about the table associated with the handle <i>table handle</i>.</td>
     </tr>
     <tr>
-        <td>foreach <i>inst</i></td>
-        <td>10</td>
+        <td>rjmp_nz</td>
+        <td>06</td>
+        <td>pos</td>
         <td></td>
-        <td>&#91;num, ... &#93; &rarr; <i>inst</i>(&#91;...&#93;) 0, <i>inst</i>(&#91;...&#93;) 1, ..., <i>inst</i>(&#91;...&#93;) (num - 1)</td>
-        <td>Runs the next instruction <i>inst</i> (program counter + 1) <i>num</i> times. Removes <i>num</i> from the stack before the first call to <i>inst</i> is done.</td>
+        <td>Continues the program execution at line <code>pc</code> + <i>pos</i> if the <a href="#localvariables">variable</a> <code>VARIABLE_RCX</code> is not-zero. Therefore, this instruction implements a relative jump in the program flow w.r.t. the current line number of the <code>rjmp_nz</code> instruction. <b>Note</b>: the value of <code>VARIABLE_RCX</code> is interpreted as signed 8-byte integer.</td>
     </tr>
-  <tr>
-    <td>addcol</td>
-    <td>11</td>
-    <td></td>
-    <td>&#91;table handle, pointer to string, type, rep, flags &#93; &rarr; &#91;column handle, table handle&#93;</td>
-    <td>Adds a new column with the name references by <i>pointer to string</i> to the table associated with <i>table handle</i>. The <a href="#datatypes">data type</a> is defined by <i>type</i>. For fixed-length field types (e.g., <code>VARCHAR(n)</code>) set <i>rep</i> to <i>n</i>. The value <i>flags</i> is an xor-ed number defining the <a href="#columnflags">column flags</a>. In case <i>table handle</i> is unknown, this action leads to an <code>ABORT</code> and the program finishes with exit code 2 (<code>ABORT BY SYSTEM</code>). If successfully, an <i>column handle</i> to access the new column and the original <i>table handle</i> are pushed onto the stack</td>
-  </tr>
-   <tr>
-    <td>vstore</td>
-    <td>12</td>
-    <td>i</td>
-    <td></td>
-    <td>Stores the top value of the stack into an u64 variable with index i. The stack is not modified.</td>
-  </tr>
-  <tr>
-    <td>vload</td>
-    <td>13</td>
-    <td>i</td>
-    <td>&rarr; value</td>
-    <td>Loads the value of the variable with index <i>i</i> and pushes the value onto the stack.</td>
-  </tr>
-  <tr>
-    <td>isset</td>
-    <td>14</td>
-    <td>i</td>
-    <td>&rarr; bool</td>
-    <td>Checks whether the variable with index <i>i</i> was set before by <code>vstore</code> or similar. Pushes <i>1</i> onto the stack if so otherwise <i>0</i>.</td>
-  </tr>
-   <tr>
-    <td>pop</td>
-    <td>15</td>
-    <td></td>
-    <td>value &rarr;</td>
-    <td>Removes the top value from the stack</td>
-  </tr>
-  <tr>
-    <td>npop</td>
-    <td>16</td>
-    <td></td>
-    <td>&#91;num, value 0, value 1,..., value (num-1)&#93; &rarr; </td>
-    <td>Removes <i>num</i> values from the stack</td>
-  </tr>
-  <tr>
-    <td>ipush</td>
-    <td>17</td>
-    <td>value</td>
-    <td>&rarr; value</td>
-    <td>Pushes value onto the stack as an u64 value</td>
-  </tr>
-  <tr>
-    <td>swap</td>
-    <td>18</td>
-    <td></td>
-    <td>&#91;value1, value2&#93; &rarr; &#91;value2, value1&#93;</td>
-    <td>Swaps the two top elements of the stack</td>
-  </tr>
-  <tr>
-    <td>commit</td>
-    <td>FC</td>
-    <td></td>
-    <td></td>
-    <td>Finishes the program with exit code 0 (<code>COMMIT</code>). Changes to the system are permanent.</td>
-  </tr>
-  <tr>
-    <td>abort</td>
-    <td>FA</td>
-    <td></td>
-    <td></td>
-    <td>Finishes the program with exit code 1 (<code>ABORT BY USER</code>). A rollback is initialized, and changes to the system are discarded.</td>
-  </tr>
+    <tr>
+        <td>addcol</td>
+        <td>01</td>
+        <td></td>
+        <td>&#91;table handle, pointer to string, type, rep, flags &#93; &rarr; &#91;column handle, table handle&#93;</td>
+        <td>Adds a new column with the name references by <i>pointer to string</i> to the table associated with <i>table handle</i>. The <a href="#datatypes">data type</a> is defined by <i>type</i>. For fixed-length field types (e.g., <code>VARCHAR(n)</code>) set <i>rep</i> to <i>n</i>. The value <i>flags</i> is an xor-ed number defining the <a href="#columnflags">column flags</a>. In case <i>table handle</i> is unknown, this action leads to an <code>ABORT</code> and the program finishes with exit code 2 (<code>ABORT BY SYSTEM</code>). If successfully, an <i>column handle</i> to access the new column and the original <i>table handle</i> are pushed onto the stack</td>
+    </tr>
+    <tr>
+        <td>vstore</td>
+        <td>19</td>
+        <td>i</td>
+        <td></td>
+        <td>Stores the top value of the stack into an u64 <a href="#localvariables">variable</a> with index i. The stack is not modified.</td>
+    </tr>
+    <tr>
+        <td>vload</td>
+        <td>18</td>
+        <td>i</td>
+        <td>&rarr; value</td>
+        <td>Loads the value of the <a href="#localvariables">variable</a> with index <i>i</i> and pushes the value onto the stack.</td>
+    </tr>
+    <tr>
+        <td>isset</td>
+        <td>09</td>
+        <td>i</td>
+        <td>&rarr; bool</td>
+        <td>Checks whether the variable with index <i>i</i> was set before by <code>vstore</code> or similar. Pushes <i>1</i> onto the stack if so otherwise <i>0</i>.</td>
+    </tr>
+        <tr>
+        <td>pop</td>
+        <td>0B</td>
+        <td></td>
+        <td>value &rarr;</td>
+        <td>Removes the top value from the stack</td>
+    </tr>
+    <tr>
+        <td>npop</td>
+        <td>0A</td>
+        <td></td>
+        <td>&#91;num, value 0, value 1,..., value (num-1)&#93; &rarr; </td>
+        <td>Removes <i>num</i> values from the stack</td>
+    </tr>
+    <tr>
+        <td>push</td>
+        <td>08</td>
+        <td>value</td>
+        <td>&rarr; value</td>
+        <td>Pushes value onto the stack as an u64 value</td>
+    </tr>
+    <tr>
+        <td>swap</td>
+        <td>0D</td>
+        <td></td>
+        <td>&#91;value1, value2&#93; &rarr; &#91;value2, value1&#93;</td>
+        <td>Swaps the two top elements of the stack</td>
+    </tr>
+    <tr>
+        <td>commit</td>
+        <td>03</td>
+        <td></td>
+        <td></td>
+        <td>Finishes the program with exit code 0 (<code>COMMIT</code>). Changes to the system are permanent.</td>
+    </tr>
+    <tr>
+        <td>abort</td>
+        <td>00</td>
+        <td></td>
+        <td></td>
+        <td>Finishes the program with exit code 1 (<code>ABORT BY USER</code>). A rollback is initialized, and changes to the system are discarded.</td>
+    </tr>
+    <tr>
+        <td>jlist</td>
+        <td>1A</td>
+        <td>job state</td>
+        <td>&rarr; &#91;num, job id 0, job id 1, ..., job id (num-1)&#93;</td>
+        <td>Pushes the job ids of jobs having a state defined <a href="#jobstates">job state</a> onto the stack. The job state can cover mutiple state type by xor-ing the state values. The element on top is a number indicating the number of jobs.</td>
+    </tr>
+    <tr>
+        <td>jinfo</td>
+        <td>1B</td>
+        <td></td>
+        <td>job id &rarr; </td>
+        <td>Prints information to stdout about the job associated with <i>job id</i>.</td> In case the job id is unknown, an <code>ABORT</code> is invoked and a rollback is initialized. The program exits with exit code 2 (<code>ABORT BY SYSTEM</code>) in this case.</td>
+    </tr>
+    <tr>
+        <td>jclean</td>
+        <td>1C</td>
+        <td></td>
+        <td>&rarr; </td>
+        <td>Removes all non-running jobs from the job pool.</td>
+    </tr>
+    <tr>
+        <td>jkill</td>
+        <td>1D</td>
+        <td></td>
+        <td>job id &rarr; </td>
+        <td>Kills a running job associated with <i>job id</i>. In case the job id is unknown or the job is not running, an <code>ABORT</code> is invoked and a rollback is initialized. The program exits with exit code 2 (<code>ABORT BY SYSTEM</code>) in this case.</td></td>
+    </tr>
+    <tr>
+        <td>jsusp</td>
+        <td>1E</td>
+        <td></td>
+        <td>job id &rarr; </td>
+        <td>Pauses a running job associated with <i>job id</i>. In case the job id is unknown or the job is not running, an <code>ABORT</code> is invoked and a rollback is initialized. The program exits with exit code 2 (<code>ABORT BY SYSTEM</code>) in this case.</td></td>
+    </tr>
+    <tr>
+        <td>jwake</td>
+        <td>1F</td>
+        <td></td>
+        <td>job id &rarr; </td>
+        <td>Continues the execution of a paused job associated with <i>job id</i>. In case the job id is unknown or the job is not paused, an <code>ABORT</code> is invoked and a rollback is initialized. The program exits with exit code 2 (<code>ABORT BY SYSTEM</code>) in this case.</td></td>
+    </tr>
+    <tr>
+        <td>jstart</td>
+        <td>20</td>
+        <td></td>
+        <td>prog id &rarr; job id</td>
+        <td>Starts the program associated with <i>prog id</i> as a new job <i>job id</i>. The control flow continues execution. In case the prog id is unknown, an <code>ABORT</code> is invoked and a rollback is initialized. The program exits with exit code 2 (<code>ABORT BY SYSTEM</code>) in this case.</td></td>
+    </tr>
+
+    <tr>
+        <td>acq_lock</td>
+        <td>21</td>
+        <td>container</td>
+        <td>&#91;mode, element&#93; &rarr; lock id</td>
+        <td>Acquires a <a href="#tab_locklatchmodes">mode</a> lock in <a href="#systemcontainers">container</a> on a specific <i>element</i>. The definition of <i>element</i> depends on the <a href="#systemcontainers">container</a>. The job-thread might be suspended until the lock is available rather than doing a busy-waiting as for latches. In case the <i>mode</i>, <i>container</i> or <i>element</i> is unknown, an <code>ABORT</code> is invoked and a rollback is initialized. The program exits with exit code 2 (<code>ABORT BY SYSTEM</code>) in this case. <b>Note</b>: locks can be explicitly released via the <code>rel_lock</code> instruction. However, when the program finishes execution, all locks that are not manually released will be released automatically. </td>
+    </tr>
+
+    <tr>
+        <td>rel_lock</td>
+        <td>22</td>
+        <td></td>
+        <td>lock id &rarr; </td>
+        <td>Releases a lock associated with <i>lock id</i> that was previously aquired via the <code>acq_lock</code> instruction. In case <i>lock id</i> is unknown or the lock associated with <i>lock id</i> is already released, the program continues <u>without any interruption</u>. <b>Note</b>: When the program finishes execution, all locks that are not manually released via <code>rel_lock</code> will be released automatically. </td>
+    </tr>
+
+    <tr>
+        <td>acq_latch</td>
+        <td>23</td>
+        <td>container</td>
+        <td>&#91;mode, element&#93; &rarr; latch id</td>
+        <td>Acquires a <a href="#tab_locklatchmodes">mode</a> latch ('spin-lock') in <a href="#systemcontainers">container</a> on a specific <i>element</i>. The definition of <i>element</i> depends on the <a href="#systemcontainers">container</a>. The job-thread will spin in a while-loop until the latch is available rather than being suspended as for locking. In case the <i>mode</i>, <i>container</i> or <i>element</i> is unknown, an <code>ABORT</code> is invoked and a rollback is initialized. The program exits with exit code 2 (<code>ABORT BY SYSTEM</code>) in this case. <b>Note</b>: latches can be explicitly released via the <code>rel_latch</code> instruction. However, when the program finishes execution, all latches that are not manually released will be released automatically. </td>
+    </tr>
+
+    <tr>
+        <td>rel_latch</td>
+        <td>24</td>
+        <td></td>
+        <td>latch id &rarr; </td>
+        <td>Releases a latch associated with <i>latch id</i> that was previously aquired via the <code>acq_latch</code> instruction. In case <i>latch id</i> is unknown or the latch associated with <i>latch id</i> is already released, the program continues <u>without any interruption</u>. <b>Note</b>: When the program finishes execution, all latches that are not manually released via <code>rel_latch</code> will be released automatically. </td>
+    </tr>
+
+    <tr>
+        <td>vmove</td>
+        <td>25</td>
+        <td>i</td>
+        <td>value &rarr; </td>
+        <td>Stores the top value of the stack into an u64 <a href="#localvariables">variable</a> with index i and removes <i>value</i> from the stack.</td>
+    </tr>
+
+    <tr>
+        <td>dec</td>
+        <td>26</td>
+        <td>i</td>
+        <td></td>
+        <td>Decrements the value of the <a href="#localvariables">variable</a> with index i.</td>
+    </tr>
+
+    <tr>
+        <td>temp_name</td>
+        <td>27</td>
+        <td></td>
+        <td>&rarr; pointer to string</td>
+        <td>Creates a new (temporary) string on heap and assigns an unique table name to it. Then, a pointer to that string is pushed onto the stack. When the program finishes, all strings created by this instruction will be automatically freed. <b>Note</b>: the temporary string is guaranteed to be unique in local <a href=#tablescopes>scope</a>. Therefore, it is not reasonable to use this instruction to generate gobal table names.</td>
+    </tr>
+
+    
+
+
 </tbody>  
 </table>
 
@@ -402,6 +516,176 @@ $(document).ready(function()
     </tr>
     
     
+
+</tbody>  
+</table>
+
+
+<h1 id="jobstates">Job States</h1>
+
+<table id="tab_jobstates" class="tablesorter">
+<thead>
+  <tr>
+    <th class="header headerSortDown">Name</th>
+    <th class="header">Type Id</th>    
+    <th class="header">Description</th>
+  </tr>
+</thead>  
+<tbody>
+
+
+    <tr>
+        <td><code>RUNNING</code></td>
+        <td>1</td>
+        <td>The job is running and was not paused.</td>
+    </tr>
+
+    <tr>
+        <td><code>PAUSED</code></td>
+        <td>2</td>
+        <td>The job was running but was suspended by the system.</td>
+    </tr>
+
+    <tr>
+        <td><code>CONTINUED</code></td>
+        <td>4</td>
+        <td>The job was suspended but execution was continued.</td>
+    </tr>
+
+    <tr>
+        <td><code>KILLED</code></td>
+        <td>8</td>
+        <td>The job was explicitly terminated by the system.</td>
+    </tr>
+
+    <tr>
+        <td><code>FINISHED</code></td>
+        <td>16</td>
+        <td>The job stopped execution regularly.</td>
+    </tr>
+
+</tbody>  
+</table>
+
+<h1 id="locklatchmodes">Lock and Latch Modes</h1>
+
+<table id="tab_locklatchmodes" class="tablesorter">
+<thead>
+  <tr>
+    <th class="header headerSortDown">Name</th>
+    <th class="header">Type Id</th>    
+    <th class="header">Description</th>
+  </tr>
+</thead>  
+<tbody>
+
+    <tr>
+        <td><code>MODE_SHARED</code></td>
+        <td>0x0000000000000000</td>
+        <td>A shared (read) lock/latch will be acquired. Having a shared lock/latch on a specific element inside an container will <i>not</i> block other shared locks/latches on the same element inside this container. However, if an other caller requests an exclusive lock/latch for an element for which a shared lock is hold, the caller will be blocked until the shared lock/latch is released. Locks and latches are equivalent regarding these modes when used in combination on the same element.</td>
+    </tr>
+
+    <tr>
+        <td><code>MODE_EXCLUSIVE</code></td>
+        <td>0x0000000000000001</td>
+        <td>An exclusive (write) lock/latch will be acquired. Having an exclusive lock/latch on a specific element inside an container will bock both other shared and exclusive locks/latches on the same element in that container. Callers for other locks/latches will be blocked until the shared lock/latch is released. Locks and latches are equivalent regarding these modes when used in combination on the same element.</td>
+    </tr>
+
+
+</tbody>  
+</table>
+
+<h1 id="systemcontainers">System Containers</h1>
+
+<table id="tab_systemcontainers" class="tablesorter">
+<thead>
+  <tr>
+    <th class="header headerSortDown">Container Name</th>
+    <th class="header">Container Id</th>    
+    <th class="header">Element(s)</th>
+    <th class="header">Description</th>
+  </tr>
+</thead>  
+<tbody>
+
+    <tr>
+        <td><code>CONTAINER_PROGPOOL</code></td>
+        <td><code>0x0000000000000000</code></td>
+        <td><code>ACCESS_GLOBAL(0x0000000000000000)</code></td>
+        <td>The program pool (progpool) is the repository for compiled programs inside a MondrianDB instance. The granularity for locks/latches on this container is global which means that the entire repository is exclusively accessed.</td>
+    </tr>
+
+
+</tbody>  
+</table>
+
+<h1 id="tablescopes">Table Scopes</h1>
+
+<table id="tab_tablescopes" class="tablesorter">
+<thead>
+  <tr>
+    <th class="header headerSortDown">Name</th>
+    <th class="header">Type Id</th>    
+    <th class="header">Description</th>
+  </tr>
+</thead>  
+<tbody>
+
+    <tr>
+        <td><code>GLOBAL</code></td>
+        <td>0</td>
+        <td>The table is stored in the global space of the database, and is visible for all transactions in the entire system. Global tables continue their existence after the program in which the table was firstly created finishes. Since global tables are a shared resource, accessing global tables typically involve the acquisition of a latch or lock. Hence, accessing global tables is more heavyweight than accessing local tables.</td>
+    </tr>
+    <tr>
+        <td><code>LOCAL</code></td>
+        <td>1</td>
+        <td>The table is stored in the local space of the program, and is visible only for the transaction that created the table. Local tables automatically end their existence when the program in which the table was created finishes. Since local tables are a non-shared resource, accessing local tables does not require to acquire a latch or lock. Hence, accessing local tables is more lightweight than accessing global tables.</td>
+    </tr>
+
+
+</tbody>  
+</table>
+
+<h1 id="localvariables">Job Local Variables</h1>
+
+<table id="tab_localvariables" class="tablesorter">
+<thead>
+  <tr>
+    <th class="header headerSortDown">Alias</th>
+    <th class="header">Value</th>    
+    <th class="header">Intention</th>  
+  </tr>
+</thead>  
+<tbody>
+
+    <tr>
+        <td><code>VARIABLE_RAX</code></td>
+        <td>0</td>
+        <td>Should be used for arithmetic operations</td>
+    </tr>
+    <tr>
+        <td><code>VARIABLE_RCX</code></td>
+        <td>1</td>
+        <td>Should be used for loop instructions</td>
+    </tr>
+    <tr>
+        <td><code>VARIABLE_LOCAL_0</code></td>
+        <td>2</td>
+        <td>Used-defined use</td>
+    </tr>
+    <tr>
+        <td><code>VARIABLE_LOCAL_1</code></td>
+        <td>3</td>
+        <td>Used-defined use</td>
+    </tr>
+    <tr>
+        <td><code>VARIABLE_LOCAL_2</code></td>
+        <td>4</td>
+        <td>Used-defined use</td>
+    </tr>
+
+    <b>Note</b>: the aliases mentioned above are only for ease of use; they can be replaced with their actual value instead of using the alias. Further, accessing variables by a certain index is not limited to the indcies mentioned in the list above.
+
 
 </tbody>  
 </table>
