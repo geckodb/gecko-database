@@ -1,6 +1,9 @@
 #include <mvm.h>
 #include <debug.h>
 #include <mondrian.h>
+#include <schema.h>
+#include <frag.h>
+#include <field.h>
 
 #ifndef OPERAND_STACK_CAPACITY
 #define OPERAND_STACK_CAPACITY  1024
@@ -17,6 +20,13 @@
 #define MVM_EC_BADCONTAINER         3
 #define MVM_EC_BADELEMENT           4
 #define MVM_EC_STACKOVERFLOW        5
+#define MVM_EC_BADSCOPE             6
+#define MVM_EC_FRAGMENT_EXISTS      7
+#define MVM_EC_UNKNOWNATTRTYPE      8
+#define MVM_EC_BADFIELDLEN          9
+#define MVM_EC_BADCOLUMNFLAGS      10
+#define MVM_EC_BADFRAGMENTTYPE     11
+#define MVM_EC_NOFRAGMENT          12
 
 #define CHECKFOR(expr, errcode, msg, ...)                                                                              \
 {                                                                                                                      \
@@ -49,13 +59,81 @@
              "container id in line '%d' in '%s': %lld",                                                                \
              (vm->pc - 1), program_name(vm->program), container)
 
+#define CHECKFOR_SCOPE(scope)                                                                                          \
+    CHECKFOR(scope != FRAGMENT_SCOPE_GLOBAL && scope != FRAGMENT_SCOPE_LOCAL, MVM_EC_BADSCOPE,                         \
+             "bad scope in line '%d' in '%s': %lld",                                                                   \
+             (vm->pc - 1), program_name(vm->program), scope)
+
+
 #define CHECKFOR_ELEMENT(container, element)                                                                           \
     CHECKFOR((container == CONTAINER_PROGPOOL && element != ACCESS_GLOBAL), MVM_EC_BADELEMENT,                         \
              "unknown element id in line '%d' in '%s': %lld",                                                          \
              (vm->pc - 1), program_name(vm->program), element)
 
+#define CHECKFOR_UNIQUE_LOCAL_FRAGMENT_NAME(frag_name)                                                                 \
+    CHECKFOR(!is_unique_fragment_name(vm, frag_name), MVM_EC_FRAGMENT_EXISTS,                                          \
+             "instruction at line '%d' in '%s' failed: local fragment name '%s' already exists",                       \
+             (vm->pc - 1), program_name(vm->program), frag_name)
+
+#define CHECKFOR_LOCAL_FRAGID(frag_id)                                                                                 \
+    CHECKFOR((frag_id >= vm->fragments->num_elements ||                                                                \
+             ((local_fragment_t *)vector_at(vm->fragments, frag_id))->is_dropped),                                     \
+             MVM_EC_NOFRAGMENT,                                                                                        \
+             "instruction at line '%d' in '%s' failed: no such fragment in local space: %lld",                         \
+             (vm->pc - 1), program_name(vm->program), frag_id)
+
+#define CHECKFOR_TYPE(type)                                                                                            \
+    CHECKFOR((type != FT_BOOL && type != FT_INT8 && type != FT_INT16 && type != FT_INT32 && type != FT_INT64 &&        \
+              type != FT_UINT8 && type != FT_UINT16 && type != FT_UINT32 && type != FT_UINT64 &&                       \
+              type != FT_FLOAT32 && type != FT_FLOAT64 && type != FT_CHAR ) , MVM_EC_UNKNOWNATTRTYPE,                  \
+             "instruction at line '%d' in '%s' failed: unknown attribute data type '%lld'",                            \
+             (vm->pc - 1), program_name(vm->program), type)
+
+#define CHECKFOR_REP(rep)                                                                                              \
+    CHECKFOR(rep <= 0, MVM_EC_BADFIELDLEN,                                                                             \
+             "instruction at line '%d' in '%s' failed: bad field length '%lld'",                                       \
+             (vm->pc - 1), program_name(vm->program), rep)
+
+#define CHECKFOR_FRAGMENTTYPE(fragment_type)                                                                           \
+    CHECKFOR((fragment_type != FRAGMENT_HOST_PLAIN_COLUMN_STORE && fragment_type != FRAGMENT_HOST_PLAIN_ROW_STORE),    \
+             MVM_EC_BADFRAGMENTTYPE,                                                                                   \
+             "instruction at line '%d' in '%s' failed: bad fragment type '%lld'",                                      \
+             (vm->pc - 1), program_name(vm->program), fragment_type)
+
+#define CHECKFOR_NOTZERO(value)                                                                                        \
+    CHECKFOR((value == 0), MVM_EC_BADFRAGMENTTYPE,                                                                     \
+             "instruction at line '%d' in '%s' failed: value is not allowed to be zero",                               \
+             (vm->pc - 1), program_name(vm->program))
+
+
+#define CHECKFOR_FLAGS(flags)                                                                                          \
+    CHECKFOR(!((flags == FLAG_REGULAR) ||                                                                              \
+                                                                                                                       \
+             ((IS_FLAG_SET(flags, FLAG_PRIMARY) ||                                                                     \
+              IS_FLAG_SET(flags, FLAG_FOREIGN) ||                                                                      \
+              IS_FLAG_SET(flags, FLAG_NULLABLE) ||                                                                     \
+              IS_FLAG_SET(flags, FLAG_AUTOINC) ||                                                                      \
+              IS_FLAG_SET(flags, FLAG_UNIQUE))    &&                                                                   \
+                                                                                                                       \
+              (IS_FLAG_SET(flags, FLAG_PRIMARY) && !(IS_FLAG_SET(flags, FLAG_FOREIGN) ||                               \
+                                                   IS_FLAG_SET(flags ,FLAG_NULLABLE)) ||                               \
+              IS_FLAG_SET(flags, FLAG_FOREIGN) && !(IS_FLAG_SET(flags, FLAG_PRIMARY) ||                                \
+                                                   IS_FLAG_SET(flags, FLAG_NULLABLE)) ||                               \
+              IS_FLAG_SET(flags, FLAG_NULLABLE) && !(IS_FLAG_SET(flags, FLAG_PRIMARY) ||                               \
+                                                    IS_FLAG_SET(flags, FLAG_FOREIGN) ||                                \
+                                                    IS_FLAG_SET(flags, FLAG_AUTOINC)) ||                               \
+              IS_FLAG_SET(flags, FLAG_AUTOINC) && !(IS_FLAG_SET(flags, FLAG_NULLABLE) ||                               \
+                                                   IS_FLAG_SET(flags, FLAG_FOREIGN))))),                               \
+             MVM_EC_BADCOLUMNFLAGS,                                                                                    \
+             "instruction at line '%d' in '%s' failed: bad column flag combination '%lld'",                            \
+             (vm->pc - 1), program_name(vm->program), flags)
+
+
 #define OPERAND_STACK_POP()                                                                                            \
     *(u64*) vector_pop_unsafe(vm->operand_stack)
+
+#define OPERAND_STACK_PEEK()                                                                                           \
+    *(u64*) vector_peek_unsafe(vm->operand_stack)
 
 #define OPERAND_STACK_PUSH(value)                                                                                      \
 {                                                                                                                      \
@@ -64,16 +142,17 @@
 }
 
 typedef u64 operand_t;
+typedef u64 frag_id_t;
 typedef u8  opcode_t;
+
+typedef struct frag_handle_t {
+    u64 is_global   : 1;
+    u64 frag_id : 63;
+} frag_handle_t;
 
 typedef enum shared_resource {
     SR_PROGPOOL
 } shared_resource;
-
-typedef enum access_mode {
-    AM_EXCLUSIVE,
-    AM_SHARED
-} access_mode;
 
 typedef struct shared_resource_release_state_t {
     access_mode mode;
@@ -83,6 +162,21 @@ typedef struct shared_resource_release_state_t {
 
 typedef size_t lock_id_t;
 typedef size_t latch_id_t;
+
+typedef struct variable_entry_t {
+    bool initialized;
+    u64 value;
+} variable_entry_t;
+
+static variable_entry_t EMPTY_ENTRY = {
+    .initialized = false,
+    .value = 0
+};
+
+typedef struct local_fragment_t {
+    frag_t *fragment;
+    bool is_dropped;
+} local_fragment_t;
 
 struct mondrian_vm_t
 {
@@ -100,6 +194,7 @@ struct mondrian_vm_t
     vector_t *latches;
     vector_t *variables;
     vector_t *temp_names;
+    vector_t *fragments;
 
     const program_t *program;
     mondrian_t *db;
@@ -127,18 +222,30 @@ static inline int mondrian_vm_tick(mondrian_vm_t *vm);
 static inline int mondrian_vm_rollback(mondrian_vm_t *vm);
 
 static inline lock_id_t mondrian_vm_ackn_lock(mondrian_vm_t *vm, shared_resource target, access_mode mode);
-static inline void mondrian_vm_set_var(mondrian_vm_t *vm, u64 index, u64 *value);
+static inline int mondrian_vm_release_lock(mondrian_vm_t *vm, lock_id_t lock_id);
 
+static inline void mondrian_vm_set_var(mondrian_vm_t *vm, u64 index, u64 *value);
+static inline int mondrian_vm_get_var(u64 *out, mondrian_vm_t *vm, u64 index);
+static inline int mondrian_vm_install_frag_local(frag_id_t *out, mondrian_vm_t *vm, frag_t *frag);
+static inline frag_t *mondrian_vm_get_frag_local(mondrian_vm_t *vm, frag_id_t id);
+
+//----------------------------------------------------------------------------------------------------------------------
+
+static inline bool is_unique_fragment_name(mondrian_vm_t *vm, const char *name);
+static inline int drop_fragment_with_name(mondrian_vm_t *vm, const char *name);
+static inline void frag_handle_make(frag_handle_t *out, u64 scope, frag_id_t frag_id);
+static inline bool frag_handle_is_global(frag_handle_t *handle);
+static inline frag_id_t frag_handle_get_frag_id(frag_handle_t *handle);
 
 //----------------------------------------------------------------------------------------------------------------------
 
 static int exec_abort(mondrian_vm_t *vm, u64 operand);
-static int exec_addcol(mondrian_vm_t *vm, u64 operand);
+static int exec_addattr(mondrian_vm_t *vm, u64 operand);
 static int exec_byname(mondrian_vm_t *vm, u64 operand);
 static int exec_commit(mondrian_vm_t *vm, u64 operand);
 static int exec_dclone(mondrian_vm_t *vm, u64 operand);
 static int exec_dopen(mondrian_vm_t *vm, u64 operand);
-static int exec_rjmp_nz(mondrian_vm_t *vm, u64 operand);
+static int exec_rjmp_nz(mondrian_vm_t *vm, u64 pos);
 static int exec_fwrite(mondrian_vm_t *vm, u64 operand);
 static int exec_push(mondrian_vm_t *vm, u64 operand);
 static int exec_isset(mondrian_vm_t *vm, u64 operand);
@@ -146,18 +253,18 @@ static int exec_npop(mondrian_vm_t *vm, u64 operand);
 static int exec_pop(mondrian_vm_t *vm, u64 operand);
 static int exec_sleep(mondrian_vm_t *vm, u64 operand);
 static int exec_swap(mondrian_vm_t *vm, u64 operand);
-static int exec_tcreate(mondrian_vm_t *vm, u64 operand);
-static int exec_tdrop(mondrian_vm_t *vm, u64 operand);
-static int exec_tdup(mondrian_vm_t *vm, u64 operand);
-static int exec_tinfo(mondrian_vm_t *vm, u64 operand);
-static int exec_tinsert(mondrian_vm_t *vm, u64 operand);
-static int exec_tinstall(mondrian_vm_t *vm, u64 operand);
+static int exec_fcreate(mondrian_vm_t *vm, u64 force);
+static int exec_fdrop(mondrian_vm_t *vm, u64 operand);
+static int exec_fdup(mondrian_vm_t *vm, u64 operand);
+static int exec_finfo(mondrian_vm_t *vm, u64 operand);
+static int exec_finsert(mondrian_vm_t *vm, u64 operand);
+static int exec_finstall(mondrian_vm_t *vm, u64 _);
 static int exec_tlist(mondrian_vm_t *vm, u64 operand);
 static int exec_progclean(mondrian_vm_t *vm, u64 operand);
-static int exec_progninfo(mondrian_vm_t *vm, u64 operand);
+static int exec_proginfo(mondrian_vm_t *vm, u64 _);
 static int exec_proglist(mondrian_vm_t *vm, u64 _);
-static int exec_vload(mondrian_vm_t *vm, u64 operand);
-static int exec_vstore(mondrian_vm_t *vm, u64 operand);
+static int exec_vload(mondrian_vm_t *vm, u64 variable_idx);
+static int exec_vstore(mondrian_vm_t *vm, u64 variable_idx);
 static int exec_jlist(mondrian_vm_t *vm, u64 operand);
 static int exec_jinfo(mondrian_vm_t *vm, u64 operand);
 static int exec_jclean(mondrian_vm_t *vm, u64 operand);
@@ -166,12 +273,15 @@ static int exec_jsusp(mondrian_vm_t *vm, u64 operand);
 static int exec_jwake(mondrian_vm_t *vm, u64 operand);
 static int exec_jstart(mondrian_vm_t *vm, u64 operand);
 static int exec_acq_lock(mondrian_vm_t *vm, u64 container);
-static int exec_rel_lock(mondrian_vm_t *vm, u64 operand);
+static int exec_rel_lock(mondrian_vm_t *vm, u64 _);
 static int exec_acq_latch(mondrian_vm_t *vm, u64 operand);
 static int exec_rel_latch(mondrian_vm_t *vm, u64 operand);
 static int exec_vmove(mondrian_vm_t *vm, u64 index);
-static int exec_dec(mondrian_vm_t *vm, u64 operand);
+static int exec_dec(mondrian_vm_t *vm, u64 var_idx);
 static int exec_temp_name(mondrian_vm_t *vm, u64 operand);
+static int exec_ofield(mondrian_vm_t *vm, u64 _);
+static int exec_wfield(mondrian_vm_t *vm, u64 _);
+static int exec_print(mondrian_vm_t *vm, u64 _);
 
 
 static struct {
@@ -181,7 +291,7 @@ static struct {
     int (*function)(mondrian_vm_t *vm, u64 operand);
 } mvm_opcode_register[] = {
         { MVM_OC_ABORT,     "abort",     false,     exec_abort },
-        { MVM_OC_ADDCOL,    "addcol",    false,     exec_addcol },
+        { MVM_OC_ADDATTR,   "addattr",   false,     exec_addattr },
         { MVM_OC_BYNAME,    "byname",    false,     exec_byname },
         { MVM_OC_COMMIT,    "commit",    false,     exec_commit },
         { MVM_OC_DCLONE,    "dclone",    false,     exec_dclone },
@@ -194,15 +304,15 @@ static struct {
         { MVM_OC_POP,       "pop",       false,     exec_pop },
         { MVM_OC_SLEEP,     "sleep",     true,      exec_sleep },
         { MVM_OC_SWAP,      "swap",      false,     exec_swap },
-        { MVM_OC_TCREATE,   "tcreate",   true,      exec_tcreate },
-        { MVM_OC_TDROP,     "tdrop",     false,     exec_tdrop },
-        { MVM_OC_TDUP,      "tdup",      false,     exec_tdup },
-        { MVM_OC_TINFO,     "tinfo",     false,     exec_tinfo },
-        { MVM_OC_TINSERT,   "tinsert",   false,     exec_tinsert },
-        { MVM_OC_TINSTALL,  "tinstall",  false,     exec_tinstall },
-        { MVM_OC_TLIST,     "tlist",     false,     exec_tlist },
+        { MVM_OC_FCREATE,   "fcreate",   true,      exec_fcreate },
+        { MVM_OC_FDROP,     "fdrop",     false,     exec_fdrop },
+        { MVM_OC_FDUP,      "fdup",      false,     exec_fdup },
+        { MVM_OC_FINFO,     "finfo",     false,     exec_finfo },
+        { MVM_OC_FINSERT,   "finsert",   false,     exec_finsert },
+        { MVM_OC_FINSTALL,  "finstall",  false,     exec_finstall },
+        { MVM_OC_FLIST,     "flist",     false,     exec_tlist },
         { MVM_OC_PROGCLEAN, "progclean", false,     exec_progclean },
-        { MVM_OC_PROGINFO,  "proginfo",  false,     exec_progninfo },
+        { MVM_OC_PROGINFO,  "proginfo",  false,     exec_proginfo },
         { MVM_OC_PROGLIST,  "proglist",  false,     exec_proglist },
         { MVM_OC_VLOAD,     "vload",     true,      exec_vload },
         { MVM_OC_VSTORE,    "vstore",    true,      exec_vstore },
@@ -221,7 +331,10 @@ static struct {
         { MVM_OC_REL_LATCH,  "rel_latch", false,     exec_rel_latch },
         { MVM_OC_VMOVE,      "vmove",     true,      exec_vmove },
         { MVM_OC_DEC,        "dec",       true,      exec_dec },
-        { MVM_OC_TEMP_NAME,  "temp_name", false,     exec_temp_name }
+        { MVM_OC_TEMP_NAME,  "temp_name", false,     exec_temp_name },
+        { MVM_OC_OFIELD,     "ofield",    false,     exec_ofield },
+        { MVM_OC_WFIELD,     "wfield",    false,     exec_wfield },
+        { MVM_OC_PRINT,      "print",     false,     exec_print }
 };
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -240,13 +353,19 @@ int mondrian_vm_create(mondrian_vm_t **out, mondrian_t *db)
             .operand_stack = vector_create(sizeof(operand_t), OPERAND_STACK_CAPACITY),
             .locks = vector_create(sizeof(shared_resource_release_state_t), 5),
             .latches = vector_create(sizeof(shared_resource_release_state_t), 5),
-            .variables = vector_create(sizeof(u64), 10),
+            .variables = vector_create(sizeof(variable_entry_t), 10),
             .temp_names = vector_create(sizeof(char *), 10),
+            .fragments = vector_create(sizeof(local_fragment_t), 10),
             .program = NULL,
             .db = db,
             .error_code = MVM_EC_NOERR,
             .error_details = NULL
         };
+
+        if ((*out)->variables) {
+            vector_memset((*out)->variables, 0, (*out)->variables->element_capacity, &EMPTY_ENTRY);
+        }
+
         return ((*out)->operand_stack != NULL && (*out)->locks != NULL && (*out)->latches != NULL &&
                 (*out)->variables != NULL && (*out)->temp_names != NULL) ?
                 MONDRIAN_OK : MONDRIAN_ERROR;
@@ -296,13 +415,14 @@ int mondrian_vm_free(mondrian_vm_t *vm)
     assert (vm->temp_names);
 
     LOG_DEBUG(vm->db, "cleanup mvm job '%s' (%p)\n"
-            "   - releasing %zu lock(s)\n"
-            "   - releasing %zu latche(s)\n"
+            "   - releasing up to %zu lock(s)\n"
+            "   - releasing up to %zu latche(s)\n"
             "   - freeing %zuB on heap for operand stack\n"
             "   - freeing %zuB on heap for locks list\n"
             "   - freeing %zuB on heap for latches list\n"
             "   - freeing %zuB on heap for variables list\n"
-            "   - freeing %zuB on heap for temporary table name(s)\n",
+            "   - freeing %zuB on heap for local fragment(s)\n"
+            "   - freeing %zuB on heap for temporary string(s)\n",
               program_name(vm->program), vm->program,
               vm->locks->num_elements,
               vm->latches->num_elements,
@@ -310,43 +430,24 @@ int mondrian_vm_free(mondrian_vm_t *vm)
               vector_memused(vm->locks),
               vector_memused(vm->latches),
               vector_memused(vm->variables),
+              vector_memused(vm->fragments),
               vector_memused__str(vm->temp_names));
 
-    shared_resource_release_state_t *release_states = (shared_resource_release_state_t *)(vm->locks->data);
     for (lock_id_t id = 0; id < vm->locks->num_elements; id++) {
-        if (!release_states[id].is_released) {
-            switch (release_states[id].resource) {
-                case SR_PROGPOOL:
-                    switch (release_states[id].mode) {
-                        case AM_EXCLUSIVE:
-                            progpool_unlock_exclusive(mondrian_get_progpool(vm->db));
-                        break;
-                        case AM_SHARED:
-                            // TODO
-                        panic("not implemented %s", "AM_SHARED");
-                        break;
-                        default: panic("Unknown access mode: %d", release_states[id].mode);
-                    }
-
-                    break;
-                default: panic("Unknown shared resource type: %d", release_states[id].resource);
-            }
-            LOG_DEBUG(vm->db, "auto released lock id %zu for mvm job '%s' (%p)\n",
-                      id, program_name(vm->program), vm->program);
-        }
+        mondrian_vm_release_lock(vm, id);
     }
 
-    release_states = (shared_resource_release_state_t *)(vm->latches->data);
+    shared_resource_release_state_t *release_states = (shared_resource_release_state_t *)(vm->latches->data);
     for (latch_id_t id = 0; id < vm->latches->num_elements; id++) {
         if (!release_states[id].is_released) {
             switch (release_states[id].resource) {
                 case SR_PROGPOOL:
                     switch (release_states[id].mode) {
-                        case AM_EXCLUSIVE:
+                        case MODE_EXCLUSIVE:
                             // TODO
                             panic("not implemented %s", "AM_EXCLUSIVE");
                             break;
-                        case AM_SHARED:
+                        case MODE_SHARED:
                             // TODO
                             panic("not implemented %s", "AM_SHARED");
                             break;
@@ -376,6 +477,11 @@ int mondrian_vm_free(mondrian_vm_t *vm)
 int program_new(program_t **out, const char *prog_name, const char *prog_author,
                 const char *prog_comment)
 {
+    if (strlen(prog_name) + 1 >= PROGRAM_MAX_NAME_LENGTH || strlen(prog_author) + 1 >= PROGRAM_MAX_AUTHOR_LENGTH ||
+        strlen(prog_comment) + 1 >= PROGRAM_MAX_COMMENT_LENGTH) {
+        return MONDRIAN_ERROR;
+    }
+
     *out = malloc(sizeof(program_t));
     **out = (program_t) {
         .instructions = vector_create(sizeof(instruction_t), 10),
@@ -422,6 +528,11 @@ int program_print(FILE *out, const program_t *program)
         }
     }
     return MONDRIAN_OK;
+}
+
+size_t program_sizeof(const program_t *program)
+{
+    return (program == NULL ? 0 : vector_sizeof(program->instructions));
 }
 
 const char *program_name(const program_t *program)
@@ -494,19 +605,158 @@ static inline lock_id_t mondrian_vm_ackn_lock(mondrian_vm_t *vm, shared_resource
     return lock_id;
 }
 
+static inline int mondrian_vm_release_lock(mondrian_vm_t *vm, lock_id_t lock_id)
+{
+    shared_resource_release_state_t *release_states = (shared_resource_release_state_t *)(vm->locks->data);
+    if (lock_id >= vm->locks->num_elements) {
+        return MONDRIAN_ERROR;
+    } else {
+        if (!release_states[lock_id].is_released) {
+            switch (release_states[lock_id].resource) {
+                case SR_PROGPOOL:
+                    switch (release_states[lock_id].mode) {
+                        case MODE_EXCLUSIVE:
+                            progpool_unlock_exclusive(mondrian_get_progpool(vm->db));
+                            release_states[lock_id].is_released = true;
+                            break;
+                        case MODE_SHARED:
+                            // TODO
+                        panic("not implemented %s", "AM_SHARED");
+                            break;
+                        default: panic("Unknown access mode: %d", release_states[lock_id].mode);
+                    }
+
+                    break;
+                default: panic("Unknown shared resource type: %d", release_states[lock_id].resource);
+            }
+            LOG_DEBUG(vm->db, "released lock id %zu for mvm job '%s' (%p)\n",
+                      lock_id, program_name(vm->program), vm->program);
+            return MONDRIAN_OK;
+        } return MONDRIAN_ALREADY_DONE;
+    }
+}
+
 static inline void mondrian_vm_set_var(mondrian_vm_t *vm, u64 index, u64 *value)
 {
-    vector_set(vm->variables, index, 1, &value);
+    variable_entry_t entry = {
+        .initialized = true,
+        .value = *value
+    };
+    size_t vec_elem = vm->variables->num_elements;
+    if (vec_elem + 1 >= vm->variables->element_capacity) {
+        size_t new_vec_cap = 2 * vec_elem;
+        vector_resize(vm->variables, new_vec_cap);
+        vector_memset(vm->variables, vec_elem, new_vec_cap, &EMPTY_ENTRY);
+    }
+    vector_set(vm->variables, index, 1, &entry);
 }
+
+static inline int mondrian_vm_get_var(u64 *out, mondrian_vm_t *vm, u64 index)
+{
+    if (vm == NULL || out == NULL) {
+        return MONDRIAN_ERROR;
+    } else {
+        const variable_entry_t *entry = (const variable_entry_t *) vector_at(vm->variables, index);
+        if (entry != NULL && entry->initialized) {
+            *out = entry->value;
+            return MONDRIAN_OK;
+        } else return MONDRIAN_ERROR;
+    }
+}
+
+static inline int mondrian_vm_install_frag_local(frag_id_t *out, mondrian_vm_t *vm, frag_t *frag)
+{
+    local_fragment_t local = {
+        .is_dropped = false,
+        .fragment = frag
+    };
+    *out = vm->fragments->num_elements;
+    vector_add(vm->fragments, 1, &local);
+    return MONDRIAN_OK;
+}
+
+static inline frag_t *mondrian_vm_get_frag_local(mondrian_vm_t *vm, frag_id_t id)
+{
+    const local_fragment_t *local = (const local_fragment_t *) vector_at(vm->fragments, id);
+    return (local == NULL ? NULL : local->fragment);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+static inline bool is_unique_fragment_name(mondrian_vm_t *vm, const char *name)
+{
+    local_fragment_t *fragments = (local_fragment_t *) vm->fragments->data;
+    for (size_t i = 0; i < vm->fragments->num_elements; i++) {
+        if ((!fragments[i].is_dropped) && (!strcmp(gs_fragment_get_schema(fragments[i].fragment)->frag_name, name))) {
+            return false;
+        }
+    }
+    return true;
+}
+
+static inline int drop_fragment_with_name(mondrian_vm_t *vm, const char *name)
+{
+    local_fragment_t *fragments = (local_fragment_t *) vm->fragments->data;
+    for (size_t i = 0; i < vm->fragments->num_elements; i++) {
+        if (!strcmp(gs_fragment_get_schema(fragments[i].fragment)->frag_name, name)) {
+            if (fragments[i].is_dropped) {
+                return MONDRIAN_ERROR;
+            } else {
+                fragments[i].is_dropped = true;
+                return MONDRIAN_OK;
+            }
+        }
+    }
+    return MONDRIAN_NOSUCHELEM;
+}
+
+static inline void frag_handle_make(frag_handle_t *out, u64 scope, frag_id_t frag_id)
+{
+    out->is_global = (scope == FRAGMENT_SCOPE_GLOBAL);
+    out->frag_id   = frag_id;
+}
+
+static inline bool frag_handle_is_global(frag_handle_t *handle)
+{
+    return handle->is_global;
+}
+
+static inline frag_id_t frag_handle_get_frag_id(frag_handle_t *handle)
+{
+    return handle->frag_id;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 
 static int exec_abort(mondrian_vm_t *vm, u64 operand)
 {
     return MONDRIAN_ERROR;
 }
 
-static int exec_addcol(mondrian_vm_t *vm, u64 operand)
+static int exec_addattr(mondrian_vm_t *vm, u64 operand)
 {
-    return MONDRIAN_ERROR;
+    CHECKFOR_STACKUNDERFLOW(5)
+    const char *name = (const char *) OPERAND_STACK_POP();
+    u64 type         = OPERAND_STACK_POP();
+    u64 rep          = OPERAND_STACK_POP();
+    u64 flags        = OPERAND_STACK_POP();
+    schema_t *schema = (schema_t *) OPERAND_STACK_PEEK();
+
+    if (schema == NULL || gs_schema_attr_by_name(schema, name) != NULL) {
+        return MONDRIAN_ERROR;
+    }
+
+    CHECKFOR_TYPE(type);
+    CHECKFOR_REP(rep);
+    CHECKFOR_FLAGS(flags);
+
+    if (IS_FLAG_SET(flags, FLAG_PRIMARY)) {
+        flags |= FLAG_UNIQUE;
+    }
+
+    attr_id_t attr_id = gs_attr_create(name, type, rep, schema);
+    OPERAND_STACK_PUSH(attr_id);
+    return MONDRIAN_OK;
 }
 
 static int exec_byname(mondrian_vm_t *vm, u64 operand)
@@ -516,7 +766,7 @@ static int exec_byname(mondrian_vm_t *vm, u64 operand)
 
 static int exec_commit(mondrian_vm_t *vm, u64 operand)
 {
-    return MONDRIAN_ERROR;
+    return MONDRIAN_OK;
 }
 
 static int exec_dclone(mondrian_vm_t *vm, u64 operand)
@@ -529,9 +779,20 @@ static int exec_dopen(mondrian_vm_t *vm, u64 operand)
     return MONDRIAN_ERROR;
 }
 
-static int exec_rjmp_nz(mondrian_vm_t *vm, u64 operand)
+static int exec_rjmp_nz(mondrian_vm_t *vm, u64 pos)
 {
-    return MONDRIAN_ERROR;
+    s64 jmp = *((s64 *)&pos);
+    u64 test;
+    mondrian_vm_get_var(&test, vm, VARIABLE_RCX);
+    if (test != 0) {
+        int new_pc = (--vm->pc) + jmp;
+        if (new_pc < 0 || new_pc >= vm->program->instructions->num_elements) {
+            return MONDRIAN_ERROR;
+        } else {
+            vm->pc = new_pc;
+            return MONDRIAN_OK;
+        }
+    } else return MONDRIAN_OK;
 }
 
 static int exec_fwrite(mondrian_vm_t *vm, u64 operand)
@@ -557,7 +818,9 @@ static int exec_npop(mondrian_vm_t *vm, u64 operand)
 
 static int exec_pop(mondrian_vm_t *vm, u64 operand)
 {
-    return MONDRIAN_ERROR;
+    CHECKFOR_STACKUNDERFLOW(1)
+    OPERAND_STACK_POP();
+    return MONDRIAN_OK;
 }
 
 static int exec_sleep(mondrian_vm_t *vm, u64 operand)
@@ -570,34 +833,110 @@ static int exec_swap(mondrian_vm_t *vm, u64 operand)
     return MONDRIAN_ERROR;
 }
 
-static int exec_tcreate(mondrian_vm_t *vm, u64 operand)
+static int exec_fcreate(mondrian_vm_t *vm, u64 force)
+{
+    CHECKFOR_STACKUNDERFLOW(2)
+    u64 scope = OPERAND_STACK_POP();
+    const char *name = (const char *) OPERAND_STACK_POP();
+    CHECKFOR_SCOPE(scope)
+
+    schema_t *schema;
+
+    switch (scope) {
+        case FRAGMENT_SCOPE_LOCAL:
+            if (!force) {
+                CHECKFOR_UNIQUE_LOCAL_FRAGMENT_NAME(name);
+            } else {
+                drop_fragment_with_name(vm, name);
+            }
+            schema = gs_schema_create(name);
+            OPERAND_STACK_PUSH(schema);
+            return MONDRIAN_OK;
+        case FRAGMENT_SCOPE_GLOBAL:
+            panic("Not implemented! %s", "FRAGMENT_SCOPE_GLOBAL");
+            return MONDRIAN_ERROR;
+        default: panic("Unknown scope %llu", scope);
+    }
+    return MONDRIAN_ERROR;
+}
+
+static int exec_fdrop(mondrian_vm_t *vm, u64 operand)
 {
     return MONDRIAN_ERROR;
 }
 
-static int exec_tdrop(mondrian_vm_t *vm, u64 operand)
+static int exec_fdup(mondrian_vm_t *vm, u64 operand)
 {
     return MONDRIAN_ERROR;
 }
 
-static int exec_tdup(mondrian_vm_t *vm, u64 operand)
+static int exec_finfo(mondrian_vm_t *vm, u64 operand)
 {
     return MONDRIAN_ERROR;
 }
 
-static int exec_tinfo(mondrian_vm_t *vm, u64 operand)
+static int exec_finsert(mondrian_vm_t *vm, u64 operand)
 {
-    return MONDRIAN_ERROR;
+    CHECKFOR_STACKUNDERFLOW(2)
+    u64 num             = OPERAND_STACK_POP();
+    frag_handle_t frag_handle = *((frag_handle_t*) &OPERAND_STACK_POP());
+    CHECKFOR_NOTZERO(num)
+
+    if (frag_handle_is_global(&frag_handle)) {
+        panic("Not implemented: '%s'", "global frag handle");
+    } else {
+        CHECKFOR_LOCAL_FRAGID(frag_handle_get_frag_id(&frag_handle));
+        frag_t *frag = mondrian_vm_get_frag_local(vm, frag_handle.frag_id);
+        if (frag == NULL) {
+            return MONDRIAN_ERROR;
+        }
+        tuplet_t *tuplet_ptr = gs_fragment_insert(frag, num);
+        mondrian_vm_set_var(vm, VARIABLE_RTC, (u64 *)&tuplet_ptr);
+        return MONDRIAN_OK;
+    }
 }
 
-static int exec_tinsert(mondrian_vm_t *vm, u64 operand)
+static int exec_finstall(mondrian_vm_t *vm, u64 _)
 {
-    return MONDRIAN_ERROR;
-}
+    CHECKFOR_STACKUNDERFLOW(3)
+    u64 scope        = OPERAND_STACK_POP();
+    u64 frag_type    = OPERAND_STACK_POP();
+    u64 capacity     = OPERAND_STACK_POP();
+    schema_t *schema = (schema_t *) OPERAND_STACK_POP();
+    CHECKFOR_SCOPE(scope)
+    CHECKFOR_FRAGMENTTYPE(frag_type)
+    CHECKFOR_NOTZERO(capacity)
+    enum frag_impl_type_t impl_type;
+    switch (frag_type) {
+        case FRAGMENT_HOST_PLAIN_ROW_STORE:
+            impl_type = FIT_HOST_NSM_VM;
+            break;
+        case FRAGMENT_HOST_PLAIN_COLUMN_STORE:
+            impl_type = FIT_HOST_DSM_VM;
+            break;
+        default:
+            panic("Unknown fragment type '%lld'", frag_type);
+    }
 
-static int exec_tinstall(mondrian_vm_t *vm, u64 operand)
-{
-    return MONDRIAN_ERROR;
+    frag_id_t frag_id;
+    frag_t *frag = gs_fragment_alloc(schema, capacity, impl_type);
+
+    switch (scope) {
+        case FRAGMENT_SCOPE_GLOBAL:
+            panic("Not implemented: '%s'", "FRAGMENT_SCOPE_GLOBAL");
+            break;
+        case FRAGMENT_SCOPE_LOCAL:
+            mondrian_vm_install_frag_local(&frag_id, vm, frag);
+            break;
+        default:
+            panic("Unknown scope: %lld", scope);
+    }
+
+    frag_handle_t handle;
+    frag_handle_make(&handle, scope, frag_id);
+
+    OPERAND_STACK_PUSH(handle);
+    return MONDRIAN_OK;
 }
 
 static int exec_tlist(mondrian_vm_t *vm, u64 operand)
@@ -610,31 +949,53 @@ static int exec_progclean(mondrian_vm_t *vm, u64 operand)
     return MONDRIAN_ERROR;
 }
 
-static int exec_progninfo(mondrian_vm_t *vm, u64 operand)
+static int exec_proginfo(mondrian_vm_t *vm, u64 _)
 {
-    return MONDRIAN_ERROR;
+    CHECKFOR_STACKUNDERFLOW(1);
+    prog_id_t prog_id = OPERAND_STACK_POP();
+    const program_t *program = progpool_get(mondrian_get_progpool(vm->db), prog_id);
+    if (program == NULL) {
+        return MONDRIAN_ERROR;
+    } else {
+        size_t size = program_sizeof(program);
+        OPERAND_STACK_PUSH(size);
+        OPERAND_STACK_PUSH(program->prog_comments);
+        OPERAND_STACK_PUSH(program->prog_author);
+        OPERAND_STACK_PUSH(program->prog_name);
+        OPERAND_STACK_PUSH(prog_id);
+        return MONDRIAN_OK;
+    }
 }
 
 static int exec_proglist(mondrian_vm_t *vm, u64 _)
 {
     prog_id_t *list;
-    s64 num_progs;
-    progpool_list(&list, (size_t *) &num_progs, mondrian_get_progpool(vm->db));
-    while (num_progs--) {
+    s64 num_progs, counter;
+    progpool_list(&list, (size_t *) &counter, mondrian_get_progpool(vm->db));
+    num_progs = counter;
+    while (counter--) {
         OPERAND_STACK_PUSH(*list++);
     }
     OPERAND_STACK_PUSH(num_progs);
     return MONDRIAN_OK;
 }
 
-static int exec_vload(mondrian_vm_t *vm, u64 operand)
+static int exec_vload(mondrian_vm_t *vm, u64 variable_idx)
 {
-    return MONDRIAN_ERROR;
+    u64 value;
+    int result = mondrian_vm_get_var(&value, vm, variable_idx);
+    if (result == MONDRIAN_OK) {
+        OPERAND_STACK_PUSH(value);
+        return MONDRIAN_OK;
+    } else return MONDRIAN_ERROR;
 }
 
-static int exec_vstore(mondrian_vm_t *vm, u64 operand)
+static int exec_vstore(mondrian_vm_t *vm, u64 variable_idx)
 {
-    return MONDRIAN_ERROR;
+    CHECKFOR_STACKUNDERFLOW(1)
+    u64 value = OPERAND_STACK_PEEK();
+    mondrian_vm_set_var(vm, variable_idx, &value);
+    return MONDRIAN_OK;
 }
 
 static int exec_jlist(mondrian_vm_t *vm, u64 operand)
@@ -690,6 +1051,7 @@ static int exec_acq_lock(mondrian_vm_t *vm, u64 container)
                     progpool_lock_exclusive(mondrian_get_progpool(vm->db));
                     break;
                 case MODE_SHARED:
+                    panic("Not implemented '%s'", "MODE_SHARED");
                     break;
                 default:
                     panic("Unknown lock mode in vm %p", vm);
@@ -703,9 +1065,11 @@ static int exec_acq_lock(mondrian_vm_t *vm, u64 container)
     return MONDRIAN_OK;
 }
 
-static int exec_rel_lock(mondrian_vm_t *vm, u64 operand)
+static int exec_rel_lock(mondrian_vm_t *vm, u64 _)
 {
-    return MONDRIAN_ERROR;
+    CHECKFOR_STACKUNDERFLOW(1)
+    lock_id_t lock_id = OPERAND_STACK_POP();
+    return (mondrian_vm_release_lock(vm, lock_id) != MONDRIAN_ERROR ? MONDRIAN_OK : MONDRIAN_ERROR);
 }
 
 static int exec_acq_latch(mondrian_vm_t *vm, u64 operand)
@@ -726,17 +1090,61 @@ static int exec_vmove(mondrian_vm_t *vm, u64 index)
     return MONDRIAN_OK;
 }
 
-static int exec_dec(mondrian_vm_t *vm, u64 operand)
+static int exec_dec(mondrian_vm_t *vm, u64 var_idx)
 {
-    return MONDRIAN_ERROR;
+    u64 value;
+    mondrian_vm_get_var(&value, vm, var_idx);
+    value--;
+    mondrian_vm_set_var(vm, var_idx, &(value));
+    return MONDRIAN_OK;
 }
 
 static int exec_temp_name(mondrian_vm_t *vm, u64 operand)
 {
     char buffer[256];
-    sprintf(buffer, "TEMP_TABLE_#%d", vm->temp_name_counter++);
-    char *temp_name = strdup(temp_name);
+    sprintf(buffer, "%s@%p:#%d", program_name(vm->program), vm->program, vm->temp_name_counter++);
+    char *temp_name = strdup(buffer);
     vector_add(vm->temp_names, 1, &temp_name);
     OPERAND_STACK_PUSH(temp_name);
     return MONDRIAN_OK;
+}
+
+static int exec_ofield(mondrian_vm_t *vm, u64 _)
+{
+    field_t *field;
+    u64 mem_addr;
+    mondrian_vm_get_var(&mem_addr, vm, VARIABLE_RTC);
+    tuplet_t *tuplet = (tuplet_t *) mem_addr;
+    field = gs_field_open(tuplet);
+    mondrian_vm_set_var(vm, VARIABLE_RFC, (u64 *) &field);
+    return MONDRIAN_OK;
+}
+
+static int exec_wfield(mondrian_vm_t *vm, u64 _)
+{
+    CHECKFOR_STACKUNDERFLOW(1)
+    u64 mem_addr;
+    mondrian_vm_get_var(&mem_addr, vm, VARIABLE_RFC);
+    field_t *cursor = (field_t *) mem_addr;
+    u64 data = OPERAND_STACK_POP();
+    gs_field_write(cursor, &data);
+
+    return MONDRIAN_OK;
+}
+
+static int exec_print(mondrian_vm_t *vm, u64 _)
+{
+    CHECKFOR_STACKUNDERFLOW(1)
+    frag_handle_t *handle = (frag_handle_t *) &OPERAND_STACK_POP();
+    if (handle->is_global) {
+        panic("Not implemented: '%s'", "exec_print for global");
+    } else {
+        frag_t *frag = mondrian_vm_get_frag_local(vm, handle->frag_id);
+        if (frag == NULL) {
+            return MONDRIAN_ERROR;
+        } else {
+            gs_frag_print(stdout, frag, 0, frag->ntuplets);
+            return MONDRIAN_OK;
+        }
+    }
 }

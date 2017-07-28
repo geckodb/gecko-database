@@ -14,6 +14,8 @@ typedef struct mvm_handle_t {
 
 int mondrian_open(mondrian_t **instance);
 
+int mondrian_show_debug_log(mondrian_t *instance, bool show);
+
 int mondrian_install(prog_id_t *out, mondrian_t *db, const program_t *program);
 
 int mondrian_exec(mvm_handle_t *out, mondrian_t *db, prog_id_t prog_id, future_eval_policy run_policy);

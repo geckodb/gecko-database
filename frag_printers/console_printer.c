@@ -36,10 +36,10 @@ static inline void calc_field_print_lens(vector_t *field_print_lens, frag_t *fra
     assert (field_print_lens);
 
     tuplet_t *tuplet = gs_tuplet_open(frag);
-    bool not_eof     = (tuplet != NULL);
+    size_t num_tuplets = frag->ntuplets;
     schema_t *schema = gs_fragment_get_schema(frag);
 
-    while (not_eof) {
+    while (num_tuplets--) {
         struct field_t *field = gs_field_open(tuplet);
         for (size_t attr_idx = 0; attr_idx < num_attr; attr_idx++) {
             enum field_type type = gs_schema_attr_type(schema, attr_idx);
@@ -54,7 +54,6 @@ static inline void calc_field_print_lens(vector_t *field_print_lens, frag_t *fra
             vector_set(field_print_lens, attr_idx, 1, &all_print_len);
             gs_field_next(field);
         }
-        not_eof = gs_tuplet_next(tuplet);
     }
 }
 
@@ -64,7 +63,8 @@ static inline void console_printer_print(struct frag_printer_t *self, FILE *file
     size_t num_attr = gs_fragment_num_of_attributes(frag);
     vector_t *field_print_lens = vector_create(sizeof(size_t), num_attr + 1);
     vector_resize(field_print_lens, num_attr);
-    vector_memset(field_print_lens, 0, num_attr, 0);
+    size_t zero = 0;
+    vector_memset(field_print_lens, 0, num_attr, &zero);
 
     calc_field_print_lens(field_print_lens, frag, num_attr);
     print_frag_header(file, frag, field_print_lens, num_attr);
@@ -114,10 +114,10 @@ static inline void print_frag_body(FILE *file, frag_t *frag, vector_t *field_pri
 
     char format_buffer[2048];
     tuplet_t *tuplet = gs_tuplet_open(frag);
-    bool not_eof     = (tuplet != NULL);
+    size_t num_tuples = frag->ntuplets;
     schema_t *schema = gs_fragment_get_schema(frag);
 
-    while (not_eof) {
+    while (num_tuples--) {
         struct field_t *field = gs_field_open(tuplet);
         for (size_t attr_idx = 0; attr_idx < num_attr; attr_idx++) {
             const attr_t *attr = gs_schema_attr_by_id(schema, attr_idx);
@@ -129,6 +129,7 @@ static inline void print_frag_body(FILE *file, frag_t *frag, vector_t *field_pri
             gs_field_next(field);
         }
         printf("|\n");
-        not_eof = gs_tuplet_next(tuplet);
     }
+
+    print_h_line(file, frag, num_attr, schema, field_print_lens);
 }

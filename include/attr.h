@@ -35,6 +35,10 @@ typedef struct attr_t {
 
 const char *gs_attr_get_name(const struct attr_t *attr);
 
+attr_id_t gs_attr_create(const char *name, enum field_type data_type, size_t data_type_rep, schema_t *schema);
+
+bool gs_attr_isstring(const attr_t *attr);
+
 size_t gs_attr_get_str_format_max_len(attr_t *attr);
 
 enum field_type gs_attr_get_type(const attr_t *attr);

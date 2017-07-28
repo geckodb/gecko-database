@@ -79,14 +79,16 @@ int progpool_uninstall(progpool_t *pool, prog_id_t id)
 
 int progpool_find_by_name(prog_id_t *out, progpool_t *pool, const char *name)
 {
-    if (out == NULL || pool == NULL || name == NULL) {
+    if (pool == NULL || name == NULL) {
         return MONDRIAN_ERROR;
     } else {
         const pool_entry_t *entries = (const pool_entry_t *) pool->entries->data;
         size_t num_entries = pool->entries->num_elements;
         for (size_t i = 0; i < num_entries; i++) {
             if (!entries[i].deleted && !strcmp(name, program_name(entries[i].program))) {
-                *out = i;
+                if (out != NULL) {
+                    *out = i;
+                }
                 return MONDRIAN_OK;
             }
         }

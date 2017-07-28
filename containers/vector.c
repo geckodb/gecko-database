@@ -67,12 +67,14 @@ size_t vector_num_elements(const vector_t *vec)
     return (vec->num_elements);
 }
 
-void vector_memset(vector_t *vec, size_t pos_start, size_t num_elements, unsigned char data)
+void vector_memset(vector_t *vec, size_t pos_start, size_t num_elements, const void *data)
 {
     require_nonnull(vec);
     require((num_elements > 0), "illegal argument");
-    require((pos_start + num_elements <= vec->num_elements), "out of bounds");
-    memset(vec->data + (pos_start * vec->sizeof_element), data, (num_elements * vec->sizeof_element));
+    require((pos_start + num_elements <= vec->element_capacity), "out of bounds");
+    for (size_t i = pos_start; i < pos_start + num_elements; i++) {
+        vector_set(vec, i, 1, data);
+    }
 }
 
 vector_t *vector_cpy(vector_t *proto)
@@ -147,6 +149,11 @@ void *vector_peek(const vector_t *vec)
 void *vector_pop_unsafe(vector_t *vec)
 {
     return (vec->data + (vec->num_elements-- - 1) * vec->sizeof_element);
+}
+
+void *vector_peek_unsafe(vector_t *vec)
+{
+    return (vec->data + (vec->num_elements - 1) * vec->sizeof_element);
 }
 
 bool vector_set(vector_t *vec, size_t idx, size_t num_elements, const void *data)
@@ -224,6 +231,11 @@ size_t vector_memused__str(vector_t *vec)
     size_t total_str_size = 0;
     vector_foreach(vec, &total_str_size, get_sizeof_strings);
     return (memused + total_str_size);
+}
+
+size_t vector_sizeof(const vector_t *vec)
+{
+    return (vec == NULL ? 0 : vec->element_capacity * vec->sizeof_element);
 }
 
 bool vector_comp(const vector_t *lhs, const vector_t *rhs, bool (*comp)(const void *a, const void *b))

@@ -286,7 +286,13 @@ static inline const void *field_read(field_t *self)
 static inline void field_update(field_t *self, const void *data)
 {
     assert (self && data);
-    memcpy(self->attr_value_ptr, data, gs_field_size(self));
+    const attr_t *attr = gs_schema_attr_by_id(self->tuplet->fragment->schema, self->attr_id);
+    if (gs_attr_isstring(attr)) {
+        const char *str = *(const char **) data;
+        strcpy(self->attr_value_ptr, str);
+    } else {
+        memcpy(self->attr_value_ptr, data, gs_field_size(self));
+    }
 }
 
 static inline void field_set_null(field_t *self)

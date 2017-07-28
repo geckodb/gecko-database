@@ -2,6 +2,7 @@
 #include <containers/list.h>
 #include <debug.h>
 #include <progpool.h>
+#include <conf.h>
 
 typedef struct vm_exec_info {
     future_t future;
@@ -39,13 +40,22 @@ int mondrian_open(mondrian_t **instance)
     return MONDRIAN_OK;
 }
 
+int mondrian_show_debug_log(mondrian_t *instance, bool show)
+{
+    if (instance == NULL) {
+        return MONDRIAN_ERROR;
+    } else {
+        instance->config.log.debug = show;
+        return MONDRIAN_OK;
+    }
+}
+
 int mondrian_install(prog_id_t *out, mondrian_t *db, const program_t *program)
 {
     if (db == NULL || program == NULL) {
         return MONDRIAN_ERROR;
     } else {
-        progpool_install(out, db->progpool, program);
-        return MONDRIAN_OK;
+        return progpool_install(out, db->progpool, program);
     }
 }
 

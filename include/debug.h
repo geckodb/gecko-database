@@ -7,7 +7,7 @@
             fprintf(stderr, "# [DEBUG]: ");                                                                            \
             fprintf(stderr, msg, __VA_ARGS__);                                                                         \
             fprintf(stderr, " (%s:%d)\n", __FILE__, __LINE__);                                                         \
-        }      else printf("Nope\n");                                                                                                         \
+        }                                                                                                              \
     })
 #else
     #define LOG_DEBUG(msg, ...) { }

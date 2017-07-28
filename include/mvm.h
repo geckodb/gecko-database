@@ -16,14 +16,14 @@ typedef struct mondrian_vm_t mondrian_vm_t;
 
 typedef struct program_t program_t;
 
-typedef struct instruction_t
+typedef struct __attribute__((__packed__)) instruction_t
 {
     u8  opcode;
     u64 operand;
 } instruction_t;
 
 #define MVM_OC_ABORT                0x00
-#define MVM_OC_ADDCOL               0x01
+#define MVM_OC_ADDATTR              0x01
 #define MVM_OC_BYNAME               0x02
 #define MVM_OC_COMMIT               0x03
 #define MVM_OC_DCLONE               0x04
@@ -36,13 +36,13 @@ typedef struct instruction_t
 #define MVM_OC_POP                  0x0B
 #define MVM_OC_SLEEP                0x0C
 #define MVM_OC_SWAP                 0x0D
-#define MVM_OC_TCREATE              0x0E
-#define MVM_OC_TDROP                0x0F
-#define MVM_OC_TDUP                 0x10
-#define MVM_OC_TINFO                0x11
-#define MVM_OC_TINSERT              0x12
-#define MVM_OC_TINSTALL             0x13
-#define MVM_OC_TLIST                0x14
+#define MVM_OC_FCREATE              0x0E
+#define MVM_OC_FDROP                0x0F
+#define MVM_OC_FDUP                 0x10
+#define MVM_OC_FINFO                0x11
+#define MVM_OC_FINSERT              0x12
+#define MVM_OC_FINSTALL             0x13
+#define MVM_OC_FLIST                0x14
 #define MVM_OC_PROGCLEAN            0x15
 #define MVM_OC_PROGINFO             0x16
 #define MVM_OC_PROGLIST             0x17
@@ -62,9 +62,14 @@ typedef struct instruction_t
 #define MVM_OC_VMOVE                0x25
 #define MVM_OC_DEC                  0x26
 #define MVM_OC_TEMP_NAME            0x27
+#define MVM_OC_OFIELD               0x28
+#define MVM_OC_WFIELD               0x29
+#define MVM_OC_PRINT                0x2A
 
-#define MODE_SHARED                 0x0000000000000000
-#define MODE_EXCLUSIVE              0x0000000000000001
+typedef enum access_mode {
+    MODE_SHARED               = 0x0000000000000000,
+    MODE_EXCLUSIVE            = 0x0000000000000001
+} access_mode;
 
 #define ACCESS_GLOBAL               0x0000000000000000
 
@@ -75,13 +80,31 @@ typedef struct instruction_t
 
 #define VARIABLE_RAX        0
 #define VARIABLE_RCX        1
-#define VARIABLE_LOCAL_0    2
-#define VARIABLE_LOCAL_1    3
-#define VARIABLE_LOCAL_2    4
+#define VARIABLE_RTC        2
+#define VARIABLE_RFC        3
+#define VARIABLE_LOCAL_0    4
+#define VARIABLE_LOCAL_1    5
+#define VARIABLE_LOCAL_2    6
+
+#define FRAGMENT_SCOPE_GLOBAL   0x0000000000000001
+#define FRAGMENT_SCOPE_LOCAL    0x0000000000000002
+
+#define FRAGMENT_HOST_PLAIN_COLUMN_STORE       0x0000000000000000
+#define FRAGMENT_HOST_PLAIN_ROW_STORE          0x0000000000000001
+
+static const char STRING_BUILTIN_PROG_ID[]     = "Program ID";
+static const char STRING_BUILTIN_NAME[]        = "Name";
+static const char STRING_BUILTIN_AUTHOR[]      = "Author";
+static const char STRING_BUILTIN_COMMENT[]     = "Comment";
+static const char STRING_BUILTIN_SIZE[]        = "Size";
 
 #define EXIT_CODE_COMMIT            0
 #define EXIT_CODE_ABORT_BY_USER     1
 #define EXIT_CODE_ABORT_BY_SYSTEM   2
+
+#define PROGRAM_MAX_NAME_LENGTH         256
+#define PROGRAM_MAX_AUTHOR_LENGTH       256
+#define PROGRAM_MAX_COMMENT_LENGTH     1024
 
 #define ADD(/* MVM_OC_* */ oc, /* u64 */ op)                                                                           \
 {                                                                                                                      \
@@ -114,6 +137,8 @@ int program_new(program_t **out, const char *prog_name, const char *prog_author,
 int program_add(program_t *out, instruction_t *inst);
 
 int program_print(FILE *out, const program_t *program);
+
+size_t program_sizeof(const program_t *program);
 
 const char *program_name(const program_t *program);
 

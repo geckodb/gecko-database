@@ -81,6 +81,13 @@ enum tuplet_format {
     TF_DSM  = 2,
 };
 
+#define FLAG_REGULAR          0
+#define FLAG_PRIMARY     1 << 1
+#define FLAG_FOREIGN     1 << 2
+#define FLAG_NULLABLE    1 << 3
+#define FLAG_AUTOINC     1 << 4
+#define FLAG_UNIQUE      1 << 5
+
 typedef struct {
     uint8_t primary  : 1;
     uint8_t foreign  : 1;
@@ -110,6 +117,8 @@ typedef MD5_CTX checksum_context_t;
 #define to_string(x)    #x
 
 #define ARRAY_LEN_OF(x) (sizeof(x) / sizeof(x[0]))
+
+#define IS_FLAG_SET(set, flag) ((set & flag) == flag)
 
 // ---------------------------------------------------------------------------------------------------------------------
 // D E F I N E S

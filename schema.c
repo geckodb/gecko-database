@@ -8,12 +8,24 @@ const struct attr_t *gs_schema_attr_by_id(const schema_t *schema, attr_id_t attr
     return ((struct attr_t *)vector_at(schema->attr, attr_id));
 }
 
+const struct attr_t *gs_schema_attr_by_name(const schema_t *schema, const char *name)
+{
+    assert (schema);
+    for (size_t i = 0; i < schema->attr->num_elements; i++) {
+        attr_t *attr = vector_at(schema->attr, i);
+        if (!strcmp(attr->name, name)) {
+            return attr;
+        }
+    }
+    return NULL;
+}
+
 schema_t *gs_schema_create(const char *table_name)
 {
     assert (table_name);
     schema_t *result = malloc(sizeof(schema_t));
     result->attr = vector_create(sizeof(attr_t), 100);
-    result->table_name = strdup(table_name);
+    result->frag_name = strdup(table_name);
     return result;
 }
 
@@ -35,7 +47,7 @@ void gs_schema_free(schema_t *schema)
 {
     assert (schema);
     vector_free(schema->attr);
-    free (schema->table_name);
+    free (schema->frag_name);
     free (schema);
 }
 

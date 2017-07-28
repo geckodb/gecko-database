@@ -54,7 +54,7 @@ bool vector_resize(vector_t *vec, size_t num_elements);
 
 size_t vector_num_elements(const vector_t *vec);
 
-void vector_memset(vector_t *vec, size_t pos_start, size_t num_elements, unsigned char data);
+void vector_memset(vector_t *vec, size_t pos_start, size_t num_elements, const void *data);
 
 vector_t *vector_cpy(vector_t *proto);
 
@@ -69,6 +69,8 @@ void *vector_at(const vector_t *vec, size_t pos);
 void *vector_peek(const vector_t *vec);
 
 void *vector_pop_unsafe(vector_t *vec);
+
+void *vector_peek_unsafe(vector_t *vec);
 
 bool vector_set(vector_t *vec, size_t idx, size_t num_elements, const void *data);
 
@@ -87,6 +89,8 @@ bool vector_contains(vector_t *vec, void *needle);
 size_t vector_memused(vector_t *vec);
 
 size_t vector_memused__str(vector_t *vec);
+
+size_t vector_sizeof(const vector_t *vec);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // C O N V E N I E N C E  F U N C T I O N S
