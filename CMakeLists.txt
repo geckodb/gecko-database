@@ -38,7 +38,7 @@ set(SOURCE_FILES
         include/containers/vector.h
         include/frags/frag_host_vm.h
         include/error.h
-        include/field.h
+        include/tuplet_field.h
         include/frag.h
         include/hash.h
         include/msg.h
@@ -76,7 +76,7 @@ set(SOURCE_FILES
         containers/vector.c
         frags/frag_host_vm.c
         error.c
-        field.c
+        tuplet_field.c
         frag.c
         hash.c
         pred.c
@@ -101,6 +101,12 @@ set(SOURCE_FILES
         inet/response.c
         mvm.c
         progpool.c
+        grid.c
+        include/grid.h
+        interval.c
+        include/interval.h
+        tuple_field.c
+        include/tuple_field.h
         )
 
 add_executable(
@@ -112,6 +118,11 @@ add_executable(
 add_executable(
         mondrian
         playground/mondrian_virtual_machine.c
+        ${SOURCE_FILES})
+
+add_executable(
+        gridtables
+        playground/mondrian_grid_tables.c
         ${SOURCE_FILES})
 
 target_link_libraries(gs ${CURSES_LIBRARIES})
@@ -187,6 +198,10 @@ target_link_libraries(
 
 target_link_libraries(
         mondrian
+        ${OPENSSL_LIBRARIES})
+
+target_link_libraries(
+        gridtables
         ${OPENSSL_LIBRARIES})
 
 target_link_libraries(

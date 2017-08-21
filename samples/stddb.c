@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <frag.h>
-#include <field.h>
+#include <tuplet_field.h>
 
 int main() {
 
@@ -20,7 +20,7 @@ int main() {
     fragment = gs_fragment_alloc(schema, 1, TF_NSM);
     tuplet   = gs_fragment_insert(fragment, 4);
 
-    struct field_t *field = gs_field_open(tuplet);
+    struct tuplet_field_t *field = gs_tuplet_field_open(tuplet);
 
     //UINT64 int_value;
     //CHAR *str_value;
@@ -43,7 +43,7 @@ int main() {
     str_value = "There\n";        cont = gs_insert_string(cont, schema, attr_2, str_value);
     bol_value = true;             cont = gs_insert_bool  (cont, schema, attr_3, &bol_value);*/
 
-    gs_field_close(field);
+    gs_tuplet_field_close(field);
     gs_tuplet_close(tuplet);
 
 

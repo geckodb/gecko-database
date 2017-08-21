@@ -2,7 +2,7 @@
 
 #include <schema.h>
 #include <frag.h>
-#include <field.h>
+#include <tuplet_field.h>
 
 #include "../types.h"
 #include "../common.h"
@@ -126,17 +126,17 @@ static inline bool serialize_customer_table(void *capture, void *begin, void *en
     size_t num_tuplets = ((tpch_customer_tuple_t *)end - (tpch_customer_tuple_t *)begin);
     frag_t *fragment = gs_fragment_alloc(schema, num_tuplets, config->format == TF_NSM ? FIT_HOST_NSM_VM : FIT_HOST_DSM_VM);
     tuplet_t *tuplet = gs_fragment_insert(fragment, num_tuplets);
-    field_t *field = gs_field_open(tuplet);
+    tuplet_field_t *field = gs_tuplet_field_open(tuplet);
 
     for (tpch_customer_tuple_t *it = begin; it < (tpch_customer_tuple_t *) end; it++) {
-        gs_field_write(field, &it->C_CUSTKEY);
-        gs_field_write(field, it->C_NAME);
-        gs_field_write(field, it->C_ADDRESS);
-        gs_field_write(field, &it->C_NATIONKEY);
-        gs_field_write(field, it->C_PHONE);
-        gs_field_write(field, &it->C_ACCTBAL);
-        gs_field_write(field, it->C_MKTSEGMENT);
-        gs_field_write(field, it->C_COMMENT);
+        gs_tuplet_field_write(field, &it->C_CUSTKEY);
+        gs_tuplet_field_write(field, it->C_NAME);
+        gs_tuplet_field_write(field, it->C_ADDRESS);
+        gs_tuplet_field_write(field, &it->C_NATIONKEY);
+        gs_tuplet_field_write(field, it->C_PHONE);
+        gs_tuplet_field_write(field, &it->C_ACCTBAL);
+        gs_tuplet_field_write(field, it->C_MKTSEGMENT);
+        gs_tuplet_field_write(field, it->C_COMMENT);
     }
 
     // printf("DONE\n");

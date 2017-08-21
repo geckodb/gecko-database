@@ -3,7 +3,7 @@
 #include <mondrian.h>
 #include <schema.h>
 #include <frag.h>
-#include <field.h>
+#include <tuplet_field.h>
 
 #ifndef OPERAND_STACK_CAPACITY
 #define OPERAND_STACK_CAPACITY  1024
@@ -1111,11 +1111,11 @@ static int exec_temp_name(mondrian_vm_t *vm, u64 operand)
 
 static int exec_ofield(mondrian_vm_t *vm, u64 _)
 {
-    field_t *field;
+    tuplet_field_t *field;
     u64 mem_addr;
     mondrian_vm_get_var(&mem_addr, vm, VARIABLE_RTC);
     tuplet_t *tuplet = (tuplet_t *) mem_addr;
-    field = gs_field_open(tuplet);
+    field = gs_tuplet_field_open(tuplet);
     mondrian_vm_set_var(vm, VARIABLE_RFC, (u64 *) &field);
     return MONDRIAN_OK;
 }
@@ -1125,9 +1125,9 @@ static int exec_wfield(mondrian_vm_t *vm, u64 _)
     CHECKFOR_STACKUNDERFLOW(1)
     u64 mem_addr;
     mondrian_vm_get_var(&mem_addr, vm, VARIABLE_RFC);
-    field_t *cursor = (field_t *) mem_addr;
+    tuplet_field_t *cursor = (tuplet_field_t *) mem_addr;
     u64 data = OPERAND_STACK_POP();
-    gs_field_write(cursor, &data);
+    gs_tuplet_field_write(cursor, &data);
 
     return MONDRIAN_OK;
 }

@@ -38,12 +38,12 @@ typedef struct expr_const_t {
     bool value;
 } expr_const_t;
 
-struct field_t;
+struct tuplet_field_t;
 
 typedef struct expr_var_t {
     enum comp_type comp;
-    struct field_t *lhs;
-    struct field_t *rhs;
+    struct tuplet_field_t *lhs;
+    struct tuplet_field_t *rhs;
 } expr_var_t;
 
 enum expr_type {
@@ -54,7 +54,7 @@ enum expr_type {
 
 typedef struct expr_t {
     enum expr_type type;
-    struct field_t *field;
+    struct tuplet_field_t *field;
     void *expr;
 } expr_t;
 
@@ -75,9 +75,9 @@ pred_tree_t *gs_pred_tree_or(pred_tree_t *subj, pred_tree_t *other);
 
 bool gs_pred_tree_eval(pred_tree_t *tree);
 
-expr_t *gs_pred_expr_create_var(enum expr_type type, struct field_t *field_lhs, struct field_t *field_rhs);
+expr_t *gs_pred_expr_create_var(enum expr_type type, struct tuplet_field_t *field_lhs, struct tuplet_field_t *field_rhs);
 
-expr_t *gs_pred_expr_create_const(enum expr_type type, struct field_t *field, const void *value);
+expr_t *gs_pred_expr_create_const(enum expr_type type, struct tuplet_field_t *field, const void *value);
 
 void gs_pred_expr_bind(expr_t *expr, const void *value);
 
