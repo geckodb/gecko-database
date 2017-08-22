@@ -851,6 +851,28 @@
 			<Option target="expr"/>
 			<Option target="mondrian"/>
 		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/include/indexes/grid_index.h">
+			<Option target="buffmgr"/>
+			<Option target="gs"/>
+			<Option target="sample_lin_hash"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
+			<Option target="gridtables"/>
+			<Option target="sample_linuxwc"/>
+			<Option target="expr"/>
+			<Option target="mondrian"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/include/indexes/grid_indexes/hash_grid_index.h">
+			<Option target="buffmgr"/>
+			<Option target="gs"/>
+			<Option target="sample_lin_hash"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
+			<Option target="gridtables"/>
+			<Option target="sample_linuxwc"/>
+			<Option target="expr"/>
+			<Option target="mondrian"/>
+		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/inet/request.h">
 			<Option target="buffmgr"/>
 			<Option target="gs"/>
@@ -1086,6 +1108,28 @@
 			<Option target="mondrian"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/unsafe.h">
+			<Option target="buffmgr"/>
+			<Option target="gs"/>
+			<Option target="sample_lin_hash"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
+			<Option target="gridtables"/>
+			<Option target="sample_linuxwc"/>
+			<Option target="expr"/>
+			<Option target="mondrian"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/indexes/grid_index.c">
+			<Option target="buffmgr"/>
+			<Option target="gs"/>
+			<Option target="sample_lin_hash"/>
+			<Option target="dbstdio"/>
+			<Option target="tpch-convert"/>
+			<Option target="gridtables"/>
+			<Option target="sample_linuxwc"/>
+			<Option target="expr"/>
+			<Option target="mondrian"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/indexes/grid_indexes/hash_grid_index.c">
 			<Option target="buffmgr"/>
 			<Option target="gs"/>
 			<Option target="sample_lin_hash"/>

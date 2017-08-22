@@ -18,6 +18,7 @@
 #define BADHURRY         "Not implemented: '%s'"
 #define BADPAGESIZE      "Request to create a page size of %zuB with a hot store limit of %zuB is illegal"
 #define BADSTATE         "Bad state: %s"
+#define BADRANGEBOUNDS   "Bad range bounds: begin must be smaller than end"
 #define BADCOLDSTOREINIT "Memory allocation failed: unable to initialize cold store of buffer manager"
 #define BADFREELISTINIT  "Memory allocation failed: unable to initialize page free list in buffer manager"
 #define BADHOTSTOREOBJ   "Page with id '%du' is not located in hot store"

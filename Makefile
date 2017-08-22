@@ -1158,6 +1158,108 @@ hash.c.s:
 	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/hash.c.s
 .PHONY : hash.c.s
 
+indexes/grid_index.o: indexes/grid_index.c.o
+
+.PHONY : indexes/grid_index.o
+
+# target to build an object file
+indexes/grid_index.c.o:
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/indexes/grid_index.c.o
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/indexes/grid_index.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/indexes/grid_index.c.o
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/indexes/grid_index.c.o
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/indexes/grid_index.c.o
+	$(MAKE) -f CMakeFiles/gridtables.dir/build.make CMakeFiles/gridtables.dir/indexes/grid_index.c.o
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/indexes/grid_index.c.o
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/indexes/grid_index.c.o
+	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/indexes/grid_index.c.o
+.PHONY : indexes/grid_index.c.o
+
+indexes/grid_index.i: indexes/grid_index.c.i
+
+.PHONY : indexes/grid_index.i
+
+# target to preprocess a source file
+indexes/grid_index.c.i:
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/indexes/grid_index.c.i
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/indexes/grid_index.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/indexes/grid_index.c.i
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/indexes/grid_index.c.i
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/indexes/grid_index.c.i
+	$(MAKE) -f CMakeFiles/gridtables.dir/build.make CMakeFiles/gridtables.dir/indexes/grid_index.c.i
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/indexes/grid_index.c.i
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/indexes/grid_index.c.i
+	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/indexes/grid_index.c.i
+.PHONY : indexes/grid_index.c.i
+
+indexes/grid_index.s: indexes/grid_index.c.s
+
+.PHONY : indexes/grid_index.s
+
+# target to generate assembly for a file
+indexes/grid_index.c.s:
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/indexes/grid_index.c.s
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/indexes/grid_index.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/indexes/grid_index.c.s
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/indexes/grid_index.c.s
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/indexes/grid_index.c.s
+	$(MAKE) -f CMakeFiles/gridtables.dir/build.make CMakeFiles/gridtables.dir/indexes/grid_index.c.s
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/indexes/grid_index.c.s
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/indexes/grid_index.c.s
+	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/indexes/grid_index.c.s
+.PHONY : indexes/grid_index.c.s
+
+indexes/grid_indexes/hash_grid_index.o: indexes/grid_indexes/hash_grid_index.c.o
+
+.PHONY : indexes/grid_indexes/hash_grid_index.o
+
+# target to build an object file
+indexes/grid_indexes/hash_grid_index.c.o:
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/indexes/grid_indexes/hash_grid_index.c.o
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/indexes/grid_indexes/hash_grid_index.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/indexes/grid_indexes/hash_grid_index.c.o
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/indexes/grid_indexes/hash_grid_index.c.o
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/indexes/grid_indexes/hash_grid_index.c.o
+	$(MAKE) -f CMakeFiles/gridtables.dir/build.make CMakeFiles/gridtables.dir/indexes/grid_indexes/hash_grid_index.c.o
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/indexes/grid_indexes/hash_grid_index.c.o
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/indexes/grid_indexes/hash_grid_index.c.o
+	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/indexes/grid_indexes/hash_grid_index.c.o
+.PHONY : indexes/grid_indexes/hash_grid_index.c.o
+
+indexes/grid_indexes/hash_grid_index.i: indexes/grid_indexes/hash_grid_index.c.i
+
+.PHONY : indexes/grid_indexes/hash_grid_index.i
+
+# target to preprocess a source file
+indexes/grid_indexes/hash_grid_index.c.i:
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/indexes/grid_indexes/hash_grid_index.c.i
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/indexes/grid_indexes/hash_grid_index.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/indexes/grid_indexes/hash_grid_index.c.i
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/indexes/grid_indexes/hash_grid_index.c.i
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/indexes/grid_indexes/hash_grid_index.c.i
+	$(MAKE) -f CMakeFiles/gridtables.dir/build.make CMakeFiles/gridtables.dir/indexes/grid_indexes/hash_grid_index.c.i
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/indexes/grid_indexes/hash_grid_index.c.i
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/indexes/grid_indexes/hash_grid_index.c.i
+	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/indexes/grid_indexes/hash_grid_index.c.i
+.PHONY : indexes/grid_indexes/hash_grid_index.c.i
+
+indexes/grid_indexes/hash_grid_index.s: indexes/grid_indexes/hash_grid_index.c.s
+
+.PHONY : indexes/grid_indexes/hash_grid_index.s
+
+# target to generate assembly for a file
+indexes/grid_indexes/hash_grid_index.c.s:
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/indexes/grid_indexes/hash_grid_index.c.s
+	$(MAKE) -f CMakeFiles/gs.dir/build.make CMakeFiles/gs.dir/indexes/grid_indexes/hash_grid_index.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/indexes/grid_indexes/hash_grid_index.c.s
+	$(MAKE) -f CMakeFiles/dbstdio.dir/build.make CMakeFiles/dbstdio.dir/indexes/grid_indexes/hash_grid_index.c.s
+	$(MAKE) -f CMakeFiles/tpch-convert.dir/build.make CMakeFiles/tpch-convert.dir/indexes/grid_indexes/hash_grid_index.c.s
+	$(MAKE) -f CMakeFiles/gridtables.dir/build.make CMakeFiles/gridtables.dir/indexes/grid_indexes/hash_grid_index.c.s
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/indexes/grid_indexes/hash_grid_index.c.s
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/indexes/grid_indexes/hash_grid_index.c.s
+	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/indexes/grid_indexes/hash_grid_index.c.s
+.PHONY : indexes/grid_indexes/hash_grid_index.c.s
+
 inet/request.o: inet/request.c.o
 
 .PHONY : inet/request.o
@@ -2469,6 +2571,12 @@ help:
 	@echo "... hash.o"
 	@echo "... hash.i"
 	@echo "... hash.s"
+	@echo "... indexes/grid_index.o"
+	@echo "... indexes/grid_index.i"
+	@echo "... indexes/grid_index.s"
+	@echo "... indexes/grid_indexes/hash_grid_index.o"
+	@echo "... indexes/grid_indexes/hash_grid_index.i"
+	@echo "... indexes/grid_indexes/hash_grid_index.s"
 	@echo "... inet/request.o"
 	@echo "... inet/request.i"
 	@echo "... inet/request.s"

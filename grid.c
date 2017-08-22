@@ -1,9 +1,16 @@
 #include <grid.h>
 
+//static inline void init_column_index(grid_table_t *table);
+
 grid_table_t *gs_grid_table_create(const schema_t *schema)
 {
-    panic(NOTIMPLEMENTED, to_string(gs_grid_table_create))
-    return NULL;
+    if (schema != NULL) {
+//        grid_table_t *result = require_good_malloc(sizeof(grid_table_t));
+        //init_column_index(result);
+
+        // TODO:...
+        return NULL;
+    } else return NULL;
 }
 
 void gs_grid_table_free(grid_table_t *table)

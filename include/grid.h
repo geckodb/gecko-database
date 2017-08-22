@@ -3,6 +3,7 @@
 #include <frag.h>
 #include <tuple.h>
 #include <interval.h>
+#include <indexes/grid_index.h>
 
 typedef size_t grid_id_t;
 
@@ -11,15 +12,21 @@ typedef struct grid_t {
     vector_t *attr_idxs_covered;
 } grid_t;
 
-typedef struct grid_index_entry_t {
+typedef struct grids_by_attr_index_elem_t {
     attr_id_t attr_id;
-    vector_t *grids;
-} grid_index_entry_t;
+    vector_t *grid_ptrs;
+} grids_by_attr_index_elem_t;
 
 typedef struct grid_table_t {
-    schema_t *schema;
-    vector_t *physical_grids;
-    vector_t grid_index;
+    schema_t *schema; /*<! The schema assigned to this table. Note that this schema is 'logical', i.e., grids
+                           have their own schema that might be a subset of this schema with another order on the
+                           attributes. The table's schema is used to give a logical structure to a caller. */
+    vector_t *grid_ptrs;  /*<! A vector of pointers to elements of type grid_t. Each grid contained in this table is
+                           referenced here, and will be freed from here once the table will be disposed. */
+    grid_index_t attr_index; /*<! An index that maps attribute ids from this tables schema to a list of pointers
+                             to grids that cover at least this attribute in their 'physical' schemata. */
+    grid_index_t tuple_index; /*<! An index that maps tuple ids to a list of pointers to grids that cover
+                             at least one field of that tuple. */
 } grid_table_t;
 
 grid_table_t *gs_grid_table_create(const schema_t *schema);

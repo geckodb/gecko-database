@@ -120,6 +120,27 @@ typedef MD5_CTX checksum_context_t;
 
 #define IS_FLAG_SET(set, flag) ((set & flag) == flag)
 
+#define delegte_call(instance, fun)                                                                                    \
+    ({                                                                                                                 \
+        require_nonnull(instance);                                                                                     \
+        require_impl(instance->fun);                                                                                   \
+        instance->fun(instance);                                                                                       \
+    })
+
+#define delegte_call_wargs(instance, fun, ...)                                                                         \
+    ({                                                                                                                 \
+        require_nonnull(instance);                                                                                     \
+        require_impl(instance->fun);                                                                                   \
+        instance->fun(instance,__VA_ARGS__);                                                                           \
+    })
+
+#define delegte_call_wargs2(instance, fun, ...)                                                                        \
+    ({                                                                                                                 \
+        require_nonnull(instance);                                                                                     \
+        require_impl(instance->fun);                                                                                   \
+        instance->fun(__VA_ARGS__);                                                                                    \
+    })
+
 // ---------------------------------------------------------------------------------------------------------------------
 // D E F I N E S
 // ---------------------------------------------------------------------------------------------------------------------

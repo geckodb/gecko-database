@@ -107,6 +107,10 @@ set(SOURCE_FILES
         include/interval.h
         tuple_field.c
         include/tuple_field.h
+        indexes/grid_index.c
+        include/indexes/grid_index.h
+        include/indexes/grid_indexes/hash_grid_index.h
+        indexes/grid_indexes/hash_grid_index.c
         )
 
 add_executable(
