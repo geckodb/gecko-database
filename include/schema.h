@@ -7,16 +7,15 @@
 typedef struct {
     char *frag_name;
     vector_t *attr;
-    vector_t *mapped_attr_idx;
 } schema_t;
 
 schema_t *gs_schema_create(const char *table_name);
 
-schema_t *gs_schema_subset(schema_t *super, vector_t /*of size_t*/ *indices);
+schema_t *gs_schema_subset(schema_t *super, const attr_id_t *indicies, size_t nindicies);
 
 void gs_schema_free(schema_t *schema);
 
-schema_t *gs_schema_cpy(schema_t *schema);
+schema_t *gs_schema_cpy(const schema_t *schema);
 
 const struct attr_t *gs_schema_attr_by_id(const schema_t *schema, attr_id_t attr_id);
 

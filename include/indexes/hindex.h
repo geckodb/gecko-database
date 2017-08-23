@@ -18,6 +18,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <stdinc.h>
+#include <interval.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 // F O R W A R D   D E C L A R A T I O N S
@@ -30,39 +31,41 @@ struct grid_t;
 // ---------------------------------------------------------------------------------------------------------------------
 
 typedef enum {
-    GIT_HASH
-} grid_index_tag;
+    HT_BINARY_SEARCH
+} hindex_tag;
 
-typedef struct index_query_t {
-    grid_index_tag tag;
+typedef struct hindex_result_t {
+    hindex_tag tag;
     void *extra;
-} index_query_t;
+} hindex_result_t;
 
-typedef struct grid_index_t {
-    grid_index_tag tag;
+typedef struct hindex_t {
+    hindex_tag tag;
 
-    void (*_add)(struct grid_index_t *self, size_t key, const struct grid_t *grid);
-    void (*_remove)(struct grid_index_t *self, size_t key);
-    bool (*_contains)(const struct grid_index_t *self, size_t key);
-    index_query_t *(*_query_open)(const struct grid_index_t *self, size_t key_range_begin, size_t key_range_end);
-    index_query_t *(*_query_append)(const struct grid_index_t *self, index_query_t *result, size_t key_range_begin, size_t key_range_end);
-    const struct grid_t *(*_query_read)(const struct grid_index_t *self, index_query_t *result_set);
-    void (*_query_close)(index_query_t *result_set);
-    void (*_free)(struct grid_index_t *self);
+    void (*_add)(struct hindex_t *self, const tuple_id_interval_t *key, const struct grid_t *grid);
+    void (*_remove_interval)(struct hindex_t *self, const tuple_id_interval_t *key);
+    void (*_remove_intersec)(struct hindex_t *self, tuple_id_t tid);
+    bool (*_contains)(const struct hindex_t *self, tuple_id_t tid);
+    hindex_result_t *(*_query_open)(const struct hindex_t *self, const tuple_id_t *tid_begin,
+                                    const tuple_id_t *tid_end);
+    const struct grid_t *(*_query_read)(const struct hindex_t *self, hindex_result_t *result_set);
+    void (*_query_close)(hindex_result_t *result_set);
+    void (*_free)(struct hindex_t *self);
 
     void *extra;
-} grid_index_t;
+} hindex_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-void grid_index_free(grid_index_t *index);
+void gs_hindex_free(struct hindex_t *index);
 
-void grid_index_add(grid_index_t *index, size_t key, const struct grid_t *grid);
-void grid_index_remove(grid_index_t *index, size_t key);
-bool grid_index_contains(const grid_index_t *index, size_t key);
-index_query_t *grid_index_query_open(const struct grid_index_t *index, size_t key_range_begin, size_t key_range_end);
-index_query_t *grid_index_query_append(const struct grid_index_t *index, index_query_t *result, size_t key_range_begin, size_t key_range_end);
-const struct grid_t *grid_index_query_read(const struct grid_index_t *index, index_query_t *result_set);
-void grid_index_query_close(const struct grid_index_t *index, index_query_t *result_set);
+void gs_hindex_add(struct hindex_t *index, const tuple_id_interval_t *key, const struct grid_t *grid);
+void gs_hindex_remove_interval(struct hindex_t *index, const tuple_id_interval_t *key);
+void gs_hindex_remove_intersec(struct hindex_t *index, tuple_id_t tid);
+bool gs_hindex_contains(const struct hindex_t *index, tuple_id_t tid);
+hindex_result_t *gs_hindex_query_open(const struct hindex_t *index, const tuple_id_t *tid_begin,
+                                const tuple_id_t *tid_end);
+const struct grid_t *gs_hindex_query_read(const struct hindex_t *index, hindex_result_t *result_set);
+void gs_hindex_query_close(const struct hindex_t *index, hindex_result_t *result_set);

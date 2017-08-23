@@ -1,46 +1,35 @@
 #include <tuple_field.h>
+#include <grid.h>
 
-tuple_field_t *gs_tuple_field_open(tuple_t *tuple)
+void gs_tuple_field_open(tuple_field_t *field, tuple_t *tuple)
 {
-    panic(NOTIMPLEMENTED, to_string(gs_tuple_field_open))
-    return NULL;
+    require_non_null(field);
+    require_non_null(tuple);
+
+    attr_id_t attr_id = 0;
+
+    grid_id_t grid_id = gs_grid_table_grid_by_field(tuple->table, attr_id, tuple->tuple_id);
+    const grid_t *grid = gs_grid_by_id(tuple->table, grid_id);
+
+    tuplet_t *tuplet = gs_tuplet_open(grid->frag);
+    tuplet_field_t *tuplet_field = gs_tuplet_field_open(tuplet);
+
+    *field = (tuple_field_t) {
+        .tuple = tuple,
+        .table_attr_id = attr_id,
+        .grid = grid,
+        .tuplet = tuplet,
+        .field = tuplet_field,
+        .frag_attr_id = gs_grid_table_attr_id_to_frag_attr_id(grid, attr_id)
+    };
 }
 
-bool gs_tuple_field_next(tuple_field_t *field)
+void gs_tuple_field_next(tuple_field_t *field)
 {
-    panic(NOTIMPLEMENTED, to_string(gs_field_next))
-    return false;
+
 }
 
-const void *gs_tuple_field_read(tuple_field_t *field)
+void gs_tuple_field_write(tuple_field_t *field, const void *data)
 {
-    panic(NOTIMPLEMENTED, to_string(gs_field_read))
-    return NULL;
-}
 
-void gs_tuple_field_update(tuple_field_t *field, const void *data)
-{
-    panic(NOTIMPLEMENTED, to_string(gs_field_update))
-}
-
-bool gs_tuple_field_write(tuple_field_t *field, const void *data)
-{
-    panic(NOTIMPLEMENTED, to_string(gs_field_write))
-    return false;
-}
-
-void gs_tuple_field_set_null(tuple_field_t *field)
-{
-    panic(NOTIMPLEMENTED, to_string(gs_field_is_null))
-}
-
-bool gs_tuple_field_is_null(tuple_field_t *field)
-{
-    panic(NOTIMPLEMENTED, to_string(gs_field_is_null))
-    return false;
-}
-
-void gs_tuple_field_close(tuple_field_t *field)
-{
-    panic(NOTIMPLEMENTED, to_string(gs_field_close))
 }

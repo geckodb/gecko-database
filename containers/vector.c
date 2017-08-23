@@ -75,6 +75,7 @@ void vector_memset(vector_t *vec, size_t pos_start, size_t num_elements, const v
     for (size_t i = pos_start; i < pos_start + num_elements; i++) {
         vector_set(vec, i, 1, data);
     }
+    vec->is_sorted = false;
 }
 
 vector_t *vector_cpy(vector_t *proto)
@@ -113,6 +114,7 @@ bool vector_add(vector_t *vec, size_t num_elements, const void *data)
         void *base = vec->data + vec->num_elements * vec->sizeof_element;
         memcpy(base, data, num_elements * vec->sizeof_element);
         vec->num_elements = new_num_elements;
+        vec->is_sorted = false;
         return true;
     } else return false;
 }
@@ -123,6 +125,7 @@ void vector_add_unsafe(vector_t *vec, size_t num_elements, const void *data)
     void *base = vec->data + vec->num_elements * vec->sizeof_element;
     memcpy(base, data, num_elements * vec->sizeof_element);
     vec->num_elements = new_num_elements;
+    vec->is_sorted = false;
 }
 
 void *vector_get(vector_t *vec)
@@ -159,6 +162,7 @@ void *vector_peek_unsafe(vector_t *vec)
 bool vector_set(vector_t *vec, size_t idx, size_t num_elements, const void *data)
 {
     if (require_non_null(vec) && _check_set_args(vec, num_elements, data)) {
+        vec->is_sorted = false;
         size_t last_idx = idx + num_elements;
         if (last_idx < vec->element_capacity) {
             memcpy(vec->data + idx * vec->sizeof_element, data, num_elements * vec->sizeof_element);
@@ -184,6 +188,7 @@ bool vector_foreach(vector_t *vec, void *capture, bool (*func)(void *capture, vo
 {
     if (!require_non_null(vec) || !require_non_null(func))
         return false;
+    vec->is_sorted = false;
     return func(capture, vec->data, vec->data + vec->num_elements * vec->sizeof_element);
 }
 
@@ -236,6 +241,50 @@ size_t vector_memused__str(vector_t *vec)
 size_t vector_sizeof(const vector_t *vec)
 {
     return (vec == NULL ? 0 : vec->element_capacity * vec->sizeof_element);
+}
+
+void vector_sort(vector_t *vec, int (*comp)(const void *lhs, const void *rhs))
+{
+    require_non_null(vec);
+    require_non_null(comp);
+
+    if (!vec->is_sorted) {
+        mergesort(vec->data, vec->num_elements, vec->sizeof_element, comp);
+        vec->is_sorted = true;
+    }
+}
+
+void *vector_bsearch(vector_t *vec, const void *needle, int (*sort_comp)(const void *lhs, const void *rhs),
+                           int (*find_comp)(const void *needle, const void *data))
+{
+    require_non_null(vec);
+    require_non_null(needle);
+    require_non_null(sort_comp);
+    require_non_null(find_comp);
+
+    if (!vec->is_sorted) {
+        vector_sort(vec, sort_comp);
+    }
+
+    size_t lower = 0;
+    size_t upper = vec->num_elements;
+    size_t mid;
+
+    while(lower <= upper) {
+        mid = lower + (upper - lower) / 2;
+        void *element = vec->data + mid * vec->sizeof_element;
+        int comp = find_comp(needle, element);
+        if(comp == 0) {
+            return element;
+        } else {
+            if(comp < 0)
+                lower = mid + 1;
+            else
+                upper = mid -1;
+        }
+    }
+
+    return NULL;
 }
 
 bool vector_comp(const vector_t *lhs, const vector_t *rhs, bool (*comp)(const void *a, const void *b))
@@ -339,6 +388,7 @@ void _init_vector(vector_t *vec, vector_flags flags, size_t capacity, size_t siz
         vec->sizeof_element = size;
         vec->grow_factor = factor;
         vec->num_elements = 0;
+        vec->is_sorted = true;
     }
 }
 
@@ -374,19 +424,21 @@ static bool _outside_bounds_enabled(vector_t *vec, size_t idx, size_t num_elemen
 
 bool _realloc_vector(vector_t *vec, size_t new_num_elements)
 {
-    while (new_num_elements >= vec->element_capacity)
-        vec->element_capacity = ceil(vec->element_capacity * vec->grow_factor);
+    if (new_num_elements >= vec->element_capacity) {
+        while (new_num_elements >= vec->element_capacity)
+            vec->element_capacity = ceil(vec->element_capacity * vec->grow_factor);
 
-    if ((vec->data = realloc(vec->data, vec->element_capacity * vec->sizeof_element)) == NULL) {
-        error(err_bad_realloc);
-        return false;
-    } else {
-        if ((vec->flags & zero_memory) == zero_memory) {
-            void *base = vec->data + vec->num_elements * vec->sizeof_element;
-            memset(base, 0, (vec->element_capacity - vec->num_elements) * vec->sizeof_element);
+        if ((vec->data = realloc(vec->data, vec->element_capacity * vec->sizeof_element)) == NULL) {
+            error(err_bad_realloc);
+            return false;
+        } else {
+            if ((vec->flags & zero_memory) == zero_memory) {
+                void *base = vec->data + vec->num_elements * vec->sizeof_element;
+                memset(base, 0, (vec->element_capacity - vec->num_elements) * vec->sizeof_element);
+            }
+            return true;
         }
-        return true;
-    }
+    } else return true;
 }
 
 static bool _advance(vector_t *vec, size_t idx, size_t num_elements)

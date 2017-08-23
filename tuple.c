@@ -1,41 +1,22 @@
 #include <tuple.h>
+#include <grid.h>
 
-tuple_t *gs_tuple_open(struct grid_table *table, tuple_id_t tuple_id)
+void gs_tuple_open(tuple_t *tuple, const struct grid_table_t *table, tuple_id_t tuple_id)
 {
-    panic(NOTIMPLEMENTED, to_string(gs_tuple_open))
-    return NULL;
+    require_non_null(tuple);
+    require_non_null(table);
+    tuple_id_t next = *((const tuple_id_t *) gs_freelist_peek_new(gs_grid_table_freelist(table)));
+    panic_if((tuple_id >= next), TIDOUTOFBOUNDS, tuple_id, gs_grid_table_name(table));
+    tuple->table = table;
+    tuple->tuple_id = tuple_id;
 }
 
-void gs_tuple_close(tuple_t *tuple)
+void gs_tuple_id_init(void *data)
 {
-    panic(NOTIMPLEMENTED, to_string(gs_tuple_close))
+    *((tuple_id_t *) data) = 0;
 }
 
-bool gs_tuple_next(tuple_t *tuple)
+void gs_tuple_id_inc(void *data)
 {
-    panic(NOTIMPLEMENTED, to_string(tuple))
-    return false;
-}
-
-tuple_t *gs_tuple_rewind(tuple_t *tuple)
-{
-    panic(NOTIMPLEMENTED, to_string(gs_tuplet_rewind))
-    return NULL;
-}
-
-void gs_tuple_set_null(tuple_t *tuple)
-{
-    panic(NOTIMPLEMENTED, to_string(gs_tuple_set_null))
-}
-
-bool gs_tuple_is_null(tuple_t *tuple)
-{
-    panic(NOTIMPLEMENTED, to_string(gs_tuple_is_null))
-    return false;
-}
-
-size_t gs_tuple_size(tuple_t *tuple)
-{
-    panic(NOTIMPLEMENTED, to_string(gs_tuple_size))
-    return 0;
+    *((tuple_id_t *) data) += 1;
 }

@@ -13,11 +13,12 @@ int main(void) {
     gs_attr_create_uint32("B", schema); // attribute id 1
     gs_attr_create_uint16("C", schema); // attribute id 2
     gs_attr_create_uint16("D", schema); // attribute id 3
-    grid_table_t *table = gs_grid_table_create(schema);
+    grid_table_t *table = gs_grid_table_create(schema, 16);
     attr_id_t cover[] = { 0, 1, 2, 3};
 
-    tuple_t *tuple;
-    tuple_field_t *field;
+    tuple_t tuple;
+    tuple_field_t field;
+    resultset_t resultset;
 
     //           +===============================+
     // tuple id  |   A   |   B   |   C   |   D   |
@@ -31,17 +32,34 @@ int main(void) {
     //         1 |   ------------------------>   |
     //         2 |   ------------------------>   |
     //           +=======================+
-    interval_t g01_tid_cover[] = {
+
+    tuple_id_interval_t g01_tid_cover[] = {
             { .begin = 0, .end = 3 }
     };
-    grid_id_t g01 = gs_grid_table_add_grid(table, &cover[0], 4, &g01_tid_cover[0], 1, FIT_HOST_NSM_VM);
+    /*grid_id_t g01 =*/ gs_grid_table_add_grid(table, &cover[0], 4, &g01_tid_cover[0], 1, FIT_HOST_NSM_VM);
 
-    tuple = gs_grid_table_insert(table, 3);
-    field = gs_tuple_field_open(tuple);
-    write_data(field, 0, 1, 2, 3);
-    write_data(field, 4, 5, 6, 7);
-    write_data(field, 8, 9, 10, 11);
+    u64 a = 0;
+    u32 b = 1;
+    u16 c = 2;
+    u16 d = 3;
 
+    gs_grid_table_insert(&resultset, table, 3);
+    while (gs_resultset_next(&tuple, &resultset)) {
+        gs_tuple_field_open(&field, &tuple);
+        gs_tuple_field_write(&field, &a);
+        gs_tuple_field_write(&field, &b);
+        gs_tuple_field_write(&field, &c);
+        gs_tuple_field_write(&field, &d);
+     //   gs_tuple_field_close(&field);
+    }
+
+
+
+//    field = gs_tuple_field_open(tuple);
+//    write_data(field, 0, 1, 2, 3);
+//    write_data(field, 4, 5, 6, 7);
+//    write_data(field, 8, 9, 10, 11);
+/*
     //  Add full grid with same schema orientation as table, column-store
     //           +===============================+
     //           |   A   |   B   |   C   |   D   |
@@ -260,8 +278,7 @@ int main(void) {
 
     gs_grid_table_print(stdout, table, 0, UINT64_MAX);
 
-
-
+*/
     return 0;
 }
 

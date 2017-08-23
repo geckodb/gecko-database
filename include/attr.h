@@ -24,7 +24,6 @@ typedef struct attr_t {
     enum field_type type;
     size_t type_rep;
     ATTR_FLAGS flags;
-    size_t foreign_id;
     size_t str_format_mlen;
     unsigned char checksum[MD5_DIGEST_LENGTH];
 } attr_t;
@@ -43,7 +42,7 @@ size_t gs_attr_get_str_format_max_len(attr_t *attr);
 
 enum field_type gs_attr_get_type(const attr_t *attr);
 
-attr_t *gs_attr_cpy(const attr_t *template, schema_t *new_owner);
+const attr_t *gs_attr_cpy(const attr_t *template, schema_t *new_owner);
 
 DECLARE_ATTRIBUTE_CREATE(bool, FT_BOOL)
 

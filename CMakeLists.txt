@@ -17,7 +17,7 @@ include_directories(${CURSES_INCLUDE_DIR})
 find_package(Doxygen)
 option(BUILD_DOCUMENTATION "API documentation requires Doxygen" ${DOXYGEN_FOUND})
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -std=c11 -Wall -Werror")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -std=c11 -Wall -Werror")
 
 set(CMAKE_BINARY_DIR
         ${CMAKE_SOURCE_DIR}/bin)
@@ -107,17 +107,19 @@ set(SOURCE_FILES
         include/interval.h
         tuple_field.c
         include/tuple_field.h
-        indexes/grid_index.c
-        include/indexes/grid_index.h
-        include/indexes/grid_indexes/hash_grid_index.h
-        indexes/grid_indexes/hash_grid_index.c
+        indexes/vindex.c
+        include/indexes/vindex.h
+        include/indexes/vindexes/hash_vindex.h
+        indexes/vindexes/hash_vindex.c
+        include/containers/freelist.h
+        containers/freelist.c
+        include/resultset.h
+        resultset.c
+        include/indexes/hindex.h
+        indexes/hindex.c
+        include/indexes/hindexes/bsearch_hindex.h
+        indexes/hindexes/bsearch_hindex.c
         )
-
-add_executable(
-        gs main.c
-        shell.c
-        include/shell.h
-        ${SOURCE_FILES})
 
 add_executable(
         mondrian
@@ -128,8 +130,6 @@ add_executable(
         gridtables
         playground/mondrian_grid_tables.c
         ${SOURCE_FILES})
-
-target_link_libraries(gs ${CURSES_LIBRARIES})
 
 add_executable(
         sample_lin_hash
@@ -158,27 +158,23 @@ target_link_libraries(
 #        exp_os_paging
 #        ${OPENSSL_LIBRARIES})
 
-add_executable(
-        tpch-convert utils/tpch_convert/launcher.c
-        utils/tpch_convert/common.h
-        utils/tpch_convert/types.h
-        utils/tpch_convert/tables/customer.h
-        utils/tpch_convert/tables/lineitem.h
-        utils/tpch_convert/tables/nation.h
-        utils/tpch_convert/tables/orders.h
-        utils/tpch_convert/tables/part.h
-        utils/tpch_convert/tables/partsupp.h
-        utils/tpch_convert/tables/region.h
-        utils/tpch_convert/tables/supplier.h
-        ${SOURCE_FILES})
+#add_executable(
+#        tpch-convert utils/tpch_convert/launcher.c
+#        utils/tpch_convert/common.h
+#        utils/tpch_convert/types.h
+#        utils/tpch_convert/tables/customer.h
+#        utils/tpch_convert/tables/lineitem.h
+#        utils/tpch_convert/tables/nation.h
+#        utils/tpch_convert/tables/orders.h
+#        utils/tpch_convert/tables/part.h
+#        utils/tpch_convert/tables/partsupp.h
+#        utils/tpch_convert/tables/region.h
+#        utils/tpch_convert/tables/supplier.h
+#        ${SOURCE_FILES})
 
 #add_executable(
 #        tableimg utils/tableimg/launcher.c
 #        ${SOURCE_FILES})
-
-add_executable(
-        dbstdio samples/stddb.c
-        ${SOURCE_FILES})
 
 add_executable(
         buffmgr samples/buffmgr/launcher.c
@@ -197,10 +193,6 @@ target_link_libraries(
         ${OPENSSL_LIBRARIES})
 
 target_link_libraries(
-        gs
-        ${OPENSSL_LIBRARIES})
-
-target_link_libraries(
         mondrian
         ${OPENSSL_LIBRARIES})
 
@@ -208,17 +200,13 @@ target_link_libraries(
         gridtables
         ${OPENSSL_LIBRARIES})
 
-target_link_libraries(
-        tpch-convert
-        ${OPENSSL_LIBRARIES})
+#target_link_libraries(
+#        tpch-convert
+#        ${OPENSSL_LIBRARIES})
 
 #target_link_libraries(
 #        tableimg
 #        ${OPENSSL_LIBRARIES})
-
-target_link_libraries(
-        dbstdio
-        ${OPENSSL_LIBRARIES})
 
 if(DOXYGEN_FOUND)
     #configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)

@@ -15,43 +15,45 @@
 // I N C L U D E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <indexes/grid_indexes/hash_grid_index.h>
+#include <indexes/vindexes/hash_vindex.h>
 #include <containers/dicts/hash_table.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 // M A C R O S
 // ---------------------------------------------------------------------------------------------------------------------
 
-#define require_hash_grid_index_tag(index)                                                                             \
-    require((index->tag == GIT_HASH), BADTAG);
+#define require_besearch_hindex_tag(index)                                                                                 \
+    require((index->tag == VT_HASH), BADTAG);
 
 #define require_instanceof_this(index)                                                                                 \
-    { require_nonnull(index); require_nonnull(index->extra); require_hash_grid_index_tag(index); }
+    { require_nonnull(index); require_nonnull(index->extra); require_besearch_hindex_tag(index); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 // H E L P E R   P R O T O T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-static inline void insert(index_query_t *result, const struct grid_index_t *self, size_t key_begin, size_t key_end);
+static inline void this_add(struct vindex_t *self, const void *key, const struct grid_t *grid);
+static inline void this_remove(struct vindex_t *self, const void *key);
+static inline bool this_contains(const struct vindex_t *self, const void *key);
+static inline vindex_result_t *this_open(const struct vindex_t *self, const void *key_begin, const void *key_end);
+static inline vindex_result_t *this_append(const struct vindex_t *self, vindex_result_t *result, const void *key_begin,
+                                         const void *key_end);
+static inline const struct grid_t *this_read(const struct vindex_t *self, vindex_result_t *result_set);
+static inline void this_close(vindex_result_t *result_set);
+static inline void this_free(struct vindex_t *self);
 
-static inline void this_add(struct grid_index_t *self, size_t key, const struct grid_t *grid);
-static inline void this_remove(struct grid_index_t *self, size_t key);
-static inline bool this_contains(const struct grid_index_t *self, size_t key);
-static inline index_query_t *this_open(const struct grid_index_t *self, size_t key_begin, size_t key_end);
-static inline index_query_t *this_append(const struct grid_index_t *self, index_query_t *result, size_t key_begin,
-                                         size_t key_end);
-static inline const struct grid_t *this_read(const struct grid_index_t *self, index_query_t *result_set);
-static inline void this_close(index_query_t *result_set);
-static inline void this_free(struct grid_index_t *self);
+static inline void insert(vindex_result_t *result, const struct vindex_t *self, const void *key_begin, const void *key_end);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E  I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-grid_index_t *hash_grid_index_create(size_t num_init_slots)
+vindex_t *hash_vindex_create(size_t key_size, size_t num_init_slots,
+                             bool (*equals)(const void *key_lhs, const void *key_rhs),
+                             void (*cleanup)(void *key, void *value))
 {
-    grid_index_t *result = require_good_malloc(sizeof(grid_index_t));
-    *result = (grid_index_t) {
+    vindex_t *result = require_good_malloc(sizeof(vindex_t));
+    *result = (vindex_t) {
         ._add = this_add,
         ._contains = this_contains,
         ._free = this_free,
@@ -60,13 +62,12 @@ grid_index_t *hash_grid_index_create(size_t num_init_slots)
         ._query_read = this_read,
         ._query_close = this_close,
         ._remove = this_remove,
-        .tag = GIT_HASH,
-        .extra = require_good_malloc(sizeof(dict_t))
+        .tag = VT_HASH
     };
 
-    result->extra = hash_table_create(
-            &(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen}, sizeof(size_t), sizeof(vector_t *),
-            num_init_slots, 1.7f, 0.75f
+    result->extra = hash_table_create_ex(
+            &(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen}, key_size, sizeof(vector_t),
+            num_init_slots, num_init_slots, 1.7f, 0.75f, equals, cleanup, false
     );
     require_non_null(result->extra);
     return result;
@@ -76,75 +77,65 @@ grid_index_t *hash_grid_index_create(size_t num_init_slots)
 // H E L P E R   I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-static inline void insert(index_query_t *result, const struct grid_index_t *self, size_t key_begin, size_t key_end)
-{
-    require_non_null(result->extra);
-    for (size_t key = key_begin; key < key_end; key++) {
-        if (this_contains(self, key)) {
-            dict_t *dict = ((dict_t *)self->extra);
-            const void *grid = dict_get(dict, &key);
-            vector_add((vector_t *) result->extra, 1, &grid);
-        }
-    }
-}
-
-static inline void this_add(struct grid_index_t *self, size_t key, const struct grid_t *grid)
+static inline void this_add(struct vindex_t *self, const void *key, const struct grid_t *grid)
 {
     require_instanceof_this(self);
     dict_t *dict = ((dict_t *)self->extra);
-    if (!dict_contains_key(dict, &key)) {
+    if (!dict_contains_key(dict, key)) {
         vector_t *vec = vector_create(sizeof(struct grid_t *), 10);
-        dict_put(dict, &key, &vec);
+        dict_put(dict, key, vec);
+        // Notice, this frees up pointer to vec, but does not cleanup the vector (especially the data pointer).
+        // That's required since dict_put copies all members of vec and is responsible to free up resources.
+        // The allocated memory for the pointer to original vector "vec", however, must be freed also.
+        free (vec);
     }
-    vector_t *vec = (vector_t *) dict_get(dict, &key);
+    vector_t *vec = (vector_t *) dict_get(dict, key);
     require_non_null(vec);
     vector_add(vec, 1, &grid);
 }
 
-static inline void this_remove(struct grid_index_t *self, size_t key)
+static inline void this_remove(struct vindex_t *self, const void *key)
 {
     require_instanceof_this(self);
     panic(NOTIMPLEMENTED, to_string(this_remove)) // requires proper implementation of remove in hash table
 }
 
-static inline bool this_contains(const struct grid_index_t *self, size_t key)
+static inline bool this_contains(const struct vindex_t *self, const void *key)
 {
     require_instanceof_this(self);
     dict_t *dict = ((dict_t *)self->extra);
     require_non_null(dict);
-    return dict_contains_key(dict, &key);
+    return dict_contains_key(dict, key);
 }
 
-static inline index_query_t *this_open(const struct grid_index_t *self, size_t key_begin, size_t key_end)
+static inline vindex_result_t *this_open(const struct vindex_t *self, const void *key_begin, const void *key_end)
 {
     require_instanceof_this(self);
-    require((key_begin < key_end), BADRANGEBOUNDS);
     size_t result_capacity = (key_end - key_begin);
-    index_query_t *result = require_good_malloc(sizeof(index_query_t));
-    *result = (index_query_t) {
-        .tag = GIT_HASH,
+    vindex_result_t *result = require_good_malloc(sizeof(vindex_result_t));
+    *result = (vindex_result_t) {
+        .tag = VT_HASH,
         .extra = vector_create(sizeof(struct grid_t *), result_capacity)
     };
     insert(result, self, key_begin, key_end);
     return result;
 }
 
-static inline index_query_t *this_append(const struct grid_index_t *self, index_query_t *result, size_t key_begin,
-                                         size_t key_end)
+static inline vindex_result_t *this_append(const struct vindex_t *self, vindex_result_t *result, const void *key_begin,
+                                         const void *key_end)
 {
     require_instanceof_this(self);
     require_instanceof_this(result);
-    require((key_begin < key_end), BADRANGEBOUNDS);
     insert(result, self, key_begin, key_end);
     return result;
 }
 
-static inline const struct grid_t *this_read(const struct grid_index_t *self, index_query_t *result_set)
+static inline const struct grid_t *this_read(const struct vindex_t *self, vindex_result_t *result_set)
 {
     require_instanceof_this(self);
     require_instanceof_this(result_set);
 
-    static index_query_t *dest;
+    static vindex_result_t *dest;
     static size_t elem_idx;
     if (result_set != NULL) {
         dest = result_set;
@@ -158,14 +149,29 @@ static inline const struct grid_t *this_read(const struct grid_index_t *self, in
 
 }
 
-void this_close(index_query_t *result_set)
+void this_close(vindex_result_t *result_set)
 {
     require_instanceof_this(result_set);
     vector_free((vector_t * ) result_set->extra);
 }
 
-void this_free(struct grid_index_t *self)
+void this_free(struct vindex_t *self)
 {
     require_instanceof_this(self);
     dict_free((dict_t *) self->extra);
 }
+
+
+static inline void insert(vindex_result_t *result, const struct vindex_t *self, const void *key_begin,
+                          const void *key_end)
+{
+    require_non_null(result->extra);
+    for (const void *key = key_begin; key != key_end; key++) {
+        if (this_contains(self, key)) {
+            dict_t *dict = ((dict_t *)self->extra);
+            const void *grid = dict_get(dict, key);
+            vector_add((vector_t *) result->extra, 1, &grid);
+        }
+    }
+}
+

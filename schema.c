@@ -29,18 +29,21 @@ schema_t *gs_schema_create(const char *table_name)
     return result;
 }
 
-schema_t *gs_schema_subset(schema_t *super, vector_t /*of attr_id_t */ *indices)
+schema_t *gs_schema_subset(schema_t *super, const attr_id_t *indicies, size_t nindicies)
 {
-    /*panic_if(indices->num_elements > super->attr->num_elements, BADINTERNAL,
-             "selected indices of super schema illegal.");
-    schema_t *result = gs_schema_create();
-    const attr_id_t *indices_data = (const attr_id_t *) vector_get(indices);
-    for (size_t i = 0; i < indices->num_elements; i++) {
-        const struct attr_t *attr = gs_schema_attr_by_id(super, indices_data[i]);
-        //gs_attr_cpy
-    }*/ // TODO
-return NULL;
+    require_non_null(super);
+    require_non_null(indicies);
 
+    panic_if(nindicies > super->attr->num_elements, BADINTERNAL,
+             "selected indices of super schema illegal.");
+
+    schema_t *schema = gs_schema_create(super->frag_name);
+    while (nindicies--) {
+        attr_id_t i = *(indicies++);
+        const attr_t *attr = gs_schema_attr_by_id(super, i);
+        gs_attr_cpy(attr, schema);
+    }
+    return schema;
 }
 
 void gs_schema_free(schema_t *schema)
@@ -51,11 +54,12 @@ void gs_schema_free(schema_t *schema)
     free (schema);
 }
 
-schema_t *gs_schema_cpy(schema_t *schema)
+schema_t *gs_schema_cpy(const schema_t *schema)
 {
     assert (schema);
     schema_t *cpy = require_good_malloc(sizeof(schema_t));
     cpy->attr = vector_cpy(schema->attr);
+    cpy->frag_name = strdup(schema->frag_name);
     return cpy;
 }
 

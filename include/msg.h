@@ -26,3 +26,6 @@
 #define BADBOUNDS        "Out of bounds access: %s"
 #define BADTAG           "Casting error. Object is not instance of required type."
 #define BADFRAGTYPE      "Unknown fragment type was requested: %d"
+#define BADINT           "Argument must be a positive non-zero integer."
+#define TIDOUTOFBOUNDS   "Tuple identifier '%d' is out of bounds in table '%s'"
+#define ATTROUTOFBOUDNDS "Attribute identifier is out of bounds'"

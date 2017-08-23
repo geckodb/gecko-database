@@ -4,7 +4,7 @@
 #include <attr.h>
 #include <tuple.h>
 #include <frag.h>
-
+/*
 struct grid_table_t;
 struct grid_t;
 
@@ -59,4 +59,4 @@ const tuple_id_t *gs_grid_covered_tuples(const grid_t *grid);
 
 size_t gs_grid_num_tuplets(const grid_t *grid);
 
-const schema_t *gs_grid_schema(const grid_t *grid);
+const schema_t *gs_grid_schema(const grid_t *grid);*/

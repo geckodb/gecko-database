@@ -2,6 +2,7 @@
 #include <containers/vector.h>
 #include <tuplet_field.h>
 #include <frag.h>
+#include <schema.h>
 
 #define DEFINE_ATTRIBUTE_CREATE(type_name,internal_type)                                                               \
 attr_id_t gs_attr_create_##type_name(const char *name, schema_t *schema) {                                             \
@@ -13,8 +14,7 @@ attr_id_t gs_attr_create_##type_name(const char *name, size_t length, schema_t *
     return gs_attr_create(name, internal_type, length, schema);                                                        \
 }
 
-attr_id_t _attr_create(const char *name, enum field_type data_type, size_t data_type_rep, ATTR_FLAGS attr_flags,
-                     attr_t *foreign_key_to, schema_t *schema)
+attr_id_t _attr_create(const char *name, enum field_type data_type, size_t data_type_rep, ATTR_FLAGS attr_flags, schema_t *schema)
 {
     panic_if((name == NULL || schema == NULL || strlen(name) + 1 > ATTR_NAME_MAXLEN), BADARG,
              "null pointer or attribute name limit exceeded");
@@ -25,7 +25,6 @@ attr_id_t _attr_create(const char *name, enum field_type data_type, size_t data_
             .type_rep = data_type_rep,
             .flags    = attr_flags,
             .str_format_mlen   = 0,
-            .foreign_id = (foreign_key_to != NULL? foreign_key_to->id : -1) // TODO: this
     };
 
     strcpy(attr.name, name);
@@ -52,19 +51,19 @@ enum field_type gs_attr_get_type(const attr_t *attr)
     return attr->type;
 }
 
-attr_t *gs_attr_cpy(const attr_t *template, schema_t *new_owner)
+const attr_t *gs_attr_cpy(const attr_t *template, schema_t *new_owner)
 {
     assert (template);
     assert(new_owner);
-//    _attr_create(template->name, template->type, template->type_rep, template->flags, template.)
-    return NULL; // TODO
+    attr_id_t id = _attr_create(template->name, template->type, template->type_rep, template->flags, new_owner);
+    return gs_schema_attr_by_id(new_owner, id);
 }
 
 attr_id_t gs_attr_create(const char *name, enum field_type data_type, size_t data_type_rep, schema_t *schema)
 {
     return _attr_create(name, data_type, data_type_rep,
                         (ATTR_FLAGS) { .autoinc = 0, .foreign = 0, .nullable = 0, .primary = 0, .unique = 0 },
-                        NULL, schema);
+                        schema);
 }
 
 bool gs_attr_isstring(const attr_t *attr)

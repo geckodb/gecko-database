@@ -1,6 +1,6 @@
 #include <grid_table.h>
 
-grid_t *gs_grid_create(schema_t *schema, size_t tuplet_capacity, enum frag_impl_type_t type)
+/*grid_t *gs_grid_create(schema_t *schema, size_t tuplet_capacity, enum frag_impl_type_t type)
 {
     require_non_null(schema);
     grid_t *result = require_good_malloc(sizeof(grid_t));
@@ -48,4 +48,4 @@ const schema_t *gs_grid_schema(const grid_t *grid)
     require_non_null(grid->frag);
     require_non_null(grid->frag->schema);
     return (grid->frag->schema);
-}
+}*/

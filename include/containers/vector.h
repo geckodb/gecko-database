@@ -40,6 +40,7 @@ typedef struct vector_t {
     vector_flags flags;
     float grow_factor;
     void *data;
+    bool is_sorted;
 } vector_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -91,6 +92,11 @@ size_t vector_memused(vector_t *vec);
 size_t vector_memused__str(vector_t *vec);
 
 size_t vector_sizeof(const vector_t *vec);
+
+void vector_sort(vector_t *vec,  int (*comp)(const void *lhs, const void *rhs));
+
+void *vector_bsearch(vector_t *vec, const void *needle, int (*sort_comp)(const void *lhs, const void *rhs),
+                           int (*find_comp)(const void *needle, const void *data));
 
 // ---------------------------------------------------------------------------------------------------------------------
 // C O N V E N I E N C E  F U N C T I O N S
