@@ -66,14 +66,19 @@ const freelist_t *gs_grid_table_freelist(const struct grid_table_t *table)
 
 grid_id_t gs_grid_table_grid_by_field(const grid_table_t *table, attr_id_t attr_id, tuple_id_t tuple_id)
 {
-    vindex_result_t *result = gs_vindex_query_open(table->schema_cover, &attr_id, &attr_id + 1);
+    grid_index_result_cursor_t *v_result = gs_vindex_query_open(table->schema_cover, &attr_id, &attr_id + 1);
+    grid_index_result_cursor_t *h_result = gs_hindex_query_open(table->tuple_cover, &tuple_id, &tuple_id + 1);
 
-    for (const grid_t *grid = gs_vindex_query_read(table->schema_cover, result); grid != NULL;
-         grid = gs_vindex_query_read(table->schema_cover, NULL)) {
-
+    for (const grid_t *grid = gs_vindex_query_read(v_result); grid != NULL;
+         grid = gs_vindex_query_read(NULL)) {
     }
 
-    gs_vindex_query_close(table->schema_cover, result);
+    for (const grid_t *grid = gs_hindex_query_read(h_result); grid != NULL;
+         grid = gs_hindex_query_read(NULL)) {
+    }
+
+    gs_vindex_query_close(v_result);
+    gs_hindex_query_close(h_result);
 
     panic(NOTIMPLEMENTED, to_string(gs_grid_table_grid_by_field))
     return 0;
@@ -137,7 +142,7 @@ static inline void create_indexes(grid_table_t *table, size_t approx_num_horizon
     size_t num_schema_slots = 2 * table->schema->attr->num_elements;
     table->schema_cover = hash_vindex_create(sizeof(attr_id_t), num_schema_slots,
                                              attr_key_equals, attr_key_cleanup);
-    table->tuple_cover  = besearch_hindex_create(approx_num_horizontal_partitions);
+    table->tuple_cover  = besearch_hindex_create(approx_num_horizontal_partitions, table->schema);
 }
 
 static inline void create_grid_ptr_store(grid_table_t *table)

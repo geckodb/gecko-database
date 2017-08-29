@@ -19,6 +19,8 @@
 
 #include <stdinc.h>
 #include <interval.h>
+#include <indexes/grid_index.h>
+#include <schema.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 // F O R W A R D   D E C L A R A T I O N S
@@ -37,7 +39,7 @@ typedef enum {
 typedef struct hindex_result_t {
     hindex_tag tag;
     void *extra;
-} hindex_result_t;
+} xxx_index_result_cursor_t;
 
 typedef struct hindex_t {
     hindex_tag tag;
@@ -46,12 +48,11 @@ typedef struct hindex_t {
     void (*_remove_interval)(struct hindex_t *self, const tuple_id_interval_t *key);
     void (*_remove_intersec)(struct hindex_t *self, tuple_id_t tid);
     bool (*_contains)(const struct hindex_t *self, tuple_id_t tid);
-    hindex_result_t *(*_query_open)(const struct hindex_t *self, const tuple_id_t *tid_begin,
-                                    const tuple_id_t *tid_end);
-    const struct grid_t *(*_query_read)(const struct hindex_t *self, hindex_result_t *result_set);
-    void (*_query_close)(hindex_result_t *result_set);
+    void (*_query)(grid_index_result_cursor_t *result, const struct hindex_t *self, const tuple_id_t *tid_begin,
+                   const tuple_id_t *tid_end);
     void (*_free)(struct hindex_t *self);
 
+    const schema_t *table_schema; /*<! Required to calculate an approx. result set size for queries */
     void *extra;
 } hindex_t;
 
@@ -65,7 +66,7 @@ void gs_hindex_add(struct hindex_t *index, const tuple_id_interval_t *key, const
 void gs_hindex_remove_interval(struct hindex_t *index, const tuple_id_interval_t *key);
 void gs_hindex_remove_intersec(struct hindex_t *index, tuple_id_t tid);
 bool gs_hindex_contains(const struct hindex_t *index, tuple_id_t tid);
-hindex_result_t *gs_hindex_query_open(const struct hindex_t *index, const tuple_id_t *tid_begin,
+grid_index_result_cursor_t *gs_hindex_query_open(const struct hindex_t *index, const tuple_id_t *tid_begin,
                                 const tuple_id_t *tid_end);
-const struct grid_t *gs_hindex_query_read(const struct hindex_t *index, hindex_result_t *result_set);
-void gs_hindex_query_close(const struct hindex_t *index, hindex_result_t *result_set);
+const struct grid_t *gs_hindex_query_read(grid_index_result_cursor_t *result_set);
+void gs_hindex_query_close(grid_index_result_cursor_t *result_set);

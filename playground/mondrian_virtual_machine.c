@@ -84,7 +84,7 @@ static program_t *prog_test()
         ADD(                 MVM_OC_FINSTALL,   0)
         ADD(                 MVM_OC_VSTORE,     VARIABLE_LOCAL_1)
 
-        /* insert as many new tuplets into the fragments as programs are installed */
+        /* this_query as many new tuplets into the fragments as programs are installed */
         ADD(                 MVM_OC_VLOAD,      VARIABLE_RCX)
         ADD(                 MVM_OC_FINSERT,    0)
         ADD(                 MVM_OC_OFIELD,     0)

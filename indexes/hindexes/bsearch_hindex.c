@@ -44,18 +44,18 @@ static inline void this_add(struct hindex_t *self, const tuple_id_interval_t *ke
 static inline void this_remove_interval(struct hindex_t *self, const tuple_id_interval_t *key);
 static inline void this_remove_intersec(struct hindex_t *self, tuple_id_t tid);
 static inline bool this_contains(const struct hindex_t *self, tuple_id_t tid);
-static inline hindex_result_t *this_query_open(const struct hindex_t *self, const tuple_id_t *tid_begin,
-                                const tuple_id_t *tid_end);
-static inline const struct grid_t *this_query_read(const struct hindex_t *self, hindex_result_t *result_set);
-static inline void this_query_close(hindex_result_t *result_set);
 static inline void this_free(struct hindex_t *self);
+static inline void this_query(grid_index_result_cursor_t *result, const struct hindex_t *self, const tuple_id_t *tid_begin,
+                              const tuple_id_t *tid_end);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E  I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-hindex_t *besearch_hindex_create(size_t approx_num_horizontal_partitions)
+hindex_t *besearch_hindex_create(size_t approx_num_horizontal_partitions, const schema_t *table_schema)
 {
+    require_non_null(table_schema);
+
     hindex_t *result = require_good_malloc(sizeof(hindex_t));
     *result = (hindex_t) {
         .tag = HT_BINARY_SEARCH,
@@ -64,12 +64,11 @@ hindex_t *besearch_hindex_create(size_t approx_num_horizontal_partitions)
         ._remove_interval = this_remove_interval,
         ._remove_intersec = this_remove_intersec,
         ._contains = this_contains,
-        ._query_open = this_query_open,
-        ._query_read = this_query_read,
-        ._query_close = this_query_close,
+        ._query = this_query,
         ._free = this_free,
 
-        .extra = vector_create(sizeof(entry_t), approx_num_horizontal_partitions)
+        .extra = vector_create(sizeof(entry_t), approx_num_horizontal_partitions),
+        .table_schema = table_schema
     };
 
     return result;
@@ -119,6 +118,21 @@ static inline void this_add(struct hindex_t *self, const tuple_id_interval_t *ke
     }
 }
 
+static inline void this_query(grid_index_result_cursor_t *result, const struct hindex_t *self, const tuple_id_t *tid_begin,
+                              const tuple_id_t *tid_end)
+{
+    require_instanceof_this(self);
+    require_non_null(result);
+    require_non_null(tid_begin);
+    require_non_null(tid_end);
+
+    require(tid_begin < tid_end, "Corrupted range");
+
+    // TODO: find interval that contains a certain tid as given in array above
+
+    panic(NOTIMPLEMENTED, to_string(this_query))
+}
+
 static inline void this_remove_interval(struct hindex_t *self, const tuple_id_interval_t *key)
 {
     panic(NOTIMPLEMENTED, to_string(this_remove_interval))
@@ -135,31 +149,6 @@ static inline bool this_contains(const struct hindex_t *self, tuple_id_t tid)
     // TODO:...
     panic(NOTIMPLEMENTED, to_string(this_contains))
     return false;
-}
-
-static inline hindex_result_t *this_query_open(const struct hindex_t *self, const tuple_id_t *tid_begin,
-                                 const tuple_id_t *tid_end)
-{
-    require_instanceof_this(self);
-    // TODO:...
-    panic(NOTIMPLEMENTED, to_string(hindex_result_t))
-    return NULL;
-}
-
-static inline const struct grid_t *this_query_read(const struct hindex_t *self, hindex_result_t *result_set)
-{
-    require_instanceof_this(self);
-    require_instanceof_this(result_set);
-    // TODO:...
-    panic(NOTIMPLEMENTED, to_string(this_query_read))
-    return NULL;
-}
-
-static inline void this_query_close(hindex_result_t *result_set)
-{
-    require_instanceof_this(result_set);
-    // TODO:...
-    panic(NOTIMPLEMENTED, to_string(this_query_close))
 }
 
 static inline void this_free(struct hindex_t *self)

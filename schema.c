@@ -63,7 +63,7 @@ schema_t *gs_schema_cpy(const schema_t *schema)
     return cpy;
 }
 
-size_t gs_schema_num_attributes(schema_t *schema)
+size_t gs_schema_num_attributes(const schema_t *schema)
 {
     assert (schema);
     return schema->attr->num_elements;

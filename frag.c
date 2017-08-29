@@ -78,7 +78,7 @@ frag_t *gs_fragment_alloc(schema_t *schema, size_t tuplet_capacity, enum frag_im
     panic_if((result->_dispose == NULL), NOTIMPLEMENTED, "frag_t::dispose");
     panic_if((result->_scan == NULL), NOTIMPLEMENTED, "frag_t::scan");
     panic_if((result->_open == NULL), NOTIMPLEMENTED, "frag_t::open");
-    panic_if((result->_insert == NULL), NOTIMPLEMENTED, "frag_t::insert");
+    panic_if((result->_insert == NULL), NOTIMPLEMENTED, "frag_t::this_query");
     return result;
 }
 

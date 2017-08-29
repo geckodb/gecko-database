@@ -119,6 +119,8 @@ set(SOURCE_FILES
         indexes/hindex.c
         include/indexes/hindexes/bsearch_hindex.h
         indexes/hindexes/bsearch_hindex.c
+        indexes/grid_index.c
+        include/indexes/grid_index.h
         )
 
 add_executable(

@@ -624,6 +624,14 @@
 			<Option target="expr"/>
 			<Option target="mondrian"/>
 		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/include/indexes/grid_index.h">
+			<Option target="gridtables"/>
+			<Option target="buffmgr"/>
+			<Option target="sample_linuxwc"/>
+			<Option target="sample_lin_hash"/>
+			<Option target="expr"/>
+			<Option target="mondrian"/>
+		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/indexes/hindex.h">
 			<Option target="gridtables"/>
 			<Option target="buffmgr"/>
@@ -833,6 +841,14 @@
 			<Option target="mondrian"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/unsafe.h">
+			<Option target="gridtables"/>
+			<Option target="buffmgr"/>
+			<Option target="sample_linuxwc"/>
+			<Option target="sample_lin_hash"/>
+			<Option target="expr"/>
+			<Option target="mondrian"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/indexes/grid_index.c">
 			<Option target="gridtables"/>
 			<Option target="buffmgr"/>
 			<Option target="sample_linuxwc"/>

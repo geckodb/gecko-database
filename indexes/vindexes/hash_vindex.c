@@ -22,8 +22,8 @@
 // M A C R O S
 // ---------------------------------------------------------------------------------------------------------------------
 
-#define require_besearch_hindex_tag(index)                                                                                 \
-    require((index->tag == VT_HASH), BADTAG);
+#define require_besearch_hindex_tag(index)                                                                             \
+    require((index->tag == GI_VINDEX_HASH), BADTAG);
 
 #define require_instanceof_this(index)                                                                                 \
     { require_nonnull(index); require_nonnull(index->extra); require_besearch_hindex_tag(index); }
@@ -35,14 +35,9 @@
 static inline void this_add(struct vindex_t *self, const void *key, const struct grid_t *grid);
 static inline void this_remove(struct vindex_t *self, const void *key);
 static inline bool this_contains(const struct vindex_t *self, const void *key);
-static inline vindex_result_t *this_open(const struct vindex_t *self, const void *key_begin, const void *key_end);
-static inline vindex_result_t *this_append(const struct vindex_t *self, vindex_result_t *result, const void *key_begin,
-                                         const void *key_end);
-static inline const struct grid_t *this_read(const struct vindex_t *self, vindex_result_t *result_set);
-static inline void this_close(vindex_result_t *result_set);
 static inline void this_free(struct vindex_t *self);
-
-static inline void insert(vindex_result_t *result, const struct vindex_t *self, const void *key_begin, const void *key_end);
+static inline void this_query(grid_index_result_cursor_t *result, const struct vindex_t *self, const void *key_begin,
+                              const void *key_end);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E  I M P L E M E N T A T I O N
@@ -57,12 +52,9 @@ vindex_t *hash_vindex_create(size_t key_size, size_t num_init_slots,
         ._add = this_add,
         ._contains = this_contains,
         ._free = this_free,
-        ._query_open = this_open,
-        ._query_append = this_append,
-        ._query_read = this_read,
-        ._query_close = this_close,
+        ._query = this_query,
         ._remove = this_remove,
-        .tag = VT_HASH
+        .tag = GI_VINDEX_HASH,
     };
 
     result->extra = hash_table_create_ex(
@@ -108,53 +100,6 @@ static inline bool this_contains(const struct vindex_t *self, const void *key)
     return dict_contains_key(dict, key);
 }
 
-static inline vindex_result_t *this_open(const struct vindex_t *self, const void *key_begin, const void *key_end)
-{
-    require_instanceof_this(self);
-    size_t result_capacity = (key_end - key_begin);
-    vindex_result_t *result = require_good_malloc(sizeof(vindex_result_t));
-    *result = (vindex_result_t) {
-        .tag = VT_HASH,
-        .extra = vector_create(sizeof(struct grid_t *), result_capacity)
-    };
-    insert(result, self, key_begin, key_end);
-    return result;
-}
-
-static inline vindex_result_t *this_append(const struct vindex_t *self, vindex_result_t *result, const void *key_begin,
-                                         const void *key_end)
-{
-    require_instanceof_this(self);
-    require_instanceof_this(result);
-    insert(result, self, key_begin, key_end);
-    return result;
-}
-
-static inline const struct grid_t *this_read(const struct vindex_t *self, vindex_result_t *result_set)
-{
-    require_instanceof_this(self);
-    require_instanceof_this(result_set);
-
-    static vindex_result_t *dest;
-    static size_t elem_idx;
-    if (result_set != NULL) {
-        dest = result_set;
-        elem_idx = 0;
-    }
-
-    vector_t *vec = (vector_t * ) dest->extra;
-    if (elem_idx < vec->sizeof_element) {
-        return (const struct grid_t *) vector_at(vec, elem_idx++);
-    } else return NULL;
-
-}
-
-void this_close(vindex_result_t *result_set)
-{
-    require_instanceof_this(result_set);
-    vector_free((vector_t * ) result_set->extra);
-}
-
 void this_free(struct vindex_t *self)
 {
     require_instanceof_this(self);
@@ -162,8 +107,8 @@ void this_free(struct vindex_t *self)
 }
 
 
-static inline void insert(vindex_result_t *result, const struct vindex_t *self, const void *key_begin,
-                          const void *key_end)
+static inline void this_query(grid_index_result_cursor_t *result, const struct vindex_t *self, const void *key_begin,
+                              const void *key_end)
 {
     require_non_null(result->extra);
     for (const void *key = key_begin; key != key_end; key++) {
