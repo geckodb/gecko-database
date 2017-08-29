@@ -17,3 +17,8 @@ typedef struct tuple_id_interval_t {
     ({                                                   \
         (interval->end - interval->begin);               \
     })
+
+#define gs_interval_equals(a, b)                         \
+    ({                                                   \
+        (a->begin == b->begin && a->end == b->end);      \
+    })

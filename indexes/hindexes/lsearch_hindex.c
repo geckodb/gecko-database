@@ -15,7 +15,7 @@
 // I N C L U D E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <indexes/hindexes/bsearch_hindex.h>
+#include <indexes/hindexes/lsearch_hindex.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 // D A T A T Y P E S
@@ -31,7 +31,7 @@ typedef struct entry_t {
 // ---------------------------------------------------------------------------------------------------------------------
 
 #define require_besearch_hindex_tag(index)                                                                             \
-    require((index->tag == HT_BINARY_SEARCH), BADTAG);
+    require((index->tag == HT_LINEAR_SEARCH), BADTAG);
 
 #define require_instanceof_this(index)                                                                                 \
     { require_nonnull(index); require_nonnull(index->extra); require_besearch_hindex_tag(index); }
@@ -45,20 +45,20 @@ static inline void this_remove_interval(struct hindex_t *self, const tuple_id_in
 static inline void this_remove_intersec(struct hindex_t *self, tuple_id_t tid);
 static inline bool this_contains(const struct hindex_t *self, tuple_id_t tid);
 static inline void this_free(struct hindex_t *self);
-static inline void this_query(grid_index_result_cursor_t *result, const struct hindex_t *self, const tuple_id_t *tid_begin,
+static inline void this_query(grid_set_cursor_t *result, const struct hindex_t *self, const tuple_id_t *tid_begin,
                               const tuple_id_t *tid_end);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E  I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-hindex_t *besearch_hindex_create(size_t approx_num_horizontal_partitions, const schema_t *table_schema)
+hindex_t *lesearch_hindex_create(size_t approx_num_horizontal_partitions, const schema_t *table_schema)
 {
     require_non_null(table_schema);
 
     hindex_t *result = require_good_malloc(sizeof(hindex_t));
     *result = (hindex_t) {
-        .tag = HT_BINARY_SEARCH,
+        .tag = HT_LINEAR_SEARCH,
 
         ._add = this_add,
         ._remove_interval = this_remove_interval,
@@ -78,23 +78,26 @@ hindex_t *besearch_hindex_create(size_t approx_num_horizontal_partitions, const 
 // H E L P E R   I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-static inline int comp_by_start(const void *lhs, const void *rhs)
+entry_t *find_interval(vector_t *haystack, const tuple_id_interval_t *needle)
 {
-    const tuple_id_interval_t *a = lhs;
-    const tuple_id_interval_t *b = rhs;
-    return (b->begin - a->begin);
+    entry_t *it = (entry_t *) haystack->data;
+    size_t num_elements = haystack->num_elements;
+    while (num_elements--) {
+        if (gs_interval_equals((&(it->interval)), needle))
+            return it;
+        else it++;
+    }
+    return NULL;
 }
 
-static inline int comp_intervals(const void *needle, const void *data)
+void find_all_by_point(vector_t *vec, vector_t *haystack, const tuple_id_t needle)
 {
-    const tuple_id_interval_t *a = needle;
-    const tuple_id_interval_t *b = data;
-    if (a->begin < b->begin) {
-        return -1;
-    } else if (a->begin > b->begin) {
-        return 1;
-    } else {
-        return (b->end - a->end);
+    const entry_t *it = (const entry_t *) haystack->data;
+    size_t num_elements = haystack->num_elements;
+    while (num_elements--) {
+        if (it->interval.begin >= needle && needle < it->interval.end)
+            vector_add(vec, 1, &it->grids);
+        else it++;
     }
 }
 
@@ -105,7 +108,7 @@ static inline void this_add(struct hindex_t *self, const tuple_id_interval_t *ke
     require_non_null(grid);
 
     vector_t *vec = self->extra;
-    entry_t *result = vector_bsearch(vec, key, comp_by_start, comp_intervals);
+    entry_t *result = find_interval(vec, key);
     if (result) {
         vector_add(result->grids, 1, &grid);
     } else {
@@ -118,19 +121,17 @@ static inline void this_add(struct hindex_t *self, const tuple_id_interval_t *ke
     }
 }
 
-static inline void this_query(grid_index_result_cursor_t *result, const struct hindex_t *self, const tuple_id_t *tid_begin,
+static inline void this_query(grid_set_cursor_t *result, const struct hindex_t *self, const tuple_id_t *tid_begin,
                               const tuple_id_t *tid_end)
 {
     require_instanceof_this(self);
     require_non_null(result);
     require_non_null(tid_begin);
     require_non_null(tid_end);
-
     require(tid_begin < tid_end, "Corrupted range");
-
-    // TODO: find interval that contains a certain tid as given in array above
-
-    panic(NOTIMPLEMENTED, to_string(this_query))
+    for (const tuple_id_t *needle = tid_begin; needle != tid_end; needle++) {
+        find_all_by_point((vector_t *) result->extra, (vector_t *) self->extra, *needle);
+    }
 }
 
 static inline void this_remove_interval(struct hindex_t *self, const tuple_id_interval_t *key)

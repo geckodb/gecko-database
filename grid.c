@@ -1,6 +1,6 @@
 #include <grid.h>
 #include <indexes/vindexes/hash_vindex.h>
-#include <indexes/hindexes/bsearch_hindex.h>
+#include <indexes/hindexes/lsearch_hindex.h>
 #include <containers/dicts/hash_table.h>
 
 static inline void create_indexes(grid_table_t *table, size_t approx_num_horizontal_partitions);
@@ -64,24 +64,39 @@ const freelist_t *gs_grid_table_freelist(const struct grid_table_t *table)
     return &(table->tuple_id_freelist);
 }
 
-grid_id_t gs_grid_table_grid_by_field(const grid_table_t *table, attr_id_t attr_id, tuple_id_t tuple_id)
+grid_set_cursor_t *gs_grid_table_grid_find(const grid_table_t *table, const attr_id_t *attr_ids, size_t nattr_ids,
+                                  const tuple_id_t *tuple_ids, size_t ntuple_ids)
 {
-    grid_index_result_cursor_t *v_result = gs_vindex_query_open(table->schema_cover, &attr_id, &attr_id + 1);
-    grid_index_result_cursor_t *h_result = gs_hindex_query_open(table->tuple_cover, &tuple_id, &tuple_id + 1);
+    grid_set_cursor_t *v_result = gs_vindex_query(table->schema_cover, attr_ids, attr_ids + nattr_ids);
+    grid_set_cursor_t *h_result = gs_hindex_query(table->tuple_cover, tuple_ids, tuple_ids + ntuple_ids);
 
-    for (const grid_t *grid = gs_vindex_query_read(v_result); grid != NULL;
-         grid = gs_vindex_query_read(NULL)) {
+    bool v_less_h = (grid_set_cursor_numelem(v_result) < grid_set_cursor_numelem(h_result));
+    grid_set_cursor_t *smaller = v_less_h ? v_result : h_result;
+    grid_set_cursor_t *larger  = v_less_h ? h_result : v_result;
+
+    grid_set_cursor_t *result = grid_set_cursor_create(grid_set_cursor_numelem(larger));
+
+    /* Hash-join intersection */
+    dict_t* hash_table = hash_table_create_jenkins(sizeof(grid_t *), sizeof(bool),
+                                                   2 * grid_set_cursor_numelem(smaller), 1.7f, 0.75f);
+
+    /* Build */
+    for (const grid_t *grid = grid_set_cursor_next(smaller); grid != NULL; grid = grid_set_cursor_next(NULL)) {
+        bool b;
+        dict_put(hash_table, &grid, &b);
     }
 
-    for (const grid_t *grid = gs_hindex_query_read(h_result); grid != NULL;
-         grid = gs_hindex_query_read(NULL)) {
+    /* Probe */
+    for (const grid_t *grid = grid_set_cursor_next(larger); grid != NULL; grid = grid_set_cursor_next(NULL)) {
+        if (dict_contains_key(hash_table, &grid)) {
+            grid_set_cursor_pushback(result, &grid);
+        }
     }
 
     gs_vindex_query_close(v_result);
     gs_hindex_query_close(h_result);
 
-    panic(NOTIMPLEMENTED, to_string(gs_grid_table_grid_by_field))
-    return 0;
+    return result;
 }
 
 attr_id_t gs_grid_table_attr_id_to_frag_attr_id(const grid_t *grid, attr_id_t table_attr_id)
@@ -142,7 +157,7 @@ static inline void create_indexes(grid_table_t *table, size_t approx_num_horizon
     size_t num_schema_slots = 2 * table->schema->attr->num_elements;
     table->schema_cover = hash_vindex_create(sizeof(attr_id_t), num_schema_slots,
                                              attr_key_equals, attr_key_cleanup);
-    table->tuple_cover  = besearch_hindex_create(approx_num_horizontal_partitions, table->schema);
+    table->tuple_cover  = lesearch_hindex_create(approx_num_horizontal_partitions, table->schema);
 }
 
 static inline void create_grid_ptr_store(grid_table_t *table)

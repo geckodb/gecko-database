@@ -1083,47 +1083,47 @@ indexes/hindex.c.s:
 	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/indexes/hindex.c.s
 .PHONY : indexes/hindex.c.s
 
-indexes/hindexes/bsearch_hindex.o: indexes/hindexes/bsearch_hindex.c.o
+indexes/hindexes/lsearch_hindex.o: indexes/hindexes/lsearch_hindex.c.o
 
-.PHONY : indexes/hindexes/bsearch_hindex.o
+.PHONY : indexes/hindexes/lsearch_hindex.o
 
 # target to build an object file
-indexes/hindexes/bsearch_hindex.c.o:
-	$(MAKE) -f CMakeFiles/gridtables.dir/build.make CMakeFiles/gridtables.dir/indexes/hindexes/bsearch_hindex.c.o
-	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/indexes/hindexes/bsearch_hindex.c.o
-	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/indexes/hindexes/bsearch_hindex.c.o
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/indexes/hindexes/bsearch_hindex.c.o
-	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/indexes/hindexes/bsearch_hindex.c.o
-	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/indexes/hindexes/bsearch_hindex.c.o
-.PHONY : indexes/hindexes/bsearch_hindex.c.o
+indexes/hindexes/lsearch_hindex.c.o:
+	$(MAKE) -f CMakeFiles/gridtables.dir/build.make CMakeFiles/gridtables.dir/indexes/hindexes/lsearch_hindex.c.o
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/indexes/hindexes/lsearch_hindex.c.o
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/indexes/hindexes/lsearch_hindex.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/indexes/hindexes/lsearch_hindex.c.o
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/indexes/hindexes/lsearch_hindex.c.o
+	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/indexes/hindexes/lsearch_hindex.c.o
+.PHONY : indexes/hindexes/lsearch_hindex.c.o
 
-indexes/hindexes/bsearch_hindex.i: indexes/hindexes/bsearch_hindex.c.i
+indexes/hindexes/lsearch_hindex.i: indexes/hindexes/lsearch_hindex.c.i
 
-.PHONY : indexes/hindexes/bsearch_hindex.i
+.PHONY : indexes/hindexes/lsearch_hindex.i
 
 # target to preprocess a source file
-indexes/hindexes/bsearch_hindex.c.i:
-	$(MAKE) -f CMakeFiles/gridtables.dir/build.make CMakeFiles/gridtables.dir/indexes/hindexes/bsearch_hindex.c.i
-	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/indexes/hindexes/bsearch_hindex.c.i
-	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/indexes/hindexes/bsearch_hindex.c.i
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/indexes/hindexes/bsearch_hindex.c.i
-	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/indexes/hindexes/bsearch_hindex.c.i
-	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/indexes/hindexes/bsearch_hindex.c.i
-.PHONY : indexes/hindexes/bsearch_hindex.c.i
+indexes/hindexes/lsearch_hindex.c.i:
+	$(MAKE) -f CMakeFiles/gridtables.dir/build.make CMakeFiles/gridtables.dir/indexes/hindexes/lsearch_hindex.c.i
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/indexes/hindexes/lsearch_hindex.c.i
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/indexes/hindexes/lsearch_hindex.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/indexes/hindexes/lsearch_hindex.c.i
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/indexes/hindexes/lsearch_hindex.c.i
+	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/indexes/hindexes/lsearch_hindex.c.i
+.PHONY : indexes/hindexes/lsearch_hindex.c.i
 
-indexes/hindexes/bsearch_hindex.s: indexes/hindexes/bsearch_hindex.c.s
+indexes/hindexes/lsearch_hindex.s: indexes/hindexes/lsearch_hindex.c.s
 
-.PHONY : indexes/hindexes/bsearch_hindex.s
+.PHONY : indexes/hindexes/lsearch_hindex.s
 
 # target to generate assembly for a file
-indexes/hindexes/bsearch_hindex.c.s:
-	$(MAKE) -f CMakeFiles/gridtables.dir/build.make CMakeFiles/gridtables.dir/indexes/hindexes/bsearch_hindex.c.s
-	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/indexes/hindexes/bsearch_hindex.c.s
-	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/indexes/hindexes/bsearch_hindex.c.s
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/indexes/hindexes/bsearch_hindex.c.s
-	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/indexes/hindexes/bsearch_hindex.c.s
-	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/indexes/hindexes/bsearch_hindex.c.s
-.PHONY : indexes/hindexes/bsearch_hindex.c.s
+indexes/hindexes/lsearch_hindex.c.s:
+	$(MAKE) -f CMakeFiles/gridtables.dir/build.make CMakeFiles/gridtables.dir/indexes/hindexes/lsearch_hindex.c.s
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/indexes/hindexes/lsearch_hindex.c.s
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/indexes/hindexes/lsearch_hindex.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/indexes/hindexes/lsearch_hindex.c.s
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/indexes/hindexes/lsearch_hindex.c.s
+	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/indexes/hindexes/lsearch_hindex.c.s
+.PHONY : indexes/hindexes/lsearch_hindex.c.s
 
 indexes/vindex.o: indexes/vindex.c.o
 
@@ -2289,9 +2289,9 @@ help:
 	@echo "... indexes/hindex.o"
 	@echo "... indexes/hindex.i"
 	@echo "... indexes/hindex.s"
-	@echo "... indexes/hindexes/bsearch_hindex.o"
-	@echo "... indexes/hindexes/bsearch_hindex.i"
-	@echo "... indexes/hindexes/bsearch_hindex.s"
+	@echo "... indexes/hindexes/lsearch_hindex.o"
+	@echo "... indexes/hindexes/lsearch_hindex.i"
+	@echo "... indexes/hindexes/lsearch_hindex.s"
 	@echo "... indexes/vindex.o"
 	@echo "... indexes/vindex.i"
 	@echo "... indexes/vindex.s"

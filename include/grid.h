@@ -56,7 +56,8 @@ grid_id_t gs_grid_table_add_grid(grid_table_t *table, const attr_id_t *attr_ids_
 
 const freelist_t *gs_grid_table_freelist(const struct grid_table_t *table);
 
-grid_id_t gs_grid_table_grid_by_field(const grid_table_t *table, attr_id_t attr_id, tuple_id_t tuple_id);
+grid_set_cursor_t *gs_grid_table_grid_find(const grid_table_t *table, const attr_id_t *attr_ids, size_t nattr_ids,
+                                  const tuple_id_t *tuple_ids, size_t ntuple_ids);
 
 attr_id_t gs_grid_table_attr_id_to_frag_attr_id(const grid_t *grid, attr_id_t table_attr_id);
 

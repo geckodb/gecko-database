@@ -36,7 +36,7 @@ static inline void this_add(struct vindex_t *self, const void *key, const struct
 static inline void this_remove(struct vindex_t *self, const void *key);
 static inline bool this_contains(const struct vindex_t *self, const void *key);
 static inline void this_free(struct vindex_t *self);
-static inline void this_query(grid_index_result_cursor_t *result, const struct vindex_t *self, const void *key_begin,
+static inline void this_query(grid_set_cursor_t *result, const struct vindex_t *self, const void *key_begin,
                               const void *key_end);
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -107,7 +107,7 @@ void this_free(struct vindex_t *self)
 }
 
 
-static inline void this_query(grid_index_result_cursor_t *result, const struct vindex_t *self, const void *key_begin,
+static inline void this_query(grid_set_cursor_t *result, const struct vindex_t *self, const void *key_begin,
                               const void *key_end)
 {
     require_non_null(result->extra);

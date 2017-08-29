@@ -640,7 +640,7 @@
 			<Option target="expr"/>
 			<Option target="mondrian"/>
 		</Unit>
-		<Unit filename="/Users/marcus/git/myimdb/include/indexes/hindexes/bsearch_hindex.h">
+		<Unit filename="/Users/marcus/git/myimdb/include/indexes/hindexes/lsearch_hindex.h">
 			<Option target="gridtables"/>
 			<Option target="buffmgr"/>
 			<Option target="sample_linuxwc"/>
@@ -864,7 +864,7 @@
 			<Option target="expr"/>
 			<Option target="mondrian"/>
 		</Unit>
-		<Unit filename="/Users/marcus/git/myimdb/indexes/hindexes/bsearch_hindex.c">
+		<Unit filename="/Users/marcus/git/myimdb/indexes/hindexes/lsearch_hindex.c">
 			<Option target="gridtables"/>
 			<Option target="buffmgr"/>
 			<Option target="sample_linuxwc"/>
