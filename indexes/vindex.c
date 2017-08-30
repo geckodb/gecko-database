@@ -5,23 +5,23 @@ void gs_vindex_free(vindex_t *index)
     delegte_call(index, _free);
 }
 
-void gs_vindex_add(vindex_t *index, const void *key, const struct grid_t *grid)
+void gs_vindex_add(vindex_t *index, const attr_id_t *key, const struct grid_t *grid)
 {
     delegte_call_wargs(index, _add, key, grid);
 }
 
-void gs_vindex_remove(vindex_t *index, const void *key)
+void gs_vindex_remove(vindex_t *index, const attr_id_t *key)
 {
     delegte_call_wargs(index, _remove, key);
 }
 
-bool gs_vindex_contains(const vindex_t *index, const void *key)
+bool gs_vindex_contains(const vindex_t *index, const attr_id_t *key)
 {
     return delegte_call_wargs(index, _contains, key);
 }
 
-grid_set_cursor_t *gs_vindex_query(const struct vindex_t *index, const void *key_range_begin,
-                                   const void *key_range_end)
+grid_set_cursor_t *gs_vindex_query(const struct vindex_t *index, const attr_id_t *key_range_begin,
+                                   const attr_id_t *key_range_end)
 {
     require_non_null(key_range_begin);
     require_non_null(key_range_end);
@@ -33,7 +33,7 @@ grid_set_cursor_t *gs_vindex_query(const struct vindex_t *index, const void *key
 }
 
 grid_set_cursor_t *gs_vindex_query_append(const struct vindex_t *index, grid_set_cursor_t *result,
-                                        const void *key_range_begin, const void *key_range_end)
+                                        const attr_id_t *key_range_begin, const attr_id_t *key_range_end)
 {
     index->_query(result, index, key_range_begin, key_range_end);
     return result;

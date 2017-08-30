@@ -32,20 +32,30 @@
 // H E L P E R   P R O T O T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-static inline void this_add(struct vindex_t *self, const void *key, const struct grid_t *grid);
-static inline void this_remove(struct vindex_t *self, const void *key);
-static inline bool this_contains(const struct vindex_t *self, const void *key);
+static inline void this_add(struct vindex_t *self, const attr_id_t *key, const struct grid_t *grid);
+static inline void this_remove(struct vindex_t *self, const attr_id_t *key);
+static inline bool this_contains(const struct vindex_t *self, const attr_id_t *key);
 static inline void this_free(struct vindex_t *self);
-static inline void this_query(grid_set_cursor_t *result, const struct vindex_t *self, const void *key_begin,
-                              const void *key_end);
+static inline void this_query(grid_set_cursor_t *result, const struct vindex_t *self, const attr_id_t *key_begin,
+                              const attr_id_t *key_end);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E  I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-vindex_t *hash_vindex_create(size_t key_size, size_t num_init_slots,
-                             bool (*equals)(const void *key_lhs, const void *key_rhs),
-                             void (*cleanup)(void *key, void *value))
+static inline bool attr_key_equals(const void *key_lhs, const void *key_rhs)
+{
+    attr_id_t lhs = *((attr_id_t *) key_lhs);
+    attr_id_t rhs = *((attr_id_t *) key_rhs);
+    return (lhs == rhs);
+}
+
+static inline void nop(void *key, void *value)
+{
+
+}
+
+vindex_t *hash_vindex_create(size_t key_size, size_t num_init_slots)
 {
     vindex_t *result = require_good_malloc(sizeof(vindex_t));
     *result = (vindex_t) {
@@ -59,7 +69,7 @@ vindex_t *hash_vindex_create(size_t key_size, size_t num_init_slots,
 
     result->extra = hash_table_create_ex(
             &(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen}, key_size, sizeof(vector_t),
-            num_init_slots, num_init_slots, 1.7f, 0.75f, equals, cleanup, false
+            num_init_slots, num_init_slots, 1.7f, 0.75f, attr_key_equals, nop, false
     );
     require_non_null(result->extra);
     return result;
@@ -69,7 +79,7 @@ vindex_t *hash_vindex_create(size_t key_size, size_t num_init_slots,
 // H E L P E R   I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-static inline void this_add(struct vindex_t *self, const void *key, const struct grid_t *grid)
+static inline void this_add(struct vindex_t *self, const attr_id_t *key, const struct grid_t *grid)
 {
     require_instanceof_this(self);
     dict_t *dict = ((dict_t *)self->extra);
@@ -86,13 +96,13 @@ static inline void this_add(struct vindex_t *self, const void *key, const struct
     vector_add(vec, 1, &grid);
 }
 
-static inline void this_remove(struct vindex_t *self, const void *key)
+static inline void this_remove(struct vindex_t *self, const attr_id_t *key)
 {
     require_instanceof_this(self);
     panic(NOTIMPLEMENTED, to_string(this_remove)) // requires proper implementation of remove in hash table
 }
 
-static inline bool this_contains(const struct vindex_t *self, const void *key)
+static inline bool this_contains(const struct vindex_t *self, const attr_id_t *key)
 {
     require_instanceof_this(self);
     dict_t *dict = ((dict_t *)self->extra);
@@ -107,14 +117,14 @@ void this_free(struct vindex_t *self)
 }
 
 
-static inline void this_query(grid_set_cursor_t *result, const struct vindex_t *self, const void *key_begin,
-                              const void *key_end)
+static inline void this_query(grid_set_cursor_t *result, const struct vindex_t *self, const attr_id_t *key_begin,
+                              const attr_id_t *key_end)
 {
     require_non_null(result->extra);
-    for (const void *key = key_begin; key != key_end; key++) {
+    for (const attr_id_t *key = key_begin; key != key_end; key++) {
         if (this_contains(self, key)) {
             dict_t *dict = ((dict_t *)self->extra);
-            const void *grid = dict_get(dict, key);
+            const struct grid_t *grid = dict_get(dict, key);
             vector_add((vector_t *) result->extra, 1, &grid);
         }
     }

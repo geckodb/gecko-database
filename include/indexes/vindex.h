@@ -33,11 +33,11 @@ struct grid_t;
 typedef struct vindex_t {
     grid_index_tag tag;
 
-    void (*_add)(struct vindex_t *self, const void *key, const struct grid_t *grid);
-    void (*_remove)(struct vindex_t *self, const void *key);
-    bool (*_contains)(const struct vindex_t *self, const void *key);
-    void (*_query)(grid_set_cursor_t *result, const struct vindex_t *self, const void *key_begin,
-                                  const void *key_end);
+    void (*_add)(struct vindex_t *self, const attr_id_t *key, const struct grid_t *grid);
+    void (*_remove)(struct vindex_t *self, const attr_id_t *key);
+    bool (*_contains)(const struct vindex_t *self, const attr_id_t *key);
+    void (*_query)(grid_set_cursor_t *result, const struct vindex_t *self, const attr_id_t *key_begin,
+                                  const attr_id_t *key_end);
     void (*_free)(struct vindex_t *self);
 
     void *extra;
@@ -49,12 +49,12 @@ typedef struct vindex_t {
 
 void gs_vindex_free(vindex_t *index);
 
-void gs_vindex_add(vindex_t *index, const void *key, const struct grid_t *grid);
-void gs_vindex_remove(vindex_t *index, const void *key);
-bool gs_vindex_contains(const vindex_t *index, const void *key);
-grid_set_cursor_t *gs_vindex_query(const struct vindex_t *index, const void *key_range_begin,
-                                   const void *key_range_end);
+void gs_vindex_add(vindex_t *index, const attr_id_t *key, const struct grid_t *grid);
+void gs_vindex_remove(vindex_t *index, const attr_id_t *key);
+bool gs_vindex_contains(const vindex_t *index, const attr_id_t *key);
+grid_set_cursor_t *gs_vindex_query(const struct vindex_t *index, const attr_id_t *key_range_begin,
+                                   const attr_id_t *key_range_end);
 grid_set_cursor_t *gs_vindex_query_append(const struct vindex_t *index, grid_set_cursor_t *result,
-                                        const void *key_range_begin, const void *key_range_end);
+                                        const attr_id_t *key_range_begin, const attr_id_t *key_range_end);
 const struct grid_t *gs_vindex_query_read(grid_set_cursor_t *result_set);
 void gs_vindex_query_close(grid_set_cursor_t *result_set);

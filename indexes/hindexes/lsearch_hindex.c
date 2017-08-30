@@ -90,13 +90,18 @@ entry_t *find_interval(vector_t *haystack, const tuple_id_interval_t *needle)
     return NULL;
 }
 
-void find_all_by_point(vector_t *vec, vector_t *haystack, const tuple_id_t needle)
+void find_all_by_point(vector_t *result, vector_t *haystack, const tuple_id_t needle)
 {
     const entry_t *it = (const entry_t *) haystack->data;
     size_t num_elements = haystack->num_elements;
     while (num_elements--) {
-        if (it->interval.begin >= needle && needle < it->interval.end)
-            vector_add(vec, 1, &it->grids);
+        if (it->interval.begin >= needle && needle < it->interval.end) {
+            size_t grid_num = vector_num_elements(it->grids);
+            struct grid_t **elem_it = it->grids->data;
+            while (grid_num--) {
+                vector_add(result, 1, elem_it++);
+            }
+        }
         else it++;
     }
 }

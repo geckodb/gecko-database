@@ -17,9 +17,6 @@ static inline size_t get_required_capacity(const tuple_id_interval_t *tuple_ids,
 static inline void indexes_insert(grid_table_t *table, grid_t *grid, const attr_id_t *attr, size_t nattr,
                                   const tuple_id_interval_t *tuples, size_t ntuples);
 
-static inline bool attr_key_equals(const void *key_lhs, const void *key_rhs);
-static inline void attr_key_cleanup(void *key, void *value);
-
 grid_table_t *gs_grid_table_create(const schema_t *schema, size_t approx_num_horizontal_partitions)
 {
     if (schema != NULL) {
@@ -96,6 +93,8 @@ grid_set_cursor_t *gs_grid_table_grid_find(const grid_table_t *table, const attr
     gs_vindex_query_close(v_result);
     gs_hindex_query_close(h_result);
 
+    // TODO: This is somehow buggy. There is no same element identified
+
     return result;
 }
 
@@ -155,8 +154,7 @@ void gs_grid_table_grid_print(FILE *file, const grid_table_t *table, grid_id_t g
 static inline void create_indexes(grid_table_t *table, size_t approx_num_horizontal_partitions)
 {
     size_t num_schema_slots = 2 * table->schema->attr->num_elements;
-    table->schema_cover = hash_vindex_create(sizeof(attr_id_t), num_schema_slots,
-                                             attr_key_equals, attr_key_cleanup);
+    table->schema_cover = hash_vindex_create(sizeof(attr_id_t), num_schema_slots);
     table->tuple_cover  = lesearch_hindex_create(approx_num_horizontal_partitions, table->schema);
 }
 
@@ -213,16 +211,4 @@ static inline void indexes_insert(grid_table_t *table, grid_t *grid, const attr_
     while (ntuples--) {
         gs_hindex_add(table->tuple_cover, tuples++, grid);
     }
-}
-
-static inline bool attr_key_equals(const void *key_lhs, const void *key_rhs)
-{
-    attr_id_t lhs = *((attr_id_t *) key_lhs);
-    attr_id_t rhs = *((attr_id_t *) key_rhs);
-    return (lhs == rhs);
-}
-
-static inline void attr_key_cleanup(void *key, void *value)
-{
-
 }
