@@ -89,7 +89,7 @@ static inline void this_add(struct vindex_t *self, const attr_id_t *key, const s
         // Notice, this frees up pointer to vec, but does not cleanup the vector (especially the data pointer).
         // That's required since dict_put copies all members of vec and is responsible to free up resources.
         // The allocated memory for the pointer to original vector "vec", however, must be freed also.
-        free (vec);
+        // free (vec);
     }
     vector_t *vec = (vector_t *) dict_get(dict, key);
     require_non_null(vec);
@@ -124,8 +124,8 @@ static inline void this_query(grid_set_cursor_t *result, const struct vindex_t *
     for (const attr_id_t *key = key_begin; key != key_end; key++) {
         if (this_contains(self, key)) {
             dict_t *dict = ((dict_t *)self->extra);
-            const struct grid_t *grid = dict_get(dict, key);
-            vector_add((vector_t *) result->extra, 1, &grid);
+            const struct vector_t *vec = dict_get(dict, key);
+            vector_add_all(result->extra, vec);
         }
     }
 }

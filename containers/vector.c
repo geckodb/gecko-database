@@ -119,6 +119,16 @@ bool vector_add(vector_t *vec, size_t num_elements, const void *data)
     } else return false;
 }
 
+bool vector_add_all(vector_t *dest, const vector_t *src)
+{
+    if (dest == NULL || src == NULL || dest->sizeof_element != src->sizeof_element) {
+        return false;
+    } else {
+        vector_add_unsafe(dest, src->num_elements, src->data);
+        return true;
+    }
+}
+
 void vector_add_unsafe(vector_t *vec, size_t num_elements, const void *data)
 {
     size_t new_num_elements = vec->num_elements + num_elements;

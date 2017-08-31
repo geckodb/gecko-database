@@ -48,6 +48,9 @@ static inline void this_free(struct hindex_t *self);
 static inline void this_query(grid_set_cursor_t *result, const struct hindex_t *self, const tuple_id_t *tid_begin,
                               const tuple_id_t *tid_end);
 
+static inline entry_t *find_interval(vector_t *haystack, const tuple_id_interval_t *needle);
+static inline void find_all_by_point(vector_t *result, vector_t *haystack, const tuple_id_t needle);
+
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E  I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
@@ -78,7 +81,7 @@ hindex_t *lesearch_hindex_create(size_t approx_num_horizontal_partitions, const 
 // H E L P E R   I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-entry_t *find_interval(vector_t *haystack, const tuple_id_interval_t *needle)
+static inline entry_t *find_interval(vector_t *haystack, const tuple_id_interval_t *needle)
 {
     entry_t *it = (entry_t *) haystack->data;
     size_t num_elements = haystack->num_elements;
@@ -90,17 +93,13 @@ entry_t *find_interval(vector_t *haystack, const tuple_id_interval_t *needle)
     return NULL;
 }
 
-void find_all_by_point(vector_t *result, vector_t *haystack, const tuple_id_t needle)
+static inline void find_all_by_point(vector_t *result, vector_t *haystack, const tuple_id_t needle)
 {
     const entry_t *it = (const entry_t *) haystack->data;
     size_t num_elements = haystack->num_elements;
     while (num_elements--) {
         if (it->interval.begin >= needle && needle < it->interval.end) {
-            size_t grid_num = vector_num_elements(it->grids);
-            struct grid_t **elem_it = it->grids->data;
-            while (grid_num--) {
-                vector_add(result, 1, elem_it++);
-            }
+            vector_add_all(result, it->grids);
         }
         else it++;
     }

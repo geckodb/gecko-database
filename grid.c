@@ -93,8 +93,6 @@ grid_set_cursor_t *gs_grid_table_grid_find(const grid_table_t *table, const attr
     gs_vindex_query_close(v_result);
     gs_hindex_query_close(h_result);
 
-    // TODO: This is somehow buggy. There is no same element identified
-
     return result;
 }
 

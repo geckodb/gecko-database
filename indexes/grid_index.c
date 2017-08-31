@@ -30,8 +30,8 @@ const struct grid_t *grid_set_cursor_next(grid_set_cursor_t *result_set)
     }
 
     vector_t *vec = (vector_t * ) dest->extra;
-    if (elem_idx < vec->sizeof_element) {
-        return (const struct grid_t *) vector_at(vec, elem_idx++);
+    if (elem_idx < vec->num_elements) {
+        return *(const struct grid_t **) vector_at(vec, elem_idx++);
     } else return NULL;
 }
 

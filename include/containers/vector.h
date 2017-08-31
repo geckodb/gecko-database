@@ -77,6 +77,8 @@ bool vector_set(vector_t *vec, size_t idx, size_t num_elements, const void *data
 
 bool vector_add(vector_t *vec, size_t num_elements, const void *data);
 
+bool vector_add_all(vector_t *dest, const vector_t *src);
+
 void vector_add_unsafe(vector_t *vec, size_t num_elements, const void *data);
 
 bool vector_comp(const vector_t *lhs, const vector_t *rhs, bool (*comp)(const void *a, const void *b));
