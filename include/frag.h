@@ -51,7 +51,7 @@ typedef struct frag_t {
     void (*_dispose)(struct frag_t *self);
 
     /*!< factory function to create impl-specific tuplet */
-    struct tuplet_t *(*_open)(struct frag_t *self);
+    struct tuplet_t *(*_open)(struct frag_t *self, tuplet_id_t tuplet_id);
 
     /*!< inserts a number of (uninitialized) ntuplets into this fragment and returns a tuplet pointer to the first
      * tuplets of these newly added tuplets. */

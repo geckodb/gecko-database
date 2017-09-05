@@ -70,6 +70,8 @@
 
 typedef uint64_t attr_id_t;
 
+typedef uint32_t tuplet_id_t;
+
 typedef uint8_t     u8;
 typedef uint16_t   u16;
 typedef uint32_t   u32;

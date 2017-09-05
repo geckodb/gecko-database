@@ -30,6 +30,13 @@
 // D A T A   T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
+typedef int (*comp_t)(const void *lhs, const void *rhs);
+
+typedef enum {
+    CCP_IGNORECACHE,
+    CCP_USECACHE
+} cache_consideration_policy;
+
 typedef enum {
     zero_memory = 1 << 0,
     auto_resize = 1 << 1,
@@ -53,6 +60,8 @@ vector_t *vector_create_ex(size_t element_size, size_t capacity, vector_flags fl
 
 bool vector_resize(vector_t *vec, size_t num_elements);
 
+bool vector_reserve(vector_t *vec, size_t num_elements);
+
 size_t vector_num_elements(const vector_t *vec);
 
 void vector_memset(vector_t *vec, size_t pos_start, size_t num_elements, const void *data);
@@ -69,6 +78,14 @@ void *vector_at(const vector_t *vec, size_t pos);
 
 void *vector_peek(const vector_t *vec);
 
+void *vector_begin(const vector_t *vec);
+
+void *vector_end(const vector_t *vec);
+
+bool vector_issorted(vector_t *vec, cache_consideration_policy policy, comp_t comp);
+
+bool vector_updatesort(vector_t *vec, comp_t comp);
+
 void *vector_pop_unsafe(vector_t *vec);
 
 void *vector_peek_unsafe(vector_t *vec);
@@ -79,9 +96,11 @@ bool vector_add(vector_t *vec, size_t num_elements, const void *data);
 
 bool vector_add_all(vector_t *dest, const vector_t *src);
 
+bool vector_add_all_unsafe(vector_t *dest, const vector_t *src);
+
 void vector_add_unsafe(vector_t *vec, size_t num_elements, const void *data);
 
-bool vector_comp(const vector_t *lhs, const vector_t *rhs, bool (*comp)(const void *a, const void *b));
+bool vector_comp(const vector_t *lhs, const vector_t *rhs, comp_t comp);
 
 bool vector_foreach(vector_t *vec, void *capture, bool (*func)(void *capture, void *begin, void *end));
 
@@ -95,10 +114,9 @@ size_t vector_memused__str(vector_t *vec);
 
 size_t vector_sizeof(const vector_t *vec);
 
-void vector_sort(vector_t *vec,  int (*comp)(const void *lhs, const void *rhs));
+void vector_sort(vector_t *vec, comp_t comp);
 
-void *vector_bsearch(vector_t *vec, const void *needle, int (*sort_comp)(const void *lhs, const void *rhs),
-                           int (*find_comp)(const void *needle, const void *data));
+void *vector_bsearch(vector_t *vec, const void *needle, comp_t sort_comp, comp_t find_comp);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // C O N V E N I E N C E  F U N C T I O N S

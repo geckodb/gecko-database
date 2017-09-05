@@ -31,7 +31,7 @@ static bool      _check_auto_resize(vector_t *, size_t);
 static bool      _check_set_args(vector_t *, size_t, const void *);
 static bool      _outside_bounds_enabled(vector_t *, size_t, size_t);
 static bool      _realloc_vector(vector_t *, size_t);
-static bool      _advance(vector_t *, size_t, size_t);
+static bool inline _advance(vector_t *, size_t, size_t);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E  I M P L E M E N T A T I O N
@@ -59,6 +59,11 @@ bool vector_resize(vector_t *vec, size_t num_elements)
         vec->num_elements = num_elements;
         return true;
     } else return false;
+}
+
+bool vector_reserve(vector_t *vec, size_t num_elements)
+{
+    return _advance(vec, 0, num_elements - 1);
 }
 
 size_t vector_num_elements(const vector_t *vec)
@@ -124,6 +129,16 @@ bool vector_add_all(vector_t *dest, const vector_t *src)
     if (dest == NULL || src == NULL || dest->sizeof_element != src->sizeof_element) {
         return false;
     } else {
+        vector_reserve(dest, dest->num_elements + src->num_elements);
+        return vector_add_all_unsafe(dest, src);
+    }
+}
+
+bool vector_add_all_unsafe(vector_t *dest, const vector_t *src)
+{
+    if (dest == NULL || src == NULL || dest->sizeof_element != src->sizeof_element) {
+        return false;
+    } else {
         vector_add_unsafe(dest, src->num_elements, src->data);
         return true;
     }
@@ -157,6 +172,46 @@ void *vector_peek(const vector_t *vec)
     if (require_non_null(vec) && require_non_zero(vec->num_elements))
         result = vector_at(vec, vec->num_elements - 1);
     return result;
+}
+
+void *vector_begin(const vector_t *vec)
+{
+    void *result = NULL;
+    if (require_non_null(vec) && require_non_zero(vec->num_elements))
+        result = vector_at(vec, 0);
+    return result;
+}
+
+void *vector_end(const vector_t *vec)
+{
+    void *result = NULL;
+    if (require_non_null(vec))
+        result = vector_at(vec, vec->num_elements);
+    return (result == NULL ? (vec->data + vec->num_elements * vec->sizeof_element) : result);
+}
+
+bool vector_issorted(vector_t *vec, cache_consideration_policy policy, comp_t comp)
+{
+    require_non_null(vec);
+    require((policy != CCP_IGNORECACHE || (comp != NULL)), "Null pointer to required function pointer");
+    return (policy == CCP_USECACHE) ? vec->is_sorted : vector_updatesort(vec, comp);
+}
+
+bool vector_updatesort(vector_t *vec, comp_t comp)
+{
+    require_non_null(vec);
+    require_non_null(comp);
+
+    // update sort state
+    vec->is_sorted = true;
+    size_t num = vec->num_elements - 1;
+    void *lhs = vec->data, *rhs = vec->data + vec->sizeof_element;
+    while (num--) {
+        vec->is_sorted &= (comp(lhs, rhs) < 1);
+        lhs += vec->sizeof_element;
+        rhs += vec->sizeof_element;
+    }
+    return vec->is_sorted;
 }
 
 void *vector_pop_unsafe(vector_t *vec)
@@ -253,7 +308,7 @@ size_t vector_sizeof(const vector_t *vec)
     return (vec == NULL ? 0 : vec->element_capacity * vec->sizeof_element);
 }
 
-void vector_sort(vector_t *vec, int (*comp)(const void *lhs, const void *rhs))
+void vector_sort(vector_t *vec, comp_t comp)
 {
     require_non_null(vec);
     require_non_null(comp);
@@ -264,17 +319,14 @@ void vector_sort(vector_t *vec, int (*comp)(const void *lhs, const void *rhs))
     }
 }
 
-void *vector_bsearch(vector_t *vec, const void *needle, int (*sort_comp)(const void *lhs, const void *rhs),
-                           int (*find_comp)(const void *needle, const void *data))
+void *vector_bsearch(vector_t *vec, const void *needle, comp_t sort_comp, comp_t find_comp)
 {
     require_non_null(vec);
     require_non_null(needle);
     require_non_null(sort_comp);
     require_non_null(find_comp);
 
-    if (!vec->is_sorted) {
-        vector_sort(vec, sort_comp);
-    }
+    vector_sort(vec, sort_comp);
 
     size_t lower = 0;
     size_t upper = vec->num_elements;
@@ -294,10 +346,10 @@ void *vector_bsearch(vector_t *vec, const void *needle, int (*sort_comp)(const v
         }
     }
 
-    return NULL;
+    return vector_end(vec);
 }
 
-bool vector_comp(const vector_t *lhs, const vector_t *rhs, bool (*comp)(const void *a, const void *b))
+bool vector_comp(const vector_t *lhs, const vector_t *rhs, comp_t comp)
 {
     if (!require_non_null(lhs) || !require_non_null(rhs))
         return false;
@@ -307,7 +359,7 @@ bool vector_comp(const vector_t *lhs, const vector_t *rhs, bool (*comp)(const vo
         for (void *lp = lhs->data; lp != lhs->data + end; lp += step) {
             bool has_found = false;
             for (void *rp = rhs->data; rp != rhs->data + end; rp += step) {
-                if (comp(lp, rp)) {
+                if (comp(lp, rp) == 0) {
                     has_found = true;
                     goto break_inner_loop;
                 }
@@ -451,7 +503,7 @@ bool _realloc_vector(vector_t *vec, size_t new_num_elements)
     } else return true;
 }
 
-static bool _advance(vector_t *vec, size_t idx, size_t num_elements)
+static bool inline  _advance(vector_t *vec, size_t idx, size_t num_elements)
 {
     if ((idx + num_elements) < vec->num_elements) {
         return true;

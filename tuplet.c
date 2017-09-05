@@ -2,12 +2,12 @@
 #include <tuplet_field.h>
 #include <schema.h>
 
-tuplet_t *gs_tuplet_open(struct frag_t *frag)
+tuplet_t *gs_tuplet_open(struct frag_t *frag, tuplet_id_t tuplet_id)
 {
     if (frag->ntuplets > 0) {
         require_non_null(frag);
         require_non_null(frag->_open);
-        tuplet_t *result = frag->_open(frag);
+        tuplet_t *result = frag->_open(frag, tuplet_id);
         panic_if((result == NULL), UNEXPECTED, "frag_t::open return NULL");
         return result;
     } else return NULL;
@@ -26,7 +26,7 @@ tuplet_t *gs_tuplet_rewind(tuplet_t *tuplet)
     require_non_null(tuplet->_close);
     frag_t *frag = tuplet->fragment;
     tuplet->_close(tuplet);
-    return gs_tuplet_open(frag);
+    return gs_tuplet_open(frag, 0);
 }
 
 void gs_tuplet_set_null(tuplet_t *tuplet)

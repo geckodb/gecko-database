@@ -18,7 +18,7 @@
 
 static inline frag_t *frag_create(schema_t *schema, size_t tuplet_capacity, enum tuplet_format format);
 
-static inline tuplet_t *frag_nsm_open(frag_t *self);
+static inline tuplet_t *frag_nsm_open(frag_t *self, tuplet_id_t tuplet_id);
 static inline tuplet_t *frag_insert(struct frag_t *self, size_t ntuplets);
 static inline void frag_dipose(frag_t *self);
 
@@ -97,6 +97,7 @@ static inline void tuplet_rebase(tuplet_t *tuplet, frag_t *frag, tuplet_id_t tup
 {
     assert (tuplet);
     REQUIRE_VALID_TUPLET_FORMAT(frag->format);
+    require((tuplet_id < frag->ntuplets), "Tuplet id out of bounds");
 
     tuplet->tuplet_id = tuplet_id;
     tuplet->fragment = frag;
@@ -127,9 +128,9 @@ static inline tuplet_t *frag_open_internal(frag_t *self, size_t pos)
     return result;
 }
 
-tuplet_t *frag_nsm_open(frag_t *self)
+tuplet_t *frag_nsm_open(frag_t *self, tuplet_id_t tuplet_id)
 {
-    return frag_open_internal(self, 0);
+    return frag_open_internal(self, tuplet_id);
 }
 
 static inline tuplet_t *frag_insert(struct frag_t *self, size_t ntuplets)

@@ -10,11 +10,11 @@ void gs_tuple_field_open(tuple_field_t *field, tuple_t *tuple)
 
     grid_set_cursor_t *cursor = gs_grid_table_grid_find(tuple->table, &attr_id, 1, &tuple->tuple_id, 1);
     require((grid_set_cursor_numelem(cursor) == 1), "Internal error: field is covered not exactly by one grid");
-    const grid_t *grid = grid_set_cursor_next(cursor);
+    grid_t *grid = grid_set_cursor_next(cursor);
 
     // TODO: add to end, or uodate in-place
 
-    tuplet_t *tuplet = gs_tuplet_open(grid->frag);
+    tuplet_t *tuplet = gs_tuplet_open(grid->frag, gs_grid_global_to_local(grid, tuple->tuple_id, AT_RANDOM));
     tuplet_field_t *tuplet_field = gs_tuplet_field_open(tuplet);
 
     *field = (tuple_field_t) {

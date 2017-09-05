@@ -21,8 +21,42 @@ typedef struct grid_t {
                                       iterating through all i that are mapped into the grid yields all associated j.
                                       Note, the order of attributes might change between the table schema and the grid
                                       schema. */
+    vector_t /* of tuple_id_interval_t */ *tuple_ids; /*<! A list of right-open intervals that describe which tuples in the table
+                                         are covered in this grid. Intervals [a, b), [c,d ),... in this list are assumed
+                                         to be ordered ascending by their lower bound, e.g., a, c for a < c. Further,
+                                         the intervals do not overlap. This information is required to translate from
+                                         tuple identifiers to per-grid tuplet identifiers and vice versa, since
+                                         the intervals in 'tuple_ids' contain a subset of all tuple identifiers in the
+                                         table (e.g., [100, 105)). With other words, the union of all intervals describe
+                                         a monotonically increasing function that is not continuous. In contrast,
+                                         tuplet identifiers per grid is strictly monotonically continuous increasing
+                                         (i.e., 0, 1, 2, 3, ...). These information are needed to map a tuple
+                                         identifier (e.g., 100) to a tuplet identifier (e.g. 2), and vice versa. */
+    tuple_id_interval_t *last_interval_cache; /*<! A nullable pointer into 'tuple_ids' data that is the last accessed interval.
+                                         it's used to speedup translation between tuplet and tuple identifier. Caching
+                                         the last access avoids searching the interval when a tuplet is request in the
+                                         same interval as before. In case the pointer is null, no entry is in the cache.
+                                         In case the pointer is non-null, an entry is cached. Note, that's not
+                                         guaranteed to find a certain tuplet in this cache. In case the tuplet is not
+                                         found here, 'tuple_ids' are searched for a match according some specific
+                                         algorithm that is implemented in the manager of this cache. */
+
     pthread_mutex_t mutex; // TODO: locking a single grid
 } grid_t;
+
+typedef enum {
+    AT_SEQUENTIAL,  /*<! A call for translation between tuplet and tuple identifier forward iterates through the
+                         the intervals of tuple identifiers coverd by a grid. If a tuple is not found in the
+                         last (cached) interval, it is guaranteed that the tuple is not in a preceding interval
+                         w.r.t. to the cached interval. With other words, if a tuple is not in the (cached) interval
+                         it must be in one of the successors of the cached one. Sequential access is typical for
+                         full table scans. */
+    AT_RANDOM       /*<! A call for translation between tuplet and tuple identifier where there are no guarantees
+                         on the order in which intervals are accessed. With other words, when running a random
+                         access type, intervals between succeeding calls for translation are likely to change. Hence,
+                         if the tuple is not in the last (cached) interval, the entire list of intervals must be
+                         searched. Random access is typical for index scans. */
+} access_type;
 
 typedef struct grids_by_attr_index_elem_t {
     attr_id_t attr_id;
@@ -74,3 +108,89 @@ void gs_grid_table_insert(resultset_t *resultset, grid_table_t *table, size_t nt
 void gs_grid_table_print(FILE *file, const grid_table_t *table, size_t row_offset, size_t limit);
 
 void gs_grid_table_grid_print(FILE *file, const grid_table_t *table, grid_id_t grid_id, size_t row_offset, size_t limit);
+
+static inline int interval_tuple_id_comp_by_element(const void *needle, const void *element)
+{
+    tuple_id_t tuple_id = *(const tuple_id_t *) needle;
+    const tuple_id_interval_t *interval = element;
+    return (gs_interval_contains(interval, tuple_id) ? 0 : (tuple_id < interval->begin ? - 1 : + 1));
+}
+
+static inline tuplet_id_t gs_grid_global_to_local(grid_t *grid, tuple_id_t tuple_id, access_type type)
+{
+    // TODO: apply a bunch of strategy alternatives here. For instance, one can buffer the distances for a given
+    // Cursor and all its processors. Then the translation does not require to scan the entire interval list in order
+    // to provide the tuplet id. Also, one can run binary search and linear search probably multi-threaded...
+
+    // The tuplet identifier that is mapped in this grid to the given 'tuplet_id'
+    tuplet_id_t result = 0;
+
+    // Determine where to start in the interval list. The last position was cached, so start here if possible
+    tuple_id_interval_t *cursor = (grid->last_interval_cache != NULL ? grid->last_interval_cache : grid->tuple_ids->data);
+
+    // Determine the end of the interval list. If cursor reaches this end, the tuple is not mapped into this grid.
+    // Clearly, if this case happens, there is an interval error since a request to this function requires
+    // a valid coverage of the given 'tuple_id' in this grid
+    const tuple_id_interval_t *end = vector_end(grid->tuple_ids);
+
+    if (!gs_interval_contains(cursor, tuple_id)) {
+        switch (type) {
+            case AT_SEQUENTIAL:
+                // seek to interval that contains the tuple, move cursor to successor since its guaranteed not in the
+                // current one
+                for (cursor++; cursor < end && !gs_interval_contains(cursor, tuple_id); cursor++);
+                break;
+            case AT_RANDOM:
+                // Assert that interval list is sorted. If sort state is not cached,
+                // re-evaluate the state and check again
+                assert (vector_issorted(grid->tuple_ids, CCP_USECACHE, NULL) ||
+                        vector_issorted(grid->tuple_ids, CCP_IGNORECACHE, gs_interval_tuple_id_comp_by_lower_bound));
+
+                // TODO: apply evolutionary algorithm here to find choice of alternatives once alternatives exists
+                // Alternatives besides bsearch might be linear search w/o multi-threading from cache or start/end, ...
+
+                // Perform binary search. Note here that this only works, because we exploit an assumption on the
+                // intervals contained in the list: intervals do not overlap and the needle can be used to state whether
+                // a lower or higher interval must be considered during search if the needle is not contained in the
+                // current interval.
+                cursor = vector_bsearch(grid->tuple_ids, &tuple_id,
+                                        gs_interval_tuple_id_comp_by_lower_bound, interval_tuple_id_comp_by_element);
+                break;
+            default: panic(BADBRANCH, grid);
+        }
+    }
+
+    panic_if((cursor == end), "Internal error: mapping of tuple '%u' is not resolvable", tuple_id);
+
+    // TODO: Cache this!
+    // calculate the number of tuplets that fall into preceding intervals
+    for (const tuple_id_interval_t *it = vector_begin(grid->tuple_ids); it < cursor; it++) {
+        result += gs_interval_get_span(it);
+    }
+    // calculate the exact identifer fot the given tuple in the 'cursor' interval
+    result += (tuple_id - cursor->begin);
+
+    // update cache
+    grid->last_interval_cache = cursor;
+
+    return result;
+}
+
+static inline tuple_id_t gs_grid_local_to_global(grid_t *grid, tuplet_id_t tuplet_id)
+{
+    assert (tuplet_id < grid->frag->ntuplets);
+
+    // TODO: Cache this!
+    tuple_id_t num_tuple_covereed = 0;
+
+    const tuple_id_interval_t *it = vector_begin(grid->tuple_ids);
+    // since tuples in the interval list maps bidirectional to tuplets, it holds with all other assumptions on the
+    // interval list and the construction of the mapping: in the order-preserving union of all intervals,
+    // the i-th tuple is mapped to the tuplet is i.
+
+    // sum up the number of tuples covered in each interval until this sum exceeds 'tuplet_id'
+    for (; num_tuple_covereed <= tuplet_id; num_tuple_covereed += gs_interval_get_span(it), it++);
+
+    // return the tuple identifier that is mapped to the tuplet id
+    return (it->end - (num_tuple_covereed - tuplet_id) - 1);
+}

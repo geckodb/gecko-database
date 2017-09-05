@@ -20,7 +20,7 @@ void grid_set_cursor_pushback(grid_set_cursor_t *cursor, const void *data)
     vector_add((cursor->extra), 1, data);
 }
 
-const struct grid_t *grid_set_cursor_next(grid_set_cursor_t *result_set)
+struct grid_t *grid_set_cursor_next(grid_set_cursor_t *result_set)
 {
     static grid_set_cursor_t *dest;
     static size_t elem_idx;
@@ -31,7 +31,7 @@ const struct grid_t *grid_set_cursor_next(grid_set_cursor_t *result_set)
 
     vector_t *vec = (vector_t * ) dest->extra;
     if (elem_idx < vec->num_elements) {
-        return *(const struct grid_t **) vector_at(vec, elem_idx++);
+        return *(struct grid_t **) vector_at(vec, elem_idx++);
     } else return NULL;
 }
 

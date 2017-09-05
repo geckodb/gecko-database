@@ -6,8 +6,6 @@
 
 struct schema_t;
 
-typedef uint32_t tuplet_id_t;
-
 typedef struct tuplet_t {
     struct frag_t *fragment; /*<! fragment in which this tuplet exists */
     tuplet_id_t tuplet_id; /*<! number of this tuplet inside the fragment */
@@ -25,7 +23,7 @@ typedef struct tuplet_t {
 } tuplet_t;
 
 /*!
- * @brief Opens the first tuplet that is located in the fragment <i>frag</i>.
+ * @brief Opens the the tuplet associated with a given tuplet id that is located in the fragment <i>frag</i>.
  *
  * To navigate from one tuplet to another, the function gs_tuplet_next() should be used.
  *
@@ -33,12 +31,12 @@ typedef struct tuplet_t {
  * explicitly by calling gs_tuplet_close() or it gets automatically released when gs_tuplet_next()
  * reaches the end of the fragment.
  *
- * In case the
  *
  * @param [in] frag The fragment. Must be non-null.
+ *        [in] tuplet_id the tuplet id. Must be valid.
  * @return A pointer to the first tuplet in <i>frag</i>, or <b>NULL</b> if the fragment does not contains any tuplets.
  * */
-tuplet_t *gs_tuplet_open(struct frag_t *frag);
+tuplet_t *gs_tuplet_open(struct frag_t *frag, tuplet_id_t tuplet_id);
 
 /*!
  * @brief Closes a tuplet and frees up resources bound to this tuplet.

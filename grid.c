@@ -180,9 +180,13 @@ static inline grid_t *create_grid(grid_table_t *table, const attr_id_t *attr, si
         .schema_map_indicies = hash_table_create(
                 &(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen}, sizeof(attr_id_t), sizeof(attr_id_t),
                 nattr + 1, 1.7f, 1.0f
-        )
-        // TODO: add mutex init here
+        ),
+        .tuple_ids = vector_create(sizeof(tuple_id_interval_t), ntuple_ids),
+        .last_interval_cache = NULL
+            // TODO: add mutex init here
     };
+    vector_add(result->tuple_ids, ntuple_ids, tuple_ids);
+
     for (size_t i = 0; i < nattr; i++) {
         dict_put(result->schema_map_indicies, attr + i, &i);
     }
