@@ -25,14 +25,14 @@ static inline void frag_dipose(frag_t *self);
 static inline void tuplet_rebase(tuplet_t *tuplet, frag_t *frag, tuplet_id_t tuplet_id);
 static inline bool tuplet_next(tuplet_t *self);
 static inline tuplet_t *frag_open_internal(frag_t *self, size_t pos);
-static inline tuplet_field_t *tuplet_open(tuplet_t *self);
+static inline tuplet_field_t *tuplet_open(tuplet_t *self, attr_id_t attr_id);
 static inline void tuplet_update(tuplet_t *self, const void *data);
 static inline void tuplet_set_null(tuplet_t *self);
 static inline void tuplet_delete(tuplet_t *self);
 static inline void tuplet_close(tuplet_t *self);
 static inline bool tuplet_is_null(tuplet_t *self);
 
-static inline void field_rebase(tuplet_field_t *field, tuplet_t *tuplet);
+static inline void field_rebase(tuplet_field_t *field, tuplet_t *tuplet, attr_id_t attr_id);
 static inline size_t field_nsm_jmp_size(tuplet_field_t *field);
 static inline size_t field_dsm_jmp_size(tuplet_field_t *field, size_t dst_tuplet_slot_id, size_t dst_attr_id);
 static inline bool field_next(tuplet_field_t *self);
@@ -166,13 +166,14 @@ static inline bool tuplet_next(tuplet_t *self)
     }
 }
 
-static inline void field_rebase(tuplet_field_t *field, tuplet_t *tuplet) {
-    field->attr_id = 0;
+static inline void field_rebase(tuplet_field_t *field, tuplet_t *tuplet, attr_id_t attr_id) {
+    assert(attr_id < tuplet->fragment->schema->attr->num_elements);
+    field->attr_id = attr_id;
     field->tuplet = tuplet;
     field->attr_value_ptr = tuplet->attr_base;
 }
 
-static inline tuplet_field_t *tuplet_open(tuplet_t *self)
+static inline tuplet_field_t *tuplet_open(tuplet_t *self, attr_id_t attr_id)
 {
     assert (self);
     assert (self->fragment);
@@ -187,7 +188,7 @@ static inline tuplet_field_t *tuplet_open(tuplet_t *self)
         ._is_null = field_is_null,
         ._close = field_close
     };
-    field_rebase(result, self);
+    field_rebase(result, self, attr_id);
     return result;
 }
 
@@ -269,10 +270,10 @@ static inline bool field_next(tuplet_field_t *self)
     } else {
         bool valid_tuplet = gs_tuplet_next(self->tuplet);
         if (valid_tuplet) {
-            field_rebase(self, self->tuplet);
+            field_rebase(self, self->tuplet, 0);
             return true;
         } else {
-            gs_tuplet_field_close(self);
+            //gs_tuplet_field_close(self);
             return false;
         }
     }

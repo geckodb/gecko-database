@@ -96,13 +96,12 @@ grid_set_cursor_t *gs_grid_table_grid_find(const grid_table_t *table, const attr
     return result;
 }
 
-attr_id_t gs_grid_table_attr_id_to_frag_attr_id(const grid_t *grid, attr_id_t table_attr_id)
+// This function returns NULL, if the table attribute is not covered by this grid
+const attr_id_t *gs_grid_table_attr_id_to_frag_attr_id(const grid_t *grid, attr_id_t table_attr_id)
 {
     require_non_null(grid);
-    require((table_attr_id >= grid->context->schema->attr->num_elements), ATTROUTOFBOUDNDS);
     const attr_id_t *frag_attr_id = dict_get(grid->schema_map_indicies, &table_attr_id);
-    require_non_null(frag_attr_id);
-    return *frag_attr_id;
+    return frag_attr_id;
 }
 
 const grid_t *gs_grid_by_id(const grid_table_t *table, grid_id_t id)
@@ -185,6 +184,12 @@ static inline grid_t *create_grid(grid_table_t *table, const attr_id_t *attr, si
         .last_interval_cache = NULL
             // TODO: add mutex init here
     };
+
+    for (size_t i = 0; i < ntuple_ids; i++) {
+        gs_fragment_insert(result->frag, gs_interval_get_span((tuple_ids + i)));
+    }
+
+
     vector_add(result->tuple_ids, ntuple_ids, tuple_ids);
 
     for (size_t i = 0; i < nattr; i++) {

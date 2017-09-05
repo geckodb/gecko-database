@@ -19,6 +19,10 @@ void grid_set_cursor_close(grid_set_cursor_t *cursor);
 
 void grid_set_cursor_pushback(grid_set_cursor_t *cursor, const void *data);
 
+void grid_set_cursor_append(grid_set_cursor_t *dst, grid_set_cursor_t *src);
+
+void grid_set_cursor_dedup(grid_set_cursor_t *cursor);
+
 struct grid_t *grid_set_cursor_next(grid_set_cursor_t *result_set);
 
 size_t grid_set_cursor_numelem(const grid_set_cursor_t *result_set);

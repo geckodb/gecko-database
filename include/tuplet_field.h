@@ -19,6 +19,8 @@ typedef struct tuplet_field_t {
 
 tuplet_field_t *gs_tuplet_field_open(tuplet_t *tuplet);
 
+tuplet_field_t *gs_tuplet_field_seek(tuplet_t *tuplet, attr_id_t attr_id);
+
 bool gs_tuplet_field_next(tuplet_field_t *field);
 
 const void *gs_tuplet_field_read(tuplet_field_t *field);

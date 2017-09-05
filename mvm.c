@@ -544,7 +544,7 @@ program_t *program_cpy(const program_t *program)
 {
     program_t *cpy = NULL;
     if(program_new(&cpy, program->prog_name, program->prog_author, program->prog_comments) == MONDRIAN_OK) {
-        cpy->instructions = vector_cpy(program->instructions);
+        cpy->instructions = vector_deep_cpy(program->instructions);
     }
     return cpy;
 }

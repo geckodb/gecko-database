@@ -66,7 +66,9 @@ size_t vector_num_elements(const vector_t *vec);
 
 void vector_memset(vector_t *vec, size_t pos_start, size_t num_elements, const void *data);
 
-vector_t *vector_cpy(vector_t *proto);
+vector_t *vector_deep_cpy(vector_t *proto);
+
+void vector_shallow_cpy(vector_t *dst, vector_t *src);
 
 bool vector_free(struct vector_t *vec);
 
@@ -103,6 +105,10 @@ void vector_add_unsafe(vector_t *vec, size_t num_elements, const void *data);
 bool vector_comp(const vector_t *lhs, const vector_t *rhs, comp_t comp);
 
 bool vector_foreach(vector_t *vec, void *capture, bool (*func)(void *capture, void *begin, void *end));
+
+void vector_dedup(vector_t *vec);
+
+void vector_swap(vector_t *lhs, vector_t *rhs);
 
 size_t vector_count(vector_t *vec, void *capture, bool (*pred)(void *capture, void *it));
 

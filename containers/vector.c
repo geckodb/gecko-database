@@ -17,6 +17,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <containers/vector.h>
+#include <containers/dicts/hash_table.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 // H E L P E R   P R O T O T Y P E S
@@ -83,7 +84,7 @@ void vector_memset(vector_t *vec, size_t pos_start, size_t num_elements, const v
     vec->is_sorted = false;
 }
 
-vector_t *vector_cpy(vector_t *proto)
+vector_t *vector_deep_cpy(vector_t *proto)
 {
     vector_t *result = NULL;
     if ((require_non_null(proto)) && (require_non_null(proto->data)) &&
@@ -255,6 +256,37 @@ bool vector_foreach(vector_t *vec, void *capture, bool (*func)(void *capture, vo
         return false;
     vec->is_sorted = false;
     return func(capture, vec->data, vec->data + vec->num_elements * vec->sizeof_element);
+}
+
+void vector_dedup(vector_t *vec)
+{
+    dict_t *dict = hash_table_create_jenkins(vec->sizeof_element, sizeof(bool), vec->num_elements, 2.0f, 0.75f);
+    void *end = vector_end(vec);
+    bool dummy;
+    for (void *it = vector_begin(vec); it < end; dict_put(dict, it++, &dummy));
+    vector_t *dedups = (vector_t *) dict_keyset(dict);
+    vector_swap(vec, dedups);
+    dict_free(dict);
+    vector_free(dedups);
+}
+
+void vector_shallow_cpy(vector_t *dst, vector_t *src)
+{
+    dst->sizeof_element = src->sizeof_element;
+    dst->num_elements = src->num_elements;
+    dst->element_capacity = src->element_capacity;
+    dst->flags = src->flags;
+    dst->grow_factor = src->grow_factor;
+    dst->data = src->data;
+    dst->is_sorted = src->is_sorted;
+}
+
+void vector_swap(vector_t *lhs, vector_t *rhs)
+{
+    vector_t tmp;
+    vector_shallow_cpy(&tmp, lhs);
+    vector_shallow_cpy(lhs, rhs);
+    vector_shallow_cpy(rhs, &tmp);
 }
 
 size_t vector_count(vector_t *vec, void *capture, bool (*pred)(void *capture, void *it))

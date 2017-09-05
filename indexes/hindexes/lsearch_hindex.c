@@ -98,7 +98,7 @@ static inline void find_all_by_point(vector_t *result, vector_t *haystack, const
     const entry_t *it = (const entry_t *) haystack->data;
     size_t num_elements = haystack->num_elements;
     while (num_elements--) {
-        if (it->interval.begin >= needle && needle < it->interval.end) {
+        if (needle >= it->interval.begin && needle < it->interval.end) {
             vector_add_all(result, it->grids);
         }
         else it++;

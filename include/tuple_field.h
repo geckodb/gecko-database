@@ -17,9 +17,13 @@ typedef struct tuple_field_t {
 
 void gs_tuple_field_open(tuple_field_t *field, tuple_t *tuple);
 
+void gs_tuple_field_seek(tuple_field_t *field, tuple_t *tuple, attr_id_t attr_id);
+
 void gs_tuple_field_next(tuple_field_t *field);
 
 void gs_tuple_field_write(tuple_field_t *field, const void *data);
+
+void gs_tuple_field_close(tuple_field_t *field);
 
 /*bool gs_tuple_field_next(tuple_field_t *field);
 

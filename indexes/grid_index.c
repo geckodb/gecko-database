@@ -1,4 +1,5 @@
 #include <indexes/grid_index.h>
+#include <containers/dicts/hash_table.h>
 
 grid_set_cursor_t *grid_set_cursor_create(size_t result_capacity)
 {
@@ -18,6 +19,16 @@ void grid_set_cursor_close(grid_set_cursor_t *cursor)
 void grid_set_cursor_pushback(grid_set_cursor_t *cursor, const void *data)
 {
     vector_add((cursor->extra), 1, data);
+}
+
+void grid_set_cursor_append(grid_set_cursor_t *dst, grid_set_cursor_t *src)
+{
+    vector_add_all(dst->extra, src->extra);
+}
+
+void grid_set_cursor_dedup(grid_set_cursor_t *cursor)
+{
+    vector_dedup(cursor->extra);
 }
 
 struct grid_t *grid_set_cursor_next(grid_set_cursor_t *result_set)

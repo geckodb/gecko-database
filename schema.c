@@ -58,7 +58,7 @@ schema_t *gs_schema_cpy(const schema_t *schema)
 {
     assert (schema);
     schema_t *cpy = require_good_malloc(sizeof(schema_t));
-    cpy->attr = vector_cpy(schema->attr);
+    cpy->attr = vector_deep_cpy(schema->attr);
     cpy->frag_name = strdup(schema->frag_name);
     return cpy;
 }
@@ -67,6 +67,12 @@ size_t gs_schema_num_attributes(const schema_t *schema)
 {
     assert (schema);
     return schema->attr->num_elements;
+}
+
+const attr_id_t *gs_schema_attributes(const schema_t *schema)
+{
+    assert (schema);
+    return schema->attr->data;
 }
 
 enum field_type gs_schema_attr_type(schema_t *schema, attr_id_t id)

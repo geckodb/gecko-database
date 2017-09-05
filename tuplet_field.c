@@ -44,8 +44,13 @@ void gs_tuplet_field_close(tuplet_field_t *field)
 
 tuplet_field_t *gs_tuplet_field_open(tuplet_t *tuplet)
 {
+    return gs_tuplet_field_seek(tuplet, 0);
+}
+
+tuplet_field_t *gs_tuplet_field_seek(tuplet_t *tuplet, attr_id_t attr_id)
+{
     assert (tuplet);
-    return tuplet->_open(tuplet);
+    return tuplet->_open(tuplet, attr_id);
 }
 
 size_t gs_tuplet_field_size(tuplet_field_t *field)
