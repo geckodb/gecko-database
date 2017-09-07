@@ -42,11 +42,12 @@ void gs_grid_table_free(grid_table_t *table)
 {
     gs_schema_free(table->schema);
     vector_foreach(table->grid_ptrs, NULL, free_grids);
+    vector_free(table->grid_ptrs);
     gs_vindex_free(table->schema_cover);
     gs_hindex_free(table->tuple_cover);
     gs_freelist_free(&table->tuple_id_freelist);
-
-   // panic(NOTIMPLEMENTED, to_string(gs_grid_table_free))
+    free(table->schema_cover);
+    free(table->tuple_cover);
 }
 
 void gs_grid_free(grid_t * grid)
