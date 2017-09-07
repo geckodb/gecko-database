@@ -890,7 +890,8 @@ static int exec_finsert(mondrian_vm_t *vm, u64 operand)
         if (frag == NULL) {
             return MONDRIAN_ERROR;
         }
-        tuplet_t *tuplet_ptr = gs_fragment_insert(frag, num);
+        tuplet_t *tuplet_ptr = require_good_malloc(num * sizeof(tuplet_t *));
+        gs_fragment_insert(tuplet_ptr, frag, num);
         mondrian_vm_set_var(vm, VARIABLE_RTC, (u64 *)&tuplet_ptr);
         return MONDRIAN_OK;
     }

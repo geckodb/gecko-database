@@ -79,7 +79,7 @@ __BEGIN_DECLS
 
 frag_t *gs_fragment_alloc(schema_t *schema, size_t tuplet_capacity, enum frag_impl_type_t type);
 
-struct tuplet_t *gs_fragment_insert(frag_t *frag, size_t ntuplets);
+void gs_fragment_insert(struct tuplet_t *out, frag_t *frag, size_t ntuplets);
 
 void gs_frag_print(FILE *file, frag_t *frag, size_t row_offset, size_t limit);
 

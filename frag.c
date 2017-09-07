@@ -82,12 +82,16 @@ frag_t *gs_fragment_alloc(schema_t *schema, size_t tuplet_capacity, enum frag_im
     return result;
 }
 
-struct tuplet_t *gs_fragment_insert(frag_t *frag, size_t ntuplets)
+void gs_fragment_insert(struct tuplet_t *out, frag_t *frag, size_t ntuplets)
 {
     assert (frag);
     assert (ntuplets > 0);
     assert (frag->_insert);
-    return frag->_insert(frag, ntuplets);
+    struct tuplet_t *result = frag->_insert(frag, ntuplets);
+    if (out != NULL) {
+        memcpy(out, result, ntuplets * sizeof(struct tuplet_t));
+    }
+    free (result);
 }
 
 void gs_frag_print(FILE *file, frag_t *frag, size_t row_offset, size_t limit)

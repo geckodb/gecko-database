@@ -186,7 +186,7 @@ static inline grid_t *create_grid(grid_table_t *table, const attr_id_t *attr, si
     };
 
     for (size_t i = 0; i < ntuple_ids; i++) {
-        gs_fragment_insert(result->frag, gs_interval_get_span((tuple_ids + i)));
+        gs_fragment_insert(NULL, result->frag, gs_interval_get_span((tuple_ids + i)));
     }
 
 
