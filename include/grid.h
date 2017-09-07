@@ -6,7 +6,7 @@
 #include <indexes/vindex.h>
 #include <indexes/hindex.h>
 #include <containers/freelist.h>
-#include <resultset.h>
+#include <tuple_cursor.h>
 
 typedef size_t grid_id_t;
 
@@ -77,6 +77,11 @@ typedef struct grid_table_t {
                                       list after the physical tuple associated with the identifier was removed from
                                       the grid table. A strictly auto-increasing number that provides a new tuple
                                       identifier that never was used before is also stored here. */
+    size_t num_tuples; /*<! The number of tuples in this table. Note: it's guaranteed that the sequence of
+                            tuple identifiers from 0 to num_tuples - 1 is strictly monotonically continuous increasing.
+                            With other words, each tuple identifier in the right open interval [0, num_tuples) is
+                            accessible. However, it's neither guaranteed that a tuple associated with an identifier in
+                            this interval is not marked as 'deleted' nor that the tuple data is initialized. */
 } grid_table_t;
 
 grid_table_t *gs_grid_table_create(const schema_t *schema, size_t approx_num_horizontal_partitions);
@@ -92,8 +97,17 @@ grid_id_t gs_grid_table_add_grid(grid_table_t *table, const attr_id_t *attr_ids_
 
 const freelist_t *gs_grid_table_freelist(const struct grid_table_t *table);
 
-grid_set_cursor_t *gs_grid_table_grid_find(const grid_table_t *table, const attr_id_t *attr_ids, size_t nattr_ids,
+grid_cursor_t *gs_grid_table_grid_find(const grid_table_t *table, const attr_id_t *attr_ids, size_t nattr_ids,
                                   const tuple_id_t *tuple_ids, size_t ntuple_ids);
+
+// A project and materialize function, that copies the tables data that is organized in grids, into a single data
+// fragment.
+frag_t *gs_grid_table_melt(enum frag_impl_type_t type, const grid_table_t *table, const tuple_id_t *tuple_ids,
+                           size_t ntuple_ids, const attr_id_t *attr_ids, size_t nattr_ids);
+
+const attr_t *gs_grid_table_attr_by_id(const grid_table_t *table, attr_id_t id);
+
+size_t gs_grid_table_num_of_attributes(const grid_table_t *table);
 
 const attr_id_t *gs_grid_table_attr_id_to_frag_attr_id(const grid_t *grid, attr_id_t table_attr_id);
 
@@ -105,11 +119,11 @@ vector_t *gs_grid_table_grids_by_tuples(const grid_table_t *table, const tuple_i
 
 bool gs_grid_table_is_valide(grid_table_t *table);
 
-void gs_grid_table_insert(resultset_t *resultset, grid_table_t *table, size_t ntuplets);
+void gs_grid_table_insert(tuple_cursor_t *resultset, grid_table_t *table, size_t ntuplets);
+
+void gs_grid_print(FILE *file, const grid_table_t *table, grid_id_t grid_id, size_t row_offset, size_t limit);
 
 void gs_grid_table_print(FILE *file, const grid_table_t *table, size_t row_offset, size_t limit);
-
-void gs_grid_table_grid_print(FILE *file, const grid_table_t *table, grid_id_t grid_id, size_t row_offset, size_t limit);
 
 static inline int interval_tuple_id_comp_by_element(const void *needle, const void *element)
 {

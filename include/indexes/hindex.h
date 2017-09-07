@@ -19,7 +19,7 @@
 
 #include <stdinc.h>
 #include <interval.h>
-#include <indexes/grid_index.h>
+#include <grid_cursor.h>
 #include <schema.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ typedef struct hindex_t {
     void (*_remove_interval)(struct hindex_t *self, const tuple_id_interval_t *key);
     void (*_remove_intersec)(struct hindex_t *self, tuple_id_t tid);
     bool (*_contains)(const struct hindex_t *self, tuple_id_t tid);
-    void (*_query)(grid_set_cursor_t *result, const struct hindex_t *self, const tuple_id_t *tid_begin,
+    void (*_query)(grid_cursor_t *result, const struct hindex_t *self, const tuple_id_t *tid_begin,
                    const tuple_id_t *tid_end);
     void (*_free)(struct hindex_t *self);
 
@@ -66,7 +66,7 @@ void gs_hindex_add(struct hindex_t *index, const tuple_id_interval_t *key, const
 void gs_hindex_remove_interval(struct hindex_t *index, const tuple_id_interval_t *key);
 void gs_hindex_remove_intersec(struct hindex_t *index, tuple_id_t tid);
 bool gs_hindex_contains(const struct hindex_t *index, tuple_id_t tid);
-grid_set_cursor_t *gs_hindex_query(const struct hindex_t *index, const tuple_id_t *tid_begin,
+grid_cursor_t *gs_hindex_query(const struct hindex_t *index, const tuple_id_t *tid_begin,
                                    const tuple_id_t *tid_end);
-const struct grid_t *gs_hindex_query_read(grid_set_cursor_t *result_set);
-void gs_hindex_query_close(grid_set_cursor_t *result_set);
+const struct grid_t *gs_hindex_query_read(grid_cursor_t *result_set);
+void gs_hindex_query_close(grid_cursor_t *result_set);

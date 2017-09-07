@@ -45,7 +45,7 @@ static inline void this_remove_interval(struct hindex_t *self, const tuple_id_in
 static inline void this_remove_intersec(struct hindex_t *self, tuple_id_t tid);
 static inline bool this_contains(const struct hindex_t *self, tuple_id_t tid);
 static inline void this_free(struct hindex_t *self);
-static inline void this_query(grid_set_cursor_t *result, const struct hindex_t *self, const tuple_id_t *tid_begin,
+static inline void this_query(grid_cursor_t *result, const struct hindex_t *self, const tuple_id_t *tid_begin,
                               const tuple_id_t *tid_end);
 
 static inline entry_t *find_interval(vector_t *haystack, const tuple_id_interval_t *needle);
@@ -125,7 +125,7 @@ static inline void this_add(struct hindex_t *self, const tuple_id_interval_t *ke
     }
 }
 
-static inline void this_query(grid_set_cursor_t *result, const struct hindex_t *self, const tuple_id_t *tid_begin,
+static inline void this_query(grid_cursor_t *result, const struct hindex_t *self, const tuple_id_t *tid_begin,
                               const tuple_id_t *tid_end)
 {
     REQUIRE_INSTANCEOF_THIS(self);

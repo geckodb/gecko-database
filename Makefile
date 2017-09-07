@@ -915,6 +915,48 @@ grid.c.s:
 	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/grid.c.s
 .PHONY : grid.c.s
 
+grid_cursor.o: grid_cursor.c.o
+
+.PHONY : grid_cursor.o
+
+# target to build an object file
+grid_cursor.c.o:
+	$(MAKE) -f CMakeFiles/gridtables.dir/build.make CMakeFiles/gridtables.dir/grid_cursor.c.o
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/grid_cursor.c.o
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/grid_cursor.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/grid_cursor.c.o
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/grid_cursor.c.o
+	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/grid_cursor.c.o
+.PHONY : grid_cursor.c.o
+
+grid_cursor.i: grid_cursor.c.i
+
+.PHONY : grid_cursor.i
+
+# target to preprocess a source file
+grid_cursor.c.i:
+	$(MAKE) -f CMakeFiles/gridtables.dir/build.make CMakeFiles/gridtables.dir/grid_cursor.c.i
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/grid_cursor.c.i
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/grid_cursor.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/grid_cursor.c.i
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/grid_cursor.c.i
+	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/grid_cursor.c.i
+.PHONY : grid_cursor.c.i
+
+grid_cursor.s: grid_cursor.c.s
+
+.PHONY : grid_cursor.s
+
+# target to generate assembly for a file
+grid_cursor.c.s:
+	$(MAKE) -f CMakeFiles/gridtables.dir/build.make CMakeFiles/gridtables.dir/grid_cursor.c.s
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/grid_cursor.c.s
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/grid_cursor.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/grid_cursor.c.s
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/grid_cursor.c.s
+	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/grid_cursor.c.s
+.PHONY : grid_cursor.c.s
+
 grid_table.o: grid_table.c.o
 
 .PHONY : grid_table.o
@@ -998,48 +1040,6 @@ hash.c.s:
 	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/hash.c.s
 	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/hash.c.s
 .PHONY : hash.c.s
-
-indexes/grid_index.o: indexes/grid_index.c.o
-
-.PHONY : indexes/grid_index.o
-
-# target to build an object file
-indexes/grid_index.c.o:
-	$(MAKE) -f CMakeFiles/gridtables.dir/build.make CMakeFiles/gridtables.dir/indexes/grid_index.c.o
-	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/indexes/grid_index.c.o
-	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/indexes/grid_index.c.o
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/indexes/grid_index.c.o
-	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/indexes/grid_index.c.o
-	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/indexes/grid_index.c.o
-.PHONY : indexes/grid_index.c.o
-
-indexes/grid_index.i: indexes/grid_index.c.i
-
-.PHONY : indexes/grid_index.i
-
-# target to preprocess a source file
-indexes/grid_index.c.i:
-	$(MAKE) -f CMakeFiles/gridtables.dir/build.make CMakeFiles/gridtables.dir/indexes/grid_index.c.i
-	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/indexes/grid_index.c.i
-	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/indexes/grid_index.c.i
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/indexes/grid_index.c.i
-	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/indexes/grid_index.c.i
-	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/indexes/grid_index.c.i
-.PHONY : indexes/grid_index.c.i
-
-indexes/grid_index.s: indexes/grid_index.c.s
-
-.PHONY : indexes/grid_index.s
-
-# target to generate assembly for a file
-indexes/grid_index.c.s:
-	$(MAKE) -f CMakeFiles/gridtables.dir/build.make CMakeFiles/gridtables.dir/indexes/grid_index.c.s
-	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/indexes/grid_index.c.s
-	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/indexes/grid_index.c.s
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/indexes/grid_index.c.s
-	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/indexes/grid_index.c.s
-	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/indexes/grid_index.c.s
-.PHONY : indexes/grid_index.c.s
 
 indexes/hindex.o: indexes/hindex.c.o
 
@@ -1725,48 +1725,6 @@ require.c.s:
 	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/require.c.s
 .PHONY : require.c.s
 
-resultset.o: resultset.c.o
-
-.PHONY : resultset.o
-
-# target to build an object file
-resultset.c.o:
-	$(MAKE) -f CMakeFiles/gridtables.dir/build.make CMakeFiles/gridtables.dir/resultset.c.o
-	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/resultset.c.o
-	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/resultset.c.o
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/resultset.c.o
-	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/resultset.c.o
-	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/resultset.c.o
-.PHONY : resultset.c.o
-
-resultset.i: resultset.c.i
-
-.PHONY : resultset.i
-
-# target to preprocess a source file
-resultset.c.i:
-	$(MAKE) -f CMakeFiles/gridtables.dir/build.make CMakeFiles/gridtables.dir/resultset.c.i
-	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/resultset.c.i
-	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/resultset.c.i
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/resultset.c.i
-	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/resultset.c.i
-	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/resultset.c.i
-.PHONY : resultset.c.i
-
-resultset.s: resultset.c.s
-
-.PHONY : resultset.s
-
-# target to generate assembly for a file
-resultset.c.s:
-	$(MAKE) -f CMakeFiles/gridtables.dir/build.make CMakeFiles/gridtables.dir/resultset.c.s
-	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/resultset.c.s
-	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/resultset.c.s
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/resultset.c.s
-	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/resultset.c.s
-	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/resultset.c.s
-.PHONY : resultset.c.s
-
 samples/buffmgr/launcher.o: samples/buffmgr/launcher.c.o
 
 .PHONY : samples/buffmgr/launcher.o
@@ -2043,6 +2001,48 @@ tuple.c.s:
 	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/tuple.c.s
 .PHONY : tuple.c.s
 
+tuple_cursor.o: tuple_cursor.c.o
+
+.PHONY : tuple_cursor.o
+
+# target to build an object file
+tuple_cursor.c.o:
+	$(MAKE) -f CMakeFiles/gridtables.dir/build.make CMakeFiles/gridtables.dir/tuple_cursor.c.o
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/tuple_cursor.c.o
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/tuple_cursor.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/tuple_cursor.c.o
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/tuple_cursor.c.o
+	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/tuple_cursor.c.o
+.PHONY : tuple_cursor.c.o
+
+tuple_cursor.i: tuple_cursor.c.i
+
+.PHONY : tuple_cursor.i
+
+# target to preprocess a source file
+tuple_cursor.c.i:
+	$(MAKE) -f CMakeFiles/gridtables.dir/build.make CMakeFiles/gridtables.dir/tuple_cursor.c.i
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/tuple_cursor.c.i
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/tuple_cursor.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/tuple_cursor.c.i
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/tuple_cursor.c.i
+	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/tuple_cursor.c.i
+.PHONY : tuple_cursor.c.i
+
+tuple_cursor.s: tuple_cursor.c.s
+
+.PHONY : tuple_cursor.s
+
+# target to generate assembly for a file
+tuple_cursor.c.s:
+	$(MAKE) -f CMakeFiles/gridtables.dir/build.make CMakeFiles/gridtables.dir/tuple_cursor.c.s
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/tuple_cursor.c.s
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/tuple_cursor.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/tuple_cursor.c.s
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/tuple_cursor.c.s
+	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/tuple_cursor.c.s
+.PHONY : tuple_cursor.c.s
+
 tuple_field.o: tuple_field.c.o
 
 .PHONY : tuple_field.o
@@ -2277,15 +2277,15 @@ help:
 	@echo "... grid.o"
 	@echo "... grid.i"
 	@echo "... grid.s"
+	@echo "... grid_cursor.o"
+	@echo "... grid_cursor.i"
+	@echo "... grid_cursor.s"
 	@echo "... grid_table.o"
 	@echo "... grid_table.i"
 	@echo "... grid_table.s"
 	@echo "... hash.o"
 	@echo "... hash.i"
 	@echo "... hash.s"
-	@echo "... indexes/grid_index.o"
-	@echo "... indexes/grid_index.i"
-	@echo "... indexes/grid_index.s"
 	@echo "... indexes/hindex.o"
 	@echo "... indexes/hindex.i"
 	@echo "... indexes/hindex.s"
@@ -2337,9 +2337,6 @@ help:
 	@echo "... require.o"
 	@echo "... require.i"
 	@echo "... require.s"
-	@echo "... resultset.o"
-	@echo "... resultset.i"
-	@echo "... resultset.s"
 	@echo "... samples/buffmgr/launcher.o"
 	@echo "... samples/buffmgr/launcher.i"
 	@echo "... samples/buffmgr/launcher.s"
@@ -2364,6 +2361,9 @@ help:
 	@echo "... tuple.o"
 	@echo "... tuple.i"
 	@echo "... tuple.s"
+	@echo "... tuple_cursor.o"
+	@echo "... tuple_cursor.i"
+	@echo "... tuple_cursor.s"
 	@echo "... tuple_field.o"
 	@echo "... tuple_field.i"
 	@echo "... tuple_field.s"

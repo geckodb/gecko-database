@@ -113,14 +113,14 @@ set(SOURCE_FILES
         indexes/vindexes/hash_vindex.c
         include/containers/freelist.h
         containers/freelist.c
-        include/resultset.h
-        resultset.c
+        include/tuple_cursor.h
+        tuple_cursor.c
         include/indexes/hindex.h
         indexes/hindex.c
         include/indexes/hindexes/lsearch_hindex.h
         indexes/hindexes/lsearch_hindex.c
-        indexes/grid_index.c
-        include/indexes/grid_index.h
+        grid_cursor.c
+        include/grid_cursor.h
         )
 
 add_executable(
