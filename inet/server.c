@@ -5,7 +5,7 @@
 
 void gs_server_create(server_t *server, in_port_t port)
 {
-    require_non_null(server);
+    REQUIRE_NONNULL(server);
 
     server->socket_len = sizeof(server->client_addr);
     int on = 1;
@@ -31,7 +31,7 @@ void gs_server_create(server_t *server, in_port_t port)
 
 void gs_server_start(server_t *server)
 {
-    require_non_null(server);
+    REQUIRE_NONNULL(server);
     int fd_client;
     char buffer[2048];
 

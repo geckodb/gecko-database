@@ -70,11 +70,11 @@ vector_t *vector_deep_cpy(vector_t *proto);
 
 void vector_shallow_cpy(vector_t *dst, vector_t *src);
 
-bool vector_free(struct vector_t *vec);
+void vector_free(struct vector_t *vec);
 
 void vector_free_data(struct vector_t *vec);
 
-bool vector_free_ex(vector_t *vec, void *capture, bool (*func)(void *capture, void *begin, void *end));
+void vector_free_ex(vector_t *vec, void *capture, bool (*func)(void *capture, void *begin, void *end));
 
 void *vector_get(vector_t *vec);
 
@@ -130,7 +130,7 @@ void *vector_bsearch(vector_t *vec, const void *needle, comp_t sort_comp, comp_t
 // C O N V E N I E N C E  F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool vector_free__str(vector_t *vec);
+void vector_free__str(vector_t *vec);
 
 bool free_strings(void *capture, void *begin, void *end);
 

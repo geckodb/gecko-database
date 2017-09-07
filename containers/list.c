@@ -55,40 +55,35 @@ list_t *list_create(size_t element_size)
     return list;
 }
 
-bool list_free(list_t *list)
+void list_free(list_t *list)
 {
-    bool result = list_clear(list);
-    if (result) {
-        free (list);
-    }
-    return result;
+    list_clear(list);
+    free (list);
 }
 
 bool list_is_empty(const list_t *list)
 {
-    bool non_null = require_non_null(list);
-    return (non_null && (list->num_elements == 0));
+    REQUIRE_NONNULL(list)
+    return (list->num_elements == 0);
 }
 
-bool list_clear(list_t *list)
+void list_clear(list_t *list)
 {
-    bool non_null = require_non_null(list);
-    if (non_null) {
-        header_t *it = list->root, *next = NULL;
-        while (it) {
-            next = it->next;
-            free(it);
-            it = next;
-        }
+    REQUIRE_NONNULL(list)
+    header_t *it = list->root, *next = NULL;
+    while (it) {
+        next = it->next;
+        free(it);
+        it = next;
     }
-    return non_null;
 }
 
 bool list_push(list_t *list, const void *data)
 {
+    REQUIRE_NONNULL(list)
+    REQUIRE_NONNULL(data)
     header_t *node = NULL;
-    if (require_non_null(list) && require_non_null(data) &&
-        ((node = require_malloc(sizeof(header_t) + list->element_size)))) {
+    if ((node = require_malloc(sizeof(header_t) + list->element_size))) {
         node->prev = node->next = NULL;
         memcpy(node + 1, data, list->element_size);
         if (list_is_empty(list)) {
@@ -106,45 +101,46 @@ bool list_push(list_t *list, const void *data)
 
 const void *list_begin(const list_t *list)
 {
-    return (require_non_null(list) && (!list_is_empty(list))) ? _get_data_ptr(list->root) : NULL;
+    REQUIRE_NONNULL(list)
+    return ((!list_is_empty(list))) ? _get_data_ptr(list->root) : NULL;
 }
 
 const void *list_next(const void *data)
 {
+    REQUIRE_NONNULL(data)
     const header_t *node;
-    return (require_non_null(data) && (node = _get_node_ptr(data)) && (node->next) && (node->list->tail != node)) ?
+    return ((node = _get_node_ptr(data)) && (node->next) && (node->list->tail != node)) ?
             _get_data_ptr(node->next) : NULL;
 }
 
-bool list_remove(const void *data)
+void list_remove(const void *data)
 {
-    if (require_non_null(data)) {
-        header_t *node = _get_node_ptr(data);
-        list_t *list = node->list;
-        if (node->prev) {
-            node->prev->next = node->next;
-            if (node == list->tail)
-                list->tail = node->prev;
-        } else {
-            if (node->next) {
-                node->next->prev = NULL;
-                list->root = node->next;
-            } else
-                list->root = list->tail = NULL;
-        }
-        list->num_elements--;
-        free (node);
+    REQUIRE_NONNULL(data)
+    header_t *node = _get_node_ptr(data);
+    list_t *list = node->list;
+    if (node->prev) {
+        node->prev->next = node->next;
+        if (node == list->tail)
+            list->tail = node->prev;
+    } else {
+        if (node->next) {
+            node->next->prev = NULL;
+            list->root = node->next;
+        } else
+            list->root = list->tail = NULL;
+    }
+    list->num_elements--;
+    free (node);
 
-        assert ((list->root == NULL) || list->root->prev == NULL);
-        assert ((list->tail == NULL) || list->tail->next == NULL);
-        assert ((list->num_elements != 0) || ((list->tail == list->root) && (list->root == NULL)));
-        return true;
-    } else return false;
+    assert ((list->root == NULL) || list->root->prev == NULL);
+    assert ((list->tail == NULL) || list->tail->next == NULL);
+    assert ((list->num_elements != 0) || ((list->tail == list->root) && (list->root == NULL)));
 }
 
 size_t list_num_elements(const list_t *list)
 {
-    return (require_non_null(list) ? list->num_elements : 0);
+    REQUIRE_NONNULL(list)
+    return list->num_elements;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

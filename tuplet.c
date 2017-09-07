@@ -5,8 +5,8 @@
 tuplet_t *gs_tuplet_open(struct frag_t *frag, tuplet_id_t tuplet_id)
 {
     if (frag->ntuplets > 0) {
-        require_non_null(frag);
-        require_non_null(frag->_open);
+        REQUIRE_NONNULL(frag);
+        REQUIRE_NONNULL(frag->_open);
         tuplet_t *result = frag->_open(frag, tuplet_id);
         panic_if((result == NULL), UNEXPECTED, "frag_t::open return NULL");
         return result;
@@ -15,15 +15,15 @@ tuplet_t *gs_tuplet_open(struct frag_t *frag, tuplet_id_t tuplet_id)
 
 bool gs_tuplet_next(tuplet_t *tuplet)
 {
-    require_non_null(tuplet);
-    require_non_null(tuplet->_next);
+    REQUIRE_NONNULL(tuplet);
+    REQUIRE_NONNULL(tuplet->_next);
     return tuplet->_next(tuplet);
 }
 
 tuplet_t *gs_tuplet_rewind(tuplet_t *tuplet)
 {
-    require_non_null(tuplet);
-    require_non_null(tuplet->_close);
+    REQUIRE_NONNULL(tuplet);
+    REQUIRE_NONNULL(tuplet->_close);
     frag_t *frag = tuplet->fragment;
     tuplet->_close(tuplet);
     return gs_tuplet_open(frag, 0);
@@ -31,29 +31,29 @@ tuplet_t *gs_tuplet_rewind(tuplet_t *tuplet)
 
 void gs_tuplet_set_null(tuplet_t *tuplet)
 {
-    require_non_null(tuplet);
-    require_non_null(tuplet->_set_null);
+    REQUIRE_NONNULL(tuplet);
+    REQUIRE_NONNULL(tuplet->_set_null);
     tuplet->_set_null(tuplet);
 }
 
 bool gs_tuplet_is_null(tuplet_t *tuplet)
 {
-    require_non_null(tuplet);
-    require_non_null(tuplet->_is_null);
+    REQUIRE_NONNULL(tuplet);
+    REQUIRE_NONNULL(tuplet->_is_null);
     return (tuplet->_is_null(tuplet));
 }
 
 void gs_tuplet_close(tuplet_t *tuplet)
 {
-    require_non_null(tuplet);
-    require_non_null(tuplet->_close);
+    REQUIRE_NONNULL(tuplet);
+    REQUIRE_NONNULL(tuplet->_close);
     tuplet->_close(tuplet);
 }
 
 size_t gs_tuplet_size(tuplet_t *tuplet)
 {
-    require_non_null(tuplet);
-    require_non_null(tuplet->fragment);
+    REQUIRE_NONNULL(tuplet);
+    REQUIRE_NONNULL(tuplet->fragment);
     return tuplet->fragment->tuplet_size;
 }
 

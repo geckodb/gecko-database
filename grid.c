@@ -58,17 +58,17 @@ void gs_grid_free(grid_t * grid)
 
 const char *gs_grid_table_name(const grid_table_t *table)
 {
-    require_non_null(table);
+    REQUIRE_NONNULL(table);
     return (table->schema->frag_name);
 }
 
 grid_id_t gs_grid_table_add_grid(grid_table_t *table, const attr_id_t *attr_ids_covered, size_t nattr_ids_covered,
                                  const tuple_id_interval_t *tuple_ids_covered, size_t ntuple_ids_covered, enum frag_impl_type_t type)
 {
-    require_non_null(table);
-    require_non_null(table->schema);
-    require_non_null(attr_ids_covered);
-    require_non_null(tuple_ids_covered);
+    REQUIRE_NONNULL(table);
+    REQUIRE_NONNULL(table->schema);
+    REQUIRE_NONNULL(attr_ids_covered);
+    REQUIRE_NONNULL(tuple_ids_covered);
 
     grid_t *grid = create_grid(table, attr_ids_covered, nattr_ids_covered, tuple_ids_covered, ntuple_ids_covered, type);
     indexes_insert(table, grid, attr_ids_covered, nattr_ids_covered, tuple_ids_covered, ntuple_ids_covered);
@@ -79,7 +79,7 @@ grid_id_t gs_grid_table_add_grid(grid_table_t *table, const attr_id_t *attr_ids_
 
 const freelist_t *gs_grid_table_freelist(const struct grid_table_t *table)
 {
-    require_non_null(table);
+    REQUIRE_NONNULL(table);
     return &(table->tuple_id_freelist);
 }
 
@@ -121,7 +121,7 @@ grid_set_cursor_t *gs_grid_table_grid_find(const grid_table_t *table, const attr
 // This function returns NULL, if the table attribute is not covered by this grid
 const attr_id_t *gs_grid_table_attr_id_to_frag_attr_id(const grid_t *grid, attr_id_t table_attr_id)
 {
-    require_non_null(grid);
+    REQUIRE_NONNULL(grid);
     const attr_id_t *frag_attr_id = dict_get(grid->schema_map_indicies, &table_attr_id);
     return frag_attr_id;
 }
@@ -152,9 +152,9 @@ bool gs_grid_table_is_valide(grid_table_t *table)
 
 void gs_grid_table_insert(resultset_t *resultset, grid_table_t *table, size_t ntuplets)
 {
-    require_non_null(table);
-    require_non_null(resultset);
-    require((ntuplets > 0), BADINT);
+    REQUIRE_NONNULL(table);
+    REQUIRE_NONNULL(resultset);
+    REQUIRE((ntuplets > 0), BADINT);
     tuple_id_t *tuple_ids = require_good_malloc(ntuplets * sizeof(tuple_id_t));
     gs_freelist_bind(tuple_ids, &table->tuple_id_freelist, ntuplets);
     gs_resultset_create(resultset, table, tuple_ids, ntuplets);

@@ -31,8 +31,8 @@ schema_t *gs_schema_create(const char *table_name)
 
 schema_t *gs_schema_subset(schema_t *super, const attr_id_t *indicies, size_t nindicies)
 {
-    require_non_null(super);
-    require_non_null(indicies);
+    REQUIRE_NONNULL(super);
+    REQUIRE_NONNULL(indicies);
 
     panic_if(nindicies > super->attr->num_elements, BADINTERNAL,
              "selected indices of super schema illegal.");

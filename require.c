@@ -29,13 +29,6 @@ static int _comp_size_t(const void *lhs, const void *rhs);
 // I N T E R F A C E  I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool require_non_null(const void *ptr)
-{
-    bool is_non_null = (ptr != NULL);
-    error_if(!is_non_null, err_null_ptr);
-    return is_non_null;
-}
-
 bool require_non_zero(int64_t value)
 {
     bool is_non_zero = (value > 0);
@@ -70,18 +63,19 @@ bool _check_expected_true(bool expr)
 bool require_constraint(const void *lhs, relation_constraint constraint, const void *rhs,
                         int (*comp)(const void *, const void *))
 {
-    if (require_non_null(lhs) && require_non_null(rhs) && require_non_null(comp)) {
-        int result = comp(lhs, rhs);
-        switch (constraint) {
-            case constraint_less:          return _check_expected_true(result < 0);
-            case constraint_less_equal:    return _check_expected_true(result <= 0);
-            case constraint_equal:         return _check_expected_true(result == 0);
-            case constraint_greater_equal: return _check_expected_true(result >= 0);
-            case constraint_greater:       return _check_expected_true(result > 0);
-            default: {
-                error(err_internal);
-                return false;
-            }
+    REQUIRE_NONNULL(lhs)
+    REQUIRE_NONNULL(rhs)
+    REQUIRE_NONNULL(comp)
+    int result = comp(lhs, rhs);
+    switch (constraint) {
+        case constraint_less:          return _check_expected_true(result < 0);
+        case constraint_less_equal:    return _check_expected_true(result <= 0);
+        case constraint_equal:         return _check_expected_true(result == 0);
+        case constraint_greater_equal: return _check_expected_true(result >= 0);
+        case constraint_greater:       return _check_expected_true(result > 0);
+        default: {
+            error(err_internal);
+            return false;
         }
     }
     return false;

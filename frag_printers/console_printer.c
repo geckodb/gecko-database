@@ -4,7 +4,7 @@
 #include <attr.h>
 
 #define REQUIRE_INSTANCEOF_THIS(x)                                                                                     \
-    require((x->tag == FPTT_CONSOLE_PRINTER), BADTAG);
+    REQUIRE((x->tag == FPTT_CONSOLE_PRINTER), BADTAG);
 
 static inline void console_printer_print(struct frag_printer_t *self, FILE *file, frag_t *frag, size_t row_offset, size_t limit);
 static inline void console_printer_free(struct frag_printer_t *self);

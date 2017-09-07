@@ -30,9 +30,9 @@ bool gs_hindex_contains(const struct hindex_t *index, tuple_id_t tid)
 grid_set_cursor_t *gs_hindex_query(const struct hindex_t *index, const tuple_id_t *tid_begin,
                                    const tuple_id_t *tid_end)
 {
-    require_non_null(tid_begin);
-    require_non_null(tid_end);
-    require(tid_begin < tid_end, "Corrupted range");
+    REQUIRE_NONNULL(tid_begin);
+    REQUIRE_NONNULL(tid_end);
+    REQUIRE(tid_begin < tid_end, "Corrupted range");
     size_t approx_result_capacity = ((tid_end - tid_begin) * gs_schema_num_attributes(index->table_schema));
     grid_set_cursor_t *result = grid_set_cursor_create(approx_result_capacity);
     index->_query(result, index, tid_begin, tid_end);

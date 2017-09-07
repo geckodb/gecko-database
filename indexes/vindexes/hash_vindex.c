@@ -23,10 +23,10 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #define require_besearch_hindex_tag(index)                                                                             \
-    require((index->tag == GI_VINDEX_HASH), BADTAG);
+    REQUIRE((index->tag == GI_VINDEX_HASH), BADTAG);
 
-#define require_instanceof_this(index)                                                                                 \
-    { require_nonnull(index); require_nonnull(index->extra); require_besearch_hindex_tag(index); }
+#define REQUIRE_INSTANCEOF_THIS(index)                                                                                 \
+    { REQUIRE_NONNULL(index); REQUIRE_NONNULL(index->extra); require_besearch_hindex_tag(index); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 // H E L P E R   P R O T O T Y P E S
@@ -71,7 +71,7 @@ vindex_t *hash_vindex_create(size_t key_size, size_t num_init_slots)
             &(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen}, key_size, sizeof(vector_t),
             num_init_slots, num_init_slots, 1.7f, 0.75f, attr_key_equals, cleanup_vectors, false
     );
-    require_non_null(result->extra);
+    REQUIRE_NONNULL(result->extra);
     return result;
 }
 
@@ -81,7 +81,7 @@ vindex_t *hash_vindex_create(size_t key_size, size_t num_init_slots)
 
 static inline void this_add(struct vindex_t *self, const attr_id_t *key, const struct grid_t *grid)
 {
-    require_instanceof_this(self);
+    REQUIRE_INSTANCEOF_THIS(self);
     dict_t *dict = ((dict_t *)self->extra);
     if (!dict_contains_key(dict, key)) {
         vector_t *vec = vector_create(sizeof(struct grid_t *), 10);
@@ -92,27 +92,27 @@ static inline void this_add(struct vindex_t *self, const attr_id_t *key, const s
         free (vec);
     }
     vector_t *vec = (vector_t *) dict_get(dict, key);
-    require_non_null(vec);
+    REQUIRE_NONNULL(vec);
     vector_add(vec, 1, &grid);
 }
 
 static inline void this_remove(struct vindex_t *self, const attr_id_t *key)
 {
-    require_instanceof_this(self);
+    REQUIRE_INSTANCEOF_THIS(self);
     panic(NOTIMPLEMENTED, to_string(this_remove)) // requires proper implementation of remove in hash table
 }
 
 static inline bool this_contains(const struct vindex_t *self, const attr_id_t *key)
 {
-    require_instanceof_this(self);
+    REQUIRE_INSTANCEOF_THIS(self);
     dict_t *dict = ((dict_t *)self->extra);
-    require_non_null(dict);
+    REQUIRE_NONNULL(dict);
     return dict_contains_key(dict, key);
 }
 
 void this_free(struct vindex_t *self)
 {
-    require_instanceof_this(self);
+    REQUIRE_INSTANCEOF_THIS(self);
     dict_free((dict_t *) self->extra);
 }
 
@@ -120,7 +120,7 @@ void this_free(struct vindex_t *self)
 static inline void this_query(grid_set_cursor_t *result, const struct vindex_t *self, const attr_id_t *key_begin,
                               const attr_id_t *key_end)
 {
-    require_non_null(result->extra);
+    REQUIRE_NONNULL(result->extra);
     for (const attr_id_t *key = key_begin; key != key_end; key++) {
         if (this_contains(self, key)) {
             dict_t *dict = ((dict_t *)self->extra);

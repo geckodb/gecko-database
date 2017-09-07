@@ -10,7 +10,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #define REQUIRE_VALID_TUPLET_FORMAT(format)                                                                            \
-    require((format == TF_NSM || format == TF_DSM), "unknown tuplet serialization format")
+    REQUIRE((format == TF_NSM || format == TF_DSM), "unknown tuplet serialization format")
 
 // ---------------------------------------------------------------------------------------------------------------------
 // H E L P E R   P R O T O T Y P E S
@@ -97,7 +97,7 @@ static inline void tuplet_rebase(tuplet_t *tuplet, frag_t *frag, tuplet_id_t tup
 {
     assert (tuplet);
     REQUIRE_VALID_TUPLET_FORMAT(frag->format);
-    require((tuplet_id < frag->ntuplets), "Tuplet id out of bounds");
+    REQUIRE((tuplet_id < frag->ntuplets), "Tuplet id out of bounds");
 
     tuplet->tuplet_id = tuplet_id;
     tuplet->fragment = frag;

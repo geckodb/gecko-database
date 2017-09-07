@@ -48,6 +48,6 @@ struct grid_t *grid_set_cursor_next(grid_set_cursor_t *result_set)
 
 size_t grid_set_cursor_numelem(const grid_set_cursor_t *result_set)
 {
-    require_non_null(result_set);
+    REQUIRE_NONNULL(result_set);
     return ((vector_t * ) result_set->extra)->num_elements;
 }

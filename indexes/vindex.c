@@ -23,9 +23,9 @@ bool gs_vindex_contains(const vindex_t *index, const attr_id_t *key)
 grid_set_cursor_t *gs_vindex_query(const struct vindex_t *index, const attr_id_t *key_range_begin,
                                    const attr_id_t *key_range_end)
 {
-    require_non_null(key_range_begin);
-    require_non_null(key_range_end);
-    require(key_range_begin < key_range_end, "Corrupted range");
+    REQUIRE_NONNULL(key_range_begin);
+    REQUIRE_NONNULL(key_range_end);
+    REQUIRE(key_range_begin < key_range_end, "Corrupted range");
     size_t result_capacity = (key_range_end - key_range_begin);
     grid_set_cursor_t *result = grid_set_cursor_create(result_capacity);
     index->_query(result, index, key_range_begin, key_range_end);

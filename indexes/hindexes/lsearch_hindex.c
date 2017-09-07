@@ -31,10 +31,10 @@ typedef struct entry_t {
 // ---------------------------------------------------------------------------------------------------------------------
 
 #define require_besearch_hindex_tag(index)                                                                             \
-    require((index->tag == HT_LINEAR_SEARCH), BADTAG);
+    REQUIRE((index->tag == HT_LINEAR_SEARCH), BADTAG);
 
-#define require_instanceof_this(index)                                                                                 \
-    { require_nonnull(index); require_nonnull(index->extra); require_besearch_hindex_tag(index); }
+#define REQUIRE_INSTANCEOF_THIS(index)                                                                                 \
+    { REQUIRE_NONNULL(index); REQUIRE_NONNULL(index->extra); require_besearch_hindex_tag(index); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 // H E L P E R   P R O T O T Y P E S
@@ -57,7 +57,7 @@ static inline void find_all_by_point(vector_t *result, vector_t *haystack, const
 
 hindex_t *lesearch_hindex_create(size_t approx_num_horizontal_partitions, const schema_t *table_schema)
 {
-    require_non_null(table_schema);
+    REQUIRE_NONNULL(table_schema);
 
     hindex_t *result = require_good_malloc(sizeof(hindex_t));
     *result = (hindex_t) {
@@ -107,9 +107,9 @@ static inline void find_all_by_point(vector_t *result, vector_t *haystack, const
 
 static inline void this_add(struct hindex_t *self, const tuple_id_interval_t *key, const struct grid_t *grid)
 {
-    require_instanceof_this(self);
-    require_non_null(key);
-    require_non_null(grid);
+    REQUIRE_INSTANCEOF_THIS(self);
+    REQUIRE_NONNULL(key);
+    REQUIRE_NONNULL(grid);
 
     vector_t *vec = self->extra;
     entry_t *result = find_interval(vec, key);
@@ -128,11 +128,11 @@ static inline void this_add(struct hindex_t *self, const tuple_id_interval_t *ke
 static inline void this_query(grid_set_cursor_t *result, const struct hindex_t *self, const tuple_id_t *tid_begin,
                               const tuple_id_t *tid_end)
 {
-    require_instanceof_this(self);
-    require_non_null(result);
-    require_non_null(tid_begin);
-    require_non_null(tid_end);
-    require(tid_begin < tid_end, "Corrupted range");
+    REQUIRE_INSTANCEOF_THIS(self);
+    REQUIRE_NONNULL(result);
+    REQUIRE_NONNULL(tid_begin);
+    REQUIRE_NONNULL(tid_end);
+    REQUIRE(tid_begin < tid_end, "Corrupted range");
     for (const tuple_id_t *needle = tid_begin; needle != tid_end; needle++) {
         find_all_by_point((vector_t *) result->extra, (vector_t *) self->extra, *needle);
     }
@@ -150,7 +150,7 @@ static inline void this_remove_intersec(struct hindex_t *self, tuple_id_t tid)
 
 static inline bool this_contains(const struct hindex_t *self, tuple_id_t tid)
 {
-    require_instanceof_this(self);
+    REQUIRE_INSTANCEOF_THIS(self);
     // TODO:...
     panic(NOTIMPLEMENTED, to_string(this_contains))
     return false;
@@ -166,7 +166,7 @@ static inline bool free_entires(void *capture, void *begin, void *end)
 
 static inline void this_free(struct hindex_t *self)
 {
-    require_instanceof_this(self);
+    REQUIRE_INSTANCEOF_THIS(self);
     vector_foreach(self->extra, NULL, free_entires);
     vector_free(self->extra);
 }

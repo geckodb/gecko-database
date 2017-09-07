@@ -3,7 +3,7 @@
 
 void gs_response_create(response_t *response)
 {
-    require_non_null(response);
+    REQUIRE_NONNULL(response);
     response->code = HTTP_STATUS_CODE_500_INTERNAL_ERR;
     response->body = NULL;
     response->fields = hash_table_create_ex(&(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen},
@@ -14,7 +14,7 @@ void gs_response_create(response_t *response)
 
 char *gs_response_pack(response_t *response)
 {
-    require_non_null(response);
+    REQUIRE_NONNULL(response);
     const char *pack = "HTTP/1.1 %s\r\n%s\r\n\r\n%s";
     const char *code = gs_response_code_str(response->code);
     const char *mime = gs_response_format_fields(response->fields);
@@ -26,8 +26,8 @@ char *gs_response_pack(response_t *response)
 
 void gs_response_field_set(response_t *response, const char *field, const char *value)
 {
-    require_non_null(response);
-    require_non_null(response->fields);
+    REQUIRE_NONNULL(response);
+    REQUIRE_NONNULL(response->fields);
     const char *imp_key = strdup(field);
     const char *imp_val = strdup(value);
     dict_put(response->fields, &imp_key, &imp_val);
@@ -35,17 +35,17 @@ void gs_response_field_set(response_t *response, const char *field, const char *
 
 const char *gs_response_field_get(response_t *response, const char *field)
 {
-    require_non_null(response);
-    require_non_null(field);
-    require_non_null(response->fields);
+    REQUIRE_NONNULL(response);
+    REQUIRE_NONNULL(field);
+    REQUIRE_NONNULL(response->fields);
     const void *result = dict_get(response->fields, field);
     return (result != NULL ? *(char **) result : "");
 }
 
 void gs_response_body_set(response_t *response, const char *body)
 {
-    require_non_null(response);
-    require_non_null(body);
+    REQUIRE_NONNULL(response);
+    REQUIRE_NONNULL(body);
     if (response->body != NULL) {
         free (response->body);
     } else {
@@ -56,9 +56,9 @@ void gs_response_body_set(response_t *response, const char *body)
 
 void gs_response_content_type_set(response_t *response, const char *content_type)
 {
-    require_non_null(response);
-    require_non_null(response->fields);
-    require_non_null(content_type);
+    REQUIRE_NONNULL(response);
+    REQUIRE_NONNULL(response->fields);
+    REQUIRE_NONNULL(content_type);
     gs_response_field_set(response, MIME_CONTENT_TYPE, content_type);
 }
 
@@ -69,14 +69,14 @@ const char *gs_response_content_type_get(response_t *response)
 
 const char *gs_response_body_get(response_t *response)
 {
-    require_non_null(response);
+    REQUIRE_NONNULL(response);
     return (response->body != NULL ? response->body : "");
 }
 
 void gs_response_free(response_t *response)
 {
-    require_non_null(response);
-    require_non_null(response->fields);
+    REQUIRE_NONNULL(response);
+    REQUIRE_NONNULL(response->fields);
     if (response->body != NULL) {
         free (response->body);
     }
@@ -85,13 +85,13 @@ void gs_response_free(response_t *response)
 
 void gs_response_end(response_t *response, http_status_code_t code)
 {
-    require_non_null(response);
+    REQUIRE_NONNULL(response);
     response->code = code;
 }
 
 const struct vector_t *gs_response_fields(response_t *response)
 {
-    require_non_null(response);
+    REQUIRE_NONNULL(response);
     return dict_keyset(response->fields);
 }
 
@@ -106,7 +106,7 @@ const char *gs_response_code_str(http_status_code_t code)
 
 const char *gs_response_format_fields(const dict_t *fields)
 {
-    require_non_null(fields);
+    REQUIRE_NONNULL(fields);
 
     const struct vector_t *keys = dict_keyset(fields);
     size_t length_fields = 0;

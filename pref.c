@@ -23,8 +23,8 @@ pref_load(
         dict_t *dict,
         char * (*resolve_variables)(dict_t *dict, const char *string))
 {
-    require_non_null(pref);
-    require_non_null(file);
+    REQUIRE_NONNULL(pref)
+    REQUIRE_NONNULL(file)
 
    // panic_if((access(file, F_OK ) == -1), NOSUCHFILE, file); // TODO: Hack
 
@@ -126,9 +126,9 @@ const char *pref_get_str(
     const char *key,
     const char *default_val)
 {
-    require_non_null(pref);
-    require_non_null(pref->dict);
-    require_non_null(key);
+    REQUIRE_NONNULL(pref);
+    REQUIRE_NONNULL(pref->dict);
+    REQUIRE_NONNULL(key);
 
     const char **value = (const char **) dict_get(pref->dict, &key);
     return (value != NULL ? (*value) : default_val);

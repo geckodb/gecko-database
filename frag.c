@@ -71,7 +71,7 @@ size_t find_type_match(enum frag_impl_type_t type)
 
 frag_t *gs_fragment_alloc(schema_t *schema, size_t tuplet_capacity, enum frag_impl_type_t type)
 {
-    require((tuplet_capacity > 0), "capacity of tuplets must be non zero");
+    REQUIRE((tuplet_capacity > 0), "capacity of tuplets must be non zero");
 
     frag_t *result = frag_type_pool[find_type_match(type)]._create(schema, tuplet_capacity);
 

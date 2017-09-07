@@ -36,17 +36,17 @@ typedef enum {
 // M A C R O S
 // ---------------------------------------------------------------------------------------------------------------------
 
-#define require_nonnull(x)                                                                                             \
+#define REQUIRE_NONNULL(x)                                                                                             \
     panic_if((x == NULL), BADARG, "parameter '" to_string(x) "' is null");
 
-#define require_impl(fun)                                                                                              \
+#define REQUIRE_IMPL(fun)                                                                                              \
     panic_if((fun == NULL), BADCALL, "illegal call to pure virtual function '" to_string(fun) "'");
 
-#define require(expr, msg)                                                                                             \
+#define REQUIRE(expr, msg)                                                                                             \
     panic_if((!(expr)), BADEXPR, msg);
 
 #define require_not_zero(value)                                                                                        \
-    require(value > 0, to_string(value) " is not allowed to be zero")
+    REQUIRE(value > 0, to_string(value) " is not allowed to be zero")
 
 #define require_good_malloc(size)                                                                                      \
     ({                                                                                                                 \
@@ -58,8 +58,6 @@ typedef enum {
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
-
-bool require_non_null(const void *ptr);
 
 bool require_non_zero(int64_t value);
 

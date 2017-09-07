@@ -40,9 +40,11 @@ static void _future_free(future_t future);
 
 future_t future_create(const void *capture, promise_t func, future_eval_policy policy)
 {
+    REQUIRE_NONNULL(capture)
+    REQUIRE_NONNULL(func);
     future_t future = NULL;
-    if (require_non_null(capture) && require_non_null(func) &&
-        (future = require_malloc(sizeof(struct _future_t)))) {
+
+    if ((future = require_malloc(sizeof(struct _future_t)))) {
             future->call_result = NULL;
             future->capture = capture;
             future->func = func;
@@ -56,38 +58,38 @@ future_t future_create(const void *capture, promise_t func, future_eval_policy p
 
 void future_wait_for(future_t future)
 {
-    if (require_non_null(future)) {
-        if (future->eval_policy == future_lazy) {
-            _start_thread(future);
-        }
-        while (!future->promise_settled);
+    REQUIRE_NONNULL(future)
+    if (future->eval_policy == future_lazy) {
+        _start_thread(future);
     }
+    while (!future->promise_settled);
 }
 
 const void *future_resolve(promise_result *return_type, future_t future)
 {
     void *result = NULL;
+    REQUIRE_NONNULL(future)
+    REQUIRE_NONNULL(future->thread_args)
 
-    if (require_non_null(future) && (require_non_null(future->thread_args))) {
-        if (!atomic_load(&future->promise_settled))
-            future_wait_for(future);
+    if (!atomic_load(&future->promise_settled))
+        future_wait_for(future);
 
-        if (return_type != NULL) {
-            switch (future->promise_state) {
-                case promise_fulfilled:
-                    *return_type = resolved;
-                    break;
-                case promise_rejected:
-                    *return_type = rejected;
-                    break;
-                default:
-                    error(err_internal);
-                    return NULL;
-            }
+    if (return_type != NULL) {
+        switch (future->promise_state) {
+            case promise_fulfilled:
+                *return_type = resolved;
+                break;
+            case promise_rejected:
+                *return_type = rejected;
+                break;
+            default:
+                error(err_internal);
+                return NULL;
         }
-        result = future->call_result;
-        _future_free(future);
     }
+    result = future->call_result;
+    _future_free(future);
+
     return result;
 }
 
@@ -97,26 +99,27 @@ const void *future_resolve(promise_result *return_type, future_t future)
 
 bool _eval(future_t future, future_eval_policy policy)
 {
+    REQUIRE_NONNULL(future)
+    REQUIRE_NONNULL(future->func)
+
     promise_result return_value = rejected;
     void *call_result = NULL;
 
-    if (require_non_null(future) && require_non_null(future->func)) {
-        future->eval_policy = policy;
+    future->eval_policy = policy;
 
-        switch (policy) {
-            case future_eager:
-                _eager_exec(call_result, future, return_value);
-                return true;
-            case future_lazy:
-                _lazy_exec(call_result, future, return_value);
-                return true;
-            case future_sync:
-                return _sync_exec(call_result, future, return_value);
-            default:
-                error(err_internal);
-                return false;
-        }
-    } else return false;
+    switch (policy) {
+        case future_eager:
+            _eager_exec(call_result, future, return_value);
+            return true;
+        case future_lazy:
+            _lazy_exec(call_result, future, return_value);
+            return true;
+        case future_sync:
+            return _sync_exec(call_result, future, return_value);
+        default:
+            error(err_internal);
+            return false;
+    }
 }
 
 bool _sync_exec(void *call_result, future_t future, promise_result return_value)
@@ -158,9 +161,9 @@ bool _lazy_exec(void *call_result, future_t future, promise_result return_value)
 {
     thrd_t *thread;
     _this_exec_args* args;
+    REQUIRE_NONNULL(future)
 
-    if (require_non_null(future) &&
-       (args = require_malloc(sizeof(_this_exec_args))) && (thread = require_malloc(sizeof(thrd_t)))) {
+    if ((args = require_malloc(sizeof(_this_exec_args))) && (thread = require_malloc(sizeof(thrd_t)))) {
         args->call_result = call_result;
         args->future = future;
         args->return_value = return_value;
@@ -187,11 +190,10 @@ void _start_thread(future_t future)
 
 void _future_free(future_t future)
 {
-    if (require_non_null(future)) {
-        if (future->call_result != NULL)
-            free(future->call_result);
-        if (future->thread_args)
-            free (future->thread_args);
-        free (future);
-    }
+    REQUIRE_NONNULL(future)
+    if (future->call_result != NULL)
+        free(future->call_result);
+    if (future->thread_args)
+        free (future->thread_args);
+    free (future);
 }

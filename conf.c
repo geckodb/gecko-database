@@ -227,7 +227,7 @@ conf_get_size_t(
 
 void gs_db_config_load(db_config_t *config)
 {
-    require_non_null(config);
+    REQUIRE_NONNULL(config);
     config->inet.port = CONF_INET_PORT;
     config->log.debug = config->log.warn = config->log.error = true;
 }

@@ -735,7 +735,7 @@ void
 buf_release(
     cursor_t *     cur)
 {
-    require_non_null(cur);
+    REQUIRE_NONNULL(cur);
     assert ((cur->state != block_state_opened) || (cur->zone != NULL));
     free (cur);
 }
@@ -744,8 +744,8 @@ void
 buf_open(
     cursor_t *     cur)
 {
-    require_non_null(cur);
-    require_non_null(cur->manager);
+    REQUIRE_NONNULL(cur);
+    REQUIRE_NONNULL(cur->manager);
     panic_if((cur->state == block_state_opened), BADSTATE, "block was already opened.")
     cur->state = block_state_opened;
 }
@@ -753,8 +753,8 @@ buf_open(
 bool buf_next(
     cursor_t *     cur)
 {
-    require_non_null(cur);
-    require_non_null(cur->manager);
+    REQUIRE_NONNULL(cur);
+    REQUIRE_NONNULL(cur->manager);
 
     if (cur->state == block_state_opened) {
         page_t *page   = anticache_page_by_id(cur->manager, cur->page_id);
@@ -772,7 +772,7 @@ void
 buf_close(
     cursor_t *     cur)
 {
-    require_non_null(cur);
+    REQUIRE_NONNULL(cur);
     cur->state = block_state_closed;
 }
 
@@ -782,8 +782,8 @@ buf_read(
     void *         capture,
     void           (*consumer)(void *capture, const void *data))
 {
-    require_non_null(cur);
-    require_non_null(consumer);
+    REQUIRE_NONNULL(cur);
+    REQUIRE_NONNULL(consumer);
     panic_if((cur->zone == NULL), BADSTATE, "read operation on illegal zone");
     consumer (capture, zone_get_data(cur->zone));
 }
@@ -795,8 +795,8 @@ buf_memcpy(
     const void *  src,
     size_t size)
 {
-    require_non_null(dst);
-    require_non_null(src);
+    REQUIRE_NONNULL(dst);
+    REQUIRE_NONNULL(src);
     panic_if((dst->state != block_state_opened), BADSTATE, "block must be opened before call to memcpy");
     panic_if((dst->zone == NULL), BADINTERNAL, "block is opened but pointer to zone is null");
     assert (hotstore_has_unsafe(dst->manager, dst->page_id));
@@ -838,7 +838,7 @@ static inline void
 anticache_init(
     anti_buf_t *   buf)
 {
-    require_non_null(buf);
+    REQUIRE_NONNULL(buf);
     hotstore_init(buf);
     anticache_freelist_init(buf);
     coldstore_init(buf);
@@ -850,7 +850,7 @@ anticache_page_by_id(
     anti_buf_t *      buf,
     page_id_t         id)
 {
-    require_non_null(buf);
+    REQUIRE_NONNULL(buf);
     WARN_IF((id >= buf->page_anticache.next_page_id), "Requested page tuplet_id '%d' might not from this pool", id);
 
     page_t *result = NULL;
@@ -869,7 +869,7 @@ anticache_freelist_init(
 {
     buf->page_anticache.free_page_ids_stack = vector_create_ex(sizeof(page_id_t),
              ANTICACHE_PAGEID_FREELIST_INITCAP, auto_resize, ANTICACHE_PAGEID_FREELIST_GROW_FACTOR);
-    require((buf->page_anticache.free_page_ids_stack), BADFREELISTINIT);
+    REQUIRE((buf->page_anticache.free_page_ids_stack), BADFREELISTINIT);
 }
 
 static inline void
@@ -893,7 +893,7 @@ anticache_create_page_safe(
     anti_buf_t *    buf,
     size_t          min_payload_size)
 {
-    require_non_null(buf);
+    REQUIRE_NONNULL(buf);
     page_t *        result             = NULL;
     size_t          matching_page_size = buf->config.ram_page_size_default;
     mem_space       mspace             = MEM_SPACE_VM;
@@ -929,7 +929,7 @@ static inline size_t
 anticache_new_page_id(
     anti_buf_t *buf)
 {
-    require_non_null(buf);
+    REQUIRE_NONNULL(buf);
     return buf->page_anticache.next_page_id++;
 }
 
@@ -990,7 +990,7 @@ hotstore_init(
     panic_if((buf == NULL), BADARGZERO, to_string(num_pages));
     panic_if(!dict_empty(buf->page_anticache.hot_store), BADPOOLINIT, buf);
     buf->page_anticache.hot_store_page_ids = list_create(sizeof(page_id_t));
-    require((buf->page_anticache.hot_store_page_ids), BADCOLDSTOREINIT);
+    REQUIRE((buf->page_anticache.hot_store_page_ids), BADCOLDSTOREINIT);
 }
 
 static inline void
@@ -1070,7 +1070,7 @@ coldstore_init(
 {
     buf->page_anticache.cold_store_page_ids = vector_create_ex(sizeof(page_id_t),
             ANTICACHE_COLDSTORELIST_INITCAP, auto_resize, ANTICACHE_COLDSTORELIST_GROW_FACTOR);
-    require((buf->page_anticache.cold_store_page_ids), BADCOLDSTOREINIT);
+    REQUIRE((buf->page_anticache.cold_store_page_ids), BADCOLDSTOREINIT);
 
 }
 
@@ -1434,8 +1434,8 @@ zone_first(
     page_t *       page,
     lane_id_t      id)
 {
-    require_non_null(buf);
-    require_non_null(page);
+    REQUIRE_NONNULL(buf);
+    REQUIRE_NONNULL(page);
 
     lane_t *      lane = lane_by_id(page, id);
     return (ptr_is_null(&lane->first) ? NULL : ptr_cast_zone(buf, &lane->first));
@@ -1446,8 +1446,8 @@ zone_next(
     anti_buf_t *   buf,
     zone_t *       zone)
 {
-    require_non_null(buf);
-    require_non_null(zone);
+    REQUIRE_NONNULL(buf);
+    REQUIRE_NONNULL(zone);
     if (ptr_is_null(&zone->next)) {
         return NULL;
     } else {
@@ -1476,7 +1476,7 @@ static inline void *
 zone_get_data(
     zone_t *       zone)
 {
-    require_non_null(zone);
+    REQUIRE_NONNULL(zone);
     return (zone + 1);
 }
 
@@ -2239,18 +2239,18 @@ buf_init(
     conf_get_size_t(&buf->config.ram_page_size_default, CONF_SETTING_SWAP_BUFFER_PAGE_SIZE_DEF,  858993459);
     conf_get_size_t(&buf->config.ram_page_size_max,     CONF_SETTING_SWAP_BUFFER_PAGE_SIZE_MAX, 3221225472);
 
-    require((buf->config.ram_page_size_default > 0), "Bad default page size");
-    require((buf->config.hotstore_size_limit > 0),  "Bad hot store limit");
-    require((buf->config.free_space_reg_capacity > 0), "Bad capacity of free space register");
-    require((buf->config.lane_reg_capacity > 0), "Bad capacity of lane register");
-    require((buf->config.ram_page_size_max < buf->config.hotstore_size_limit), "miss-configured.");
-    require((buf->config.ram_page_size_default < buf->config.ram_page_size_max), "miss-configured.");
+    REQUIRE((buf->config.ram_page_size_default > 0), "Bad default page size");
+    REQUIRE((buf->config.hotstore_size_limit > 0),  "Bad hot store limit");
+    REQUIRE((buf->config.free_space_reg_capacity > 0), "Bad capacity of free space register");
+    REQUIRE((buf->config.lane_reg_capacity > 0), "Bad capacity of lane register");
+    REQUIRE((buf->config.ram_page_size_max < buf->config.hotstore_size_limit), "miss-configured.");
+    REQUIRE((buf->config.ram_page_size_default < buf->config.ram_page_size_max), "miss-configured.");
 
     panic_if((buf->config.ram_page_size_max > 0.5 * buf->config.hotstore_size_limit),
              BADPAGESIZE, (size_t) buf->config.ram_page_size_max, (size_t) buf->config.hotstore_size_limit);
 
 
-    require_non_null(buf->page_anticache.hot_store);
+    REQUIRE_NONNULL(buf->page_anticache.hot_store);
 }
 
 static inline page_t *
@@ -2329,9 +2329,9 @@ anticache_create_lane(
     block_pos      strat,
     size_t         size
 ) {
-    require_non_null(buf);
-    require_non_null(page);
-    require((size > 0), "size must be non-zero");
+    REQUIRE_NONNULL(buf);
+    REQUIRE_NONNULL(page);
+    REQUIRE((size > 0), "size must be non-zero");
     panic_if(!(hotstore_has_unsafe(buf, page->header.id)), BADHOTSTOREOBJ, page->header.id);
     lane_handle_t *lane_id = lane_create(page, strat, size);            // TODO: just return lane_id here instead of lane handle
     panic_if((lane_id == NULL), UNEXPECTED, "Lane handle is null");

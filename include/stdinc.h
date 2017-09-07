@@ -124,22 +124,22 @@ typedef MD5_CTX checksum_context_t;
 
 #define delegte_call(instance, fun)                                                                                    \
     ({                                                                                                                 \
-        require_nonnull(instance);                                                                                     \
-        require_impl(instance->fun);                                                                                   \
+        REQUIRE_NONNULL(instance);                                                                                     \
+        REQUIRE_IMPL(instance->fun);                                                                                   \
         instance->fun(instance);                                                                                       \
     })
 
 #define delegte_call_wargs(instance, fun, ...)                                                                         \
     ({                                                                                                                 \
-        require_nonnull(instance);                                                                                     \
-        require_impl(instance->fun);                                                                                   \
+        REQUIRE_NONNULL(instance);                                                                                     \
+        REQUIRE_IMPL(instance->fun);                                                                                   \
         instance->fun(instance,__VA_ARGS__);                                                                           \
     })
 
 #define delegte_call_wargs2(instance, fun, ...)                                                                        \
     ({                                                                                                                 \
-        require_nonnull(instance);                                                                                     \
-        require_impl(instance->fun);                                                                                   \
+        REQUIRE_NONNULL(instance);                                                                                     \
+        REQUIRE_IMPL(instance->fun);                                                                                   \
         instance->fun(__VA_ARGS__);                                                                                    \
     })
 
