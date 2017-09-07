@@ -49,8 +49,10 @@ tuplet_field_t *gs_tuplet_field_open(tuplet_t *tuplet)
 
 tuplet_field_t *gs_tuplet_field_seek(tuplet_t *tuplet, attr_id_t attr_id)
 {
-    assert (tuplet);
-    return tuplet->_open(tuplet, attr_id);
+    assert(tuplet);
+    tuplet_field_t *field = tuplet->_open(tuplet);
+    field->_seek(field, attr_id);
+    return field;
 }
 
 size_t gs_tuplet_field_size(tuplet_field_t *field)

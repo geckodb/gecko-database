@@ -10,6 +10,7 @@ typedef struct tuplet_field_t {
 
     /* operations */
     bool (*_next)(struct tuplet_field_t *self); /* seeks to the next attr_value_ptr inside this tuplet */
+    bool (*_seek)(struct tuplet_field_t *self, attr_id_t attr_id); /* seeks the attr_value_ptr to this attribute */
     const void *(*_read)(struct tuplet_field_t *self); /* access current attr_value_ptr 'attr_id' of this tuplet */
     void (*_update)(struct tuplet_field_t *self, const void *data); /* update data of current attr_value_ptr 'attr_id' */
     void (*_set_null)(struct tuplet_field_t *self); /* set the attr_value_ptr for 'attr_id' to NULL */

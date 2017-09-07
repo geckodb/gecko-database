@@ -150,9 +150,17 @@ grid_table_t *gs_grid_table_melt(enum frag_impl_type_t type, const grid_table_t 
         gs_tuple_open(&src_tuple, src_table, src_tuple_id++);
         for (size_t x = 0; x < nattr_ids; x++) {
             attr_id_t attr_id = attr_ids[x];
+            if(attr_id==0) {
+                printf("DEBUG");
+            }
             gs_tuple_field_seek(&src_field, &src_tuple, attr_id);
             gs_tuple_field_seek(&dst_field, &dst_tuple, attr_id);
             const void *field_data = gs_tuple_field_read(&src_field);
+            if(attr_id==0) {
+                printf("%llu\n", *(u64*)field_data);
+            } else if(attr_id == 1) {
+                printf("%d\n", *(u32*)field_data);
+            }
             gs_tuple_field_write(&dst_field, field_data);
         }
     }

@@ -25,7 +25,7 @@ static inline void frag_dipose(frag_t *self);
 static inline void tuplet_rebase(tuplet_t *tuplet, frag_t *frag, tuplet_id_t tuplet_id);
 static inline bool tuplet_next(tuplet_t *self);
 static inline tuplet_t *frag_open_internal(frag_t *self, size_t pos);
-static inline tuplet_field_t *tuplet_open(tuplet_t *self, attr_id_t attr_id);
+static inline tuplet_field_t *tuplet_open(tuplet_t *self);
 static inline void tuplet_update(tuplet_t *self, const void *data);
 static inline void tuplet_set_null(tuplet_t *self);
 static inline void tuplet_delete(tuplet_t *self);
@@ -33,14 +33,15 @@ static inline void tuplet_close(tuplet_t *self);
 static inline bool tuplet_is_null(tuplet_t *self);
 
 static inline void field_rebase(tuplet_field_t *field, tuplet_t *tuplet, attr_id_t attr_id);
-static inline size_t field_nsm_jmp_size(tuplet_field_t *field);
+static inline size_t field_nsm_jmp_size(tuplet_field_t *field, size_t dst_attr_id);
 static inline size_t field_dsm_jmp_size(tuplet_field_t *field, size_t dst_tuplet_slot_id, size_t dst_attr_id);
-static inline bool field_next(tuplet_field_t *self);
-static inline const void *field_read(tuplet_field_t *self);
-static inline void field_update(tuplet_field_t *self, const void *data);
-static inline void field_set_null(tuplet_field_t *self);
-static inline bool field_is_null(tuplet_field_t *self);
-static inline void field_close(tuplet_field_t *self);
+static inline bool field_next(tuplet_field_t *field);
+static inline bool field_seek(tuplet_field_t *field, attr_id_t attr_id);
+static inline const void *field_read(tuplet_field_t *field);
+static inline void field_update(tuplet_field_t *field, const void *data);
+static inline void field_set_null(tuplet_field_t *field);
+static inline bool field_is_null(tuplet_field_t *field);
+static inline void field_close(tuplet_field_t *field);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   I M P L E M E N T A T I O N
@@ -168,12 +169,22 @@ static inline bool tuplet_next(tuplet_t *self)
 
 static inline void field_rebase(tuplet_field_t *field, tuplet_t *tuplet, attr_id_t attr_id) {
     assert(attr_id < tuplet->fragment->schema->attr->num_elements);
-    field->attr_id = attr_id;
     field->tuplet = tuplet;
-    field->attr_value_ptr = tuplet->attr_base;
+
+    size_t skip_size = (tuplet->fragment->format == TF_NSM ?
+                        field_nsm_jmp_size(field, attr_id) :
+                        field_dsm_jmp_size(field, tuplet->tuplet_id, attr_id));
+
+    if (attr_id == 0) {
+        field->attr_value_ptr = tuplet->attr_base;
+    } else {
+        field->attr_value_ptr += skip_size;
+    }
+
+    field->attr_id = attr_id;
 }
 
-static inline tuplet_field_t *tuplet_open(tuplet_t *self, attr_id_t attr_id)
+static inline tuplet_field_t *tuplet_open(tuplet_t *self)
 {
     assert (self);
     assert (self->fragment);
@@ -182,13 +193,14 @@ static inline tuplet_field_t *tuplet_open(tuplet_t *self, attr_id_t attr_id)
     tuplet_field_t *result = REQUIRE_MALLOC(sizeof(tuplet_field_t));
     *result = (tuplet_field_t) {
         ._next = field_next,
+        ._seek = field_seek,
         ._read = field_read,
         ._update = field_update,
         ._set_null = field_set_null,
         ._is_null = field_is_null,
         ._close = field_close
     };
-    field_rebase(result, self, attr_id);
+    field_rebase(result, self, 0);
     return result;
 }
 
@@ -232,7 +244,7 @@ static inline bool tuplet_is_null(tuplet_t *self)
 
 // - F I E L D   I M P L E M E N T A T I O N ---------------------------------------------------------------------------
 
-static inline size_t field_nsm_jmp_size(tuplet_field_t *field)
+static inline size_t field_nsm_jmp_size(tuplet_field_t *field, size_t dst_attr_id)
 {
     return gs_tuplet_field_size(field);
 }
@@ -249,74 +261,74 @@ static inline size_t field_dsm_jmp_size(tuplet_field_t *field, size_t dst_tuplet
     return skip_size;
 }
 
-static inline bool field_next(tuplet_field_t *self)
+static inline bool field_next(tuplet_field_t *field)
 {
-    assert (self);
-    assert (self->tuplet);
-    assert (self->tuplet->fragment);
+    assert (field);
+    assert (field->tuplet);
+    assert (field->tuplet->fragment);
 
-    enum tuplet_format format = self->tuplet->fragment->format;
+    enum tuplet_format format = field->tuplet->fragment->format;
     REQUIRE_VALID_TUPLET_FORMAT(format);
 
-    const attr_id_t next_attr_id = self->attr_id + 1;
-    if (next_attr_id < self->tuplet->fragment->schema->attr->num_elements) {
-
-        size_t skip_size = (format == TF_NSM ?
-                            field_nsm_jmp_size(self) :
-                            field_dsm_jmp_size(self, self->tuplet->tuplet_id, next_attr_id));
-
-        self->attr_value_ptr = (format == TF_NSM ? self->attr_value_ptr: self->tuplet->fragment->tuplet_data) +
-                               skip_size;
-
-        self->attr_id = next_attr_id;
+    const attr_id_t next_attr_id = field->attr_id + 1;
+    if (next_attr_id < field->tuplet->fragment->schema->attr->num_elements) {
+        field_rebase(field, field->tuplet, next_attr_id);
         return true;
     } else {
-        bool valid_tuplet = gs_tuplet_next(self->tuplet);
+        bool valid_tuplet = gs_tuplet_next(field->tuplet);
         if (valid_tuplet) {
-            field_rebase(self, self->tuplet, 0);
+            field_rebase(field, field->tuplet, 0);
             return true;
         } else {
-            //gs_tuplet_field_close(self);
+            //gs_tuplet_field_close(field);
             return false;
         }
     }
 }
 
-static inline const void *field_read(tuplet_field_t *self)
+static inline bool field_seek(tuplet_field_t *field, attr_id_t attr_id)
 {
-    assert (self);
-    return self->attr_value_ptr;
+    bool result = true;
+    while(attr_id-- && result)
+        result &= field_next(field);
+    return result;
 }
 
-static inline void field_update(tuplet_field_t *self, const void *data)
+static inline const void *field_read(tuplet_field_t *field)
 {
-    assert (self && data);
-    const attr_t *attr = gs_schema_attr_by_id(self->tuplet->fragment->schema, self->attr_id);
+    assert (field);
+    return field->attr_value_ptr;
+}
+
+static inline void field_update(tuplet_field_t *field, const void *data)
+{
+    assert (field && data);
+    const attr_t *attr = gs_schema_attr_by_id(field->tuplet->fragment->schema, field->attr_id);
     if (gs_attr_isstring(attr)) {
         const char *str = *(const char **) data;
-        strcpy(self->attr_value_ptr, str);
+        strcpy(field->attr_value_ptr, str);
     } else {
-        memcpy(self->attr_value_ptr, data, gs_tuplet_field_size(self));
+        memcpy(field->attr_value_ptr, data, gs_tuplet_field_size(field));
     }
 }
 
-static inline void field_set_null(tuplet_field_t *self)
+static inline void field_set_null(tuplet_field_t *field)
 {
-    assert (self);
+    assert (field);
     // TODO: Implement
     panic(NOTIMPLEMENTED, to_string(field_set_null));
 }
 
-static inline bool field_is_null(tuplet_field_t *self)
+static inline bool field_is_null(tuplet_field_t *field)
 {
-    assert (self);
+    assert (field);
     // TODO: Implement
     panic(NOTIMPLEMENTED, to_string(field_set_null));
     return false;
 }
 
-static inline void field_close(tuplet_field_t *self)
+static inline void field_close(tuplet_field_t *field)
 {
-    assert (self);
-    free (self);
+    assert (field);
+    free (field);
 }

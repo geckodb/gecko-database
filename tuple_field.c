@@ -24,8 +24,7 @@ void gs_tuple_field_seek(tuple_field_t *field, tuple_t *tuple, attr_id_t attr_id
             .table_attr_id = attr_id,
             .grid = grid,
             .tuplet = tuplet,
-            .field = tuplet_field,
-            .frag_attr_id = *gs_grid_table_attr_id_to_frag_attr_id(grid, attr_id)
+            .field = tuplet_field
     };
 
     grid_cursor_close(cursor);

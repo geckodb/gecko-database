@@ -38,10 +38,10 @@ int main(void) {
     };
     grid_id_t g01 = gs_grid_table_add_grid(table, &cover[0], 4, &g01_tid_cover[0], 1, FIT_HOST_NSM_VM);
 
-    u64 a = 0;
-    u32 b = 1;
-    u16 c = 2;
-    u16 d = 3;
+    u64 a = 1;
+    u32 b = 2;
+    u16 c = 3;
+    u16 d = 4;
 
     gs_grid_table_insert(&resultset, table, 3);
     while (gs_tuple_cursor_next(&tuple, &resultset)) {
@@ -50,10 +50,10 @@ int main(void) {
         gs_tuple_field_write(&field, &b);
         gs_tuple_field_write(&field, &c);
         gs_tuple_field_write(&field, &d);
-        a <<= 2;
-        b <<= 2;
-        c <<= 2;
-        d <<= 2;
+        a += 4;
+        b += 4;
+        c += 4;
+        d += 4;
     }
     gs_tuple_cursor_free(&resultset);
 
