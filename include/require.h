@@ -48,23 +48,15 @@ typedef enum {
 #define REQUIRE_NONZERO(value)                                                                                         \
     REQUIRE((value != 0), "Value must be non-zero")
 
+#define REQUIRE_LESSTHAN(lhs, rhs)                                                                                     \
+    REQUIRE((lhs < rhs), "Order corrupted")
+
 #define require_not_zero(value)                                                                                        \
     REQUIRE(value > 0, to_string(value) " is not allowed to be zero")
 
-#define REQUIRE_MALLOC(size)                                                                                      \
+#define REQUIRE_MALLOC(size)                                                                                           \
     ({                                                                                                                 \
         void *block = malloc(size);                                                                                    \
         panic_if((block == NULL), BADMALLOC, "request to allocate '" to_string(size) "' bytes failed");                \
         block;                                                                                                         \
     })
-
-// ---------------------------------------------------------------------------------------------------------------------
-// I N T E R F A C E   F U N C T I O N S
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool require_less_than(const void *lhs, const void *rhs);
-
-bool require_constraint(const void *lhs, relation_constraint constraint, const void *rhs,
-                        int (*comp)(const void *lhs, const void *rhs));
-
-bool require_constraint_size_t(size_t lhs, relation_constraint constraint, size_t rhs);

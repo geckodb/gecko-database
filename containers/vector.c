@@ -172,9 +172,8 @@ void *vector_get(vector_t *vec)
 void *vector_at(const vector_t *vec, size_t pos)
 {
     REQUIRE_NONNULL(vec)
-    void *result = NULL;
-    if (require_constraint_size_t(pos, constraint_less, vec->num_elements))
-       result = (vec->data + pos * vec->sizeof_element);
+    REQUIRE_LESSTHAN(pos, vec->num_elements)
+    void *result = (vec->data + pos * vec->sizeof_element);
     return result;
 }
 
@@ -197,8 +196,8 @@ void *vector_begin(const vector_t *vec)
 void *vector_end(const vector_t *vec)
 {
     REQUIRE_NONNULL(vec)
-    void *result = vector_at(vec, vec->num_elements);
-    return (result == NULL ? (vec->data + vec->num_elements * vec->sizeof_element) : result);
+    void *result = (vec->data + vec->num_elements * vec->sizeof_element);
+    return result;
 }
 
 bool vector_issorted(vector_t *vec, cache_consideration_policy policy, comp_t comp)
@@ -436,26 +435,25 @@ bool free_strings(void *capture, void *begin, void *end)
 {
     REQUIRE_NONNULL(begin)
     REQUIRE_NONNULL(end)
-    bool result = require_less_than(begin, end);
+    REQUIRE_LESSTHAN(begin, end)
     for (char **it = (char **) begin; it < (char **) end; it++) {
         free (*it);
     }
-
-    return result;
+    return true;
 };
 
 bool get_sizeof_strings(void *capture, void *begin, void *end)
 {
     REQUIRE_NONNULL(begin)
     REQUIRE_NONNULL(end)
+    REQUIRE_LESSTHAN(begin, end)
 
     size_t total_size = 0;
-    bool result = require_less_than(begin, end);
     for (char **it = (char **) begin; it < (char **) end; it++) {
         total_size += (strlen (*it) + 1);
     }
     *((size_t *) capture) = total_size;
-    return result;
+    return true;
 };
 
 bool check_create_args(size_t size, vector_flags flags, float grow_factor)

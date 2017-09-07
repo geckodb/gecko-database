@@ -91,7 +91,6 @@ void hash_table_info(dict_t *dict, linear_hash_table_info_t *info);
 
 bool str_equals(const void *lhs, const void *rhs);
 void clean_up(void *key, void *value);
-bool free_strings(void *capture, void *begin, void *end);
 
 
 
