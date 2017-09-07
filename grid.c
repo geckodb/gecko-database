@@ -113,6 +113,7 @@ grid_set_cursor_t *gs_grid_table_grid_find(const grid_table_t *table, const attr
         }
     }
 
+    dict_free(hash_table);
     gs_vindex_query_close(v_result);
     gs_hindex_query_close(h_result);
 
@@ -218,6 +219,8 @@ static inline grid_t *create_grid(grid_table_t *table, const attr_id_t *attr, si
     for (size_t i = 0; i < nattr; i++) {
         dict_put(result->schema_map_indicies, attr + i, &i);
     }
+
+    gs_schema_free(grid_schema);
 
     return result;
 }
