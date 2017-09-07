@@ -150,17 +150,21 @@ grid_table_t *gs_grid_table_melt(enum frag_impl_type_t type, const grid_table_t 
         gs_tuple_open(&src_tuple, src_table, src_tuple_id++);
         for (size_t x = 0; x < nattr_ids; x++) {
             attr_id_t attr_id = attr_ids[x];
-            if(attr_id==0) {
-                printf("DEBUG");
-            }
             gs_tuple_field_seek(&src_field, &src_tuple, attr_id);
             gs_tuple_field_seek(&dst_field, &dst_tuple, attr_id);
             const void *field_data = gs_tuple_field_read(&src_field);
-            if(attr_id==0) {
-                printf("%llu\n", *(u64*)field_data);
-            } else if(attr_id == 1) {
-                printf("%d\n", *(u32*)field_data);
-            }
+
+         /*   // DEBUG:
+            if (src_field.field->attr_id == 0) {
+                printf("read tuplet (%u) field attr0 (%llu): '%llu'\n", src_field.field->tuplet->tuplet_id, src_field.field->attr_id, *(u64*) src_field.field->attr_value_ptr);
+            } else if (src_field.field->attr_id == 1) {
+                printf("read tuplet (%u) field attr1 (%llu): '%d'\n", src_field.field->tuplet->tuplet_id, src_field.field->attr_id, *(u32*) src_field.field->attr_value_ptr);
+            } else if (src_field.field->attr_id == 2) {
+                printf("read tuplet (%u) field attr2 (%llu): '%d'\n", src_field.field->tuplet->tuplet_id, src_field.field->attr_id, *(u16*) src_field.field->attr_value_ptr);
+            } else if (src_field.field->attr_id == 3) {
+                printf("read tuplet (%u) field attr3 (%llu): '%d'\n", src_field.field->tuplet->tuplet_id, src_field.field->attr_id, *(u16*) src_field.field->attr_value_ptr);
+            }*/
+
             gs_tuple_field_write(&dst_field, field_data);
         }
     }
@@ -239,7 +243,7 @@ void gs_grid_table_print(FILE *file, const grid_table_t *table, size_t row_offse
     for (size_t i = 0; i < table->num_tuples; tuple_ids[i] = i, i++);
     for (size_t i = 0; i < gs_grid_table_num_of_attributes(table); attr_ids[i] = i, i++);
 
-    grid_table_t *molten_table = gs_grid_table_melt(FIT_HOST_NSM_VM, table, tuple_ids, table->num_tuples, attr_ids,
+    grid_table_t *molten_table = gs_grid_table_melt(FIT_HOST_DSM_VM, table, tuple_ids, table->num_tuples, attr_ids,
                                       gs_grid_table_num_of_attributes(table));
 
     gs_frag_print(file, gs_grid_by_id(molten_table, 0)->frag, row_offset, limit);

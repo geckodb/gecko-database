@@ -55,6 +55,21 @@ int main(void) {
         c += 4;
         d += 4;
     }
+
+
+    /*// DEBUG:
+    gs_tuple_cursor_rewind(&resultset);
+
+    while (gs_tuple_cursor_next(&tuple, &resultset)) {
+        gs_tuple_field_open(&field, &tuple);
+        gs_tuple_field_read(&field);
+        gs_tuple_field_read(&field);
+        gs_tuple_field_read(&field);
+        gs_tuple_field_read(&field);
+    }*/
+
+    //----
+
     gs_tuple_cursor_free(&resultset);
 
 
