@@ -19,7 +19,7 @@ static inline void print_frag_body(FILE *file, frag_t *frag, vector_t *field_pri
 
 struct frag_printer_t *console_printer_create()
 {
-    frag_printer_t *result = require_good_malloc(sizeof(frag_printer_t));
+    frag_printer_t *result = REQUIRE_MALLOC(sizeof(frag_printer_t));
     *result = (frag_printer_t) {
         ._print = console_printer_print,
         ._free  = console_printer_free,

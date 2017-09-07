@@ -28,7 +28,7 @@ void gs_freelist_create(freelist_t *list, size_t elem_size, size_t capacity, ini
     REQUIRE_NONNULL(inc);
     REQUIRE((elem_size > 0), BADINT);
     list->free_elem = vector_create(elem_size, capacity);
-    list->next_element = require_good_malloc(elem_size);
+    list->next_element = REQUIRE_MALLOC(elem_size);
     list->inc = inc;
     init(list->next_element);
 }

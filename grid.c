@@ -20,7 +20,7 @@ static inline void indexes_insert(grid_table_t *table, grid_t *grid, const attr_
 grid_table_t *gs_grid_table_create(const schema_t *schema, size_t approx_num_horizontal_partitions)
 {
     if (schema != NULL) {
-        grid_table_t *result = require_good_malloc(sizeof(grid_table_t));
+        grid_table_t *result = REQUIRE_MALLOC(sizeof(grid_table_t));
         result->schema = gs_schema_cpy(schema);
         create_indexes(result, approx_num_horizontal_partitions);
         create_grid_ptr_store(result);
@@ -155,7 +155,7 @@ void gs_grid_table_insert(resultset_t *resultset, grid_table_t *table, size_t nt
     REQUIRE_NONNULL(table);
     REQUIRE_NONNULL(resultset);
     REQUIRE((ntuplets > 0), BADINT);
-    tuple_id_t *tuple_ids = require_good_malloc(ntuplets * sizeof(tuple_id_t));
+    tuple_id_t *tuple_ids = REQUIRE_MALLOC(ntuplets * sizeof(tuple_id_t));
     gs_freelist_bind(tuple_ids, &table->tuple_id_freelist, ntuplets);
     gs_resultset_create(resultset, table, tuple_ids, ntuplets);
 }
@@ -190,7 +190,7 @@ static inline void create_tuple_id_store(grid_table_t *table)
 static inline grid_t *create_grid(grid_table_t *table, const attr_id_t *attr, size_t nattr,
                                   const tuple_id_interval_t *tuple_ids, size_t ntuple_ids, enum frag_impl_type_t type)
 {
-    grid_t *result = require_good_malloc(sizeof(grid_t));
+    grid_t *result = REQUIRE_MALLOC(sizeof(grid_t));
 
     schema_t *grid_schema = gs_schema_subset(table->schema, attr, nattr);
     size_t tuplet_capacity = get_required_capacity(tuple_ids, ntuple_ids);

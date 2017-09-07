@@ -29,15 +29,6 @@ static int _comp_size_t(const void *lhs, const void *rhs);
 // I N T E R F A C E  I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-void *require_malloc(size_t size)
-{
-    if (require_constraint_size_t(size, constraint_greater, 0)) {
-        void *block = malloc(size);
-        error_if(block == NULL, err_bad_malloc);
-        return block;
-    } else return NULL;
-}
-
 bool require_less_than(const void *lhs, const void *rhs)
 {
     bool is_less_than = (lhs < rhs);

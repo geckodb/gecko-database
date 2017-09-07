@@ -3,7 +3,7 @@
 /*grid_t *gs_grid_create(schema_t *schema, size_t tuplet_capacity, enum frag_impl_type_t type)
 {
     require_non_null(schema);
-    grid_t *result = require_good_malloc(sizeof(grid_t));
+    grid_t *result = REQUIRE_MALLOC(sizeof(grid_t));
     *result = (grid_t) {
         .frag = gs_fragment_alloc(schema, tuplet_capacity, type),
         .tuple_id_mapping = vector_create(sizeof(tuple_id_t), tuplet_capacity)

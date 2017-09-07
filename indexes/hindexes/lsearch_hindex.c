@@ -59,7 +59,7 @@ hindex_t *lesearch_hindex_create(size_t approx_num_horizontal_partitions, const 
 {
     REQUIRE_NONNULL(table_schema);
 
-    hindex_t *result = require_good_malloc(sizeof(hindex_t));
+    hindex_t *result = REQUIRE_MALLOC(sizeof(hindex_t));
     *result = (hindex_t) {
         .tag = HT_LINEAR_SEARCH,
 

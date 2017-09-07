@@ -467,7 +467,7 @@ bool check_create_args(size_t size, vector_flags flags, float grow_factor)
 
 vector_t *alloc_vector()
 {
-    vector_t *result = malloc (sizeof(vector_t));
+    vector_t *result = REQUIRE_MALLOC (sizeof(vector_t));
     error_if((result == NULL), err_bad_malloc);
     return result;
 }
@@ -476,7 +476,7 @@ vector_t *alloc_data(vector_t *vec, vector_flags flags, size_t capacity, size_t 
 {
     if (__builtin_expect((vec != NULL) && (vec->data = ((flags & zero_memory) == zero_memory) ?
                                                        calloc(capacity, size) :
-                                                       malloc(capacity * size)) == NULL, false)) {
+                                                       REQUIRE_MALLOC(capacity * size)) == NULL, false)) {
         error(err_bad_malloc);
         free(vec);
         return NULL;

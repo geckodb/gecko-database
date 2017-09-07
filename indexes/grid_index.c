@@ -3,7 +3,7 @@
 
 grid_set_cursor_t *grid_set_cursor_create(size_t result_capacity)
 {
-    grid_set_cursor_t *result = require_good_malloc(sizeof(grid_set_cursor_t));
+    grid_set_cursor_t *result = REQUIRE_MALLOC(sizeof(grid_set_cursor_t));
     *result = (grid_set_cursor_t) {
             .extra = vector_create(sizeof(struct grid_t *), result_capacity)
     };

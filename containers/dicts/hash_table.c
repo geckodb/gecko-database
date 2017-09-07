@@ -179,7 +179,7 @@ dict_t *hash_table_create_ex(const hash_function_t *hash_function, size_t key_si
     REQUIRE_NONNULL(hash_function->hash_code);
     require_not_zero(num_slots);
 
-    dict_t *result = require_good_malloc(sizeof(dict_t));
+    dict_t *result = REQUIRE_MALLOC(sizeof(dict_t));
     *result = (dict_t) {
         .tag = dict_type_linear_hash_table,
         .key_size = key_size,
@@ -197,7 +197,7 @@ dict_t *hash_table_create_ex(const hash_function_t *hash_function, size_t key_si
         .num_elements = this_num_elements,
         .for_each = this_for_each,
 
-        .extra = require_good_malloc(sizeof(hash_table_extra_t))
+        .extra = REQUIRE_MALLOC(sizeof(hash_table_extra_t))
     };
 
     panic_if ((key_is_str && key_size != sizeof(char *)), BADARG, "key must be pointer to string");
@@ -209,8 +209,8 @@ dict_t *hash_table_create_ex(const hash_function_t *hash_function, size_t key_si
         .num_inuse = 0,
         .grow_factor = grow_factor,
         .max_load_factor = max_load_factor,
-        .slots = require_good_malloc(num_slots * (key_size + elem_size)),
-        .empty_indicator = key_is_str ? require_good_malloc(sizeof(char **)) : require_good_malloc(key_size),
+        .slots = REQUIRE_MALLOC(num_slots * (key_size + elem_size)),
+        .empty_indicator = key_is_str ? REQUIRE_MALLOC(sizeof(char **)) : REQUIRE_MALLOC(key_size),
         .mutex = PTHREAD_MUTEX_INITIALIZER,
         .equals = equals,
         .cleanup = cleanup,
@@ -219,7 +219,7 @@ dict_t *hash_table_create_ex(const hash_function_t *hash_function, size_t key_si
     };
 
     if (key_is_str) {
-        char *empty_str = malloc(1);
+        char *empty_str = REQUIRE_MALLOC(1);
         *empty_str = '\0';
         extra->empty_indicator = &empty_str;
     } else {

@@ -51,7 +51,7 @@ typedef enum {
 #define require_not_zero(value)                                                                                        \
     REQUIRE(value > 0, to_string(value) " is not allowed to be zero")
 
-#define require_good_malloc(size)                                                                                      \
+#define REQUIRE_MALLOC(size)                                                                                      \
     ({                                                                                                                 \
         void *block = malloc(size);                                                                                    \
         panic_if((block == NULL), BADMALLOC, "request to allocate '" to_string(size) "' bytes failed");                \
@@ -61,8 +61,6 @@ typedef enum {
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
-
-void *require_malloc(size_t size);
 
 bool require_less_than(const void *lhs, const void *rhs);
 

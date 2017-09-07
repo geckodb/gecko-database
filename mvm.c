@@ -341,7 +341,7 @@ static struct {
 
 int mondrian_vm_create(mondrian_vm_t **out, mondrian_t *db)
 {
-    (*out) = malloc(sizeof(mondrian_vm_t));
+    (*out) = REQUIRE_MALLOC(sizeof(mondrian_vm_t));
     if (*out == NULL) {
         return MONDRIAN_ERROR;
     } else {
@@ -482,7 +482,7 @@ int program_new(program_t **out, const char *prog_name, const char *prog_author,
         return MONDRIAN_ERROR;
     }
 
-    *out = malloc(sizeof(program_t));
+    *out = REQUIRE_MALLOC(sizeof(program_t));
     **out = (program_t) {
         .instructions = vector_create(sizeof(instruction_t), 10),
         .magic_word   = MVM_MAGIC_WORD,
@@ -890,7 +890,7 @@ static int exec_finsert(mondrian_vm_t *vm, u64 operand)
         if (frag == NULL) {
             return MONDRIAN_ERROR;
         }
-        tuplet_t *tuplet_ptr = require_good_malloc(num * sizeof(tuplet_t *));
+        tuplet_t *tuplet_ptr = REQUIRE_MALLOC(num * sizeof(tuplet_t *));
         gs_fragment_insert(tuplet_ptr, frag, num);
         mondrian_vm_set_var(vm, VARIABLE_RTC, (u64 *)&tuplet_ptr);
         return MONDRIAN_OK;

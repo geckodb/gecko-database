@@ -32,7 +32,7 @@ void *promise_mondrian_vm_exec(promise_result *return_value, const void *capture
 int mondrian_open(mondrian_t **instance)
 {
     assert (instance);
-    *instance = malloc(sizeof(mondrian_t));
+    *instance = REQUIRE_MALLOC(sizeof(mondrian_t));
     (*instance)->start = time(NULL);
     (*instance)->vm_programs = list_create(sizeof(vm_exec_info));
     progpool_create(&((*instance)->progpool));
@@ -119,7 +119,7 @@ static inline int mondrian_start_vm(mvm_handle_t *out, mondrian_t *instance, con
     else {
         future_t retval;
 
-        mondrian_vm_exec_args_t *args = require_good_malloc(sizeof(mondrian_vm_exec_args_t));
+        mondrian_vm_exec_args_t *args = REQUIRE_MALLOC(sizeof(mondrian_vm_exec_args_t));
         *args = (mondrian_vm_exec_args_t) {
                 .instance = instance,
                 .program = program

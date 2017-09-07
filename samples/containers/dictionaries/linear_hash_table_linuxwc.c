@@ -81,7 +81,7 @@ int main(void)
     vector_t *words = read_all_lines("/Users/marcus/temp/linux-words");
 
 
-    char *key = malloc(SIZEOF_KEY);
+    char *key = REQUIRE_MALLOC(SIZEOF_KEY);
 
     clock_t start = clock();
     for (int i = 0; i < words->num_elements; i++) {

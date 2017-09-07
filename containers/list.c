@@ -47,7 +47,7 @@ static header_t *_get_node_ptr(const void *);
 list_t *list_create(size_t element_size)
 {
     list_t *list = NULL;
-    if (_check_create_args(element_size) && ((list = require_malloc(sizeof(list_t))))) {
+    if (_check_create_args(element_size) && ((list = REQUIRE_MALLOC(sizeof(list_t))))) {
         list->element_size = element_size;
         list->num_elements = 0;
         list->root = list->tail = NULL;
@@ -83,7 +83,7 @@ bool list_push(list_t *list, const void *data)
     REQUIRE_NONNULL(list)
     REQUIRE_NONNULL(data)
     header_t *node = NULL;
-    if ((node = require_malloc(sizeof(header_t) + list->element_size))) {
+    if ((node = REQUIRE_MALLOC(sizeof(header_t) + list->element_size))) {
         node->prev = node->next = NULL;
         memcpy(node + 1, data, list->element_size);
         if (list_is_empty(list)) {

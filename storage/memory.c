@@ -681,7 +681,7 @@ coldstore_is_empty(
 anti_buf_t *
 buf_create()
 {
-    anti_buf_t *result = malloc(sizeof(anti_buf_t));
+    anti_buf_t *result = REQUIRE_MALLOC(sizeof(anti_buf_t));
     EXPECT_GOOD_MALLOC(result, NULL);
 
     buf_init(result);
@@ -701,7 +701,7 @@ buf_alloc(
     EXPECT_GREATER(size, 0, NULL);
     EXPECT_GREATER(nlanes, 0, NULL);
 
-    cursor_t *    result    = require_good_malloc(sizeof(cursor_t));
+    cursor_t *    result    = REQUIRE_MALLOC(sizeof(cursor_t));
     page_t *      page_lane = anticache_page_by_freesize(buf, LANE_HDR_SIZE, NULL);
     lane_id_t     lane      = anticache_create_lane(buf, page_lane, strat, size);
 

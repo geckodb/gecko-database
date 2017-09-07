@@ -44,7 +44,7 @@ future_t future_create(const void *capture, promise_t func, future_eval_policy p
     REQUIRE_NONNULL(func);
     future_t future = NULL;
 
-    if ((future = require_malloc(sizeof(struct _future_t)))) {
+    if ((future = REQUIRE_MALLOC(sizeof(struct _future_t)))) {
             future->call_result = NULL;
             future->capture = capture;
             future->func = func;
@@ -163,7 +163,7 @@ bool _lazy_exec(void *call_result, future_t future, promise_result return_value)
     _this_exec_args* args;
     REQUIRE_NONNULL(future)
 
-    if ((args = require_malloc(sizeof(_this_exec_args))) && (thread = require_malloc(sizeof(thrd_t)))) {
+    if ((args = REQUIRE_MALLOC(sizeof(_this_exec_args))) && (thread = REQUIRE_MALLOC(sizeof(thrd_t)))) {
         args->call_result = call_result;
         args->future = future;
         args->return_value = return_value;

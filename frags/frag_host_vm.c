@@ -62,7 +62,7 @@ struct frag_t *gs_frag_host_vm_dsm_create(schema_t *schema, size_t tuplet_capaci
 
 static inline frag_t *frag_create(schema_t *schema, size_t tuplet_capacity, enum tuplet_format format)
 {
-    frag_t *fragment = malloc(sizeof(frag_t));
+    frag_t *fragment = REQUIRE_MALLOC(sizeof(frag_t));
     size_t tuplet_size   = gs_tuplet_size_by_schema(schema);
     size_t required_size = tuplet_size * tuplet_capacity;
     *fragment = (frag_t) {
@@ -70,7 +70,7 @@ static inline frag_t *frag_create(schema_t *schema, size_t tuplet_capacity, enum
             .format = format,
             .ntuplets = 0,
             .ncapacity = tuplet_capacity,
-            .tuplet_data = require_good_malloc (required_size),
+            .tuplet_data = REQUIRE_MALLOC (required_size),
             .tuplet_size = tuplet_size,
             ._scan = scan_mediator,
             ._dispose = frag_dipose,
@@ -113,7 +113,7 @@ static inline tuplet_t *frag_open_internal(frag_t *self, size_t pos)
 {
     tuplet_t *result = NULL;
     if (self->ntuplets > 0) {
-        result = require_good_malloc(sizeof(tuplet_t));
+        result = REQUIRE_MALLOC(sizeof(tuplet_t));
         *result = (tuplet_t) {
             ._next = tuplet_next,
             ._open = tuplet_open,
@@ -179,7 +179,7 @@ static inline tuplet_field_t *tuplet_open(tuplet_t *self, attr_id_t attr_id)
     assert (self->fragment);
     assert (self->fragment->ntuplets);
 
-    tuplet_field_t *result = require_good_malloc(sizeof(tuplet_field_t));
+    tuplet_field_t *result = REQUIRE_MALLOC(sizeof(tuplet_field_t));
     *result = (tuplet_field_t) {
         ._next = field_next,
         ._read = field_read,

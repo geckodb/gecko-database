@@ -57,7 +57,7 @@ static inline void cleanup_vectors(void *key, void *value)
 
 vindex_t *hash_vindex_create(size_t key_size, size_t num_init_slots)
 {
-    vindex_t *result = require_good_malloc(sizeof(vindex_t));
+    vindex_t *result = REQUIRE_MALLOC(sizeof(vindex_t));
     *result = (vindex_t) {
         ._add = this_add,
         ._contains = this_contains,

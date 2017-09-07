@@ -23,7 +23,7 @@ const struct attr_t *gs_schema_attr_by_name(const schema_t *schema, const char *
 schema_t *gs_schema_create(const char *table_name)
 {
     assert (table_name);
-    schema_t *result = malloc(sizeof(schema_t));
+    schema_t *result = REQUIRE_MALLOC(sizeof(schema_t));
     result->attr = vector_create(sizeof(attr_t), 100);
     result->frag_name = strdup(table_name);
     return result;
@@ -57,7 +57,7 @@ void gs_schema_free(schema_t *schema)
 schema_t *gs_schema_cpy(const schema_t *schema)
 {
     assert (schema);
-    schema_t *cpy = require_good_malloc(sizeof(schema_t));
+    schema_t *cpy = REQUIRE_MALLOC(sizeof(schema_t));
     cpy->attr = vector_deep_cpy(schema->attr);
     cpy->frag_name = strdup(schema->frag_name);
     return cpy;

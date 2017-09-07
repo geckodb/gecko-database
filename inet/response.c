@@ -19,7 +19,7 @@ char *gs_response_pack(response_t *response)
     const char *code = gs_response_code_str(response->code);
     const char *mime = gs_response_format_fields(response->fields);
     const char *body = gs_response_body_get(response);
-    char *buffer = require_good_malloc(strlen(pack) + 1 + strlen(mime) + 1 + strlen(body) + 1);
+    char *buffer = REQUIRE_MALLOC(strlen(pack) + 1 + strlen(mime) + 1 + strlen(body) + 1);
     sprintf(buffer, pack, code, mime, body);
     return buffer;
 }
@@ -49,7 +49,7 @@ void gs_response_body_set(response_t *response, const char *body)
     if (response->body != NULL) {
         free (response->body);
     } else {
-        response->body = malloc(strlen(body) + 1);
+        response->body = REQUIRE_MALLOC(strlen(body) + 1);
         strcpy(response->body, body);
     }
 }
@@ -119,7 +119,7 @@ const char *gs_response_format_fields(const dict_t *fields)
     }
     length_fields += 1; // null terminator
 
-    char *formatted_str = require_good_malloc(length_fields);
+    char *formatted_str = REQUIRE_MALLOC(length_fields);
     size_t offset = 0;
     for (size_t i = 0; i < num_elements; i++) {
         const char *field_name = (const char *) vector_at(keys, i);

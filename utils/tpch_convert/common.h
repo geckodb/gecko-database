@@ -35,7 +35,7 @@ static inline void decimal(tpch_decimal_t *dst, const char *src)
 
 static inline void text(tpch_text_t *dst, const char *src, size_t n)
 {
-    *dst = malloc(n);
+    *dst = require_good_malloc(n);
     strcpy(*dst, src);
 }
 

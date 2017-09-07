@@ -11,7 +11,7 @@ size_t gs_unsafe_field_get_println(enum field_type type, const void *data)
 char *gs_unsafe_field_to_string(enum field_type type, const void *data)
 {
     const size_t INIT_BUFFER_LEN = 2048;
-    char *buffer = malloc(INIT_BUFFER_LEN);
+    char *buffer = REQUIRE_MALLOC(INIT_BUFFER_LEN);
     switch (type) {
         case FT_BOOL:
             strcpy (buffer, *((bool *) data) == true? "true" : "false");
