@@ -29,9 +29,30 @@ grid_table_t *gs_grid_table_create(const schema_t *schema, size_t approx_num_hor
     } else return NULL;
 }
 
+static inline bool free_grids(void *capture, void *begin, void *end)
+{
+    for (grid_t **it = (grid_t **) begin; it < (grid_t **) end; it++) {
+        gs_grid_free(*it);
+        free(*it);
+    }
+    return true;
+}
+
 void gs_grid_table_free(grid_table_t *table)
 {
-    panic(NOTIMPLEMENTED, to_string(gs_grid_table_free))
+    gs_schema_free(table->schema);
+    vector_foreach(table->grid_ptrs, NULL, free_grids);
+    gs_vindex_free(table->schema_cover);
+    gs_hindex_free(table->tuple_cover);
+
+   // panic(NOTIMPLEMENTED, to_string(gs_grid_table_free))
+}
+
+void gs_grid_free(grid_t * grid)
+{
+    gs_fragment_free(grid->frag);
+    dict_free(grid->schema_map_indicies);
+    vector_free(grid->tuple_ids);
 }
 
 const char *gs_grid_table_name(const grid_table_t *table)

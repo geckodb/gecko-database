@@ -53,6 +53,7 @@ int main(void) {
      //   gs_tuple_field_close(&field);
     }
     gs_resultset_free(&resultset);
+    gs_grid_table_free(table);
 
 
 

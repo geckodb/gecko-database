@@ -83,6 +83,8 @@ grid_table_t *gs_grid_table_create(const schema_t *schema, size_t approx_num_hor
 
 void gs_grid_table_free(grid_table_t *table);
 
+void gs_grid_free(grid_t * grid);
+
 const char *gs_grid_table_name(const grid_table_t *table);
 
 grid_id_t gs_grid_table_add_grid(grid_table_t *table, const attr_id_t *attr_ids_covered, size_t nattr_ids_covered,

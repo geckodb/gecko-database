@@ -156,10 +156,17 @@ static inline bool this_contains(const struct hindex_t *self, tuple_id_t tid)
     return false;
 }
 
+static inline bool free_entires(void *capture, void *begin, void *end)
+{
+    for (entry_t *it = (entry_t *) begin; it < (entry_t *) end; it++) {
+        vector_free(it->grids);
+    }
+    return true;
+}
+
 static inline void this_free(struct hindex_t *self)
 {
     require_instanceof_this(self);
-    // TODO:...
-    panic(NOTIMPLEMENTED, to_string(this_free))
-
+    vector_foreach(self->extra, NULL, free_entires);
+    vector_free(self->extra);
 }
