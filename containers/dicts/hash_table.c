@@ -260,7 +260,7 @@ bool hash_table_free(dict_t *dict)
 
         if (extra->cleanup != NULL) {
             for (size_t slot_id = 0; slot_id < extra->num_slots; slot_id++) {
-                if (slot_is_empty(dict, extra, slot_id)) {
+                if (!slot_is_empty(dict, extra, slot_id)) {
                     void *key = slot_get_key(extra->slots, slot_id, dict->key_size, dict->elem_size);
                     void *value = slot_get_value(extra->slots, slot_id, dict->key_size, dict->elem_size);
 

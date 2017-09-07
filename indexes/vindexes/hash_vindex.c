@@ -50,9 +50,9 @@ static inline bool attr_key_equals(const void *key_lhs, const void *key_rhs)
     return (lhs == rhs);
 }
 
-static inline void nop(void *key, void *value)
+static inline void cleanup_vectors(void *key, void *value)
 {
-
+    vector_free_data((vector_t *) value);
 }
 
 vindex_t *hash_vindex_create(size_t key_size, size_t num_init_slots)
@@ -69,7 +69,7 @@ vindex_t *hash_vindex_create(size_t key_size, size_t num_init_slots)
 
     result->extra = hash_table_create_ex(
             &(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen}, key_size, sizeof(vector_t),
-            num_init_slots, num_init_slots, 1.7f, 0.75f, attr_key_equals, nop, false
+            num_init_slots, num_init_slots, 1.7f, 0.75f, attr_key_equals, cleanup_vectors, false
     );
     require_non_null(result->extra);
     return result;
@@ -89,7 +89,7 @@ static inline void this_add(struct vindex_t *self, const attr_id_t *key, const s
         // Notice, this frees up pointer to vec, but does not cleanup the vector (especially the data pointer).
         // That's required since dict_put copies all members of vec and is responsible to free up resources.
         // The allocated memory for the pointer to original vector "vec", however, must be freed also.
-        // free (vec);
+        free (vec);
     }
     vector_t *vec = (vector_t *) dict_get(dict, key);
     require_non_null(vec);

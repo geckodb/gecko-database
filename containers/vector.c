@@ -99,11 +99,19 @@ bool vector_free(struct vector_t *vec)
     bool non_null = require_non_null(vec);
     if (non_null) {
         if (require_non_null(vec->data)) {
-            free (vec->data);
+            vector_free_data(vec);
         }
         free (vec);
     }
     return non_null;
+}
+
+void vector_free_data(struct vector_t *vec)
+{
+    free (vec->data);
+    vec->data = NULL;
+    vec->element_capacity = 0;
+    vec->num_elements = 0;
 }
 
 bool vector_free_ex(vector_t *vec, void *capture, bool (*func)(void *capture, void *begin, void *end))
