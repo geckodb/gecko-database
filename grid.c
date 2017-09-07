@@ -133,7 +133,7 @@ void gs_grid_table_insert(resultset_t *resultset, grid_table_t *table, size_t nt
     require_non_null(table);
     require_non_null(resultset);
     require((ntuplets > 0), BADINT);
-    tuple_id_t *tuple_ids = require_good_malloc(sizeof(tuple_id_t));
+    tuple_id_t *tuple_ids = require_good_malloc(ntuplets * sizeof(tuple_id_t));
     gs_freelist_bind(tuple_ids, &table->tuple_id_freelist, ntuplets);
     gs_resultset_create(resultset, table, tuple_ids, ntuplets);
 }
