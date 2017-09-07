@@ -53,6 +53,7 @@ int main(void) {
     }
     gs_resultset_free(&resultset);
     gs_grid_table_free(table);
+    free (table);
 
 
 
