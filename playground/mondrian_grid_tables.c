@@ -20,6 +20,11 @@ int main(void) {
     tuple_field_t field;
     tuple_cursor_t resultset;
 
+    u64 a = 1;
+    u32 b = 2;
+    u16 c = 3;
+    u16 d = 4;
+
     //           +===============================+
     // tuple id  |   A   |   B   |   C   |   D   |
     //           +===============================+
@@ -36,12 +41,7 @@ int main(void) {
     tuple_id_interval_t g01_tid_cover[] = {
             { .begin = 0, .end = 3 }
     };
-    grid_id_t g01 = gs_grid_table_add_grid(table, &cover[0], 4, &g01_tid_cover[0], 1, FIT_HOST_NSM_VM);
-
-    u64 a = 1;
-    u32 b = 2;
-    u16 c = 3;
-    u16 d = 4;
+    grid_id_t g01 = gs_grid_table_add_grid(table, &cover[0], 4, &g01_tid_cover[0], 1, FIT_HOST_DSM_VM);
 
     gs_grid_table_insert(&resultset, table, 3);
     while (gs_tuple_cursor_next(&tuple, &resultset)) {
@@ -56,39 +56,12 @@ int main(void) {
         d += 4;
     }
 
-
-    /*// DEBUG:
-    gs_tuple_cursor_rewind(&resultset);
-
-    while (gs_tuple_cursor_next(&tuple, &resultset)) {
-        gs_tuple_field_open(&field, &tuple);
-        gs_tuple_field_read(&field);
-        gs_tuple_field_read(&field);
-        gs_tuple_field_read(&field);
-        gs_tuple_field_read(&field);
-    }*/
-
-    //----
-
     gs_tuple_cursor_free(&resultset);
-
-
-    gs_grid_print(stdout, table, 0, UINT64_MAX, g01);
-
-    gs_grid_table_print(stdout, table, 0, UINT64_MAX);
-
-    gs_grid_table_free(table);
-
-    free (table);
-    gs_schema_free(schema);
+    gs_grid_print(stdout, table, g01, 0, UINT64_MAX);
 
 
 
-//    field = gs_tuple_field_open(tuple);
-//    write_data(field, 0, 1, 2, 3);
-//    write_data(field, 4, 5, 6, 7);
-//    write_data(field, 8, 9, 10, 11);
-/*
+
     //  Add full grid with same schema orientation as table, column-store
     //           +===============================+
     //           |   A   |   B   |   C   |   D   |
@@ -97,16 +70,28 @@ int main(void) {
     //         4 |   |       |       |       |   |
     //         5 |   v       v       v       v   |
     //           +===============================+
-    interval_t g02_tid_cover[] = {
+    tuple_id_interval_t g02_tid_cover[] = {
             { .begin = 3, .end = 6 }
     };
-    grid_id_t g02 = gs_grid_table_add_grid(table, &cover[0], 4, &g02_tid_cover[0], 1, FIT_HOST_DSM_VM);
+    grid_id_t g02 = gs_grid_table_add_grid(table, &cover[0], 4, &g02_tid_cover[0], 1, FIT_HOST_NSM_VM);
 
-    tuple = gs_grid_table_insert(table, 3);
-    field = gs_tuple_field_open(tuple);
-    write_data(field, 12, 13, 14, 15);
-    write_data(field, 16, 17, 18, 19);
-    write_data(field, 20, 21, 22, 23);
+    gs_grid_table_insert(&resultset, table, 3);
+    while (gs_tuple_cursor_next(&tuple, &resultset)) {
+        gs_tuple_field_open(&field, &tuple);
+        gs_tuple_field_write(&field, &a);
+        gs_tuple_field_write(&field, &b);
+        gs_tuple_field_write(&field, &c);
+        gs_tuple_field_write(&field, &d);
+        a += 4;
+        b += 4;
+        c += 4;
+        d += 4;
+    }
+
+    gs_tuple_cursor_free(&resultset);
+    gs_grid_print(stdout, table, g02, 0, UINT64_MAX);
+
+
 
     //  Add full grid with same altered schema orientation, row-store
     //           +===============================+
@@ -116,7 +101,31 @@ int main(void) {
     //         7 |   ------------------------>   |
     //         8 |   ------------------------>   |
     //           +===============================+
-    cover[0] = 3; cover[2] = 2; cover[2] = 1; cover[3] = 0;
+
+    //cover[0] = 3; cover[2] = 2; cover[2] = 1; cover[3] = 0;
+
+    tuple_id_interval_t g03_tid_cover[] = {
+            { .begin = 6, .end = 9 }
+    };
+    grid_id_t g03 = gs_grid_table_add_grid(table, &cover[0], 4, &g03_tid_cover[0], 1, FIT_HOST_NSM_VM);
+
+    gs_grid_table_insert(&resultset, table, 3);
+    while (gs_tuple_cursor_next(&tuple, &resultset)) {
+        gs_tuple_field_open(&field, &tuple);
+        gs_tuple_field_write(&field, &a);
+        gs_tuple_field_write(&field, &b);
+        gs_tuple_field_write(&field, &c);
+        gs_tuple_field_write(&field, &d);
+        a += 4;
+        b += 4;
+        c += 4;
+        d += 4;
+    }
+
+    gs_tuple_cursor_free(&resultset);
+    gs_grid_print(stdout, table, g03, 0, UINT64_MAX);
+
+    /*cover[0] = 3; cover[2] = 2; cover[2] = 1; cover[3] = 0;
     interval_t g03_tid_cover[] = {
             { .begin = 6, .end = 9 }
     };
@@ -308,6 +317,12 @@ int main(void) {
     gs_grid_table_print(stdout, table, 0, UINT64_MAX);
 
 */
+
+    gs_grid_table_print(stdout, table, 0, UINT64_MAX);
+    gs_grid_table_free(table);
+    free (table);
+    gs_schema_free(schema);
+
     return 0;
 }
 

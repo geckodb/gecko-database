@@ -196,7 +196,7 @@ static inline void field_movebase(tuplet_field_t *field, tuplet_t *tuplet)
 
     size_t skip_size = (format == TF_NSM ?
                         field_nsm_jmp_size(field) :
-                        field_dsm_jmp_size(field, field->tuplet->tuplet_id, field->attr_id));
+                        field_dsm_jmp_size(field, field->tuplet->tuplet_id, (field->attr_id + 1)));
 
     field->attr_value_ptr = (format == TF_NSM ? field->attr_value_ptr : field->tuplet->fragment->tuplet_data) +
                            skip_size;
@@ -329,8 +329,8 @@ static inline const void *field_read(tuplet_field_t *field)
     } else if (field->attr_id == 3) {
         printf("read tuplet (%u %p) field attr3 (%llu %p): '%d'\n", field->tuplet->tuplet_id, field->tuplet, field->attr_id, field->attr_value_ptr, *(u16*) field->attr_value_ptr);
     }
-    // --*/
-
+    // --
+*/
     return field->attr_value_ptr;
 }
 
@@ -344,8 +344,8 @@ static inline void field_update(tuplet_field_t *field, const void *data)
     } else {
         memcpy(field->attr_value_ptr, data, gs_tuplet_field_size(field));
     }
-
-    /*// DEBUG:
+/*
+    // DEBUG:
     if (field->attr_id == 0) {
         printf("wrote tuplet (%u %p) field attr0 (%llu %p): '%llu'\n", field->tuplet->tuplet_id, field->tuplet, field->attr_id, field->attr_value_ptr, *(u64*) field->attr_value_ptr);
     } else if (field->attr_id == 1) {
