@@ -45,6 +45,9 @@ typedef enum {
 #define REQUIRE(expr, msg)                                                                                             \
     panic_if((!(expr)), BADEXPR, msg);
 
+#define REQUIRE_NONZERO(value)                                                                                         \
+    REQUIRE((value != 0), "Value must be non-zero")
+
 #define require_not_zero(value)                                                                                        \
     REQUIRE(value > 0, to_string(value) " is not allowed to be zero")
 
@@ -58,8 +61,6 @@ typedef enum {
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
-
-bool require_non_zero(int64_t value);
 
 void *require_malloc(size_t size);
 

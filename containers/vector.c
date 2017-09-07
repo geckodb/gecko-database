@@ -57,7 +57,8 @@ vector_t *vector_create_ex(size_t element_size, size_t capacity, vector_flags fl
 bool vector_resize(vector_t *vec, size_t num_elements)
 {
     REQUIRE_NONNULL(vec)
-    if (require_non_zero(num_elements) && advance(vec, 0, num_elements)) {
+    REQUIRE_NONZERO(num_elements)
+    if (advance(vec, 0, num_elements)) {
         vec->num_elements = num_elements;
         return true;
     } else return false;
@@ -180,18 +181,16 @@ void *vector_at(const vector_t *vec, size_t pos)
 void *vector_peek(const vector_t *vec)
 {
     REQUIRE_NONNULL(vec)
-    void *result = NULL;
-    if (require_non_zero(vec->num_elements))
-        result = vector_at(vec, vec->num_elements - 1);
+    REQUIRE_NONZERO(vec->num_elements)
+    void *result = vector_at(vec, vec->num_elements - 1);
     return result;
 }
 
 void *vector_begin(const vector_t *vec)
 {
     REQUIRE_NONNULL(vec)
-    void *result = NULL;
-    if (require_non_zero(vec->num_elements))
-        result = vector_at(vec, 0);
+    REQUIRE_NONZERO(vec->num_elements)
+    void *result = vector_at(vec, 0);
     return result;
 }
 

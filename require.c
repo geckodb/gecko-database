@@ -29,13 +29,6 @@ static int _comp_size_t(const void *lhs, const void *rhs);
 // I N T E R F A C E  I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool require_non_zero(int64_t value)
-{
-    bool is_non_zero = (value > 0);
-    error_if(!is_non_zero, err_constraint_violated);
-    return is_non_zero;
-}
-
 void *require_malloc(size_t size)
 {
     if (require_constraint_size_t(size, constraint_greater, 0)) {
