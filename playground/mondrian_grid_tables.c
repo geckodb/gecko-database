@@ -52,6 +52,7 @@ int main(void) {
         gs_tuple_field_write(&field, &d);
      //   gs_tuple_field_close(&field);
     }
+    gs_resultset_free(&resultset);
 
 
 
