@@ -100,9 +100,7 @@ const freelist_t *gs_grid_table_freelist(const struct grid_table_t *table);
 grid_cursor_t *gs_grid_table_grid_find(const grid_table_t *table, const attr_id_t *attr_ids, size_t nattr_ids,
                                   const tuple_id_t *tuple_ids, size_t ntuple_ids);
 
-// A project and materialize function, that copies the tables data that is organized in grids, into a single data
-// fragment.
-frag_t *gs_grid_table_melt(enum frag_impl_type_t type, const grid_table_t *table, const tuple_id_t *tuple_ids,
+grid_table_t *gs_grid_table_melt(enum frag_impl_type_t type, const grid_table_t *src_table, const tuple_id_t *tuple_ids,
                            size_t ntuple_ids, const attr_id_t *attr_ids, size_t nattr_ids);
 
 const attr_t *gs_grid_table_attr_by_id(const grid_table_t *table, attr_id_t id);
@@ -180,11 +178,11 @@ static inline tuplet_id_t gs_grid_global_to_local(grid_t *grid, tuple_id_t tuple
 
     // TODO: Cache this!
     // calculate the number of tuplets that fall into preceding intervals
-    for (const tuple_id_interval_t *it = vector_begin(grid->tuple_ids); it < cursor; it++) {
+    for (const tuple_id_interval_t *it = vector_begin(grid->tuple_ids); it < end; it++) {
         result += gs_interval_get_span(it);
     }
-    // calculate the exact identifer fot the given tuple in the 'cursor' interval
-    result += (tuple_id - cursor->begin);
+    // calculate the exact identifier for the given tuple in the 'cursor' interval
+    result += (tuple_id - cursor->end);
 
     // update cache
     grid->last_interval_cache = cursor;

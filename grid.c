@@ -3,6 +3,8 @@
 #include <indexes/hindexes/lsearch_hindex.h>
 #include <containers/dicts/hash_table.h>
 #include <schema.h>
+#include <tuplet_field.h>
+#include <tuple_field.h>
 
 static inline void create_indexes(grid_table_t *table, size_t approx_num_horizontal_partitions);
 
@@ -130,19 +132,31 @@ grid_cursor_t *gs_grid_table_grid_find(const grid_table_t *table, const attr_id_
     return result;
 }
 
-frag_t *gs_grid_table_melt(enum frag_impl_type_t type, const grid_table_t *table, const tuple_id_t *tuple_ids,
+grid_table_t *gs_grid_table_melt(enum frag_impl_type_t type, const grid_table_t *src_table, const tuple_id_t *tuple_ids,
                            size_t ntuple_ids, const attr_id_t *attr_ids, size_t nattr_ids)
 {
-    schema_t *melt_schema = gs_schema_subset(table->schema, attr_ids, nattr_ids);
+    tuple_t src_tuple, dst_tuple;
+    tuple_field_t src_field, dst_field;
+    tuple_cursor_t dst_cursor;
+    tuple_id_t src_tuple_id = 0;
 
-    frag_t *result = gs_fragment_alloc(melt_schema, ntuple_ids, type);
-    grid_cursor_t *cursor = gs_grid_table_grid_find(table, attr_ids, nattr_ids, tuple_ids, ntuple_ids);
+    schema_t *dst_schema = gs_schema_subset(src_table->schema, attr_ids, nattr_ids);
+    grid_table_t *dst_table = gs_grid_table_create(dst_schema, 1);
+    tuple_id_interval_t cover = { .begin = 0, .end = ntuple_ids };
+    gs_grid_table_add_grid(dst_table, attr_ids, nattr_ids, &cover, 1, type);
+    gs_grid_table_insert(&dst_cursor, dst_table, ntuple_ids);
 
-    panic("Not implemented: %s", "the holy melt function");
-
-    grid_cursor_close(cursor);
-    gs_schema_free(melt_schema);
-    gs_fragment_free(result);
+    while (gs_tuple_cursor_next(&dst_tuple, &dst_cursor)) {
+        gs_tuple_open(&src_tuple, src_table, src_tuple_id++);
+        for (size_t x = 0; x < nattr_ids; x++) {
+            attr_id_t attr_id = attr_ids[x];
+            gs_tuple_field_seek(&src_field, &src_tuple, attr_id);
+            gs_tuple_field_seek(&dst_field, &dst_tuple, attr_id);
+            const void *field_data = gs_tuple_field_read(&src_field);
+            gs_tuple_field_write(&dst_field, field_data);
+        }
+    }
+    return dst_table;
 }
 
 // This function returns NULL, if the table attribute is not covered by this grid
@@ -210,25 +224,21 @@ void gs_grid_print(FILE *file, const grid_table_t *table, grid_id_t grid_id, siz
 void gs_grid_table_print(FILE *file, const grid_table_t *table, size_t row_offset, size_t limit)
 {
     REQUIRE_NONNULL(table);
+
     tuple_id_t *tuple_ids = REQUIRE_MALLOC(table->num_tuples * sizeof(tuple_id_t));
     attr_id_t *attr_ids = REQUIRE_MALLOC(gs_grid_table_num_of_attributes(table) * sizeof(attr_id_t));
 
-    for (size_t i = 0; i < table->num_tuples; i++) {
-        tuple_ids[i] = i;
-    }
+    for (size_t i = 0; i < table->num_tuples; tuple_ids[i] = i, i++);
+    for (size_t i = 0; i < gs_grid_table_num_of_attributes(table); attr_ids[i] = i, i++);
 
-    for (size_t i = 0; i < gs_grid_table_num_of_attributes(table); i++) {
-        attr_ids[i] = i;
-    }
-
-    frag_t *frag = gs_grid_table_melt(FIT_HOST_NSM_VM, table, tuple_ids, table->num_tuples, attr_ids,
+    grid_table_t *molten_table = gs_grid_table_melt(FIT_HOST_NSM_VM, table, tuple_ids, table->num_tuples, attr_ids,
                                       gs_grid_table_num_of_attributes(table));
 
-    gs_frag_print(file, frag, row_offset, limit);
+    gs_frag_print(file, gs_grid_by_id(molten_table, 0)->frag, row_offset, limit);
 
     free(attr_ids);
     free(tuple_ids);
-    gs_fragment_free(frag);
+    gs_grid_table_free(molten_table);
 }
 
 static inline void create_indexes(grid_table_t *table, size_t approx_num_horizontal_partitions)

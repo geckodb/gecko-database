@@ -23,6 +23,8 @@ void gs_tuple_field_next(tuple_field_t *field);
 
 void gs_tuple_field_write(tuple_field_t *field, const void *data);
 
+const void *gs_tuple_field_read(tuple_field_t *field);
+
 void gs_tuple_field_close(tuple_field_t *field);
 
 /*bool gs_tuple_field_next(tuple_field_t *field);

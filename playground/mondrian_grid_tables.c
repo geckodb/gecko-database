@@ -50,10 +50,10 @@ int main(void) {
         gs_tuple_field_write(&field, &b);
         gs_tuple_field_write(&field, &c);
         gs_tuple_field_write(&field, &d);
-        a++;
-        b++;
-        c++;
-        d++;
+        a <<= 2;
+        b <<= 2;
+        c <<= 2;
+        d <<= 2;
     }
     gs_tuple_cursor_free(&resultset);
 

@@ -17,7 +17,7 @@ void gs_tuple_field_seek(tuple_field_t *field, tuple_t *tuple, attr_id_t attr_id
     grid_t *grid = grid_cursor_next(cursor);
 
     tuplet_t *tuplet = gs_tuplet_open(grid->frag, gs_grid_global_to_local(grid, tuple->tuple_id, AT_RANDOM));
-    tuplet_field_t *tuplet_field = gs_tuplet_field_open(tuplet);
+    tuplet_field_t *tuplet_field = gs_tuplet_field_seek(tuplet, attr_id);
 
     *field = (tuple_field_t) {
             .tuple = tuple,
@@ -55,6 +55,11 @@ void gs_tuple_field_write(tuple_field_t *field, const void *data)
 {
     gs_tuplet_field_write(field->field, data);
     gs_tuple_field_next(field);
+}
+
+const void *gs_tuple_field_read(tuple_field_t *field)
+{
+    return gs_tuplet_field_read(field->field);
 }
 
 void gs_tuple_field_close(tuple_field_t *field)
