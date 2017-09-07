@@ -36,7 +36,9 @@ void gs_tuple_field_next(tuple_field_t *field)
     const attr_id_t *attr_id = gs_grid_table_attr_id_to_frag_attr_id(field->grid, ++field->table_attr_id);
     if (attr_id) {
         // next tuple field is inside the current tuplet
-        gs_tuplet_field_seek(field->tuplet, *attr_id);
+        tuplet_field_t *intermediate = gs_tuplet_field_seek(field->tuplet, *attr_id);
+        gs_tuplet_field_close(intermediate);
+        gs_tuplet_close(field->tuplet);
     } else {
         // next tuple fiels is in another tuplet (i.e., requires to search the other grid)
         if (field->table_attr_id < field->grid->context->schema->attr->num_elements) {
@@ -58,4 +60,5 @@ void gs_tuple_field_write(tuple_field_t *field, const void *data)
 void gs_tuple_field_close(tuple_field_t *field)
 {
     gs_tuplet_field_close(field->field);
+    free (field->tuplet);
 }

@@ -215,8 +215,11 @@ static inline void tuplet_delete(tuplet_t *self)
 
 static inline void tuplet_close(tuplet_t *self)
 {
-    assert (self != NULL);
-    free (self);
+    //assert (self != NULL);
+    //free (self);
+
+
+
 }
 
 static inline bool tuplet_is_null(tuplet_t *self)

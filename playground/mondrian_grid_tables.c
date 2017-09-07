@@ -50,7 +50,6 @@ int main(void) {
         gs_tuple_field_write(&field, &b);
         gs_tuple_field_write(&field, &c);
         gs_tuple_field_write(&field, &d);
-     //   gs_tuple_field_close(&field);
     }
     gs_resultset_free(&resultset);
     gs_grid_table_free(table);

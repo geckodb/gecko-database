@@ -107,9 +107,7 @@ void gs_frag_print_ex(FILE *file, enum frag_printer_type_tag type, frag_t *frag,
 void gs_fragment_free(frag_t *frag)
 {
     assert(frag);
-    assert(frag->tuplet_data);
-    free (frag->tuplet_data);
-    free (frag);
+    frag->_dispose(frag);
 }
 
 size_t gs_fragment_num_of_attributes(const frag_t *frag)
