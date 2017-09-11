@@ -53,7 +53,7 @@ void gs_tuple_field_next(tuple_field_t *field)
 
 void gs_tuple_field_write(tuple_field_t *field, const void *data)
 {
-    gs_tuplet_field_write(field->tuplet_field, data);
+    gs_tuplet_field_write(field->tuplet_field, data, false);
     gs_tuple_field_next(field);
 }
 

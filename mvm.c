@@ -1128,7 +1128,7 @@ static int exec_wfield(mondrian_vm_t *vm, u64 _)
     mondrian_vm_get_var(&mem_addr, vm, VARIABLE_RFC);
     tuplet_field_t *cursor = (tuplet_field_t *) mem_addr;
     u64 data = OPERAND_STACK_POP();
-    gs_tuplet_field_write(cursor, &data);
+    gs_tuplet_field_write(cursor, &data, true);
 
     return MONDRIAN_OK;
 }

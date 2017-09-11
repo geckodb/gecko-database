@@ -52,7 +52,7 @@ static inline void calc_field_print_lens(vector_t *field_print_lens, frag_t *fra
             size_t all_print_len = *(size_t *) vector_at(field_print_lens, attr_idx);
             all_print_len = max(all_print_len, this_print_len_field);
             vector_set(field_print_lens, attr_idx, 1, &all_print_len);
-            gs_tuplet_field_next(field);
+            gs_tuplet_field_next(field, true);
         }
     }
 }
@@ -126,7 +126,7 @@ static inline void print_frag_body(FILE *file, frag_t *frag, vector_t *field_pri
             sprintf(format_buffer, "| %%-%zus ", print_len);
             printf(format_buffer, str);
             free (str);
-            gs_tuplet_field_next(field);
+            gs_tuplet_field_next(field, true);
         }
         printf("|\n");
     }

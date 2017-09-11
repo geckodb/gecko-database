@@ -2,10 +2,10 @@
 #include <schema.h>
 #include <unsafe.h>
 
-bool gs_tuplet_field_next(tuplet_field_t *field)
+bool gs_tuplet_field_next(tuplet_field_t *field, bool auto_next)
 {
     assert (field);
-    return field->_next(field);
+    return field->_next(field, auto_next);
 }
 
 const void *gs_tuplet_field_read(tuplet_field_t *field)
@@ -20,15 +20,15 @@ void gs_tuplet_field_update(tuplet_field_t *field, const void *data)
     return field->_update(field, data);
 }
 
-bool gs_tuplet_field_write(tuplet_field_t *field, const void *data)
+bool gs_tuplet_field_write(tuplet_field_t *field, const void *data, bool auto_next)
 {
     gs_tuplet_field_update(field, data);
-    return gs_tuplet_field_next(field);
+    return gs_tuplet_field_next(field, auto_next);
 }
 
-bool gs_tuplet_field_write_eval(tuplet_field_t *field, bool eval)
+bool gs_tuplet_field_write_eval(tuplet_field_t *field, bool eval, bool auto_next)
 {
-    return gs_tuplet_field_write(field, &eval);
+    return gs_tuplet_field_write(field, &eval, auto_next);
 }
 
 void gs_tuplet_field_set_null(tuplet_field_t *field)

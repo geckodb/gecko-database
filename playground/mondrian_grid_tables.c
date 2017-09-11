@@ -120,8 +120,6 @@ int main(void) {
         b += 4;
         c += 4;
         d += 4;
-        printf("\nXXXXX\n");
-        gs_grid_print(stdout, table, g03, 0, UINT64_MAX);
     }
 
     gs_tuple_cursor_free(&resultset);

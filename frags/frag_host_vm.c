@@ -36,7 +36,7 @@ static inline void field_rebase(tuplet_field_t *field, tuplet_t *tuplet);
 static inline void field_movebase(tuplet_field_t *field, tuplet_t *tuplet);
 static inline size_t field_nsm_jmp_size(tuplet_field_t *field);
 static inline size_t field_dsm_jmp_size(tuplet_field_t *field, size_t dst_tuplet_slot_id, size_t dst_attr_id);
-static inline bool field_next(tuplet_field_t *field);
+static inline bool field_next(tuplet_field_t *field, bool auto_next);
 static inline bool field_seek(tuplet_field_t *field, attr_id_t attr_id);
 static inline const void *field_read(tuplet_field_t *field);
 static inline void field_update(tuplet_field_t *field, const void *data);
@@ -267,7 +267,7 @@ static inline size_t field_dsm_jmp_size(tuplet_field_t *field, size_t dst_tuplet
     return skip_size;
 }
 
-static inline bool field_next(tuplet_field_t *field)
+static inline bool field_next(tuplet_field_t *field, bool auto_next)
 {
     assert (field);
     assert (field->tuplet);
@@ -282,14 +282,11 @@ static inline bool field_next(tuplet_field_t *field)
         field_movebase(field, field->tuplet);
         return true;
     } else {
-        bool valid_tuplet = gs_tuplet_next(field->tuplet);
-        if (valid_tuplet) {
-            field_rebase(field, field->tuplet);
-            return true;
-        } else {
-            //gs_tuplet_field_close(tuplet_field);
-            return false;
+        if (auto_next && gs_tuplet_next(field->tuplet)) {
+              field_rebase(field, field->tuplet);
+              return true;
         }
+        return false;
     }
 }
 
@@ -297,7 +294,7 @@ static inline bool field_seek(tuplet_field_t *field, attr_id_t attr_id)
 {
     bool result = true;
     while(attr_id-- && result)
-        result &= field_next(field);
+        result &= field_next(field, false);
     return result;
 }
 
