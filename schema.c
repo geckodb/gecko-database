@@ -89,6 +89,7 @@ void gs_schema_print(FILE *file, schema_t *schema)
     gs_attr_create_attrid("attr_id", print_schema);
     gs_attr_create_strptr("name", print_schema);
     gs_attr_create_strptr("type", print_schema);
+    gs_attr_create_uint64("rep", print_schema);
     gs_attr_create_bool("primary", print_schema);
     gs_attr_create_bool("foreign", print_schema);
     gs_attr_create_bool("nullable", print_schema);
@@ -107,6 +108,7 @@ void gs_schema_print(FILE *file, schema_t *schema)
             gs_tuplet_field_write(field, &i);
             gs_tuplet_field_write(field, attr->name);
             gs_tuplet_field_write(field, gs_field_type_str(attr->type));
+            gs_tuplet_field_write(field, &attr->type_rep);
             gs_tuplet_field_write_eval(field, (attr->flags.primary == 1));
             gs_tuplet_field_write_eval(field, (attr->flags.foreign == 1));
             gs_tuplet_field_write_eval(field, (attr->flags.nullable == 1));

@@ -136,8 +136,8 @@ $(document).ready(function()
         <td></td>
         <td></td>
         <td></td>
-        <td>&#91; data, field handle &#93; &rarr; field handle</td>
-        <td>Writes <i>data</i> into the field associated with <i>field handle</i>, moves <i>field handle</i> to the next field and removes <i>data</i> from the stack. Which data type is used for <i>data</i> is inferred by the associated column of the fragment. In case the field handle is moves beyond the last field of the current tuplet, it is set to the first field in the subsequent tuplet. In case the field handle is moved outside the bounds of the tbale, an <code>ABORT</code> is invoked and a rollback is initialized. The program exits with exit code 2 (<code>ABORT BY SYSTEM</code>) in this case.</td>
+        <td>&#91; data, tuplet_field handle &#93; &rarr; tuplet_field handle</td>
+        <td>Writes <i>data</i> into the tuplet_field associated with <i>tuplet_field handle</i>, moves <i>tuplet_field handle</i> to the next tuplet_field and removes <i>data</i> from the stack. Which data type is used for <i>data</i> is inferred by the associated column of the fragment. In case the tuplet_field handle is moves beyond the last tuplet_field of the current tuplet, it is set to the first tuplet_field in the subsequent tuplet. In case the tuplet_field handle is moved outside the bounds of the tbale, an <code>ABORT</code> is invoked and a rollback is initialized. The program exits with exit code 2 (<code>ABORT BY SYSTEM</code>) in this case.</td>
     </tr>
     <tr>
         <td>proglist</td>
@@ -200,7 +200,7 @@ $(document).ready(function()
         <td></td>
         <td></td>
         <td>&#91;pointer to string, type, rep, flags, pointer to schema &#93; &rarr; &#91;attr id, pointer to schema&#93;</td>
-        <td>Adds a new attribute with the name references by <i>pointer to string</i> to schema referenced by <i>pointer to schema</i>. The <a href="#datatypes">data type</a> is defined by <i>type</i>. For fixed-length field types (e.g., <code>VARCHAR(n)</code>) set <i>rep</i> to <i>n</i>. The value <i>flags</i> is an xor-ed number defining the <a href="#columnflags">column flags</a>. In case the new attribute name conflicts with another attribute name in the schema, an <code>ABORT</code> is issued and the program finishes with exit code 2 (<code>ABORT BY SYSTEM</code>). If successfully, a number identifying the new attribute (<i>attr id</i>) to access the new attribute is pushed onto the stack</td>
+        <td>Adds a new attribute with the name references by <i>pointer to string</i> to schema referenced by <i>pointer to schema</i>. The <a href="#datatypes">data type</a> is defined by <i>type</i>. For fixed-length tuplet_field types (e.g., <code>VARCHAR(n)</code>) set <i>rep</i> to <i>n</i>. The value <i>flags</i> is an xor-ed number defining the <a href="#columnflags">column flags</a>. In case the new attribute name conflicts with another attribute name in the schema, an <code>ABORT</code> is issued and the program finishes with exit code 2 (<code>ABORT BY SYSTEM</code>). If successfully, a number identifying the new attribute (<i>attr id</i>) to access the new attribute is pushed onto the stack</td>
     </tr>
     <tr>
         <td>vstore</td>
@@ -424,7 +424,7 @@ $(document).ready(function()
         <td>VARIABLE_RTP</td>
         <td>VARIABLE_RFP</td>
         <td></td>
-        <td>Sets the <code>VARIABLE_RFC</code> <a href="#localvariables">variable</a> to a <i>cursor to the first field</i> inside the tuplet references by a <i>cursor to tuplet</i> in the <code>VARIABLE_RFC</code> <a href="#localvariables">variable</a>. The stack is not modified.</td>
+        <td>Sets the <code>VARIABLE_RFC</code> <a href="#localvariables">variable</a> to a <i>cursor to the first tuplet_field</i> inside the tuplet references by a <i>cursor to tuplet</i> in the <code>VARIABLE_RFC</code> <a href="#localvariables">variable</a>. The stack is not modified.</td>
     </tr>
 
     <tr>
@@ -434,7 +434,7 @@ $(document).ready(function()
         <td>VARIABLE_RFP</td>
         <td></td>
         <td>value &rarr; </td>
-        <td>Writes <i>value</i> from the operand stack into the current field cursor as referenced by <code>VARIABLE_RFC</code> <a href="#localvariables">variable</a>. How the value on the stack is interpreted is inferred from the schema of the owning tuplet. After the data was written into the field, the field cursor is updated to the next field inside the tuplet. In case the field cursor goes beyond the last field of the current tuplet, the field cursor is updated to the first field of the next tuplet. In case the field cursor goes beyond the last tuplet, the field cursor is closed and resources for the cursor are freed. Accessing a closed cursor leads to undefined behavior.</td>
+        <td>Writes <i>value</i> from the operand stack into the current tuplet_field cursor as referenced by <code>VARIABLE_RFC</code> <a href="#localvariables">variable</a>. How the value on the stack is interpreted is inferred from the schema of the owning tuplet. After the data was written into the tuplet_field, the tuplet_field cursor is updated to the next tuplet_field inside the tuplet. In case the tuplet_field cursor goes beyond the last tuplet_field of the current tuplet, the tuplet_field cursor is updated to the first tuplet_field of the next tuplet. In case the tuplet_field cursor goes beyond the last tuplet, the tuplet_field cursor is closed and resources for the cursor are freed. Accessing a closed cursor leads to undefined behavior.</td>
     </tr>
 
     <tr>

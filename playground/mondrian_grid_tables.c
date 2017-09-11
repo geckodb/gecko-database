@@ -120,6 +120,8 @@ int main(void) {
         b += 4;
         c += 4;
         d += 4;
+        printf("\nXXXXX\n");
+        gs_grid_print(stdout, table, g03, 0, UINT64_MAX);
     }
 
     gs_tuple_cursor_free(&resultset);
@@ -132,10 +134,10 @@ int main(void) {
     grid_id_t g03 = gs_grid_table_add_grid(table, &cover[0], 4, &g03_tid_cover[0], 1, FIT_HOST_NSM_VM);
 
     tuple = gs_grid_table_insert(table, 3);
-    field = gs_tuple_field_open(tuple);
-    write_data(field, 24, 25, 26, 27);
-    write_data(field, 28, 29, 30, 31);
-    write_data(field, 32, 33, 34, 35);
+    tuplet_field = gs_tuple_field_open(tuple);
+    write_data(tuplet_field, 24, 25, 26, 27);
+    write_data(tuplet_field, 28, 29, 30, 31);
+    write_data(tuplet_field, 32, 33, 34, 35);
 
 
     //  Add full grid with same altered schema orientation, column-store
@@ -152,10 +154,10 @@ int main(void) {
     grid_id_t g04 = gs_grid_table_add_grid(table, &cover[0], 4, &g04_tid_cover[0], 1, FIT_HOST_DSM_VM);
 
     tuple = gs_grid_table_insert(table, 3);
-    field = gs_tuple_field_open(tuple);
-    write_data(field, 36, 37, 38, 39);
-    write_data(field, 40, 41, 42, 43);
-    write_data(field, 44, 45, 46, 47);
+    tuplet_field = gs_tuple_field_open(tuple);
+    write_data(tuplet_field, 36, 37, 38, 39);
+    write_data(tuplet_field, 40, 41, 42, 43);
+    write_data(tuplet_field, 44, 45, 46, 47);
 
     //  Add partial grids with same original schema orientation, column-store + row-store
     //           +===============|===============+
@@ -173,10 +175,10 @@ int main(void) {
     grid_id_t g06 = gs_grid_table_add_grid(table, &cover[0] + 2, 2, &g0506_tid_cover[0], 1, FIT_HOST_NSM_VM);
 
     tuple = gs_grid_table_insert(table, 3);
-    field = gs_tuple_field_open(tuple);
-    write_data(field, 48, 49, 50, 51);
-    write_data(field, 52, 53, 54, 55);
-    write_data(field, 56, 57, 58, 59);
+    tuplet_field = gs_tuple_field_open(tuple);
+    write_data(tuplet_field, 48, 49, 50, 51);
+    write_data(tuplet_field, 52, 53, 54, 55);
+    write_data(tuplet_field, 56, 57, 58, 59);
 
     //  Add partial grids with one having same original schema orientation other altered, column-store + row-store
     //           +===============|===============+
@@ -194,10 +196,10 @@ int main(void) {
     grid_id_t g08 = gs_grid_table_add_grid(table, &cover[0] + 2, 2, &g0708_tid_cover[0], 1, FIT_HOST_NSM_VM);
 
     tuple = gs_grid_table_insert(table, 3);
-    field = gs_tuple_field_open(tuple);
-    write_data(field, 60, 61, 62, 63);
-    write_data(field, 64, 65, 66, 67);
-    write_data(field, 68, 69, 70, 71);
+    tuplet_field = gs_tuple_field_open(tuple);
+    write_data(tuplet_field, 60, 61, 62, 63);
+    write_data(tuplet_field, 64, 65, 66, 67);
+    write_data(tuplet_field, 68, 69, 70, 71);
 
     //  Add 2 partial interleaved grids with original schema orientation, column-store + row-store
     //           +=======|===============|=======+
@@ -216,10 +218,10 @@ int main(void) {
     grid_id_t g10 = gs_grid_table_add_grid(table, &cover[0], 2, &g0910_tid_cover[0], 1, FIT_HOST_DSM_VM);
 
     tuple = gs_grid_table_insert(table, 3);
-    field = gs_tuple_field_open(tuple);
-    write_data(field, 72, 73, 74, 75);
-    write_data(field, 76, 77, 78, 79);
-    write_data(field, 80, 81, 82, 83);
+    tuplet_field = gs_tuple_field_open(tuple);
+    write_data(tuplet_field, 72, 73, 74, 75);
+    write_data(tuplet_field, 76, 77, 78, 79);
+    write_data(tuplet_field, 80, 81, 82, 83);
 
     //  Add 2 partial interleaved grids with one having alternate schema orientation, column-store + row-store
     //           +=======|===============|=======+
@@ -238,10 +240,10 @@ int main(void) {
     grid_id_t g12 = gs_grid_table_add_grid(table, &cover[0], 2, &g1112_tid_cover[0], 1, FIT_HOST_DSM_VM);
 
     tuple = gs_grid_table_insert(table, 3);
-    field = gs_tuple_field_open(tuple);
-    write_data(field, 84, 85, 86, 87);
-    write_data(field, 88, 89, 90, 91);
-    write_data(field, 92, 93, 94, 95);
+    tuplet_field = gs_tuple_field_open(tuple);
+    write_data(tuplet_field, 84, 85, 86, 87);
+    write_data(tuplet_field, 88, 89, 90, 91);
+    write_data(tuplet_field, 92, 93, 94, 95);
 
     //  Add complex interleaved grids with having alternate schema orientation, column-store + row-store
     //           +=======|=======================+
@@ -286,13 +288,13 @@ int main(void) {
     grid_id_t g16 = gs_grid_table_add_grid(table, &cover[0], 1, &g16_tid_cover[0], 1, FIT_HOST_DSM_VM);
 
     tuple = gs_grid_table_insert(table, 3);
-    field = gs_tuple_field_open(tuple);
-    write_data(field, 96, 97, 98, 99);
-    write_data(field, 100, 101, 102, 103);
-    write_data(field, 104, 105, 106, 107);
-    write_data(field, 108, 109, 110, 111);
-    write_data(field, 112, 113, 114, 115);
-    write_data(field, 116, 117, 118, 119);
+    tuplet_field = gs_tuple_field_open(tuple);
+    write_data(tuplet_field, 96, 97, 98, 99);
+    write_data(tuplet_field, 100, 101, 102, 103);
+    write_data(tuplet_field, 104, 105, 106, 107);
+    write_data(tuplet_field, 108, 109, 110, 111);
+    write_data(tuplet_field, 112, 113, 114, 115);
+    write_data(tuplet_field, 116, 117, 118, 119);
 
     bool valid = gs_grid_table_is_valide(table);
     assert (valid);

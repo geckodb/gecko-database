@@ -155,14 +155,14 @@ grid_table_t *gs_grid_table_melt(enum frag_impl_type_t type, const grid_table_t 
             const void *field_data = gs_tuple_field_read(&src_field);
 
          /*   // DEBUG:
-            if (src_field.field->attr_id == 0) {
-                printf("read tuplet (%u) field attr0 (%llu): '%llu'\n", src_field.field->tuplet->tuplet_id, src_field.field->attr_id, *(u64*) src_field.field->attr_value_ptr);
-            } else if (src_field.field->attr_id == 1) {
-                printf("read tuplet (%u) field attr1 (%llu): '%d'\n", src_field.field->tuplet->tuplet_id, src_field.field->attr_id, *(u32*) src_field.field->attr_value_ptr);
-            } else if (src_field.field->attr_id == 2) {
-                printf("read tuplet (%u) field attr2 (%llu): '%d'\n", src_field.field->tuplet->tuplet_id, src_field.field->attr_id, *(u16*) src_field.field->attr_value_ptr);
-            } else if (src_field.field->attr_id == 3) {
-                printf("read tuplet (%u) field attr3 (%llu): '%d'\n", src_field.field->tuplet->tuplet_id, src_field.field->attr_id, *(u16*) src_field.field->attr_value_ptr);
+            if (src_field.tuplet_field->attr_id == 0) {
+                printf("read tuplet (%u) tuplet_field attr0 (%llu): '%llu'\n", src_field.tuplet_field->tuplet->tuplet_id, src_field.tuplet_field->attr_id, *(u64*) src_field.tuplet_field->attr_value_ptr);
+            } else if (src_field.tuplet_field->attr_id == 1) {
+                printf("read tuplet (%u) tuplet_field attr1 (%llu): '%d'\n", src_field.tuplet_field->tuplet->tuplet_id, src_field.tuplet_field->attr_id, *(u32*) src_field.tuplet_field->attr_value_ptr);
+            } else if (src_field.tuplet_field->attr_id == 2) {
+                printf("read tuplet (%u) tuplet_field attr2 (%llu): '%d'\n", src_field.tuplet_field->tuplet->tuplet_id, src_field.tuplet_field->attr_id, *(u16*) src_field.tuplet_field->attr_value_ptr);
+            } else if (src_field.tuplet_field->attr_id == 3) {
+                printf("read tuplet (%u) tuplet_field attr3 (%llu): '%d'\n", src_field.tuplet_field->tuplet->tuplet_id, src_field.tuplet_field->attr_id, *(u16*) src_field.tuplet_field->attr_value_ptr);
             }*/
 
             gs_tuple_field_write(&dst_field, field_data);
@@ -277,6 +277,7 @@ static inline grid_t *create_grid(grid_table_t *table, const attr_id_t *attr, si
 
     schema_t *grid_schema = gs_schema_subset(table->schema, attr, nattr);
     assert (grid_schema);
+    gs_schema_print(stdout, table->schema);
     gs_schema_print(stdout, grid_schema);
     size_t tuplet_capacity = get_required_capacity(tuple_ids, ntuple_ids);
 
