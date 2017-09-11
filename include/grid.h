@@ -105,11 +105,19 @@ grid_table_t *gs_grid_table_melt(enum frag_impl_type_t type, const grid_table_t 
 
 const attr_t *gs_grid_table_attr_by_id(const grid_table_t *table, attr_id_t id);
 
+const char *gs_grid_table_attr_name_by_id(const grid_table_t *table, attr_id_t id);
+
 size_t gs_grid_table_num_of_attributes(const grid_table_t *table);
+
+size_t gs_grid_table_num_of_tuples(const grid_table_t *table);
+
+size_t gs_grid_table_num_of_grids(const grid_table_t *table);
 
 const attr_id_t *gs_grid_table_attr_id_to_frag_attr_id(const grid_t *grid, attr_id_t table_attr_id);
 
 const grid_t *gs_grid_by_id(const grid_table_t *table, grid_id_t id);
+
+size_t gs_grid_num_of_attributes(const grid_t *grid);
 
 vector_t *gs_grid_table_grids_by_attr(const grid_table_t *table, const attr_id_t *attr_ids, size_t nattr_ids);
 
@@ -121,13 +129,17 @@ void gs_grid_table_insert(tuple_cursor_t *resultset, grid_table_t *table, size_t
 
 void gs_grid_print(FILE *file, const grid_table_t *table, grid_id_t grid_id, size_t row_offset, size_t limit);
 
+void gs_grid_table_grid_list_print(FILE *file, const grid_table_t *table, size_t row_offset, size_t limit);
+
 void gs_grid_table_print(FILE *file, const grid_table_t *table, size_t row_offset, size_t limit);
+
+void gs_grid_table_structure_print(FILE *file, const grid_table_t *table, size_t row_offset, size_t limit);
 
 static inline int interval_tuple_id_comp_by_element(const void *needle, const void *element)
 {
     tuple_id_t tuple_id = *(const tuple_id_t *) needle;
     const tuple_id_interval_t *interval = element;
-    return (gs_interval_contains(interval, tuple_id) ? 0 : (tuple_id < interval->begin ? - 1 : + 1));
+    return (GS_INTERVAL_CONTAINS(interval, tuple_id) ? 0 : (tuple_id < interval->begin ? - 1 : + 1));
 }
 
 static inline tuplet_id_t gs_grid_global_to_local(grid_t *grid, tuple_id_t tuple_id, access_type type)
@@ -147,12 +159,12 @@ static inline tuplet_id_t gs_grid_global_to_local(grid_t *grid, tuple_id_t tuple
     // a valid coverage of the given 'tuple_id' in this grid
     const tuple_id_interval_t *end = vector_end(grid->tuple_ids);
 
-    if (!gs_interval_contains(cursor, tuple_id)) {
+    if (!GS_INTERVAL_CONTAINS(cursor, tuple_id)) {
         switch (type) {
             case AT_SEQUENTIAL:
                 // seek to interval that contains the tuple, move cursor to successor since its guaranteed not in the
                 // current one
-                for (cursor++; cursor < end && !gs_interval_contains(cursor, tuple_id); cursor++);
+                for (cursor++; cursor < end && !GS_INTERVAL_CONTAINS(cursor, tuple_id); cursor++);
                 break;
             case AT_RANDOM:
                 // Assert that interval list is sorted. If sort state is not cached,

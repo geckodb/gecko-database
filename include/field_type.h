@@ -18,6 +18,10 @@ enum field_type {
     /* internal */
     FT_STRPTR   = 100,
     FT_ATTRID   = 101,
+    FT_GRIDID   = 102,
+    FT_FRAGTYPE = 103,
+    FT_SIZE     = 104,
+    FT_TFORMAT  = 105,
 };
 
 size_t gs_field_type_sizeof(enum field_type type);

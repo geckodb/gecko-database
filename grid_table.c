@@ -27,7 +27,7 @@ tuplet_t *gs_grid_insert(grid_t *grid, const tuple_id_t *tuple_ids, size_t num_t
     require_non_zero(num_tuples);
 
     vector_add(grid->tuple_id_mapping, num_tuples, tuple_ids);
-    return gs_fragment_insert(grid->frag, num_tuples);
+    return gs_frag_insert(grid->frag, num_tuples);
 }
 
 const tuple_id_t *gs_grid_covered_tuples(const grid_t *grid)

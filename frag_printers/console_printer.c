@@ -37,7 +37,7 @@ static inline void calc_field_print_lens(vector_t *field_print_lens, frag_t *fra
 
     tuplet_t *tuplet = gs_tuplet_open(frag, 0);
     size_t num_tuplets = frag->ntuplets;
-    schema_t *schema = gs_fragment_get_schema(frag);
+    schema_t *schema = gs_frag_get_schema(frag);
 
     while (num_tuplets--) {
         struct tuplet_field_t *field = gs_tuplet_field_open(tuplet);
@@ -93,7 +93,7 @@ static inline void print_h_line(FILE *file, const frag_t *frag, size_t num_attr,
 static inline void print_frag_header(FILE *file, const frag_t *frag, vector_t *field_print_lens, size_t num_attr)
 {
     char format_buffer[2048];
-    schema_t *schema   = gs_fragment_get_schema(frag);
+    schema_t *schema   = gs_frag_get_schema(frag);
 
     print_h_line(file, frag, num_attr, schema, field_print_lens);
 
@@ -115,7 +115,7 @@ static inline void print_frag_body(FILE *file, frag_t *frag, vector_t *field_pri
     char format_buffer[2048];
     tuplet_t *tuplet = gs_tuplet_open(frag, 0);
     size_t num_tuples = frag->ntuplets;
-    schema_t *schema = gs_fragment_get_schema(frag);
+    schema_t *schema = gs_frag_get_schema(frag);
 
     while (num_tuples--) {
         struct tuplet_field_t *field = gs_tuplet_field_open(tuplet);

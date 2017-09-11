@@ -143,6 +143,15 @@ typedef MD5_CTX checksum_context_t;
         instance->fun(__VA_ARGS__);                                                                                    \
     })
 
+static inline const char *gs_tuplet_format_str(enum tuplet_format format)
+{
+    switch (format) {
+        case TF_NSM: return "row";
+        case TF_DSM: return "column";
+        default: perror("Unknown tuple format"); abort();
+    }
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 // D E F I N E S
 // ---------------------------------------------------------------------------------------------------------------------
@@ -201,4 +210,20 @@ typedef MD5_CTX checksum_context_t;
 
 #ifndef ATTRID
 #define ATTRID    attr_id_t
+#endif
+
+#ifndef GRIDID
+#define GRIDID    grid_id_t
+#endif
+
+#ifndef FRAGTYPE
+#define FRAGTYPE  enum frag_impl_type_t
+#endif
+
+#ifndef SIZE
+#define SIZE      size_t
+#endif
+
+#ifndef TFORMAT
+#define TFORMAT   enum tuplet_format
 #endif

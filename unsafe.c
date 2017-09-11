@@ -1,4 +1,6 @@
 #include <unsafe.h>
+#include <frag.h>
+#include <grid.h>
 
 size_t gs_unsafe_field_get_println(enum field_type type, const void *data)
 {
@@ -69,6 +71,18 @@ char *gs_unsafe_field_to_string(enum field_type type, const void *data)
         } break;
         case FT_ATTRID:
             sprintf(buffer, "%llu", *(ATTRID *) data);
+            break;
+        case FT_GRIDID:
+            sprintf(buffer, "%zu", *(GRIDID *) data);
+            break;
+        case FT_FRAGTYPE:
+            sprintf(buffer, "%s", gs_frag_str(*(FRAGTYPE *) data));
+            break;
+        case FT_SIZE:
+            sprintf(buffer, "%zu", *(SIZE *) data);
+            break;
+        case FT_TFORMAT:
+            sprintf(buffer, "%s", gs_tuplet_format_str(*(TFORMAT *) data));
             break;
         default:
             perror("Unknown type");

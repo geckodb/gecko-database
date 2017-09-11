@@ -18,7 +18,7 @@ typedef struct tuple_id_interval_t {
         (interval->end - interval->begin);                               \
     })
 
-#define gs_interval_contains(interval, elem)                             \
+#define GS_INTERVAL_CONTAINS(interval, elem)                             \
     ({                                                                   \
         (elem >= interval->begin && elem < interval->end);               \
     })

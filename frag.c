@@ -74,6 +74,7 @@ frag_t *gs_fragment_alloc(schema_t *schema, size_t tuplet_capacity, enum frag_im
     REQUIRE((tuplet_capacity > 0), "capacity of tuplets must be non zero");
 
     frag_t *result = frag_type_pool[find_type_match(type)]._create(schema, tuplet_capacity);
+    result->impl_type = type;
 
     panic_if((result->_dispose == NULL), NOTIMPLEMENTED, "frag_t::dispose");
     panic_if((result->_scan == NULL), NOTIMPLEMENTED, "frag_t::scan");
@@ -82,7 +83,7 @@ frag_t *gs_fragment_alloc(schema_t *schema, size_t tuplet_capacity, enum frag_im
     return result;
 }
 
-void gs_fragment_insert(struct tuplet_t *out, frag_t *frag, size_t ntuplets)
+void gs_frag_insert(struct tuplet_t *out, frag_t *frag, size_t ntuplets)
 {
     assert (frag);
     assert (ntuplets > 0);
@@ -113,6 +114,15 @@ void gs_fragment_free(frag_t *frag)
     frag->_dispose(frag);
 }
 
+const char *gs_frag_str(enum frag_impl_type_t type)
+{
+    switch (type) {
+        case FIT_HOST_NSM_VM: return "host/vm nsm";
+        case FIT_HOST_DSM_VM: return "host/vm dsm";
+        default: panic("Unknown fragment implementation type '%d'", type);
+    }
+}
+
 size_t gs_fragment_num_of_attributes(const frag_t *frag)
 {
     assert (frag);
@@ -125,7 +135,7 @@ size_t gs_fragment_num_of_tuplets(const frag_t *frag)
     return frag->ntuplets;
 }
 
-schema_t *gs_fragment_get_schema(const frag_t *frag)
+schema_t *gs_frag_get_schema(const frag_t *frag)
 {
     assert(frag);
     return frag->schema;

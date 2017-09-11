@@ -38,6 +38,11 @@ enum frag_printer_type_tag;
 // T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
+enum frag_impl_type_t {
+    FIT_HOST_NSM_VM,
+    FIT_HOST_DSM_VM
+};
+
 typedef struct frag_t {
     schema_t *schema; /*!< schema of this fragment */
     void *tuplet_data; /*!< data inside this fragment; the record format (e.g., NSM/DSM) is implementation-specific */
@@ -45,6 +50,7 @@ typedef struct frag_t {
     size_t ncapacity; /*!< number of tuplets that can be stored in this fragment, before a resize-opp is required */
     size_t tuplet_size; /*!< size in byte of a single tuplet */
     enum tuplet_format format; /*!< the tuplet format that defined whether NSM or DSM is used*/
+    enum frag_impl_type_t impl_type; /*!< the implementation type of the data fragment*/
 
     /* operations */
     struct frag_t *(*_scan)(struct frag_t *self, const pred_tree_t *pred, size_t batch_size, size_t nthreads);
@@ -58,10 +64,6 @@ typedef struct frag_t {
     struct tuplet_t *(*_insert)(struct frag_t *self, size_t ntuplets);
 } frag_t;
 
-enum frag_impl_type_t {
-    FIT_HOST_NSM_VM,
-    FIT_HOST_DSM_VM
-};
 
 static struct frag_type_pool_t {
     enum frag_impl_type_t binding;
@@ -79,7 +81,7 @@ __BEGIN_DECLS
 
 frag_t *gs_fragment_alloc(schema_t *schema, size_t tuplet_capacity, enum frag_impl_type_t type);
 
-void gs_fragment_insert(struct tuplet_t *out, frag_t *frag, size_t ntuplets);
+void gs_frag_insert(struct tuplet_t *out, frag_t *frag, size_t ntuplets);
 
 void gs_frag_print(FILE *file, frag_t *frag, size_t row_offset, size_t limit);
 
@@ -87,11 +89,13 @@ void gs_frag_print_ex(FILE *file, enum frag_printer_type_tag printer_type, frag_
 
 void gs_fragment_free(frag_t *frag);
 
+const char *gs_frag_str(enum frag_impl_type_t type);
+
 size_t gs_fragment_num_of_attributes(const frag_t *frag);
 
 size_t gs_fragment_num_of_tuplets(const frag_t *frag);
 
-schema_t *gs_fragment_get_schema(const frag_t *frag);
+schema_t *gs_frag_get_schema(const frag_t *frag);
 
 enum field_type gs_fragment_get_field_type(const frag_t *frag, attr_id_t id);
 

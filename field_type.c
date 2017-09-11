@@ -1,4 +1,5 @@
 #include <field_type.h>
+#include <grid.h>
 
 size_t gs_field_type_sizeof(enum field_type type)
 {
@@ -32,6 +33,14 @@ size_t gs_field_type_sizeof(enum field_type type)
             return sizeof(STRPTR);
         case FT_ATTRID:
             return sizeof(ATTRID);
+        case FT_GRIDID:
+            return sizeof(GRIDID);
+        case FT_FRAGTYPE:
+            return sizeof(FRAGTYPE);
+        case FT_SIZE:
+            return sizeof(SIZE);
+        case FT_TFORMAT:
+            return sizeof(TFORMAT);
         default:
             perror ("Unknown type");
             abort();
@@ -70,6 +79,14 @@ const char *gs_field_type_str(enum field_type type)
             return "string";
         case FT_ATTRID:
             return "attr id";
+        case FT_GRIDID:
+            return "grid id";
+        case FT_FRAGTYPE:
+            return "frag type";
+        case FT_SIZE:
+            return "size";
+        case FT_TFORMAT:
+            return "tuple format";
         default:
             perror ("Unknown type");
             abort();

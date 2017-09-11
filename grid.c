@@ -184,10 +184,27 @@ const attr_t *gs_grid_table_attr_by_id(const grid_table_t *table, attr_id_t id)
     return gs_schema_attr_by_id(table->schema, id);
 }
 
+const char *gs_grid_table_attr_name_by_id(const grid_table_t *table, attr_id_t id)
+{
+    return gs_grid_table_attr_by_id(table, id)->name;
+}
+
 size_t gs_grid_table_num_of_attributes(const grid_table_t *table)
 {
     REQUIRE_NONNULL(table)
     return table->schema->attr->num_elements;
+}
+
+size_t gs_grid_table_num_of_tuples(const grid_table_t *table)
+{
+    REQUIRE_NONNULL(table)
+    return table->num_tuples;
+}
+
+size_t gs_grid_table_num_of_grids(const grid_table_t *table)
+{
+    REQUIRE_NONNULL(table)
+    return table->grid_ptrs->num_elements;
 }
 
 const grid_t *gs_grid_by_id(const grid_table_t *table, grid_id_t id)
@@ -195,6 +212,12 @@ const grid_t *gs_grid_by_id(const grid_table_t *table, grid_id_t id)
     REQUIRE_NONNULL(table);
     REQUIRE_LESSTHAN(id, table->grid_ptrs->num_elements);
     return *(const grid_t **) vector_at(table->grid_ptrs, id);
+}
+
+size_t gs_grid_num_of_attributes(const grid_t *grid)
+{
+    REQUIRE_NONNULL(grid);
+    return grid->frag->schema->attr->num_elements;
 }
 
 vector_t *gs_grid_table_grids_by_attr(const grid_table_t *table, const attr_id_t *attr_ids, size_t nattr_ids)
@@ -233,6 +256,48 @@ void gs_grid_print(FILE *file, const grid_table_t *table, grid_id_t grid_id, siz
     gs_frag_print(stdout, grid->frag, row_offset, limit);
 }
 
+void gs_grid_table_grid_list_print(FILE *file, const grid_table_t *table, size_t row_offset, size_t limit)
+{
+    tuplet_t tuplet;
+
+    schema_t *print_schema = gs_schema_create("ad hoc info");
+    gs_attr_create_gridid("grid id", print_schema);
+    gs_attr_create_tformat("tuple format", print_schema);
+    gs_attr_create_fragtype("implementation", print_schema);
+    gs_attr_create_uint64("tuplet count", print_schema);
+    gs_attr_create_size("tuplet capacity", print_schema);
+    gs_attr_create_size("tuplet size", print_schema);
+    gs_attr_create_size("total size", print_schema);
+
+    size_t num_tuples = gs_grid_table_num_of_grids(table);
+    frag_t *frag = gs_fragment_alloc(print_schema, num_tuples, FIT_HOST_NSM_VM);
+    gs_frag_insert(&tuplet, frag, num_tuples);
+
+    do {
+        gs_tuplet_field_open(&tuplet);
+        tuplet_field_t *field = gs_tuplet_field_open(&tuplet);
+        for (size_t i = 0; i < num_tuples; i++) {
+            const grid_t *grid = gs_grid_by_id(table, i);
+            gs_tuplet_field_write(field, &i, true);
+            gs_tuplet_field_write(field, &grid->frag->format, true);
+            gs_tuplet_field_write(field, &grid->frag->impl_type, true);
+            gs_tuplet_field_write(field, &grid->frag->ntuplets, true);
+            gs_tuplet_field_write(field, &grid->frag->ncapacity, true);
+            gs_tuplet_field_write(field, &grid->frag->tuplet_size, true);
+            size_t total_size = (grid->frag->tuplet_size * grid->frag->ncapacity);
+            gs_tuplet_field_write(field, &total_size, true);
+        }
+
+        gs_tuplet_field_close(field);
+        gs_tuplet_close(&tuplet);
+    } while (gs_tuplet_next(&tuplet));
+
+    gs_frag_print(file, frag, 0, INT_MAX);
+
+    gs_fragment_free(frag);
+    gs_schema_free(print_schema);
+}
+
 void gs_grid_table_print(FILE *file, const grid_table_t *table, size_t row_offset, size_t limit)
 {
     REQUIRE_NONNULL(table);
@@ -251,6 +316,58 @@ void gs_grid_table_print(FILE *file, const grid_table_t *table, size_t row_offse
     free(attr_ids);
     free(tuple_ids);
     gs_grid_table_free(molten_table);
+}
+
+void gs_grid_table_structure_print(FILE *file, const grid_table_t *table, size_t row_offset, size_t limit)
+{
+    tuple_t read_tuple;
+    tuple_field_t read_field;
+    schema_t *write_schema;
+    tuplet_t write_tuplet;
+    frag_t *write_frag;
+    size_t num_tuples;
+    size_t num_attr;
+
+    num_tuples   = gs_grid_table_num_of_tuples(table);
+    num_attr     = gs_grid_table_num_of_attributes(table);
+    write_schema = gs_schema_create("ad hoc info");
+
+    for (size_t attr_idx = 0; attr_idx < num_attr; attr_idx++) {
+        gs_attr_create_gridid(gs_grid_table_attr_name_by_id(table, attr_idx), write_schema);
+    }
+
+    write_frag   = gs_fragment_alloc(write_schema, num_tuples, FIT_HOST_NSM_VM);
+    gs_frag_insert(&write_tuplet, write_frag, num_tuples);
+
+    /* that's very naive, but does the job for now */
+    do {
+        gs_tuplet_field_open(&write_tuplet);
+        gs_tuple_open(&read_tuple, table, write_tuplet.tuplet_id);
+        gs_tuple_field_open(&read_field, &read_tuple);
+        num_attr = gs_grid_table_num_of_attributes(table);
+
+        while (num_attr--) {
+            const char *t_attr_name = gs_grid_table_attr_name_by_id(table, read_field.table_attr_id);
+            for (grid_id_t grid_id = 0; grid_id < gs_grid_table_num_of_grids(table); grid_id++) {
+                const grid_t *grid = gs_grid_by_id(table, grid_id);
+                for (attr_id_t grid_attr_id = 0; grid_attr_id < gs_grid_num_of_attributes(grid); grid_attr_id++) {
+                    const char *g_attr_name = gs_schema_attr_by_id(gs_frag_get_schema(grid->frag), grid_attr_id)->name;
+                    if (strcmp(t_attr_name, g_attr_name) == 0) {
+                        for (size_t i = 0; i < grid->tuple_ids->num_elements; i++) {
+                            const tuple_id_interval_t *span = vector_at(grid->tuple_ids, i);
+                            if (GS_INTERVAL_CONTAINS(span, write_tuplet.tuplet_id)) {
+                                tuplet_field_t *write_field = gs_tuplet_field_seek(&write_tuplet, grid_attr_id);
+                                gs_tuplet_field_write(write_field, &grid_id, false);
+                                gs_tuplet_field_close(write_field);
+                            }
+                        }
+                    }
+                }
+            }
+            gs_tuple_field_next(&read_field);
+        }
+    } while (gs_tuplet_next(&write_tuplet));
+    gs_frag_print(file, write_frag, 0, INT_MAX);
 }
 
 static inline void create_indexes(grid_table_t *table, size_t approx_num_horizontal_partitions)
@@ -292,7 +409,7 @@ static inline grid_t *create_grid(grid_table_t *table, const attr_id_t *attr, si
     };
 
     for (size_t i = 0; i < ntuple_ids; i++) {
-        gs_fragment_insert(NULL, result->frag, gs_interval_get_span((tuple_ids + i)));
+        gs_frag_insert(NULL, result->frag, gs_interval_get_span((tuple_ids + i)));
     }
 
 

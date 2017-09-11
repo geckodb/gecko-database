@@ -687,7 +687,7 @@ static inline bool is_unique_fragment_name(mondrian_vm_t *vm, const char *name)
 {
     local_fragment_t *fragments = (local_fragment_t *) vm->fragments->data;
     for (size_t i = 0; i < vm->fragments->num_elements; i++) {
-        if ((!fragments[i].is_dropped) && (!strcmp(gs_fragment_get_schema(fragments[i].fragment)->frag_name, name))) {
+        if ((!fragments[i].is_dropped) && (!strcmp(gs_frag_get_schema(fragments[i].fragment)->frag_name, name))) {
             return false;
         }
     }
@@ -698,7 +698,7 @@ static inline int drop_fragment_with_name(mondrian_vm_t *vm, const char *name)
 {
     local_fragment_t *fragments = (local_fragment_t *) vm->fragments->data;
     for (size_t i = 0; i < vm->fragments->num_elements; i++) {
-        if (!strcmp(gs_fragment_get_schema(fragments[i].fragment)->frag_name, name)) {
+        if (!strcmp(gs_frag_get_schema(fragments[i].fragment)->frag_name, name)) {
             if (fragments[i].is_dropped) {
                 return MONDRIAN_ERROR;
             } else {
@@ -891,7 +891,7 @@ static int exec_finsert(mondrian_vm_t *vm, u64 operand)
             return MONDRIAN_ERROR;
         }
         tuplet_t *tuplet_ptr = REQUIRE_MALLOC(num * sizeof(tuplet_t *));
-        gs_fragment_insert(tuplet_ptr, frag, num);
+        gs_frag_insert(tuplet_ptr, frag, num);
         mondrian_vm_set_var(vm, VARIABLE_RTC, (u64 *)&tuplet_ptr);
         return MONDRIAN_OK;
     }

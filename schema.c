@@ -98,7 +98,7 @@ void gs_schema_print(FILE *file, schema_t *schema)
     frag_t *frag = gs_fragment_alloc(print_schema, 1, FIT_HOST_NSM_VM);
     size_t num_attr = gs_schema_num_attributes(schema);
     tuplet_t tuplet;
-    gs_fragment_insert(&tuplet, frag, num_attr);
+    gs_frag_insert(&tuplet, frag, num_attr);
 
     do {
         gs_tuplet_field_open(&tuplet);
