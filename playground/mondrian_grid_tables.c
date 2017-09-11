@@ -102,7 +102,7 @@ int main(void) {
     //         8 |   ------------------------>   |
     //           +===============================+
 
-    //cover[0] = 3; cover[2] = 2; cover[2] = 1; cover[3] = 0;
+    cover[0] = 3; cover[1] = 2; cover[2] = 1; cover[3] = 0;
 
     tuple_id_interval_t g03_tid_cover[] = {
             { .begin = 6, .end = 9 }
