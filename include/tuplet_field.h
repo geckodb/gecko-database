@@ -30,6 +30,8 @@ void gs_tuplet_field_update(tuplet_field_t *field, const void *data);
 
 bool gs_tuplet_field_write(tuplet_field_t *field, const void *data);
 
+bool gs_tuplet_field_write_eval(tuplet_field_t *field, bool eval);
+
 void gs_tuplet_field_set_null(tuplet_field_t *field);
 
 bool gs_tuplet_field_is_null(tuplet_field_t *field);

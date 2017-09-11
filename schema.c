@@ -1,6 +1,7 @@
 #include <schema.h>
 #include <attr.h>
 #include <tuplet_field.h>
+#include <debug.h>
 
 const struct attr_t *gs_schema_attr_by_id(const schema_t *schema, attr_id_t attr_id)
 {
@@ -80,4 +81,45 @@ enum field_type gs_schema_attr_type(schema_t *schema, attr_id_t id)
     assert(schema);
     const attr_t *attr = gs_schema_attr_by_id(schema, id);
     return attr->type;
+}
+
+void gs_schema_print(FILE *file, schema_t *schema)
+{
+    schema_t *print_schema = gs_schema_create("ad hoc info");
+    gs_attr_create_attrid("attr_id", print_schema);
+    gs_attr_create_strptr("name", print_schema);
+    gs_attr_create_strptr("type", print_schema);
+    gs_attr_create_bool("primary", print_schema);
+    gs_attr_create_bool("foreign", print_schema);
+    gs_attr_create_bool("nullable", print_schema);
+    gs_attr_create_bool("autoinc", print_schema);
+    gs_attr_create_bool("unique", print_schema);
+    frag_t *frag = gs_fragment_alloc(print_schema, 1, FIT_HOST_NSM_VM);
+    size_t num_attr = gs_schema_num_attributes(schema);
+    tuplet_t tuplet;
+    gs_fragment_insert(&tuplet, frag, num_attr);
+
+    do {
+        gs_tuplet_field_open(&tuplet);
+        tuplet_field_t *field = gs_tuplet_field_open(&tuplet);
+        for (attr_id_t i = 0; i < num_attr; i++) {
+            const attr_t *attr = gs_schema_attr_by_id(schema, i);
+            gs_tuplet_field_write(field, &i);
+            gs_tuplet_field_write(field, attr->name);
+            gs_tuplet_field_write(field, gs_field_type_str(attr->type));
+            gs_tuplet_field_write_eval(field, (attr->flags.primary == 1));
+            gs_tuplet_field_write_eval(field, (attr->flags.foreign == 1));
+            gs_tuplet_field_write_eval(field, (attr->flags.nullable == 1));
+            gs_tuplet_field_write_eval(field, (attr->flags.autoinc == 1));
+            gs_tuplet_field_write_eval(field, (attr->flags.unique == 1));
+        }
+
+        gs_tuplet_field_close(field);
+        gs_tuplet_close(&tuplet);
+    } while (gs_tuplet_next(&tuplet));
+
+    gs_frag_print(file, frag, 0, INT_MAX);
+
+    gs_fragment_free(frag);
+    gs_schema_free(print_schema);
 }

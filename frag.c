@@ -88,8 +88,11 @@ void gs_fragment_insert(struct tuplet_t *out, frag_t *frag, size_t ntuplets)
     assert (ntuplets > 0);
     assert (frag->_insert);
     struct tuplet_t *result = frag->_insert(frag, ntuplets);
+    REQUIRE_NONNULL(result)
+    REQUIRE_NONNULL(result->fragment)
+    REQUIRE_NONNULL(result->attr_base)
     if (out != NULL) {
-        memcpy(out, result, ntuplets * sizeof(struct tuplet_t));
+        memcpy(out, result, sizeof(struct tuplet_t));
     }
     free (result);
 }

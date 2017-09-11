@@ -26,6 +26,11 @@ bool gs_tuplet_field_write(tuplet_field_t *field, const void *data)
     return gs_tuplet_field_next(field);
 }
 
+bool gs_tuplet_field_write_eval(tuplet_field_t *field, bool eval)
+{
+    return gs_tuplet_field_write(field, &eval);
+}
+
 void gs_tuplet_field_set_null(tuplet_field_t *field)
 {
     assert (field);

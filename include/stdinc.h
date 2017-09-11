@@ -194,3 +194,11 @@ typedef MD5_CTX checksum_context_t;
 #ifndef CHAR
 #define CHAR      char
 #endif
+
+#ifndef STRPTR
+#define STRPTR    char*
+#endif
+
+#ifndef ATTRID
+#define ATTRID    attr_id_t
+#endif

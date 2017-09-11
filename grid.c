@@ -276,6 +276,8 @@ static inline grid_t *create_grid(grid_table_t *table, const attr_id_t *attr, si
     grid_t *result = REQUIRE_MALLOC(sizeof(grid_t));
 
     schema_t *grid_schema = gs_schema_subset(table->schema, attr, nattr);
+    assert (grid_schema);
+    gs_schema_print(stdout, grid_schema);
     size_t tuplet_capacity = get_required_capacity(tuple_ids, ntuple_ids);
 
     *result = (grid_t) {

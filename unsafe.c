@@ -8,6 +8,15 @@ size_t gs_unsafe_field_get_println(enum field_type type, const void *data)
     return print_len;
 }
 
+char *clip(const char *str, size_t max_len)
+{
+    char *out = malloc(max_len);
+    memset(out, 32, strlen(str));
+    strcpy(out, str);
+    out[max_len - 1] = out[max_len - 2] = out[max_len - 3] = '.';
+    return out;
+}
+
 char *gs_unsafe_field_to_string(enum field_type type, const void *data)
 {
     const size_t INIT_BUFFER_LEN = 2048;
@@ -51,6 +60,15 @@ char *gs_unsafe_field_to_string(enum field_type type, const void *data)
                 buffer = realloc(buffer, strlen(data) + 1);
             }
             strcpy(buffer, data);
+            break;
+        /* internal */
+        case FT_STRPTR: {
+            char *output = (strlen((STRPTR) data) + 1) > INIT_BUFFER_LEN ? clip(data, INIT_BUFFER_LEN) : strdup(data);
+            sprintf(buffer, "%s", output);
+            free(output);
+        } break;
+        case FT_ATTRID:
+            sprintf(buffer, "%llu", *(ATTRID *) data);
             break;
         default:
             perror("Unknown type");
