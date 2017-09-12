@@ -87,7 +87,7 @@ void gs_frag_print(FILE *file, frag_t *frag, size_t row_offset, size_t limit);
 
 void gs_frag_print_ex(FILE *file, enum frag_printer_type_tag printer_type, frag_t *frag, size_t row_offset, size_t limit);
 
-void gs_fragment_free(frag_t *frag);
+void gs_frag_free(frag_t *frag);
 
 const char *gs_frag_str(enum frag_impl_type_t type);
 

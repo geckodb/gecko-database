@@ -108,7 +108,7 @@ void gs_frag_print_ex(FILE *file, enum frag_printer_type_tag type, frag_t *frag,
     gs_frag_printer_print(file, type, frag, row_offset, limit);
 }
 
-void gs_fragment_free(frag_t *frag)
+void gs_frag_free(frag_t *frag)
 {
     assert(frag);
     frag->_dispose(frag);

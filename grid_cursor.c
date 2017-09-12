@@ -1,11 +1,11 @@
 #include <grid_cursor.h>
 #include <containers/dicts/hash_table.h>
 
-grid_cursor_t *grid_cursor_create(size_t result_capacity)
+grid_cursor_t *grid_cursor_create(size_t cursor)
 {
     grid_cursor_t *result = REQUIRE_MALLOC(sizeof(grid_cursor_t));
     *result = (grid_cursor_t) {
-            .extra = vector_create(sizeof(struct grid_t *), result_capacity)
+            .extra = vector_create(sizeof(struct grid_t *), cursor)
     };
     return result;
 }
@@ -31,12 +31,12 @@ void grid_cursor_dedup(grid_cursor_t *cursor)
     vector_dedup(cursor->extra);
 }
 
-struct grid_t *grid_cursor_next(grid_cursor_t *result_set)
+struct grid_t *grid_cursor_next(grid_cursor_t *cursor)
 {
     static grid_cursor_t *dest;
     static size_t elem_idx;
-    if (result_set != NULL) {
-        dest = result_set;
+    if (cursor != NULL) {
+        dest = cursor;
         elem_idx = 0;
     }
 
@@ -46,8 +46,14 @@ struct grid_t *grid_cursor_next(grid_cursor_t *result_set)
     } else return NULL;
 }
 
-size_t grid_cursor_numelem(const grid_cursor_t *result_set)
+size_t grid_cursor_numelem(const grid_cursor_t *cursor)
 {
-    REQUIRE_NONNULL(result_set);
-    return ((vector_t * ) result_set->extra)->num_elements;
+    REQUIRE_NONNULL(cursor);
+    return ((vector_t * ) cursor->extra)->num_elements;
+}
+
+bool gs_grid_cursor_is_empty(const grid_cursor_t *cursor)
+{
+    REQUIRE_NONNULL(cursor)
+    return (vector_num_elements(cursor->extra) == 0);
 }

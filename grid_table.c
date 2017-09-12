@@ -15,7 +15,7 @@ void gs_grid_free(grid_t *grid)
 {
     require_non_null(grid);
     vector_free(grid->tuple_id_mapping);
-    gs_fragment_free(grid->frag);
+    gs_frag_free(grid->frag);
     free(grid);
 }
 

@@ -56,7 +56,7 @@ void gs_grid_table_free(grid_table_t *table)
 
 void gs_grid_free(grid_t * grid)
 {
-    gs_fragment_free(grid->frag);
+    gs_frag_free(grid->frag);
     dict_free(grid->schema_map_indicies);
     vector_free(grid->tuple_ids);
 }
@@ -109,6 +109,7 @@ grid_cursor_t *gs_grid_table_grid_find(const grid_table_t *table, const attr_id_
     grid_cursor_t *result = grid_cursor_create(grid_cursor_numelem(larger));
 
     /* Hash-join intersection */
+    panic_if(gs_grid_cursor_is_empty(smaller), "No grid found. Does the table field cover for %p contain gaps?", table);
     dict_t* hash_table = hash_table_create_jenkins(sizeof(grid_t *), sizeof(bool),
                                                    2 * grid_cursor_numelem(smaller), 1.7f, 0.75f);
 
@@ -294,7 +295,7 @@ void gs_grid_table_grid_list_print(FILE *file, const grid_table_t *table, size_t
 
     gs_frag_print(file, frag, 0, INT_MAX);
 
-    gs_fragment_free(frag);
+    gs_frag_free(frag);
     gs_schema_free(print_schema);
 }
 
@@ -339,7 +340,8 @@ void gs_grid_table_structure_print(FILE *file, const grid_table_t *table, size_t
     write_frag   = gs_fragment_alloc(write_schema, num_tuples, FIT_HOST_NSM_VM);
     gs_frag_insert(&write_tuplet, write_frag, num_tuples);
 
-    /* that's very naive, but does the job for now */
+    /* For each field in the input grid table, find the grid object that contains this field. The search is done via
+     * nested linear search, currently. That's very naive, but does the job for now. */
     do {
         gs_tuplet_field_open(&write_tuplet);
         gs_tuple_open(&read_tuple, table, write_tuplet.tuplet_id);
@@ -367,7 +369,11 @@ void gs_grid_table_structure_print(FILE *file, const grid_table_t *table, size_t
             gs_tuple_field_next(&read_field);
         }
     } while (gs_tuplet_next(&write_tuplet));
-    gs_frag_print(file, write_frag, 0, INT_MAX);
+
+    gs_frag_print(file, write_frag, row_offset, limit);
+
+    gs_frag_free(write_frag);
+    gs_schema_free(write_schema);
 }
 
 static inline void create_indexes(grid_table_t *table, size_t approx_num_horizontal_partitions)

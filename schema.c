@@ -122,6 +122,6 @@ void gs_schema_print(FILE *file, schema_t *schema)
 
     gs_frag_print(file, frag, 0, INT_MAX);
 
-    gs_fragment_free(frag);
+    gs_frag_free(frag);
     gs_schema_free(print_schema);
 }
