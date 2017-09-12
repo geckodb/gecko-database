@@ -374,20 +374,21 @@ void *vector_bsearch(vector_t *vec, const void *needle, comp_t sort_comp, comp_t
     vector_sort(vec, sort_comp);
 
     size_t lower = 0;
-    size_t upper = vec->num_elements;
+    size_t upper = vec->num_elements - 1;
     size_t mid;
 
     while(lower <= upper) {
-        mid = lower + (upper - lower) / 2;
+        mid = (lower + upper) / 2;
         void *element = vec->data + mid * vec->sizeof_element;
         int comp = find_comp(needle, element);
         if(comp == 0) {
             return element;
         } else {
-            if(comp < 0)
+            if(comp < 0) {
+                upper = mid - 1;
+            } else {
                 lower = mid + 1;
-            else
-                upper = mid -1;
+            }
         }
     }
 

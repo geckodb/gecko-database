@@ -57,6 +57,7 @@ int main(void) {
     }
 
     gs_tuple_cursor_free(&resultset);
+    printf("grid 0:\n");
     gs_grid_print(stdout, table, g01, 0, UINT64_MAX);
 
 
@@ -89,6 +90,7 @@ int main(void) {
     }
 
     gs_tuple_cursor_free(&resultset);
+    printf("grid 1:\n");
     gs_grid_print(stdout, table, g02, 0, UINT64_MAX);
 
 
@@ -123,6 +125,7 @@ int main(void) {
     }
 
     gs_tuple_cursor_free(&resultset);
+    printf("grid 2:\n");
     gs_grid_print(stdout, table, g03, 0, UINT64_MAX);
 
     //  Add full grid with same altered schema orientation, column-store
@@ -154,6 +157,7 @@ int main(void) {
     }
 
     gs_tuple_cursor_free(&resultset);
+    printf("grid 3:\n");
     gs_grid_print(stdout, table, g04, 0, UINT64_MAX);
 
     //  Add partial grids with same original schema orientation, column-store + row-store
@@ -190,10 +194,10 @@ int main(void) {
     }
 
     gs_tuple_cursor_free(&resultset);
+    printf("grid 4:\n");
     gs_grid_print(stdout, table, g07, 0, UINT64_MAX);
+    printf("grid 5:\n");
     gs_grid_print(stdout, table, g08, 0, UINT64_MAX);
-
-
 
     //  Add partial grids with one having same original schema orientation other altered, column-store + row-store
     //           +===============|===============+
@@ -227,7 +231,9 @@ int main(void) {
     }
 
     gs_tuple_cursor_free(&resultset);
+    printf("grid 6:\n");
     gs_grid_print(stdout, table, g09, 0, UINT64_MAX);
+    printf("grid 7:\n");
     gs_grid_print(stdout, table, g10, 0, UINT64_MAX);
 
 
@@ -263,7 +269,9 @@ int main(void) {
     }
 
     gs_tuple_cursor_free(&resultset);
+    printf("grid 8:\n");
     gs_grid_print(stdout, table, g11, 0, UINT64_MAX);
+    printf("grid 9:\n");
     gs_grid_print(stdout, table, g12, 0, UINT64_MAX);
 
 
@@ -299,7 +307,9 @@ int main(void) {
     }
 
     gs_tuple_cursor_free(&resultset);
+    printf("grid 10:\n");
     gs_grid_print(stdout, table, g13, 0, UINT64_MAX);
+    printf("grid 11:\n");
     gs_grid_print(stdout, table, g14, 0, UINT64_MAX);
 
 
@@ -321,16 +331,29 @@ int main(void) {
   //        29 |   v   |   ----------------->  |
   //           +=======|=======================+
 
-    cover[0] = 3; cover[1] = 0; cover[2] = 1; cover[3] = 2;
+    cover[0] = 3; cover[1] = 1; cover[2] = 2; cover[3] = 0;
 
-    tuple_id_interval_t g1314_tid_coverP[] = {
-            { .begin = 24, .end = 27 }
+    tuple_id_interval_t tid_cover[] = {
+            { .begin = 24, .end = 30 }
     };
 
-    grid_id_t g15 = gs_grid_table_add_grid(table, &cover[0],     2, &g1314_tid_coverP[0], 1, FIT_HOST_DSM_VM);
-    grid_id_t g16 = gs_grid_table_add_grid(table, &cover[0] + 2, 2, &g1314_tid_coverP[0], 1, FIT_HOST_NSM_VM);
+    grid_id_t g15 = gs_grid_table_add_grid(table, &cover[0],     1, &tid_cover[0], 1, FIT_HOST_DSM_VM);
 
-    gs_grid_table_insert(&resultset, table, 3);
+    tuple_id_interval_t tid_cover2[] = {
+            { .begin = 24, .end = 25 }, { .begin = 28, .end = 30 }
+    };
+
+    grid_id_t g16 = gs_grid_table_add_grid(table, &cover[0] + 1, 3, &tid_cover2[0], 2, FIT_HOST_NSM_VM);
+
+    cover[0] = 0; cover[1] = 2;
+    tuple_id_interval_t tid_cover3[] = { { .begin = 25, .end = 28 }};
+    grid_id_t g17 = gs_grid_table_add_grid(table, &cover[0],     2, &tid_cover3[0], 1, FIT_HOST_NSM_VM);
+
+    cover[0] = 1;
+    tuple_id_interval_t tid_cover4[] = { { .begin = 25, .end = 28 }};
+    grid_id_t g18 = gs_grid_table_add_grid(table, &cover[0],     1, &tid_cover4[0], 1, FIT_HOST_DSM_VM);
+
+    gs_grid_table_insert(&resultset, table, 6);
     while (gs_tuple_cursor_next(&tuple, &resultset)) {
         gs_tuple_field_open(&field, &tuple);
         gs_tuple_field_write(&field, &a);
@@ -344,49 +367,27 @@ int main(void) {
     }
 
     gs_tuple_cursor_free(&resultset);
+    printf("grid 12:\n");
     gs_grid_print(stdout, table, g15, 0, UINT64_MAX);
+    printf("grid 13:\n");
     gs_grid_print(stdout, table, g16, 0, UINT64_MAX);
+    printf("grid 14:\n");
+    gs_grid_print(stdout, table, g17, 0, UINT64_MAX);
+    printf("grid 15:\n");
+    gs_grid_print(stdout, table, g18, 0, UINT64_MAX);
 
-//    cover[0] = 3; cover[1] = 1; cover[2] = 2; cover[3] = 0;
-//
-//    tuple_id_interval_t tid_cover[] = {
-//            { .begin = 24, .end = 25 }
-//    };
-//
-//    grid_id_t g15 = gs_grid_table_add_grid(table, &cover[0],     1, &tid_cover[0], 1, FIT_HOST_DSM_VM);
-//    grid_id_t g16 = gs_grid_table_add_grid(table, &cover[0] + 1, 3, &tid_cover[0], 1, FIT_HOST_NSM_VM);
-
-   /* cover[0] = 0; cover[1] = 2;
-    tuple_id_interval_t tid_cover3[] = { { .begin = 25, .end = 28 }};
-    grid_id_t g17 = gs_grid_table_add_grid(table, &cover[0],     2, &tid_cover3[0], 1, FIT_HOST_NSM_VM);
-
-    cover[0] = 1;
-    tuple_id_interval_t tid_cover4[] = { { .begin = 25, .end = 28 }};
-    grid_id_t g18 = gs_grid_table_add_grid(table, &cover[0],     1, &tid_cover4[0], 1, FIT_HOST_DSM_VM);*/
-
-//    gs_grid_table_insert(&resultset, table, 1);
-//    while (gs_tuple_cursor_next(&tuple, &resultset)) {
-//        gs_tuple_field_open(&field, &tuple);
-//        gs_tuple_field_write(&field, &a);
-//        gs_tuple_field_write(&field, &b);
-//        gs_tuple_field_write(&field, &c);
-//        gs_tuple_field_write(&field, &d);
-//        a += 4;
-//        b += 4;
-//        c += 4;
-//        d += 4;
-//    }
-//
-//    gs_tuple_cursor_free(&resultset);
-//    gs_grid_print(stdout, table, g15, 0, UINT64_MAX);
-//    gs_grid_print(stdout, table, g16, 0, UINT64_MAX);
-    //gs_grid_print(stdout, table, g17, 0, UINT64_MAX);
-    //gs_grid_print(stdout, table, g18, 0, UINT64_MAX);
-
+    printf("grid table schema:\n");
     gs_schema_print(stdout, table->schema);
+    printf("grid table grid list:\n");
     gs_grid_table_grid_list_print(stdout, table, 0, UINT64_MAX);
+    printf("grid table structure:\n");
     gs_grid_table_structure_print(stdout, table, 0, UINT64_MAX);
+    printf("grid table:\n");
     gs_grid_table_print(stdout, table, 0, UINT64_MAX);
+    printf("grid table hindex:\n");
+    gs_hindex_print(stdout, table->tuple_cover);
+    printf("grid table vindex:\n");
+    gs_vindex_print(stdout, table->schema_cover);
 
     gs_grid_table_free(table);
     free (table);

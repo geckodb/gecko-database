@@ -324,10 +324,6 @@ void gs_grid_table_print(FILE *file, const grid_table_t *table, size_t row_offse
 
 void gs_grid_table_structure_print(FILE *file, const grid_table_t *table, size_t row_offset, size_t limit)
 {
-    gs_hindex_print(stdout, table->tuple_cover);
-    gs_vindex_print(stdout, table->schema_cover);
-    gs_grid_table_grid_list_print(stdout, table, 0, UINT64_MAX);
-
     tuple_t read_tuple;
     tuple_field_t read_field;
     schema_t *write_schema;
@@ -424,7 +420,6 @@ static inline grid_t *create_grid(grid_table_t *table, const attr_id_t *attr, si
     for (size_t i = 0; i < ntuple_ids; i++) {
         gs_frag_insert(NULL, result->frag, gs_interval_get_span((tuple_ids + i)));
     }
-
 
     vector_add(result->tuple_ids, ntuple_ids, tuple_ids);
 
