@@ -12,6 +12,7 @@ typedef size_t grid_id_t;
 
 typedef struct grid_t {
     struct grid_table_t *context; /*<! The grid table in which this grid exists. */
+    grid_id_t grid_id; /*<! The id of this grid in context of the grid table. */
     frag_t *frag; /*<! The physical data fragment including the applied physical schema of this grid. */
     dict_t *schema_map_indicies; /*<! An (inverted) index that allows direct access from a table schema attribute to
                                       the associated grid schema attribute via indices mapping. This index returns the

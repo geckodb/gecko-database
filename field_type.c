@@ -35,6 +35,8 @@ size_t gs_field_type_sizeof(enum field_type type)
             return sizeof(ATTRID);
         case FT_GRIDID:
             return sizeof(GRIDID);
+        case FT_TUPLEID:
+            return sizeof(TUPLEID);
         case FT_FRAGTYPE:
             return sizeof(FRAGTYPE);
         case FT_SIZE:
@@ -81,6 +83,8 @@ const char *gs_field_type_str(enum field_type type)
             return "attr id";
         case FT_GRIDID:
             return "grid id";
+        case FT_TUPLEID:
+            return "tuple id";
         case FT_FRAGTYPE:
             return "frag type";
         case FT_SIZE:

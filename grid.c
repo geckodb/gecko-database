@@ -20,6 +20,8 @@ static inline size_t get_required_capacity(const tuple_id_interval_t *tuple_ids,
 static inline void indexes_insert(grid_table_t *table, grid_t *grid, const attr_id_t *attr, size_t nattr,
                                   const tuple_id_interval_t *tuples, size_t ntuples);
 
+static inline void register_grid(grid_table_t *table, grid_t *grid);
+
 grid_table_t *gs_grid_table_create(const schema_t *schema, size_t approx_num_horizontal_partitions)
 {
     if (schema != NULL) {
@@ -77,7 +79,7 @@ grid_id_t gs_grid_table_add_grid(grid_table_t *table, const attr_id_t *attr_ids_
 
     grid_t *grid = create_grid(table, attr_ids_covered, nattr_ids_covered, tuple_ids_covered, ntuple_ids_covered, type);
     indexes_insert(table, grid, attr_ids_covered, nattr_ids_covered, tuple_ids_covered, ntuple_ids_covered);
-    vector_add(table->grid_ptrs, 1, &grid);
+    register_grid(table, grid);
 
     // Determine the maximum number of tuples in this table
     while (ntuple_ids_covered--) {
@@ -322,6 +324,10 @@ void gs_grid_table_print(FILE *file, const grid_table_t *table, size_t row_offse
 
 void gs_grid_table_structure_print(FILE *file, const grid_table_t *table, size_t row_offset, size_t limit)
 {
+    gs_hindex_print(stdout, table->tuple_cover);
+//    gs_vindex_print(stdout, table->schema_cover);
+    gs_grid_table_grid_list_print(stdout, table, 0, UINT64_MAX);
+
     tuple_t read_tuple;
     tuple_field_t read_field;
     schema_t *write_schema;
@@ -450,4 +456,10 @@ static inline void indexes_insert(grid_table_t *table, grid_t *grid, const attr_
     while (ntuples--) {
         gs_hindex_add(table->tuple_cover, tuples++, grid);
     }
+}
+
+static inline void register_grid(grid_table_t *table, grid_t *grid)
+{
+    vector_add(table->grid_ptrs, 1, &grid);
+    grid->grid_id = vector_num_elements(table->grid_ptrs) - 1;
 }

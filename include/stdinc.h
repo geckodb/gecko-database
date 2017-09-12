@@ -122,14 +122,14 @@ typedef MD5_CTX checksum_context_t;
 
 #define IS_FLAG_SET(set, flag) ((set & flag) == flag)
 
-#define delegte_call(instance, fun)                                                                                    \
+#define DELEGATE_CALL(instance, fun)                                                                                    \
     ({                                                                                                                 \
         REQUIRE_NONNULL(instance);                                                                                     \
         REQUIRE_IMPL(instance->fun);                                                                                   \
         instance->fun(instance);                                                                                       \
     })
 
-#define delegte_call_wargs(instance, fun, ...)                                                                         \
+#define DELEGATE_CALL_WARGS(instance, fun, ...)                                                                         \
     ({                                                                                                                 \
         REQUIRE_NONNULL(instance);                                                                                     \
         REQUIRE_IMPL(instance->fun);                                                                                   \
@@ -214,6 +214,10 @@ static inline const char *gs_tuplet_format_str(enum tuplet_format format)
 
 #ifndef GRIDID
 #define GRIDID    grid_id_t
+#endif
+
+#ifndef TUPLEID
+#define TUPLEID   tuple_id_t
 #endif
 
 #ifndef FRAGTYPE

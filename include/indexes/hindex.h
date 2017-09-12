@@ -43,6 +43,7 @@ typedef struct hindex_result_t {
 
 typedef struct hindex_t {
     hindex_tag tag;
+    tuple_id_interval_t bounds;
 
     void (*_add)(struct hindex_t *self, const tuple_id_interval_t *key, const struct grid_t *grid);
     void (*_remove_interval)(struct hindex_t *self, const tuple_id_interval_t *key);
@@ -51,6 +52,8 @@ typedef struct hindex_t {
     void (*_query)(grid_cursor_t *result, const struct hindex_t *self, const tuple_id_t *tid_begin,
                    const tuple_id_t *tid_end);
     void (*_free)(struct hindex_t *self);
+    tuple_id_t (*_minbegin)(struct hindex_t *self);
+    tuple_id_t (*_maxend)(struct hindex_t *self);
 
     const schema_t *table_schema; /*<! Required to calculate an approx. result set size for queries */
     void *extra;
@@ -70,3 +73,5 @@ grid_cursor_t *gs_hindex_query(const struct hindex_t *index, const tuple_id_t *t
                                    const tuple_id_t *tid_end);
 const struct grid_t *gs_hindex_query_read(grid_cursor_t *result_set);
 void gs_hindex_query_close(grid_cursor_t *result_set);
+void gs_hindex_get_bounds(tuple_id_interval_t *bounds, const hindex_t *index);
+void gs_hindex_print(FILE *file, const hindex_t *index);

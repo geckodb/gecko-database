@@ -47,6 +47,9 @@ static inline bool this_contains(const struct hindex_t *self, tuple_id_t tid);
 static inline void this_free(struct hindex_t *self);
 static inline void this_query(grid_cursor_t *result, const struct hindex_t *self, const tuple_id_t *tid_begin,
                               const tuple_id_t *tid_end);
+static inline tuple_id_t this_minbegin(struct hindex_t *self);
+static inline tuple_id_t this_maxend(struct hindex_t *self);
+static inline tuple_id_t bounds(struct hindex_t *self, bool begin);
 
 static inline entry_t *find_interval(vector_t *haystack, const tuple_id_interval_t *needle);
 static inline void find_all_by_point(vector_t *result, vector_t *haystack, const tuple_id_t needle);
@@ -69,6 +72,8 @@ hindex_t *lesearch_hindex_create(size_t approx_num_horizontal_partitions, const 
         ._contains = this_contains,
         ._query = this_query,
         ._free = this_free,
+        ._minbegin = this_minbegin,
+        ._maxend = this_maxend,
 
         .extra = vector_create(sizeof(entry_t), approx_num_horizontal_partitions),
         .table_schema = table_schema
@@ -98,7 +103,7 @@ static inline void find_all_by_point(vector_t *result, vector_t *haystack, const
     const entry_t *it = (const entry_t *) haystack->data;
     size_t num_elements = haystack->num_elements;
     while (num_elements--) {
-        if (needle >= it->interval.begin && needle < it->interval.end) {
+        if (GS_INTERVAL_CONTAINS((&it->interval), needle)) {
             vector_add_all(result, it->grids);
         }
         else it++;
@@ -169,4 +174,24 @@ static inline void this_free(struct hindex_t *self)
     REQUIRE_INSTANCEOF_THIS(self);
     vector_foreach(self->extra, NULL, free_entires);
     vector_free(self->extra);
+}
+
+static inline tuple_id_t bounds(struct hindex_t *self, bool begin)
+{
+    REQUIRE_INSTANCEOF_THIS(self);
+    tuple_id_t tuple = begin ? INT_MAX : INT_MIN;
+    entry_t *it = vector_begin((vector_t *) self->extra);
+    size_t num  = vector_num_elements((vector_t *) self->extra);
+    while (num--) { tuple = begin ? min(tuple, (it++)->interval.begin) : max(tuple, (it++)->interval.end); }
+    return tuple;
+}
+
+static inline tuple_id_t this_minbegin(struct hindex_t *self)
+{
+    return bounds(self, true);
+}
+
+static inline tuple_id_t this_maxend(struct hindex_t *self)
+{
+    return bounds(self, false);
 }

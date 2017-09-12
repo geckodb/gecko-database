@@ -24,61 +24,61 @@
 
 bool dict_free(dict_t *dict)
 {
-    return delegte_call(dict, free_dict);
+    return DELEGATE_CALL(dict, free_dict);
 }
 
 void dict_clear(dict_t *dict)
 {
-    delegte_call(dict, clear);
+    DELEGATE_CALL(dict, clear);
 }
 
 bool dict_empty(const dict_t *dict)
 {
-    return delegte_call(dict, empty);
+    return DELEGATE_CALL(dict, empty);
 }
 
 bool dict_contains_key(const dict_t *dict, const void *key)
 {
-    return delegte_call_wargs(dict, contains_key, key);
+    return DELEGATE_CALL_WARGS(dict, contains_key, key);
 }
 
 const struct vector_t *dict_keyset(const dict_t *dict)
 {
-    return delegte_call(dict, keyset);
+    return DELEGATE_CALL(dict, keyset);
 }
 
 const void *dict_get(const dict_t *dict, const void *key)
 {
-    return delegte_call_wargs(dict, get, key);
+    return DELEGATE_CALL_WARGS(dict, get, key);
 }
 
 struct vector_t *dict_gets(const dict_t *dict, size_t num_keys, const void *keys)
 {
-    return delegte_call_wargs(dict, gets, num_keys, keys);
+    return DELEGATE_CALL_WARGS(dict, gets, num_keys, keys);
 }
 
 bool dict_remove(dict_t *dict, size_t num_keys, const void *keys)
 {
-    return delegte_call_wargs(dict, remove, num_keys, keys);
+    return DELEGATE_CALL_WARGS(dict, remove, num_keys, keys);
 }
 
 void dict_put(dict_t *dict, const void *key, const void *value)
 {
-    delegte_call_wargs(dict, put, key, value);
+    DELEGATE_CALL_WARGS(dict, put, key, value);
 }
 
 void dict_puts(dict_t *dict, size_t num_elements, const void *keys, const void *values)
 {
-    delegte_call_wargs(dict, puts, num_elements, keys, values);
+    DELEGATE_CALL_WARGS(dict, puts, num_elements, keys, values);
 }
 
 size_t dict_num_elements(dict_t *dict)
 {
-    return delegte_call(dict, num_elements);
+    return DELEGATE_CALL(dict, num_elements);
 }
 
 void dict_for_each(dict_t *dict, void *capture,
                    void (*consumer)(void *capture, const void *key, const void *value))
 {
-    delegte_call_wargs(dict, for_each, capture, consumer);
+    DELEGATE_CALL_WARGS(dict, for_each, capture, consumer);
 }

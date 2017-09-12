@@ -75,6 +75,9 @@ char *gs_unsafe_field_to_string(enum field_type type, const void *data)
         case FT_GRIDID:
             sprintf(buffer, "%zu", *(GRIDID *) data);
             break;
+        case FT_TUPLEID:
+            sprintf(buffer, "%u", *(TUPLEID *) data);
+            break;
         case FT_FRAGTYPE:
             sprintf(buffer, "%s", gs_frag_str(*(FRAGTYPE *) data));
             break;

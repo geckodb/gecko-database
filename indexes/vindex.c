@@ -2,22 +2,22 @@
 
 void gs_vindex_free(vindex_t *index)
 {
-    delegte_call(index, _free);
+    DELEGATE_CALL(index, _free);
 }
 
 void gs_vindex_add(vindex_t *index, const attr_id_t *key, const struct grid_t *grid)
 {
-    delegte_call_wargs(index, _add, key, grid);
+    DELEGATE_CALL_WARGS(index, _add, key, grid);
 }
 
 void gs_vindex_remove(vindex_t *index, const attr_id_t *key)
 {
-    delegte_call_wargs(index, _remove, key);
+    DELEGATE_CALL_WARGS(index, _remove, key);
 }
 
 bool gs_vindex_contains(const vindex_t *index, const attr_id_t *key)
 {
-    return delegte_call_wargs(index, _contains, key);
+    return DELEGATE_CALL_WARGS(index, _contains, key);
 }
 
 grid_cursor_t *gs_vindex_query(const struct vindex_t *index, const attr_id_t *key_range_begin,
