@@ -458,9 +458,9 @@ bool get_sizeof_strings(void *capture, void *begin, void *end)
 
 bool check_create_args(size_t size, vector_flags flags, float grow_factor)
 {
-    bool result = (size > 0) && (((flags & auto_resize) != auto_resize) || (grow_factor > 1));
-    error_if(result, err_illegal_args);
-    return result;
+    bool valid_args = (size > 0) && (((flags & auto_resize) != auto_resize) || (grow_factor > 1));
+    error_if(!valid_args, err_illegal_args);
+    return valid_args;
 }
 
 vector_t *alloc_vector()

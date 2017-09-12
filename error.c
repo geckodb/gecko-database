@@ -4,6 +4,7 @@ error_code last_error;
 
 void error(error_code code)
 {
+    panic("ERROR %d", code);
     last_error = code;
 }
 

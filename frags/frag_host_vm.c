@@ -301,20 +301,7 @@ static inline bool field_seek(tuplet_field_t *field, attr_id_t attr_id)
 static inline const void *field_read(tuplet_field_t *field)
 {
     assert (field);
-
-   /* // DEBUG:
-    if (tuplet_field->attr_id == 0) {
-        printf("read tuplet (%u %p) tuplet_field attr0 (%llu %p): '%llu'\n", tuplet_field->tuplet->tuplet_id, tuplet_field->tuplet, tuplet_field->attr_id, tuplet_field->attr_value_ptr, *(u64*) tuplet_field->attr_value_ptr);
-    } else if (tuplet_field->attr_id == 1) {
-        printf("read tuplet (%u %p) tuplet_field attr1 (%llu %p): '%d'\n", tuplet_field->tuplet->tuplet_id, tuplet_field->tuplet, tuplet_field->attr_id, tuplet_field->attr_value_ptr, *(u32*) tuplet_field->attr_value_ptr);
-    } else if (tuplet_field->attr_id == 2) {
-        printf("read tuplet (%u %p) tuplet_field attr2 (%llu %p): '%d'\n", tuplet_field->tuplet->tuplet_id, tuplet_field->tuplet, tuplet_field->attr_id, tuplet_field->attr_value_ptr, *(u16*) tuplet_field->attr_value_ptr);
-    } else if (tuplet_field->attr_id == 3) {
-        printf("read tuplet (%u %p) tuplet_field attr3 (%llu %p): '%d'\n", tuplet_field->tuplet->tuplet_id, tuplet_field->tuplet, tuplet_field->attr_id, tuplet_field->attr_value_ptr, *(u16*) tuplet_field->attr_value_ptr);
-    }
-    // --
-*/
-return field->attr_value_ptr;
+    return field->attr_value_ptr;
 }
 
 static inline void field_update(tuplet_field_t *field, const void *data)
@@ -327,17 +314,6 @@ static inline void field_update(tuplet_field_t *field, const void *data)
     } else {
         memcpy(field->attr_value_ptr, data, gs_tuplet_field_size(field));
     }
-/*
-// DEBUG:
-if (tuplet_field->attr_id == 0) {
-    printf("wrote tuplet (%u %p) tuplet_field attr0 (%llu %p): '%llu'\n", tuplet_field->tuplet->tuplet_id, tuplet_field->tuplet, tuplet_field->attr_id, tuplet_field->attr_value_ptr, *(u64*) tuplet_field->attr_value_ptr);
-} else if (tuplet_field->attr_id == 1) {
-    printf("wrote tuplet (%u %p) tuplet_field attr1 (%llu %p): '%d'\n", tuplet_field->tuplet->tuplet_id, tuplet_field->tuplet, tuplet_field->attr_id, tuplet_field->attr_value_ptr, *(u32*) tuplet_field->attr_value_ptr);
-} else if (tuplet_field->attr_id == 2) {
-    printf("wrote tuplet (%u %p) tuplet_field attr2 (%llu %p): '%d'\n", tuplet_field->tuplet->tuplet_id, tuplet_field->tuplet, tuplet_field->attr_id, tuplet_field->attr_value_ptr, *(u16*) tuplet_field->attr_value_ptr);
-} else if (tuplet_field->attr_id == 3) {
-    printf("wrote tuplet (%u %p) tuplet_field attr3 (%llu %p): '%d'\n", tuplet_field->tuplet->tuplet_id, tuplet_field->tuplet, tuplet_field->attr_id, tuplet_field->attr_value_ptr, *(u16*) tuplet_field->attr_value_ptr);
-}*/
 }
 
 static inline void field_set_null(tuplet_field_t *field)

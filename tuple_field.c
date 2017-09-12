@@ -13,7 +13,9 @@ void gs_tuple_field_seek(tuple_field_t *tuple_field, tuple_t *tuple, attr_id_t t
     REQUIRE_NONNULL(tuple);
 
     grid_cursor_t *cursor = gs_grid_table_grid_find(tuple->table, &table_attr_id, 1, &tuple->tuple_id, 1);
-    REQUIRE((grid_cursor_numelem(cursor) == 1), "Internal error: tuple_field is covered not exactly by one grid");
+    REQUIRE_WARGS((grid_cursor_numelem(cursor) == 1),
+                  "Internal error: tuple_field [row %d, col %llu] is covered by %zu grids. Must be covered by exactly one grid instead.",
+                  tuple->tuple_id, table_attr_id, grid_cursor_numelem(cursor));
     grid_t *grid = grid_cursor_next(cursor);
 
     tuplet_t *tuplet = gs_tuplet_open(grid->frag, gs_grid_global_to_local(grid, tuple->tuple_id, AT_RANDOM));
@@ -59,9 +61,7 @@ void gs_tuple_field_write(tuple_field_t *field, const void *data)
 
 const void *gs_tuple_field_read(tuple_field_t *field)
 {
-    const void *data = gs_tuplet_field_read(field->tuplet_field);
-    gs_tuple_field_next(field);
-    return data;
+    return gs_tuplet_field_read(field->tuplet_field);
 }
 
 void gs_tuple_field_close(tuple_field_t *field)

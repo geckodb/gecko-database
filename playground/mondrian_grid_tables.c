@@ -302,87 +302,92 @@ int main(void) {
     gs_grid_print(stdout, table, g13, 0, UINT64_MAX);
     gs_grid_print(stdout, table, g14, 0, UINT64_MAX);
 
-    gs_schema_print(stdout, table->schema);
-    gs_grid_table_grid_list_print(stdout, table, 0, UINT64_MAX);
-    gs_grid_table_structure_print(stdout, table, 0, UINT64_MAX);
 
-    /*
   //  Add complex interleaved grid layout with having alternate schema orientation, column-store + row-store
   //           +=======|=======================+
   //           |   D   |   B   |   C   |   A   |
   //           +=======|=======================+
-  //        23 |   |   |   ----------------->  |
+  //        24 |   |   |   ----------------->  |
   //           |       |===============|=======+
   //           |       |   A   |   C   |   B   |
   //           |       |===============|=======+
-  //        24 |   |   |   --------->  |   |   |
   //        25 |   |   |   --------->  |   |   |
-  //        26 |   |   |   --------->  |   v   |
+  //        26 |   |   |   --------->  |   |   |
+  //        27 |   |   |   --------->  |   v   |
   //           |       |=======================+
   //           |       |   B   |   C   |   A   |
   //           |       |=======================+
-  //        27 |   |   |   ----------------->  |
-  //        28 |   v   |   ----------------->  |
+  //        28 |   |   |   ----------------->  |
+  //        29 |   v   |   ----------------->  |
   //           +=======|=======================+
-  cover[0] = 3;
-  interval_t g13_tid_cover[] = {
-          { .begin = 23, .end = 29 }
-  };
-  grid_id_t g13 = gs_grid_table_add_grid(table, &cover[0], 1, &g13_tid_cover[0], 1, FIT_HOST_DSM_VM);
 
-  cover[0] = 1; cover[1] = 2; cover[2] = 0;
-  interval_t g14_tid_cover[] = {
-          { .begin = 23, .end = 24 },
-          { .begin = 27, .end = 29 },
-  };
-  grid_id_t g14 = gs_grid_table_add_grid(table, &cover[0], 3, &g14_tid_cover[0], 1, FIT_HOST_NSM_VM);
+    cover[0] = 3; cover[1] = 0; cover[2] = 1; cover[3] = 2;
 
-  cover[0] = 0; cover[1] = 2;
-  interval_t g15_tid_cover[] = {
-          { .begin = 24, .end = 27 },
-  };
-  grid_id_t g15 = gs_grid_table_add_grid(table, &cover[0], 2, &g15_tid_cover[0], 1, FIT_HOST_NSM_VM);
+    tuple_id_interval_t g1314_tid_coverP[] = {
+            { .begin = 24, .end = 27 }
+    };
 
-  cover[0] = 1;
-  interval_t g16_tid_cover[] = {
-          { .begin = 24, .end = 27 },
-  };
-  grid_id_t g16 = gs_grid_table_add_grid(table, &cover[0], 1, &g16_tid_cover[0], 1, FIT_HOST_DSM_VM);
+    grid_id_t g15 = gs_grid_table_add_grid(table, &cover[0],     2, &g1314_tid_coverP[0], 1, FIT_HOST_DSM_VM);
+    grid_id_t g16 = gs_grid_table_add_grid(table, &cover[0] + 2, 2, &g1314_tid_coverP[0], 1, FIT_HOST_NSM_VM);
 
-  tuple = gs_grid_table_insert(table, 3);
-  tuplet_field = gs_tuple_field_open(tuple);
-  write_data(tuplet_field, 96, 97, 98, 99);
-  write_data(tuplet_field, 100, 101, 102, 103);
-  write_data(tuplet_field, 104, 105, 106, 107);
-  write_data(tuplet_field, 108, 109, 110, 111);
-  write_data(tuplet_field, 112, 113, 114, 115);
-  write_data(tuplet_field, 116, 117, 118, 119);
+    gs_grid_table_insert(&resultset, table, 3);
+    while (gs_tuple_cursor_next(&tuple, &resultset)) {
+        gs_tuple_field_open(&field, &tuple);
+        gs_tuple_field_write(&field, &a);
+        gs_tuple_field_write(&field, &b);
+        gs_tuple_field_write(&field, &c);
+        gs_tuple_field_write(&field, &d);
+        a += 4;
+        b += 4;
+        c += 4;
+        d += 4;
+    }
 
-  bool valid = gs_grid_table_is_valide(table);
-  assert (valid);
+    gs_tuple_cursor_free(&resultset);
+    gs_grid_print(stdout, table, g15, 0, UINT64_MAX);
+    gs_grid_print(stdout, table, g16, 0, UINT64_MAX);
 
-  gs_grid_table_grid_print(stdout, table, g01, 0, UINT64_MAX);
-  gs_grid_table_grid_print(stdout, table, g02, 0, UINT64_MAX);
-  gs_grid_table_grid_print(stdout, table, g03, 0, UINT64_MAX);
-  gs_grid_table_grid_print(stdout, table, g04, 0, UINT64_MAX);
-  gs_grid_table_grid_print(stdout, table, g05, 0, UINT64_MAX);
-  gs_grid_table_grid_print(stdout, table, g06, 0, UINT64_MAX);
-  gs_grid_table_grid_print(stdout, table, g07, 0, UINT64_MAX);
-  gs_grid_table_grid_print(stdout, table, g08, 0, UINT64_MAX);
-  gs_grid_table_grid_print(stdout, table, g09, 0, UINT64_MAX);
-  gs_grid_table_grid_print(stdout, table, g10, 0, UINT64_MAX);
-  gs_grid_table_grid_print(stdout, table, g11, 0, UINT64_MAX);
-  gs_grid_table_grid_print(stdout, table, g12, 0, UINT64_MAX);
-  gs_grid_table_grid_print(stdout, table, g13, 0, UINT64_MAX);
-  gs_grid_table_grid_print(stdout, table, g14, 0, UINT64_MAX);
-  gs_grid_table_grid_print(stdout, table, g15, 0, UINT64_MAX);
-  gs_grid_table_grid_print(stdout, table, g16, 0, UINT64_MAX);
+//    cover[0] = 3; cover[1] = 1; cover[2] = 2; cover[3] = 0;
+//
+//    tuple_id_interval_t tid_cover[] = {
+//            { .begin = 24, .end = 25 }
+//    };
+//
+//    grid_id_t g15 = gs_grid_table_add_grid(table, &cover[0],     1, &tid_cover[0], 1, FIT_HOST_DSM_VM);
+//    grid_id_t g16 = gs_grid_table_add_grid(table, &cover[0] + 1, 3, &tid_cover[0], 1, FIT_HOST_NSM_VM);
 
-  gs_grid_table_print(stdout, table, 0, UINT64_MAX);
+   /* cover[0] = 0; cover[1] = 2;
+    tuple_id_interval_t tid_cover3[] = { { .begin = 25, .end = 28 }};
+    grid_id_t g17 = gs_grid_table_add_grid(table, &cover[0],     2, &tid_cover3[0], 1, FIT_HOST_NSM_VM);
 
-*/
+    cover[0] = 1;
+    tuple_id_interval_t tid_cover4[] = { { .begin = 25, .end = 28 }};
+    grid_id_t g18 = gs_grid_table_add_grid(table, &cover[0],     1, &tid_cover4[0], 1, FIT_HOST_DSM_VM);*/
 
+//    gs_grid_table_insert(&resultset, table, 1);
+//    while (gs_tuple_cursor_next(&tuple, &resultset)) {
+//        gs_tuple_field_open(&field, &tuple);
+//        gs_tuple_field_write(&field, &a);
+//        gs_tuple_field_write(&field, &b);
+//        gs_tuple_field_write(&field, &c);
+//        gs_tuple_field_write(&field, &d);
+//        a += 4;
+//        b += 4;
+//        c += 4;
+//        d += 4;
+//    }
+//
+//    gs_tuple_cursor_free(&resultset);
+//    gs_grid_print(stdout, table, g15, 0, UINT64_MAX);
+//    gs_grid_print(stdout, table, g16, 0, UINT64_MAX);
+    //gs_grid_print(stdout, table, g17, 0, UINT64_MAX);
+    //gs_grid_print(stdout, table, g18, 0, UINT64_MAX);
+
+    gs_schema_print(stdout, table->schema);
+    gs_grid_table_grid_list_print(stdout, table, 0, UINT64_MAX);
+    gs_grid_table_structure_print(stdout, table, 0, UINT64_MAX);
     gs_grid_table_print(stdout, table, 0, UINT64_MAX);
+
     gs_grid_table_free(table);
     free (table);
     gs_schema_free(schema);

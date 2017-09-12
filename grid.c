@@ -81,6 +81,7 @@ grid_id_t gs_grid_table_add_grid(grid_table_t *table, const attr_id_t *attr_ids_
 
     // Determine the maximum number of tuples in this table
     while (ntuple_ids_covered--) {
+        REQUIRE_LESSTHAN(tuple_ids_covered->begin, tuple_ids_covered->end);
         table->num_tuples = max(table->num_tuples, tuple_ids_covered->end);
         tuple_ids_covered++;
     }
@@ -111,7 +112,7 @@ grid_cursor_t *gs_grid_table_grid_find(const grid_table_t *table, const attr_id_
     /* Hash-join intersection */
     panic_if(gs_grid_cursor_is_empty(smaller), "No grid found. Does the table field cover for %p contain gaps?", table);
     dict_t* hash_table = hash_table_create_jenkins(sizeof(grid_t *), sizeof(bool),
-                                                   2 * grid_cursor_numelem(smaller), 1.7f, 0.75f);
+                                                   10 * grid_cursor_numelem(smaller), 1.7f, 0.95f);
 
     /* Build */
     for (const grid_t *grid = grid_cursor_next(smaller); grid != NULL; grid = grid_cursor_next(NULL)) {
@@ -358,7 +359,7 @@ void gs_grid_table_structure_print(FILE *file, const grid_table_t *table, size_t
                         for (size_t i = 0; i < grid->tuple_ids->num_elements; i++) {
                             const tuple_id_interval_t *span = vector_at(grid->tuple_ids, i);
                             if (GS_INTERVAL_CONTAINS(span, write_tuplet.tuplet_id)) {
-                                tuplet_field_t *write_field = gs_tuplet_field_seek(&write_tuplet, grid_attr_id);
+                                tuplet_field_t *write_field = gs_tuplet_field_seek(&write_tuplet, read_field.table_attr_id);
                                 gs_tuplet_field_write(write_field, &grid_id, false);
                                 gs_tuplet_field_close(write_field);
                             }

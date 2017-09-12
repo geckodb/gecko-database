@@ -45,6 +45,9 @@ typedef enum {
 #define REQUIRE(expr, msg)                                                                                             \
     panic_if((!(expr)), BADEXPR, msg);
 
+#define REQUIRE_WARGS(expr, msg, args...)                                                                              \
+    panic_if((!(expr)), msg, args);
+
 #define REQUIRE_NONZERO(value)                                                                                         \
     REQUIRE((value != 0), "Value must be non-zero")
 
