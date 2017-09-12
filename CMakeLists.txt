@@ -121,6 +121,8 @@ set(SOURCE_FILES
         indexes/hindexes/lsearch_hindex.c
         grid_cursor.c
         include/grid_cursor.h
+        containers/hashset.c
+        include/containers/hashset.h
         )
 
 add_executable(

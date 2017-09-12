@@ -360,6 +360,14 @@
 			<Option target="expr"/>
 			<Option target="mondrian"/>
 		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/containers/hashset.c">
+			<Option target="gridtables"/>
+			<Option target="buffmgr"/>
+			<Option target="sample_linuxwc"/>
+			<Option target="sample_lin_hash"/>
+			<Option target="expr"/>
+			<Option target="mondrian"/>
+		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/containers/list.c">
 			<Option target="gridtables"/>
 			<Option target="buffmgr"/>
@@ -521,6 +529,14 @@
 			<Option target="mondrian"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/containers/freelist.h">
+			<Option target="gridtables"/>
+			<Option target="buffmgr"/>
+			<Option target="sample_linuxwc"/>
+			<Option target="sample_lin_hash"/>
+			<Option target="expr"/>
+			<Option target="mondrian"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/myimdb/include/containers/hashset.h">
 			<Option target="gridtables"/>
 			<Option target="buffmgr"/>
 			<Option target="sample_linuxwc"/>
