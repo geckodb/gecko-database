@@ -106,7 +106,7 @@ static inline void find_all_by_point(vector_t *result, vector_t *haystack, const
         if (GS_INTERVAL_CONTAINS((&it->interval), needle)) {
             vector_add_all(result, it->grids);
         }
-        else it++;
+        it++;
     }
 }
 
