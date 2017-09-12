@@ -19,6 +19,7 @@
 
 #include <stdinc.h>
 #include <grid_cursor.h>
+#include <containers/hashset.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 // F O R W A R D   D E C L A R A T I O N S
@@ -32,6 +33,7 @@ struct grid_t;
 
 typedef struct vindex_t {
     grid_index_tag tag;
+    hashset_t keys;
 
     void (*_add)(struct vindex_t *self, const attr_id_t *key, const struct grid_t *grid);
     void (*_remove)(struct vindex_t *self, const attr_id_t *key);
@@ -58,3 +60,7 @@ grid_cursor_t *gs_vindex_query_append(const struct vindex_t *index, grid_cursor_
                                         const attr_id_t *key_range_begin, const attr_id_t *key_range_end);
 const struct grid_t *gs_vindex_query_read(grid_cursor_t *result_set);
 void gs_vindex_query_close(grid_cursor_t *result_set);
+const attr_id_t *gs_vindex_keys_begin(const vindex_t *index);
+const attr_id_t *gs_vindex_keys_end(const vindex_t *index);
+
+void gs_vindex_print(FILE *file, vindex_t *index);

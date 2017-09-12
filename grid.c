@@ -325,7 +325,7 @@ void gs_grid_table_print(FILE *file, const grid_table_t *table, size_t row_offse
 void gs_grid_table_structure_print(FILE *file, const grid_table_t *table, size_t row_offset, size_t limit)
 {
     gs_hindex_print(stdout, table->tuple_cover);
-//    gs_vindex_print(stdout, table->schema_cover);
+    gs_vindex_print(stdout, table->schema_cover);
     gs_grid_table_grid_list_print(stdout, table, 0, UINT64_MAX);
 
     tuple_t read_tuple;

@@ -64,8 +64,10 @@ vindex_t *hash_vindex_create(size_t key_size, size_t num_init_slots)
         ._free = this_free,
         ._query = this_query,
         ._remove = this_remove,
-        .tag = GI_VINDEX_HASH,
+        .tag = GI_VINDEX_HASH
     };
+
+    gs_hashset_create(&result->keys, key_size, num_init_slots);
 
     result->extra = hash_table_create_ex(
             &(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen}, key_size, sizeof(vector_t),
@@ -114,6 +116,7 @@ void this_free(struct vindex_t *self)
 {
     REQUIRE_INSTANCEOF_THIS(self);
     dict_free((dict_t *) self->extra);
+    gs_hashset_free(&self->keys);
 }
 
 
