@@ -278,7 +278,6 @@ static inline bool field_next(tuplet_field_t *field, bool auto_next)
 
     const attr_id_t next_attr_id = field->attr_id + 1;
     if (next_attr_id < field->tuplet->fragment->schema->attr->num_elements) {
-        //field_rebase(tuplet_field, tuplet_field->tuplet, next_attr_id);
         field_movebase(field, field->tuplet);
         return true;
     } else {

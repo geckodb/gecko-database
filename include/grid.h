@@ -192,7 +192,7 @@ static inline tuplet_id_t gs_grid_global_to_local(grid_t *grid, tuple_id_t tuple
     // TODO: Cache this!
     // calculate the number of tuplets that fall into preceding intervals
     for (const tuple_id_interval_t *it = vector_begin(grid->tuple_ids); it < end; it++) {
-        result += gs_interval_get_span(it);
+        result += (tuple_id >= it->begin) ? gs_interval_get_span(it) : 0;
     }
     // calculate the exact identifier for the given tuple in the 'cursor' interval
     result += (tuple_id - cursor->end);
