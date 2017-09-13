@@ -237,7 +237,6 @@ static inline void tuplet_close(tuplet_t *self)
     //free (self);
 
 
-
 }
 
 static inline bool tuplet_is_null(tuplet_t *self)

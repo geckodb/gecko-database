@@ -4,7 +4,7 @@
 
 void gs_tuple_field_open(tuple_field_t *field, tuple_t *tuple)
 {
-    return gs_tuple_field_seek(field, tuple, 0);
+    gs_tuple_field_seek(field, tuple, 0);
 }
 
 void gs_tuple_field_seek(tuple_field_t *tuple_field, tuple_t *tuple, attr_id_t table_attr_id)
@@ -41,16 +41,18 @@ void gs_tuple_field_seek(tuple_field_t *tuple_field, tuple_t *tuple, attr_id_t t
 void gs_tuple_field_next(tuple_field_t *field)
 {
     const attr_id_t *attr_id = gs_grid_table_attr_id_to_frag_attr_id(field->grid, ++field->table_attr_id);
+    gs_tuplet_field_close(field->tuplet_field);
     if (attr_id) {
         field->tuplet_field = gs_tuplet_field_seek(field->tuplet, *attr_id);
     } else {
-        // next tuple fiels is in another tuplet (i.e., requires to search the other grid)
+        gs_tuplet_close(field->tuplet);
+        // next tuple field is in another tuplet (i.e., requires to search the other grid)
         if (field->table_attr_id < field->grid->context->schema->attr->num_elements) {
             // there are is at least one attribute in the table schema left that is covered by some grid, so proceed.
             gs_tuple_field_seek(field, field->tuple, field->table_attr_id);
         } else {
             // the tuple tuplet_field cursor goes beyond the table schema attribute list, so close the cursor.
-            gs_tuple_field_close(field);
+            // gs_tuple_field_close(field);
         }
     }
 }
@@ -69,5 +71,6 @@ const void *gs_tuple_field_read(tuple_field_t *field)
 void gs_tuple_field_close(tuple_field_t *field)
 {
     gs_tuplet_field_close(field->tuplet_field);
-    free (field->tuplet);
+    gs_tuplet_close(field->tuplet);
+    free(field->tuplet);
 }
