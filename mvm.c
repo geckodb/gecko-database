@@ -1115,9 +1115,10 @@ static int exec_ofield(mondrian_vm_t *vm, u64 _)
     tuplet_field_t *field;
     u64 mem_addr;
     mondrian_vm_get_var(&mem_addr, vm, VARIABLE_RTC);
-    tuplet_t *tuplet = (tuplet_t *) mem_addr;
-    field = gs_tuplet_field_open(tuplet);
+//    tuplet_t *tuplet = (tuplet_t *) mem_addr;
+    //field = gs_tuplet_field_open(tuplet);
     mondrian_vm_set_var(vm, VARIABLE_RFC, (u64 *) &field);
+    panic("Not implemented '%s'!", "exec_ofield");
     return MONDRIAN_OK;
 }
 

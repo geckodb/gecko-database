@@ -41,19 +41,20 @@ static inline void calc_field_print_lens(vector_t *field_print_lens, frag_t *fra
     schema_t *schema = gs_frag_get_schema(frag);
 
     while (num_tuplets--) {
-        struct tuplet_field_t *field = gs_tuplet_field_open(&tuplet);
+        struct tuplet_field_t field;
+        gs_tuplet_field_open(&field, &tuplet);
         for (size_t attr_idx = 0; attr_idx < num_attr; attr_idx++) {
             enum field_type type = gs_schema_attr_type(schema, attr_idx);
             const struct attr_t *attr = gs_schema_attr_by_id(schema, attr_idx);
 
             size_t this_print_len_attr  = strlen(gs_attr_get_name(attr));
-            size_t this_print_len_value = gs_unsafe_field_get_println(type, gs_tuplet_field_read(field));
+            size_t this_print_len_value = gs_unsafe_field_get_println(type, gs_tuplet_field_read(&field));
             size_t this_print_len_field = max(this_print_len_attr, this_print_len_value);
 
             size_t all_print_len = *(size_t *) vector_at(field_print_lens, attr_idx);
             all_print_len = max(all_print_len, this_print_len_field);
             vector_set(field_print_lens, attr_idx, 1, &all_print_len);
-            gs_tuplet_field_next(field, true);
+            gs_tuplet_field_next(&field, true);
         }
         gs_tuplet_next(&tuplet);
     }
@@ -121,15 +122,16 @@ static inline void print_frag_body(FILE *file, frag_t *frag, vector_t *field_pri
     schema_t *schema = gs_frag_get_schema(frag);
 
     while (num_tuples--) {
-        struct tuplet_field_t *field = gs_tuplet_field_open(&tuplet);
+        struct tuplet_field_t field;
+        gs_tuplet_field_open(&field, &tuplet);
         for (size_t attr_idx = 0; attr_idx < num_attr; attr_idx++) {
             const attr_t *attr = gs_schema_attr_by_id(schema, attr_idx);
-            char *str = gs_unsafe_field_to_string(attr->type, gs_tuplet_field_read(field));
+            char *str = gs_unsafe_field_to_string(attr->type, gs_tuplet_field_read(&field));
             size_t print_len = max(strlen(str), *(size_t *) vector_at(field_print_lens, attr_idx));
             sprintf(format_buffer, "| %%-%zus ", print_len);
             printf(format_buffer, str);
             free (str);
-            gs_tuplet_field_next(field, true);
+            gs_tuplet_field_next(&field, false);
         }
         gs_tuplet_next(&tuplet);
         printf("|\n");

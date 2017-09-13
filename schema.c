@@ -101,21 +101,20 @@ void gs_schema_print(FILE *file, schema_t *schema)
     gs_frag_insert(&tuplet, frag, num_attr);
 
     do {
-        tuplet_field_t *field = gs_tuplet_field_open(&tuplet);
+        tuplet_field_t field;
+        gs_tuplet_field_open(&field, &tuplet);
         for (attr_id_t i = 0; i < num_attr; i++) {
             const attr_t *attr = gs_schema_attr_by_id(schema, i);
-            gs_tuplet_field_write(field, &i, true);
-            gs_tuplet_field_write(field, attr->name, true);
-            gs_tuplet_field_write(field, gs_field_type_str(attr->type), true);
-            gs_tuplet_field_write(field, &attr->type_rep, true);
-            gs_tuplet_field_write_eval(field, (attr->flags.primary == 1), true);
-            gs_tuplet_field_write_eval(field, (attr->flags.foreign == 1), true);
-            gs_tuplet_field_write_eval(field, (attr->flags.nullable == 1), true);
-            gs_tuplet_field_write_eval(field, (attr->flags.autoinc == 1), true);
-            gs_tuplet_field_write_eval(field, (attr->flags.unique == 1), true);
+            gs_tuplet_field_write(&field, &i, true);
+            gs_tuplet_field_write(&field, attr->name, true);
+            gs_tuplet_field_write(&field, gs_field_type_str(attr->type), true);
+            gs_tuplet_field_write(&field, &attr->type_rep, true);
+            gs_tuplet_field_write_eval(&field, (attr->flags.primary == 1), true);
+            gs_tuplet_field_write_eval(&field, (attr->flags.foreign == 1), true);
+            gs_tuplet_field_write_eval(&field, (attr->flags.nullable == 1), true);
+            gs_tuplet_field_write_eval(&field, (attr->flags.autoinc == 1), true);
+            gs_tuplet_field_write_eval(&field, (attr->flags.unique == 1), true);
         }
-
-        gs_tuplet_field_close(field);
     } while (gs_tuplet_next(&tuplet));
 
     gs_frag_print(file, frag, 0, INT_MAX);

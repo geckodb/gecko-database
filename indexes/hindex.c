@@ -87,6 +87,7 @@ void gs_hindex_print(FILE *file, const hindex_t *index)
         ids[i] = i;
     }
     grid_cursor_t *cursor = gs_hindex_query(index, ids, ids + dist);
+    tuplet_field_t field;
     tuplet_t tuplet;
 
     /* dedup entries by hand */
@@ -99,12 +100,10 @@ void gs_hindex_print(FILE *file, const hindex_t *index)
        print_tuple_t t = { .grid = grid->grid_id, .begin = interval->begin, .end = interval->end };
        if (!dict_contains_key(dict, &t)) {
            gs_frag_insert(&tuplet, frag, 1);
-           gs_tuplet_field_open(&tuplet);
-           tuplet_field_t *field = gs_tuplet_field_open(&tuplet);
-           gs_tuplet_field_write(field, &interval->begin, true);
-           gs_tuplet_field_write(field, &interval->end, true);
-           gs_tuplet_field_write(field, &grid->grid_id, true);
-           gs_tuplet_field_close(field);
+           gs_tuplet_field_open(&field, &tuplet);
+           gs_tuplet_field_write(&field, &interval->begin, true);
+           gs_tuplet_field_write(&field, &interval->end, true);
+           gs_tuplet_field_write(&field, &grid->grid_id, true);
            dict_put(dict, &t, &dummy);
        }
     }

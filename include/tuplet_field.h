@@ -3,7 +3,7 @@
 #include <tuplet.h>
 
 typedef struct tuplet_field_t {
-    tuplet_t tuplet; /*<! tuplet to which this attr_value_ptr belongs to */
+    tuplet_t *tuplet; /*<! pointer to tuplet to which this attr_value_ptr belongs to */
 
     attr_id_t attr_id; /*<! current attribute tuplet_id to which this tuplet is seeked */
     void *attr_value_ptr; /*<! pointer in data in 'tuplet_base' of attr_value_ptr content of attribute 'attr_id */
@@ -15,12 +15,11 @@ typedef struct tuplet_field_t {
     void (*_update)(struct tuplet_field_t *self, const void *data); /* update data of current attr_value_ptr 'attr_id' */
     void (*_set_null)(struct tuplet_field_t *self); /* set the attr_value_ptr for 'attr_id' to NULL */
     bool (*_is_null)(struct tuplet_field_t *self); /* returns true iff attr_value_ptr of 'attr_id' is null */
-    void (*_close)(struct tuplet_field_t *self); /* close request for this attr_value_ptr */
 } tuplet_field_t;
 
-tuplet_field_t *gs_tuplet_field_open(tuplet_t *tuplet);
+void gs_tuplet_field_open(tuplet_field_t *dst, tuplet_t *tuplet);
 
-tuplet_field_t *gs_tuplet_field_seek(tuplet_t *tuplet, attr_id_t attr_id);
+void gs_tuplet_field_seek(tuplet_field_t *dst, tuplet_t *tuplet, attr_id_t attr_id);
 
 bool gs_tuplet_field_next(tuplet_field_t *field, bool auto_next);
 
@@ -35,8 +34,6 @@ bool gs_tuplet_field_write_eval(tuplet_field_t *field, bool eval, bool auto_next
 void gs_tuplet_field_set_null(tuplet_field_t *field);
 
 bool gs_tuplet_field_is_null(tuplet_field_t *field);
-
-void gs_tuplet_field_close(tuplet_field_t *field);
 
 size_t gs_tuplet_field_size(tuplet_field_t *field);
 

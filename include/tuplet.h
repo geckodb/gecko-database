@@ -13,7 +13,7 @@ typedef struct tuplet_t {
 
     /* operations */
     bool (*_next)(struct tuplet_t *self); /* seeks to the next tuplet inside this fragment */
-    struct tuplet_field_t *(*_open)(struct tuplet_t *self); /*<! access the attr_value_ptr data of this tuplet */
+    void (*_open)(struct tuplet_field_t *dst, struct tuplet_t *self); /*<! access the attr_value_ptr data of this tuplet */
     void (*_update)(struct tuplet_t *self, const void *data); /*<! updates all fields of this tuplet and moves to next */
     void (*_set_null)(struct tuplet_t *self); /*<! updates all fields of this tuplet to NULL, and moves to next */
     void (*_delete)(struct tuplet_t *self); /* request to delete this tuplet from fragment */

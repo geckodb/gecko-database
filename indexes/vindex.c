@@ -75,16 +75,15 @@ void gs_vindex_print(FILE *file, vindex_t *index)
     gs_attr_create_gridid("grid id", print_schema);
     frag_t *frag = gs_fragment_alloc(print_schema, 1, FIT_HOST_NSM_VM);
     tuplet_t tuplet;
+    tuplet_field_t field;
 
     for (const attr_id_t *it = gs_vindex_keys_begin(index); it < gs_vindex_keys_end(index); it++) {
         grid_cursor_t *cursor = gs_vindex_query(index, it, it + 1);
         for (struct grid_t *grid = grid_cursor_next(cursor); grid != NULL; grid = grid_cursor_next(NULL)) {
             gs_frag_insert(&tuplet, frag, 1);
-            gs_tuplet_field_open(&tuplet);
-            tuplet_field_t *field = gs_tuplet_field_open(&tuplet);
-            gs_tuplet_field_write(field, gs_grid_table_attr_by_id(grid->context, *it)->name, true);
-            gs_tuplet_field_write(field, &grid->grid_id, true);
-            gs_tuplet_field_close(field);
+            gs_tuplet_field_open(&field, &tuplet);
+            gs_tuplet_field_write(&field, gs_grid_table_attr_by_id(grid->context, *it)->name, true);
+            gs_tuplet_field_write(&field, &grid->grid_id, true);
         }
         grid_cursor_close(cursor);
     }

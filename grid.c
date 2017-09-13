@@ -161,6 +161,7 @@ grid_table_t *gs_grid_table_melt(enum frag_impl_type_t type, const grid_table_t 
         }
     }
     gs_tuple_cursor_free(&dst_cursor);
+    gs_schema_free(dst_schema);
     return dst_table;
 }
 
@@ -267,20 +268,19 @@ void gs_grid_table_grid_list_print(FILE *file, const grid_table_t *table, size_t
     gs_frag_insert(&tuplet, frag, num_tuples);
 
     do {
-        tuplet_field_t *field = gs_tuplet_field_open(&tuplet);
+        tuplet_field_t field;
+        gs_tuplet_field_open(&field, &tuplet);
         for (size_t i = 0; i < num_tuples; i++) {
             const grid_t *grid = gs_grid_by_id(table, i);
-            gs_tuplet_field_write(field, &i, true);
-            gs_tuplet_field_write(field, &grid->frag->format, true);
-            gs_tuplet_field_write(field, &grid->frag->impl_type, true);
-            gs_tuplet_field_write(field, &grid->frag->ntuplets, true);
-            gs_tuplet_field_write(field, &grid->frag->ncapacity, true);
-            gs_tuplet_field_write(field, &grid->frag->tuplet_size, true);
+            gs_tuplet_field_write(&field, &i, true);
+            gs_tuplet_field_write(&field, &grid->frag->format, true);
+            gs_tuplet_field_write(&field, &grid->frag->impl_type, true);
+            gs_tuplet_field_write(&field, &grid->frag->ntuplets, true);
+            gs_tuplet_field_write(&field, &grid->frag->ncapacity, true);
+            gs_tuplet_field_write(&field, &grid->frag->tuplet_size, true);
             size_t total_size = (grid->frag->tuplet_size * grid->frag->ncapacity);
-            gs_tuplet_field_write(field, &total_size, true);
+            gs_tuplet_field_write(&field, &total_size, true);
         }
-
-        gs_tuplet_field_close(field);
     } while (gs_tuplet_next(&tuplet));
 
     gs_frag_print(file, frag, 0, INT_MAX);
@@ -317,6 +317,7 @@ void gs_grid_table_structure_print(FILE *file, const grid_table_t *table, size_t
     schema_t *write_schema;
     tuplet_t write_tuplet;
     frag_t *write_frag;
+    tuplet_field_t write_field;
     size_t num_tuples;
     size_t num_attr;
 
@@ -334,7 +335,7 @@ void gs_grid_table_structure_print(FILE *file, const grid_table_t *table, size_t
     /* For each field in the input grid table, find the grid object that contains this field. The search is done via
      * nested linear search, currently. That's very naive, but does the job for now. */
     do {
-        gs_tuplet_field_open(&write_tuplet);
+        //gs_tuplet_field_open(&write_tuplet);
         gs_tuple_open(&read_tuple, table, write_tuplet.tuplet_id);
         gs_tuple_field_open(&read_field, &read_tuple);
         num_attr = gs_grid_table_num_of_attributes(table);
@@ -349,9 +350,8 @@ void gs_grid_table_structure_print(FILE *file, const grid_table_t *table, size_t
                         for (size_t i = 0; i < grid->tuple_ids->num_elements; i++) {
                             const tuple_id_interval_t *span = vector_at(grid->tuple_ids, i);
                             if (GS_INTERVAL_CONTAINS(span, write_tuplet.tuplet_id)) {
-                                tuplet_field_t *write_field = gs_tuplet_field_seek(&write_tuplet, read_field.table_attr_id);
-                                gs_tuplet_field_write(write_field, &grid_id, false);
-                                gs_tuplet_field_close(write_field);
+                                gs_tuplet_field_seek(&write_field, &write_tuplet, read_field.table_attr_id);
+                                gs_tuplet_field_write(&write_field, &grid_id, false);
                             }
                         }
                     }

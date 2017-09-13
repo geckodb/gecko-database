@@ -24,7 +24,8 @@ void gs_tuple_field_seek(tuple_field_t *tuple_field, tuple_t *tuple, attr_id_t t
 
     attr_id_t grid_attr_id = *gs_grid_table_attr_id_to_frag_attr_id(grid, table_attr_id);
 
-    tuplet_field_t *tuplet_field = gs_tuplet_field_seek(&tuple_field->tuplet, grid_attr_id);
+    tuplet_field_t tuplet_field;
+    gs_tuplet_field_seek(&tuplet_field, &tuple_field->tuplet, grid_attr_id);
 
     tuple_field->tuple = tuple;
     tuple_field->table_attr_id = table_attr_id;
@@ -38,34 +39,24 @@ void gs_tuple_field_seek(tuple_field_t *tuple_field, tuple_t *tuple, attr_id_t t
 void gs_tuple_field_next(tuple_field_t *field)
 {
     const attr_id_t *attr_id = gs_grid_table_attr_id_to_frag_attr_id(field->grid, ++field->table_attr_id);
-    gs_tuplet_field_close(field->tuplet_field);
     if (attr_id) {
-        field->tuplet_field = gs_tuplet_field_seek(&field->tuplet, *attr_id);
+        gs_tuplet_field_seek(&field->tuplet_field, &field->tuplet, *attr_id);
     } else {
-        //gs_tuplet_close(field->tuplet);
         // next tuple field is in another tuplet (i.e., requires to search the other grid)
         if (field->table_attr_id < field->grid->context->schema->attr->num_elements) {
             // there are is at least one attribute in the table schema left that is covered by some grid, so proceed.
             gs_tuple_field_seek(field, field->tuple, field->table_attr_id);
-        } else {
-            // the tuple tuplet_field cursor goes beyond the table schema attribute list, so close the cursor.
-            // gs_tuple_field_close(field);
         }
     }
 }
 
 void gs_tuple_field_write(tuple_field_t *field, const void *data)
 {
-    gs_tuplet_field_write(field->tuplet_field, data, false);
+    gs_tuplet_field_write(&field->tuplet_field, data, false);
     gs_tuple_field_next(field);
 }
 
 const void *gs_tuple_field_read(tuple_field_t *field)
 {
-    return gs_tuplet_field_read(field->tuplet_field);
-}
-
-void gs_tuple_field_close(tuple_field_t *field)
-{
-    gs_tuplet_field_close(field->tuplet_field);
+    return gs_tuplet_field_read(&field->tuplet_field);
 }
