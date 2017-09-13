@@ -1,4 +1,21 @@
+// Copyright (C) 2017 Marcus Pinnecke
+//
+// This program is free software: you can redistribute it and/or modify it under the terms of the
+// GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with this program.
+// If not, see <http://www.gnu.org/licenses/>.
+
 #pragma once
+
+// ---------------------------------------------------------------------------------------------------------------------
+// I N C L U D E S
+// ---------------------------------------------------------------------------------------------------------------------
 
 #include <frag.h>
 #include <tuple.h>
@@ -7,6 +24,10 @@
 #include <indexes/hindex.h>
 #include <containers/freelist.h>
 #include <tuple_cursor.h>
+
+// ---------------------------------------------------------------------------------------------------------------------
+// D A T A   T Y P E S
+// ---------------------------------------------------------------------------------------------------------------------
 
 typedef size_t grid_id_t;
 
@@ -84,6 +105,10 @@ typedef struct grid_table_t {
                             accessible. However, it's neither guaranteed that a tuple associated with an identifier in
                             this interval is not marked as 'deleted' nor that the tuple data is initialized. */
 } grid_table_t;
+
+// ---------------------------------------------------------------------------------------------------------------------
+// I N T E R F A C E  D E C L A R A T I O N S
+// ---------------------------------------------------------------------------------------------------------------------
 
 grid_table_t *gs_grid_table_create(const schema_t *schema, size_t approx_num_horizontal_partitions);
 

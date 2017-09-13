@@ -1,4 +1,21 @@
+// Copyright (C) 2017 Marcus Pinnecke
+//
+// This program is free software: you can redistribute it and/or modify it under the terms of the
+// GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with this program.
+// If not, see <http://www.gnu.org/licenses/>.
+
 #pragma once
+
+// ---------------------------------------------------------------------------------------------------------------------
+// I N C L U D E S
+// ---------------------------------------------------------------------------------------------------------------------
 
 #include <stdinc.h>
 
@@ -21,6 +38,15 @@ typedef struct __attribute__((__packed__)) instruction_t
     u8  opcode;
     u64 operand;
 } instruction_t;
+
+typedef enum access_mode {
+    MODE_SHARED               = 0x0000000000000000,
+    MODE_EXCLUSIVE            = 0x0000000000000001
+} access_mode;
+
+// ---------------------------------------------------------------------------------------------------------------------
+// C O N S T A N T S
+// ---------------------------------------------------------------------------------------------------------------------
 
 #define MVM_OC_ABORT                0x00
 #define MVM_OC_ADDATTR              0x01
@@ -66,11 +92,6 @@ typedef struct __attribute__((__packed__)) instruction_t
 #define MVM_OC_WFIELD               0x29
 #define MVM_OC_PRINT                0x2A
 
-typedef enum access_mode {
-    MODE_SHARED               = 0x0000000000000000,
-    MODE_EXCLUSIVE            = 0x0000000000000001
-} access_mode;
-
 #define ACCESS_GLOBAL               0x0000000000000000
 
 #define CONTAINER_PROGPOOL          0x0000000000000000
@@ -106,6 +127,10 @@ static const char STRING_BUILTIN_SIZE[]        = "Size";
 #define PROGRAM_MAX_AUTHOR_LENGTH       256
 #define PROGRAM_MAX_COMMENT_LENGTH     1024
 
+// ---------------------------------------------------------------------------------------------------------------------
+// M A C R O S
+// ---------------------------------------------------------------------------------------------------------------------
+
 #define ADD(/* MVM_OC_* */ oc, /* u64 */ op)                                                                           \
 {                                                                                                                      \
     instruction_t inst = {                                                                                             \
@@ -123,6 +148,10 @@ static const char STRING_BUILTIN_SIZE[]        = "Size";
 
 #define END()                                                                                                          \
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// I N T E R F A C E   D E C L A R A T I O N
+// ---------------------------------------------------------------------------------------------------------------------
 
 int mondrian_vm_create(mondrian_vm_t **out, mondrian_t *db);
 

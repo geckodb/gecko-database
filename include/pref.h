@@ -1,14 +1,43 @@
+// Copyright (C) 2017 Marcus Pinnecke
+//
+// This program is free software: you can redistribute it and/or modify it under the terms of the
+// GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with this program.
+// If not, see <http://www.gnu.org/licenses/>.
+
 #pragma once
+
+// ---------------------------------------------------------------------------------------------------------------------
+// I N C L U D E S
+// ---------------------------------------------------------------------------------------------------------------------
 
 #include <stdinc.h>
 #include <containers/dict.h>
 
+// ---------------------------------------------------------------------------------------------------------------------
+// C O N F I G
+// ---------------------------------------------------------------------------------------------------------------------
+
 #define NUM_INIT_CONFIG_STATEMENTS    10
+
+// ---------------------------------------------------------------------------------------------------------------------
+// D A T A   T Y P E S
+// ---------------------------------------------------------------------------------------------------------------------
 
 typedef struct {
     time_t last_read;
     dict_t *dict;
 } pref_t;
+
+// ---------------------------------------------------------------------------------------------------------------------
+// I N T E R F A C E   D E C L A R A T I O N
+// ---------------------------------------------------------------------------------------------------------------------
 
 void pref_load(pref_t *pref, const char *file, dict_t *dict,
         char * (*resolve_variables)(dict_t *dict, const char *string));

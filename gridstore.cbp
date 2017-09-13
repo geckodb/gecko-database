@@ -384,14 +384,6 @@
 			<Option target="expr"/>
 			<Option target="mondrian"/>
 		</Unit>
-		<Unit filename="/Users/marcus/git/myimdb/debug.c">
-			<Option target="gridtables"/>
-			<Option target="buffmgr"/>
-			<Option target="sample_linuxwc"/>
-			<Option target="sample_lin_hash"/>
-			<Option target="expr"/>
-			<Option target="mondrian"/>
-		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/error.c">
 			<Option target="gridtables"/>
 			<Option target="buffmgr"/>
@@ -457,14 +449,6 @@
 			<Option target="mondrian"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/grid_cursor.c">
-			<Option target="gridtables"/>
-			<Option target="buffmgr"/>
-			<Option target="sample_linuxwc"/>
-			<Option target="sample_lin_hash"/>
-			<Option target="expr"/>
-			<Option target="mondrian"/>
-		</Unit>
-		<Unit filename="/Users/marcus/git/myimdb/grid_table.c">
 			<Option target="gridtables"/>
 			<Option target="buffmgr"/>
 			<Option target="sample_linuxwc"/>
@@ -633,14 +617,6 @@
 			<Option target="mondrian"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/include/grid_cursor.h">
-			<Option target="gridtables"/>
-			<Option target="buffmgr"/>
-			<Option target="sample_linuxwc"/>
-			<Option target="sample_lin_hash"/>
-			<Option target="expr"/>
-			<Option target="mondrian"/>
-		</Unit>
-		<Unit filename="/Users/marcus/git/myimdb/include/grid_table.h">
 			<Option target="gridtables"/>
 			<Option target="buffmgr"/>
 			<Option target="sample_linuxwc"/>
@@ -983,14 +959,6 @@
 			<Option target="mondrian"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/myimdb/progpool.c">
-			<Option target="gridtables"/>
-			<Option target="buffmgr"/>
-			<Option target="sample_linuxwc"/>
-			<Option target="sample_lin_hash"/>
-			<Option target="expr"/>
-			<Option target="mondrian"/>
-		</Unit>
-		<Unit filename="/Users/marcus/git/myimdb/require.c">
 			<Option target="gridtables"/>
 			<Option target="buffmgr"/>
 			<Option target="sample_linuxwc"/>

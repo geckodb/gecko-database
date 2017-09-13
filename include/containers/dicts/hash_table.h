@@ -48,6 +48,10 @@
 #include <pref.h>
 #include <containers/dict.h>
 
+// ---------------------------------------------------------------------------------------------------------------------
+// D A T A T Y P E S
+// ---------------------------------------------------------------------------------------------------------------------
+
 typedef struct {
     size_t num_put_calls, num_collisions, num_locks, num_rebuilds, num_put_slotsearch, num_updates,
            num_get_foundkey, num_get_slotdisplaced, num_get_nosuchkey_fullsearch, num_get_nosuchkey,

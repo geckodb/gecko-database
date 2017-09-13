@@ -1,10 +1,35 @@
+// Copyright (C) 2017 Marcus Pinnecke
+//
+// This program is free software: you can redistribute it and/or modify it under the terms of the
+// GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with this program.
+// If not, see <http://www.gnu.org/licenses/>.
+
 #pragma once
+
+// ---------------------------------------------------------------------------------------------------------------------
+// I N C L U D E S
+// ---------------------------------------------------------------------------------------------------------------------
 
 #include <stdinc.h>
 #include <attr.h>
 #include <frag.h>
 
+// ---------------------------------------------------------------------------------------------------------------------
+// F O R W A R D   D E C L A R A T I O N S
+// ---------------------------------------------------------------------------------------------------------------------
+
 struct schema_t;
+
+// ---------------------------------------------------------------------------------------------------------------------
+// D A T A   T Y P E S
+// ---------------------------------------------------------------------------------------------------------------------
 
 typedef struct tuplet_t {
     struct frag_t *fragment; /*<! fragment in which this tuplet exists */
@@ -20,6 +45,10 @@ typedef struct tuplet_t {
     bool (*_is_null)(struct tuplet_t *self); /*<! checks whether this tuplet is NULL entirely */
 
 } tuplet_t;
+
+// ---------------------------------------------------------------------------------------------------------------------
+// I N T E R F A C E   D E C L A R A T I O N
+// ---------------------------------------------------------------------------------------------------------------------
 
 /*!
  * @brief Opens the the tuplet associated with a given tuplet id that is located in the fragment <i>frag</i>.

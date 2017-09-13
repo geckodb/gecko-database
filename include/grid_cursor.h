@@ -1,7 +1,28 @@
+// Copyright (C) 2017 Marcus Pinnecke
+//
+// This program is free software: you can redistribute it and/or modify it under the terms of the
+// GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with this program.
+// If not, see <http://www.gnu.org/licenses/>.
+
 #pragma once
+
+// ---------------------------------------------------------------------------------------------------------------------
+// I N C L U D E S
+// ---------------------------------------------------------------------------------------------------------------------
 
 #include <stdinc.h>
 #include <grid_cursor.h>
+
+// ---------------------------------------------------------------------------------------------------------------------
+// D A T A   T Y P E S
+// ---------------------------------------------------------------------------------------------------------------------
 
 typedef enum {
     GI_VINDEX_HASH,
@@ -12,6 +33,10 @@ typedef enum {
 typedef struct grid_cursor_t {
     void *extra;
 } grid_cursor_t;
+
+// ---------------------------------------------------------------------------------------------------------------------
+// F O R W A R D   D E C L A R A T I O N S
+// ---------------------------------------------------------------------------------------------------------------------
 
 grid_cursor_t *grid_cursor_create(size_t cursor);
 

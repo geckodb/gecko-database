@@ -57,7 +57,6 @@ set(SOURCE_FILES
         include/unsafe.h
         include/timer.h
         include/field_type.h
-        include/grid_table.h
         include/tuple.h
         include/inet/server.h
         include/debug.h
@@ -81,7 +80,6 @@ set(SOURCE_FILES
         hash.c
         pred.c
         pref.c
-        require.c
         schema.c
         storage/memory.c
         tuplet.c
@@ -92,10 +90,8 @@ set(SOURCE_FILES
         unsafe.c
         timer.c
         field_type.c
-        grid_table.c
         tuple.c
         inet/server.c
-        debug.c
         global.c
         inet/request.c
         inet/response.c

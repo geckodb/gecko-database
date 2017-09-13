@@ -1,18 +1,15 @@
-/*
- * Copyright (C) 2017 Marcus Pinnecke
- *
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along with this program.
- * If not, see <http://www.gnu.org/licenses/>.
- *
- */
+// Copyright (C) 2017 Marcus Pinnecke
+//
+// This program is free software: you can redistribute it and/or modify it under the terms of the
+// GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with this program.
+// If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
@@ -54,7 +51,6 @@
 #include <require.h>
 #include <hash.h>
 #include <zconf.h>
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 // C O N S T A N T S
@@ -122,25 +118,18 @@ typedef MD5_CTX checksum_context_t;
 
 #define IS_FLAG_SET(set, flag) ((set & flag) == flag)
 
-#define DELEGATE_CALL(instance, fun)                                                                                    \
+#define DELEGATE_CALL(instance, fun)                                                                                   \
     ({                                                                                                                 \
         REQUIRE_NONNULL(instance);                                                                                     \
         REQUIRE_IMPL(instance->fun);                                                                                   \
         instance->fun(instance);                                                                                       \
     })
 
-#define DELEGATE_CALL_WARGS(instance, fun, ...)                                                                         \
+#define DELEGATE_CALL_WARGS(instance, fun, ...)                                                                        \
     ({                                                                                                                 \
         REQUIRE_NONNULL(instance);                                                                                     \
         REQUIRE_IMPL(instance->fun);                                                                                   \
         instance->fun(instance,__VA_ARGS__);                                                                           \
-    })
-
-#define delegte_call_wargs2(instance, fun, ...)                                                                        \
-    ({                                                                                                                 \
-        REQUIRE_NONNULL(instance);                                                                                     \
-        REQUIRE_IMPL(instance->fun);                                                                                   \
-        instance->fun(__VA_ARGS__);                                                                                    \
     })
 
 static inline const char *gs_tuplet_format_str(enum tuplet_format format)
