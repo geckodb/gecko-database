@@ -320,6 +320,7 @@ void gs_grid_table_print(FILE *file, const grid_table_t *table, size_t row_offse
     free(attr_ids);
     free(tuple_ids);
     gs_grid_table_free(molten_table);
+    free(molten_table);
 }
 
 void gs_grid_table_structure_print(FILE *file, const grid_table_t *table, size_t row_offset, size_t limit)
