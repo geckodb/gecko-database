@@ -3,7 +3,7 @@
 #include <tuplet.h>
 
 typedef struct tuplet_field_t {
-    tuplet_t *tuplet; /*<! tuplet to which this attr_value_ptr belongs to */
+    tuplet_t tuplet; /*<! tuplet to which this attr_value_ptr belongs to */
 
     attr_id_t attr_id; /*<! current attribute tuplet_id to which this tuplet is seeked */
     void *attr_value_ptr; /*<! pointer in data in 'tuplet_base' of attr_value_ptr content of attribute 'attr_id */

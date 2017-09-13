@@ -13,7 +13,6 @@ typedef struct tuplet_t {
 
     /* operations */
     bool (*_next)(struct tuplet_t *self); /* seeks to the next tuplet inside this fragment */
-    void (*_close)(struct tuplet_t *self); /* frees resources of this tuplet */
     struct tuplet_field_t *(*_open)(struct tuplet_t *self); /*<! access the attr_value_ptr data of this tuplet */
     void (*_update)(struct tuplet_t *self, const void *data); /*<! updates all fields of this tuplet and moves to next */
     void (*_set_null)(struct tuplet_t *self); /*<! updates all fields of this tuplet to NULL, and moves to next */
@@ -36,20 +35,7 @@ typedef struct tuplet_t {
  *        [in] tuplet_id the tuplet id. Must be valid.
  * @return A pointer to the first tuplet in <i>frag</i>, or <b>NULL</b> if the fragment does not contains any tuplets.
  * */
-tuplet_t *gs_tuplet_open(struct frag_t *frag, tuplet_id_t tuplet_id);
-
-/*!
- * @brief Closes a tuplet and frees up resources bound to this tuplet.
- *
- * Tuplets are allocated on the heap. When no further operations on tuplets are needed, they must be closed in order
- * to release resources (i.e., freeing space on the heap and fragment-specific resources). A closing operation is
- * either scheduled by a call to gs_tuplet_close() or when gs_tuplet_next() reaches the end of the fragment.
- * However, which resources are actually freed is fragment-type specific. It is not defined how a fragment behaves when
- * tuplets are not closed correctly.
- *
- * @param [in] tuplet The tuplet to be closed.
- */
-void gs_tuplet_close(tuplet_t *tuplet);
+void gs_tuplet_open(tuplet_t *dst, struct frag_t *frag, tuplet_id_t tuplet_id);
 
 /*!
  * @brief Moves the input tuplet cursor to its successor inside its fragment.
@@ -78,7 +64,7 @@ bool gs_tuplet_next(tuplet_t *tuplet);
  * @param tuplet A valid tuplet inside a fragment (mus be non-null)
  * @return The first tuplet in the fragment of the input tuplet.
  */
-tuplet_t *gs_tuplet_rewind(tuplet_t *tuplet);
+void gs_tuplet_rewind(tuplet_t *tuplet);
 
 void gs_tuplet_set_null(tuplet_t *tuplet);
 
@@ -90,6 +76,6 @@ void *gs_update(void *dst, schema_t *frag, attr_id_t attr_id, void *src);
 
 size_t gs_tuplet_size_by_schema(const schema_t *schema);
 
-enum field_type gs_tuplet_get_field_type(tuplet_t *tuplet, attr_id_t id);
+enum field_type gs_tuplet_get_field_type(const tuplet_t *tuplet, attr_id_t id);
 
 size_t gs_tuplet_printlen(const attr_t *attr, const void *field_data);

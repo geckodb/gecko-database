@@ -11,7 +11,7 @@ typedef struct tuple_field_t
     attr_id_t table_attr_id;
     attr_id_t grid_attr_id;
     tuple_t *tuple;
-    tuplet_t *tuplet;
+    tuplet_t tuplet;
     tuplet_field_t *tuplet_field;
 } tuple_field_t;
 

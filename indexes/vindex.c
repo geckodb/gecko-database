@@ -85,7 +85,6 @@ void gs_vindex_print(FILE *file, vindex_t *index)
             gs_tuplet_field_write(field, gs_grid_table_attr_by_id(grid->context, *it)->name, true);
             gs_tuplet_field_write(field, &grid->grid_id, true);
             gs_tuplet_field_close(field);
-            gs_tuplet_close(&tuplet);
         }
         grid_cursor_close(cursor);
     }

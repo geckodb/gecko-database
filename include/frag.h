@@ -33,6 +33,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 enum frag_printer_type_tag;
+struct tuplet_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // T Y P E S
@@ -57,11 +58,11 @@ typedef struct frag_t {
     void (*_dispose)(struct frag_t *self);
 
     /*!< factory function to create impl-specific tuplet */
-    struct tuplet_t *(*_open)(struct frag_t *self, tuplet_id_t tuplet_id);
+    void (*_open)(struct tuplet_t *dst, struct frag_t *self, tuplet_id_t tuplet_id);
 
     /*!< inserts a number of (uninitialized) ntuplets into this fragment and returns a tuplet pointer to the first
      * tuplets of these newly added tuplets. */
-    struct tuplet_t *(*_insert)(struct frag_t *self, size_t ntuplets);
+    void (*_insert)(struct tuplet_t *dst, struct frag_t *self, size_t ntuplets);
 } frag_t;
 
 

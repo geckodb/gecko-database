@@ -116,7 +116,6 @@ void gs_schema_print(FILE *file, schema_t *schema)
         }
 
         gs_tuplet_field_close(field);
-        gs_tuplet_close(&tuplet);
     } while (gs_tuplet_next(&tuplet));
 
     gs_frag_print(file, frag, 0, INT_MAX);

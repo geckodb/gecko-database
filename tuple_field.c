@@ -20,20 +20,17 @@ void gs_tuple_field_seek(tuple_field_t *tuple_field, tuple_t *tuple, attr_id_t t
                   grid_cursor_numelem(cursor));
     grid_t *grid = grid_cursor_next(cursor);
 
-    tuplet_t *tuplet = gs_tuplet_open(grid->frag, gs_grid_global_to_local(grid, tuple->tuple_id, AT_RANDOM));
+    gs_tuplet_open(&tuple_field->tuplet, grid->frag, gs_grid_global_to_local(grid, tuple->tuple_id, AT_RANDOM));
 
     attr_id_t grid_attr_id = *gs_grid_table_attr_id_to_frag_attr_id(grid, table_attr_id);
 
-    tuplet_field_t *tuplet_field = gs_tuplet_field_seek(tuplet, grid_attr_id);
+    tuplet_field_t *tuplet_field = gs_tuplet_field_seek(&tuple_field->tuplet, grid_attr_id);
 
-    *tuple_field = (tuple_field_t) {
-            .tuple = tuple,
-            .table_attr_id = table_attr_id,
-            .grid_attr_id = grid_attr_id,
-            .grid = grid,
-            .tuplet = tuplet,
-            .tuplet_field = tuplet_field
-    };
+    tuple_field->tuple = tuple;
+    tuple_field->table_attr_id = table_attr_id;
+    tuple_field->grid_attr_id = grid_attr_id;
+    tuple_field->grid = grid;
+    tuple_field->tuplet_field = tuplet_field;
 
     grid_cursor_close(cursor);
 }
@@ -43,9 +40,9 @@ void gs_tuple_field_next(tuple_field_t *field)
     const attr_id_t *attr_id = gs_grid_table_attr_id_to_frag_attr_id(field->grid, ++field->table_attr_id);
     gs_tuplet_field_close(field->tuplet_field);
     if (attr_id) {
-        field->tuplet_field = gs_tuplet_field_seek(field->tuplet, *attr_id);
+        field->tuplet_field = gs_tuplet_field_seek(&field->tuplet, *attr_id);
     } else {
-        gs_tuplet_close(field->tuplet);
+        //gs_tuplet_close(field->tuplet);
         // next tuple field is in another tuplet (i.e., requires to search the other grid)
         if (field->table_attr_id < field->grid->context->schema->attr->num_elements) {
             // there are is at least one attribute in the table schema left that is covered by some grid, so proceed.
@@ -71,6 +68,4 @@ const void *gs_tuple_field_read(tuple_field_t *field)
 void gs_tuple_field_close(tuple_field_t *field)
 {
     gs_tuplet_field_close(field->tuplet_field);
-    gs_tuplet_close(field->tuplet);
-    free(field->tuplet);
 }

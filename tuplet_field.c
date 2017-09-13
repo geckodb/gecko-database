@@ -63,8 +63,8 @@ tuplet_field_t *gs_tuplet_field_seek(tuplet_t *tuplet, attr_id_t attr_id)
 size_t gs_tuplet_field_size(tuplet_field_t *field)
 {
     assert (field);
-    panic_if((field->attr_id >= field->tuplet->fragment->schema->attr->num_elements), BADBOUNDS, "attribute tuplet_id invalid");
-    const attr_t *attr = gs_schema_attr_by_id(field->tuplet->fragment->schema, field->attr_id);
+    panic_if((field->attr_id >= field->tuplet.fragment->schema->attr->num_elements), BADBOUNDS, "attribute tuplet_id invalid");
+    const attr_t *attr = gs_schema_attr_by_id(field->tuplet.fragment->schema, field->attr_id);
     return (gs_attr_total_size(attr));
 }
 
@@ -76,7 +76,7 @@ size_t gs_attr_total_size(const struct attr_t *attr)
 enum field_type gs_tuplet_field_get_type(const tuplet_field_t *field)
 {
     assert(field);
-    return gs_tuplet_get_field_type(field->tuplet, field->attr_id);
+    return gs_tuplet_get_field_type(&field->tuplet, field->attr_id);
 }
 
 size_t gs_tuplet_field_get_printlen(const tuplet_field_t *field)

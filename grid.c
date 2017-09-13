@@ -281,7 +281,6 @@ void gs_grid_table_grid_list_print(FILE *file, const grid_table_t *table, size_t
         }
 
         gs_tuplet_field_close(field);
-        gs_tuplet_close(&tuplet);
     } while (gs_tuplet_next(&tuplet));
 
     gs_frag_print(file, frag, 0, INT_MAX);

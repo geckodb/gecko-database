@@ -35,12 +35,13 @@ static inline void calc_field_print_lens(vector_t *field_print_lens, frag_t *fra
 {
     assert (field_print_lens);
 
-    tuplet_t *tuplet = gs_tuplet_open(frag, 0);
+    tuplet_t tuplet;
+    gs_tuplet_open(&tuplet, frag, 0);
     size_t num_tuplets = frag->ntuplets;
     schema_t *schema = gs_frag_get_schema(frag);
 
     while (num_tuplets--) {
-        struct tuplet_field_t *field = gs_tuplet_field_open(tuplet);
+        struct tuplet_field_t *field = gs_tuplet_field_open(&tuplet);
         for (size_t attr_idx = 0; attr_idx < num_attr; attr_idx++) {
             enum field_type type = gs_schema_attr_type(schema, attr_idx);
             const struct attr_t *attr = gs_schema_attr_by_id(schema, attr_idx);
@@ -54,6 +55,7 @@ static inline void calc_field_print_lens(vector_t *field_print_lens, frag_t *fra
             vector_set(field_print_lens, attr_idx, 1, &all_print_len);
             gs_tuplet_field_next(field, true);
         }
+        gs_tuplet_next(&tuplet);
     }
 }
 
@@ -113,12 +115,13 @@ static inline void print_frag_body(FILE *file, frag_t *frag, vector_t *field_pri
     assert (field_print_lens);
 
     char format_buffer[2048];
-    tuplet_t *tuplet = gs_tuplet_open(frag, 0);
+    tuplet_t tuplet;
+    gs_tuplet_open(&tuplet, frag, 0);
     size_t num_tuples = frag->ntuplets;
     schema_t *schema = gs_frag_get_schema(frag);
 
     while (num_tuples--) {
-        struct tuplet_field_t *field = gs_tuplet_field_open(tuplet);
+        struct tuplet_field_t *field = gs_tuplet_field_open(&tuplet);
         for (size_t attr_idx = 0; attr_idx < num_attr; attr_idx++) {
             const attr_t *attr = gs_schema_attr_by_id(schema, attr_idx);
             char *str = gs_unsafe_field_to_string(attr->type, gs_tuplet_field_read(field));
@@ -128,6 +131,7 @@ static inline void print_frag_body(FILE *file, frag_t *frag, vector_t *field_pri
             free (str);
             gs_tuplet_field_next(field, true);
         }
+        gs_tuplet_next(&tuplet);
         printf("|\n");
     }
 

@@ -106,7 +106,6 @@ void gs_hindex_print(FILE *file, const hindex_t *index)
            gs_tuplet_field_write(field, &grid->grid_id, true);
            gs_tuplet_field_close(field);
            dict_put(dict, &t, &dummy);
-           gs_tuplet_close(&tuplet);
        }
     }
 
