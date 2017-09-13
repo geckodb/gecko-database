@@ -157,21 +157,10 @@ grid_table_t *gs_grid_table_melt(enum frag_impl_type_t type, const grid_table_t 
             gs_tuple_field_seek(&src_field, &src_tuple, attr_id);
             gs_tuple_field_seek(&dst_field, &dst_tuple, attr_id);
             const void *field_data = gs_tuple_field_read(&src_field);
-
-         /*   // DEBUG:
-            if (src_field.tuplet_field->attr_id == 0) {
-                printf("read tuplet (%u) tuplet_field attr0 (%llu): '%llu'\n", src_field.tuplet_field->tuplet->tuplet_id, src_field.tuplet_field->attr_id, *(u64*) src_field.tuplet_field->attr_value_ptr);
-            } else if (src_field.tuplet_field->attr_id == 1) {
-                printf("read tuplet (%u) tuplet_field attr1 (%llu): '%d'\n", src_field.tuplet_field->tuplet->tuplet_id, src_field.tuplet_field->attr_id, *(u32*) src_field.tuplet_field->attr_value_ptr);
-            } else if (src_field.tuplet_field->attr_id == 2) {
-                printf("read tuplet (%u) tuplet_field attr2 (%llu): '%d'\n", src_field.tuplet_field->tuplet->tuplet_id, src_field.tuplet_field->attr_id, *(u16*) src_field.tuplet_field->attr_value_ptr);
-            } else if (src_field.tuplet_field->attr_id == 3) {
-                printf("read tuplet (%u) tuplet_field attr3 (%llu): '%d'\n", src_field.tuplet_field->tuplet->tuplet_id, src_field.tuplet_field->attr_id, *(u16*) src_field.tuplet_field->attr_value_ptr);
-            }*/
-
             gs_tuple_field_write(&dst_field, field_data);
         }
     }
+    gs_tuple_cursor_free(&dst_cursor);
     return dst_table;
 }
 
@@ -278,7 +267,6 @@ void gs_grid_table_grid_list_print(FILE *file, const grid_table_t *table, size_t
     gs_frag_insert(&tuplet, frag, num_tuples);
 
     do {
-        gs_tuplet_field_open(&tuplet);
         tuplet_field_t *field = gs_tuplet_field_open(&tuplet);
         for (size_t i = 0; i < num_tuples; i++) {
             const grid_t *grid = gs_grid_by_id(table, i);

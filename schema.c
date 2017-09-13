@@ -101,7 +101,6 @@ void gs_schema_print(FILE *file, schema_t *schema)
     gs_frag_insert(&tuplet, frag, num_attr);
 
     do {
-        gs_tuplet_field_open(&tuplet);
         tuplet_field_t *field = gs_tuplet_field_open(&tuplet);
         for (attr_id_t i = 0; i < num_attr; i++) {
             const attr_t *attr = gs_schema_attr_by_id(schema, i);
