@@ -23,14 +23,14 @@
 const struct attr_t *gs_schema_attr_by_id(const schema_t *schema, attr_id_t attr_id)
 {
     assert (attr_id < schema->attr->num_elements);
-    return ((struct attr_t *)vector_at(schema->attr, attr_id));
+    return ((struct attr_t *) vec_at(schema->attr, attr_id));
 }
 
 const struct attr_t *gs_schema_attr_by_name(const schema_t *schema, const char *name)
 {
     assert (schema);
     for (size_t i = 0; i < schema->attr->num_elements; i++) {
-        attr_t *attr = vector_at(schema->attr, i);
+        attr_t *attr = vec_at(schema->attr, i);
         if (!strcmp(attr->name, name)) {
             return attr;
         }
@@ -42,7 +42,7 @@ schema_t *gs_schema_create(const char *table_name)
 {
     assert (table_name);
     schema_t *result = REQUIRE_MALLOC(sizeof(schema_t));
-    result->attr = vector_create(sizeof(attr_t), 100);
+    result->attr = vec_create(sizeof(attr_t), 100);
     result->frag_name = strdup(table_name);
     return result;
 }
@@ -67,7 +67,7 @@ schema_t *gs_schema_subset(schema_t *super, const attr_id_t *indicies, size_t ni
 void gs_schema_free(schema_t *schema)
 {
     assert (schema);
-    vector_free(schema->attr);
+    vec_free(schema->attr);
     free (schema->frag_name);
     free (schema);
 }
@@ -76,7 +76,7 @@ schema_t *gs_schema_cpy(const schema_t *schema)
 {
     assert (schema);
     schema_t *cpy = REQUIRE_MALLOC(sizeof(schema_t));
-    cpy->attr = vector_deep_cpy(schema->attr);
+    cpy->attr = vec_cpy_deep(schema->attr);
     cpy->frag_name = strdup(schema->frag_name);
     return cpy;
 }

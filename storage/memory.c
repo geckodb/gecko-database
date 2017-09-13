@@ -867,8 +867,9 @@ static inline void
 anticache_freelist_init(
     anti_buf_t *   buf)
 {
-    buf->page_anticache.free_page_ids_stack = vector_create_ex(sizeof(page_id_t),
-             ANTICACHE_PAGEID_FREELIST_INITCAP, auto_resize, ANTICACHE_PAGEID_FREELIST_GROW_FACTOR);
+    buf->page_anticache.free_page_ids_stack = vec_create_ex(sizeof(page_id_t),
+                                                            ANTICACHE_PAGEID_FREELIST_INITCAP, auto_resize,
+                                                            ANTICACHE_PAGEID_FREELIST_GROW_FACTOR);
     REQUIRE((buf->page_anticache.free_page_ids_stack), BADFREELISTINIT);
 }
 
@@ -1068,8 +1069,9 @@ static inline void
 coldstore_init(
     anti_buf_t *   buf)
 {
-    buf->page_anticache.cold_store_page_ids = vector_create_ex(sizeof(page_id_t),
-            ANTICACHE_COLDSTORELIST_INITCAP, auto_resize, ANTICACHE_COLDSTORELIST_GROW_FACTOR);
+    buf->page_anticache.cold_store_page_ids = vec_create_ex(sizeof(page_id_t),
+                                                            ANTICACHE_COLDSTORELIST_INITCAP, auto_resize,
+                                                            ANTICACHE_COLDSTORELIST_GROW_FACTOR);
     REQUIRE((buf->page_anticache.cold_store_page_ids), BADCOLDSTOREINIT);
 
 }
@@ -1967,33 +1969,33 @@ freespace_merge(
     assert (page);
     freespace_reg_t * reg = freespace(page);
     size_t            len = freespace_len(page);
-    vector_t *        vec = vector_create(sizeof(range_t), len);
+    vec_t *        vec = vec_create(sizeof(range_t), len);
 
     size_t idx = len;
     while (idx--) {
         range_t *range = freespace_at(page, idx);
-        vector_add(vec, 1, range);
+        vec_pushback(vec, 1, range);
     }
 
-    void *raw_data = vector_get(vec);
+    void *raw_data = vec_data(vec);
     qsort(raw_data, len, sizeof(range_t), freespace_comp_by_start);
 
-    vector_t *stack = vector_create(sizeof(range_t), len);
-    vector_add(stack, 1, raw_data);
+    vec_t *stack = vec_create(sizeof(range_t), len);
+    vec_pushback(stack, 1, raw_data);
 
     for (size_t range_idx = 0; range_idx < len; range_idx++) {
         range_t *current_range = (range_t *)(raw_data + range_idx * sizeof(range_t));
-        range_t *stack_top = vector_peek(stack);
+        range_t *stack_top = vec_peek(stack);
         if (range_do_overlap(current_range, stack_top)) {
             stack_top->end = max(stack_top->end, current_range->end);
-        } else vector_add(stack, 1, current_range);
+        } else vec_pushback(stack, 1, current_range);
     }
 
     reg->list_len = stack->num_elements;
-    memcpy(freespace_at(page, 0), vector_get(stack), stack->num_elements * sizeof(range_t));
+    memcpy(freespace_at(page, 0), vec_data(stack), stack->num_elements * sizeof(range_t));
 
-    vector_free(vec);
-    vector_free(stack);
+    vec_free(vec);
+    vec_free(stack);
 }
 
 static inline lane_id_t

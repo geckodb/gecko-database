@@ -25,11 +25,11 @@
 static inline void console_printer_print(struct frag_printer_t *self, FILE *file, frag_t *frag, size_t row_offset, size_t limit);
 static inline void console_printer_free(struct frag_printer_t *self);
 
-static inline void calc_field_print_lens(vector_t *field_print_lens, frag_t *frag, size_t num_attr);
+static inline void calc_field_print_lens(vec_t *field_print_lens, frag_t *frag, size_t num_attr);
 
-static inline void print_h_line(FILE *file, const frag_t *frag, size_t num_attr, schema_t *schema, vector_t *field_print_lens);
-static inline void print_frag_header(FILE *file, const frag_t *frag, vector_t *field_print_lens, size_t num_attr);
-static inline void print_frag_body(FILE *file, frag_t *frag, vector_t *field_print_lens, size_t num_attr, size_t row_offset, size_t limit);
+static inline void print_h_line(FILE *file, const frag_t *frag, size_t num_attr, schema_t *schema, vec_t *field_print_lens);
+static inline void print_frag_header(FILE *file, const frag_t *frag, vec_t *field_print_lens, size_t num_attr);
+static inline void print_frag_body(FILE *file, frag_t *frag, vec_t *field_print_lens, size_t num_attr, size_t row_offset, size_t limit);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -47,7 +47,7 @@ struct frag_printer_t *console_printer_create()
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-static inline void calc_field_print_lens(vector_t *field_print_lens, frag_t *frag, size_t num_attr)
+static inline void calc_field_print_lens(vec_t *field_print_lens, frag_t *frag, size_t num_attr)
 {
     assert (field_print_lens);
 
@@ -67,9 +67,9 @@ static inline void calc_field_print_lens(vector_t *field_print_lens, frag_t *fra
             size_t this_print_len_value = gs_unsafe_field_get_println(type, gs_tuplet_field_read(&field));
             size_t this_print_len_field = max(this_print_len_attr, this_print_len_value);
 
-            size_t all_print_len = *(size_t *) vector_at(field_print_lens, attr_idx);
+            size_t all_print_len = *(size_t *) vec_at(field_print_lens, attr_idx);
             all_print_len = max(all_print_len, this_print_len_field);
-            vector_set(field_print_lens, attr_idx, 1, &all_print_len);
+            vec_set(field_print_lens, attr_idx, 1, &all_print_len);
             gs_tuplet_field_next(&field, true);
         }
         gs_tuplet_next(&tuplet);
@@ -80,15 +80,15 @@ static inline void console_printer_print(struct frag_printer_t *self, FILE *file
 {
     REQUIRE_INSTANCEOF_THIS(self);
     size_t num_attr = gs_fragment_num_of_attributes(frag);
-    vector_t *field_print_lens = vector_create(sizeof(size_t), num_attr + 1);
-    vector_resize(field_print_lens, num_attr);
+    vec_t *field_print_lens = vec_create(sizeof(size_t), num_attr + 1);
+    vec_resize(field_print_lens, num_attr);
     size_t zero = 0;
-    vector_memset(field_print_lens, 0, num_attr, &zero);
+    vec_memset(field_print_lens, 0, num_attr, &zero);
 
     calc_field_print_lens(field_print_lens, frag, num_attr);
     print_frag_header(file, frag, field_print_lens, num_attr);
     print_frag_body(file, frag, field_print_lens, num_attr, row_offset, limit);
-    vector_free(field_print_lens);
+    vec_free(field_print_lens);
 }
 
 static inline void console_printer_free(struct frag_printer_t *self)
@@ -96,10 +96,10 @@ static inline void console_printer_free(struct frag_printer_t *self)
     REQUIRE_INSTANCEOF_THIS(self);
 }
 
-static inline void print_h_line(FILE *file, const frag_t *frag, size_t num_attr, schema_t *schema, vector_t *field_print_lens)
+static inline void print_h_line(FILE *file, const frag_t *frag, size_t num_attr, schema_t *schema, vec_t *field_print_lens)
 {
     for (size_t attr_idx = 0; attr_idx < num_attr; attr_idx++) {
-        size_t   col_width = *(size_t *)vector_at(field_print_lens, attr_idx);
+        size_t   col_width = *(size_t *) vec_at(field_print_lens, attr_idx);
 
         printf("+");
         for (size_t i = 0; i < col_width + 2; i++)
@@ -109,7 +109,7 @@ static inline void print_h_line(FILE *file, const frag_t *frag, size_t num_attr,
     printf("+\n");
 }
 
-static inline void print_frag_header(FILE *file, const frag_t *frag, vector_t *field_print_lens, size_t num_attr)
+static inline void print_frag_header(FILE *file, const frag_t *frag, vec_t *field_print_lens, size_t num_attr)
 {
     char format_buffer[2048];
     schema_t *schema   = gs_frag_get_schema(frag);
@@ -118,7 +118,7 @@ static inline void print_frag_header(FILE *file, const frag_t *frag, vector_t *f
 
     for (size_t attr_idx = 0; attr_idx < num_attr; attr_idx++) {
         const struct attr_t *attr = gs_schema_attr_by_id(schema, attr_idx);
-        size_t  col_width = *(size_t *) vector_at(field_print_lens, attr_idx);
+        size_t  col_width = *(size_t *) vec_at(field_print_lens, attr_idx);
         sprintf(format_buffer, "| %%-%zus ", col_width);
         printf(format_buffer, gs_attr_get_name(attr));
     }
@@ -127,7 +127,7 @@ static inline void print_frag_header(FILE *file, const frag_t *frag, vector_t *f
     print_h_line(file, frag, num_attr, schema, field_print_lens);
 }
 
-static inline void print_frag_body(FILE *file, frag_t *frag, vector_t *field_print_lens, size_t num_attr, size_t row_offset, size_t limit)
+static inline void print_frag_body(FILE *file, frag_t *frag, vec_t *field_print_lens, size_t num_attr, size_t row_offset, size_t limit)
 {
     assert (field_print_lens);
 
@@ -143,7 +143,7 @@ static inline void print_frag_body(FILE *file, frag_t *frag, vector_t *field_pri
         for (size_t attr_idx = 0; attr_idx < num_attr; attr_idx++) {
             const attr_t *attr = gs_schema_attr_by_id(schema, attr_idx);
             char *str = gs_unsafe_field_to_string(attr->type, gs_tuplet_field_read(&field));
-            size_t print_len = max(strlen(str), *(size_t *) vector_at(field_print_lens, attr_idx));
+            size_t print_len = max(strlen(str), *(size_t *) vec_at(field_print_lens, attr_idx));
             sprintf(format_buffer, "| %%-%zus ", print_len);
             printf(format_buffer, str);
             free (str);

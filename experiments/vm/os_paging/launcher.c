@@ -8,7 +8,7 @@
 #include <stdinc.h>
 #include <containers/dict.h>
 #include <containers/dicts/hash_table.h>
-#include <containers/vector.h>
+#include <containers/vec.h>
 
 char * exec_cmd(const char *cmd) {
 

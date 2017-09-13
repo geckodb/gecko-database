@@ -24,7 +24,7 @@ typedef struct pool_entry_t {
 
 struct progpool_t {
     pthread_mutex_t mutex;
-    vector_t *entries;
+    vec_t *entries;
 };
 
 int progpool_create(progpool_t **pool)
@@ -33,14 +33,14 @@ int progpool_create(progpool_t **pool)
     if (*pool == NULL)
         return MONDRIAN_ERROR;
     else {
-        (*pool)->entries = vector_create(sizeof(pool_entry_t), 10);
+        (*pool)->entries = vec_create(sizeof(pool_entry_t), 10);
         return ((*pool)->entries != NULL ? MONDRIAN_OK : MONDRIAN_ERROR);
     }
 }
 
 int progpool_free(progpool_t *pool)
 {
-    vector_free(pool->entries);
+    vec_free(pool->entries);
     free(pool);
     return MONDRIAN_OK;
 }
@@ -51,13 +51,13 @@ int progpool_install(prog_id_t *out, progpool_t *pool, const program_t *program)
         return MONDRIAN_ERROR;
     } else {
         if (out != NULL) {
-            *out = vector_num_elements(pool->entries);
+            *out = vec_length(pool->entries);
         }
         pool_entry_t entry = {
             .deleted = false,
             .program = program_cpy(program)
         };
-        vector_add(pool->entries, 1, &entry);
+        vec_pushback(pool->entries, 1, &entry);
         return MONDRIAN_OK;
     }
 }

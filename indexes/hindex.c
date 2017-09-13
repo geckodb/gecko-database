@@ -113,7 +113,7 @@ void gs_hindex_print(FILE *file, const hindex_t *index)
 
     for (struct grid_t *grid = grid_cursor_next(cursor); grid != NULL; grid = grid_cursor_next(NULL)) {
        size_t interval_idx = 0;
-       const tuple_id_interval_t *interval = vector_at(grid->tuple_ids, interval_idx); bool dummy;
+       const tuple_id_interval_t *interval = vec_at(grid->tuple_ids, interval_idx); bool dummy;
        print_tuple_t t = { .grid = grid->grid_id, .begin = interval->begin, .end = interval->end };
        if (!dict_contains_key(dict, &t)) {
            gs_frag_insert(&tuplet, frag, 1);

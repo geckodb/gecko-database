@@ -23,7 +23,7 @@
 
 typedef struct entry_t {
     tuple_id_interval_t interval;
-    vector_t *grids;
+    vec_t *grids;
 } entry_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -51,8 +51,8 @@ static inline tuple_id_t this_minbegin(struct hindex_t *self);
 static inline tuple_id_t this_maxend(struct hindex_t *self);
 static inline tuple_id_t bounds(struct hindex_t *self, bool begin);
 
-static inline entry_t *find_interval(vector_t *haystack, const tuple_id_interval_t *needle);
-static inline void find_all_by_point(vector_t *result, vector_t *haystack, const tuple_id_t needle);
+static inline entry_t *find_interval(vec_t *haystack, const tuple_id_interval_t *needle);
+static inline void find_all_by_point(vec_t *result, vec_t *haystack, const tuple_id_t needle);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E  I M P L E M E N T A T I O N
@@ -75,7 +75,7 @@ hindex_t *lesearch_hindex_create(size_t approx_num_horizontal_partitions, const 
         ._minbegin = this_minbegin,
         ._maxend = this_maxend,
 
-        .extra = vector_create(sizeof(entry_t), approx_num_horizontal_partitions),
+        .extra = vec_create(sizeof(entry_t), approx_num_horizontal_partitions),
         .table_schema = table_schema
     };
 
@@ -86,7 +86,7 @@ hindex_t *lesearch_hindex_create(size_t approx_num_horizontal_partitions, const 
 // H E L P E R   I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-static inline entry_t *find_interval(vector_t *haystack, const tuple_id_interval_t *needle)
+static inline entry_t *find_interval(vec_t *haystack, const tuple_id_interval_t *needle)
 {
     entry_t *it = (entry_t *) haystack->data;
     size_t num_elements = haystack->num_elements;
@@ -98,13 +98,13 @@ static inline entry_t *find_interval(vector_t *haystack, const tuple_id_interval
     return NULL;
 }
 
-static inline void find_all_by_point(vector_t *result, vector_t *haystack, const tuple_id_t needle)
+static inline void find_all_by_point(vec_t *result, vec_t *haystack, const tuple_id_t needle)
 {
     const entry_t *it = (const entry_t *) haystack->data;
     size_t num_elements = haystack->num_elements;
     while (num_elements--) {
         if (GS_INTERVAL_CONTAINS((&it->interval), needle)) {
-            vector_add_all(result, it->grids);
+            vec_add_all(result, it->grids);
         }
         it++;
     }
@@ -116,17 +116,17 @@ static inline void this_add(struct hindex_t *self, const tuple_id_interval_t *ke
     REQUIRE_NONNULL(key);
     REQUIRE_NONNULL(grid);
 
-    vector_t *vec = self->extra;
+    vec_t *vec = self->extra;
     entry_t *result = find_interval(vec, key);
     if (result) {
-        vector_add(result->grids, 1, &grid);
+        vec_pushback(result->grids, 1, &grid);
     } else {
         entry_t entry = {
                 .interval = *key,
-                .grids = vector_create(sizeof(struct grid_t *), 16)
+                .grids = vec_create(sizeof(struct grid_t *), 16)
         };
-        vector_add(entry.grids, 1, &grid);
-        vector_add(vec, 1, &entry);
+        vec_pushback(entry.grids, 1, &grid);
+        vec_pushback(vec, 1, &entry);
     }
 }
 
@@ -139,7 +139,7 @@ static inline void this_query(grid_cursor_t *result, const struct hindex_t *self
     REQUIRE_NONNULL(tid_end);
     REQUIRE(tid_begin < tid_end, "Corrupted range");
     for (const tuple_id_t *needle = tid_begin; needle != tid_end; needle++) {
-        find_all_by_point((vector_t *) result->extra, (vector_t *) self->extra, *needle);
+        find_all_by_point((vec_t *) result->extra, (vec_t *) self->extra, *needle);
     }
 }
 
@@ -164,7 +164,7 @@ static inline bool this_contains(const struct hindex_t *self, tuple_id_t tid)
 static inline bool free_entires(void *capture, void *begin, void *end)
 {
     for (entry_t *it = (entry_t *) begin; it < (entry_t *) end; it++) {
-        vector_free(it->grids);
+        vec_free(it->grids);
     }
     return true;
 }
@@ -172,16 +172,16 @@ static inline bool free_entires(void *capture, void *begin, void *end)
 static inline void this_free(struct hindex_t *self)
 {
     REQUIRE_INSTANCEOF_THIS(self);
-    vector_foreach(self->extra, NULL, free_entires);
-    vector_free(self->extra);
+    vec_foreach(self->extra, NULL, free_entires);
+    vec_free(self->extra);
 }
 
 static inline tuple_id_t bounds(struct hindex_t *self, bool begin)
 {
     REQUIRE_INSTANCEOF_THIS(self);
     tuple_id_t tuple = begin ? INT_MAX : INT_MIN;
-    entry_t *it = vector_begin((vector_t *) self->extra);
-    size_t num  = vector_num_elements((vector_t *) self->extra);
+    entry_t *it = vec_begin((vec_t *) self->extra);
+    size_t num  = vec_length((vec_t *) self->extra);
     while (num--) { tuple = begin ? min(tuple, (it++)->interval.begin) : max(tuple, (it++)->interval.end); }
     return tuple;
 }

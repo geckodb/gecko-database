@@ -118,7 +118,7 @@ typedef struct {
     bool (*equals)(const void *key_lhs, const void *key_rhs);
     void (*cleanup)(void *key, void *value);
     bool key_is_str;
-    struct vector_t *keyset;
+    struct vec_t *keyset;
 } hash_table_extra_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -128,9 +128,9 @@ typedef struct {
 void this_clear(struct dict_t *self);
 bool this_empty(const struct dict_t *self);
 bool this_contains_key(const struct dict_t *self, const void *key);
-const struct vector_t *this_keyset(const struct dict_t *self);
+const struct vec_t *this_keyset(const struct dict_t *self);
 const void *this_get(const struct dict_t *self, const void *key);
-struct vector_t *this_gets(const struct dict_t *self, size_t num_keys, const void *keys);
+struct vec_t *this_gets(const struct dict_t *self, size_t num_keys, const void *keys);
 bool this_remove(struct dict_t *self, size_t num_keys, const void *keys);
 void this_put(struct dict_t *self, const void *key, const void *value);
 void this_puts(struct dict_t *self, size_t num_elements, const void *keys, const void *values);
@@ -215,7 +215,7 @@ dict_t *hash_table_create_ex(const hash_function_t *hash_function, size_t key_si
         .equals = equals,
         .cleanup = cleanup,
         .key_is_str = key_is_str,
-        .keyset = (struct vector_t*) vector_create(key_size, approx_num_keys)
+        .keyset = (struct vec_t*) vec_create(key_size, approx_num_keys)
     };
 
     if (key_is_str) {
@@ -269,7 +269,7 @@ bool hash_table_free(dict_t *dict)
         }
 
         if (extra->keyset != NULL) {
-            vector_free(extra->keyset);
+            vec_free(extra->keyset);
         }
 
         free(extra->slots);
@@ -369,7 +369,7 @@ bool this_contains_key(const struct dict_t *self, const void *key)
     return (this_get(self, key) != NULL);
 }
 
-const struct vector_t *this_keyset(const struct dict_t *self)
+const struct vec_t *this_keyset(const struct dict_t *self)
 {
     REQUIRE_INSTANCEOF_THIS(self);
     hash_table_extra_t *extra = (hash_table_extra_t *) self->extra;
@@ -378,20 +378,20 @@ const struct vector_t *this_keyset(const struct dict_t *self)
 
 const void *this_get(const struct dict_t *self, const void *key)
 {
-    vector_t *value_ptrs = this_gets(self, 1, key);
+    vec_t *value_ptrs = this_gets(self, 1, key);
     assert (value_ptrs->num_elements <= 1);
-    void *result = (value_ptrs->num_elements == 0 ? NULL : *(void **) vector_at(value_ptrs, 0));
-    vector_free(value_ptrs);
+    void *result = (value_ptrs->num_elements == 0 ? NULL : *(void **) vec_at(value_ptrs, 0));
+    vec_free(value_ptrs);
     return result;
 }
 
-struct vector_t *this_gets(const struct dict_t *self, size_t num_keys, const void *keys)
+struct vec_t *this_gets(const struct dict_t *self, size_t num_keys, const void *keys)
 {
     REQUIRE_INSTANCEOF_THIS(self);
     REQUIRE_NONNULL(keys);
     require_not_zero(num_keys);
 
-    vector_t *result = vector_create(sizeof(void *), num_keys);
+    vec_t *result = vec_create(sizeof(void *), num_keys);
     hash_table_extra_t *extra = (hash_table_extra_t *) self->extra;
 
     while (num_keys--) {
@@ -409,7 +409,7 @@ struct vector_t *this_gets(const struct dict_t *self, size_t num_keys, const voi
                 if (KEYS_MATCH(self, extra, key, old_key)) {
                     extra->counters.num_get_foundkey++;
                     void *value_ptr = GET_VALUE(self, extra, slot_id);
-                    vector_add(result, 1, &value_ptr);
+                    vec_pushback(result, 1, &value_ptr);
                     goto next_key;
                 } else {
                     extra->counters.num_get_slotdisplaced++;
@@ -531,7 +531,7 @@ void this_puts(struct dict_t *self, size_t num_elements, const void *keys, const
             extra->num_inuse++;
             extra->counters.num_put_calls++;
             if (new_key) {
-                vector_add(extra->keyset, 1, key);
+                vec_pushback(extra->keyset, 1, key);
             }
         }
     }

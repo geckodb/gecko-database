@@ -43,7 +43,7 @@ typedef struct grid_t {
                                       iterating through all i that are mapped into the grid yields all associated j.
                                       Note, the order of attributes might change between the table schema and the grid
                                       schema. */
-    vector_t /* of tuple_id_interval_t */ *tuple_ids; /*<! A list of right-open intervals that describe which tuples in the table
+    vec_t /* of tuple_id_interval_t */ *tuple_ids; /*<! A list of right-open intervals that describe which tuples in the table
                                          are covered in this grid. Intervals [a, b), [c,d ),... in this list are assumed
                                          to be ordered ascending by their lower bound, e.g., a, c for a < c. Further,
                                          the intervals do not overlap. This information is required to translate from
@@ -82,14 +82,14 @@ typedef enum {
 
 typedef struct grids_by_attr_index_elem_t {
     attr_id_t attr_id;
-    vector_t *grid_ptrs;
+    vec_t *grid_ptrs;
 } grids_by_attr_index_elem_t;
 
 typedef struct grid_table_t {
     schema_t *schema; /*<! The schema assigned to this table. Note that this schema is 'logical', i.e., grids
                            have their own schema that might be a subset of this schema with another order on the
                            attributes. The table's schema is used to give a logical structure to a caller. */
-    vector_t *grid_ptrs;  /*<! A vector of pointers to elements of type grid_t. Each grid contained in this table is
+    vec_t *grid_ptrs;  /*<! A vector of pointers to elements of type grid_t. Each grid contained in this table is
                            referenced here, and will be freed from here once the table will be disposed. */
     vindex_t *schema_cover; /*<! An index that maps attribute ids from this tables schema to a list of pointers
                              to grids that cover at least this attribute in their 'physical' schemata. */
@@ -145,9 +145,9 @@ const grid_t *gs_grid_by_id(const grid_table_t *table, grid_id_t id);
 
 size_t gs_grid_num_of_attributes(const grid_t *grid);
 
-vector_t *gs_grid_table_grids_by_attr(const grid_table_t *table, const attr_id_t *attr_ids, size_t nattr_ids);
+vec_t *gs_grid_table_grids_by_attr(const grid_table_t *table, const attr_id_t *attr_ids, size_t nattr_ids);
 
-vector_t *gs_grid_table_grids_by_tuples(const grid_table_t *table, const tuple_id_t *tuple_ids, size_t ntuple_ids);
+vec_t *gs_grid_table_grids_by_tuples(const grid_table_t *table, const tuple_id_t *tuple_ids, size_t ntuple_ids);
 
 bool gs_grid_table_is_valide(grid_table_t *table);
 
@@ -183,7 +183,7 @@ static inline tuplet_id_t gs_grid_global_to_local(grid_t *grid, tuple_id_t tuple
     // Determine the end of the interval list. If cursor reaches this end, the tuple is not mapped into this grid.
     // Clearly, if this case happens, there is an interval error since a request to this function requires
     // a valid coverage of the given 'tuple_id' in this grid
-    const tuple_id_interval_t *end = vector_end(grid->tuple_ids);
+    const tuple_id_interval_t *end = vec_end(grid->tuple_ids);
 
     if (!GS_INTERVAL_CONTAINS(cursor, tuple_id)) {
         switch (type) {
@@ -195,8 +195,8 @@ static inline tuplet_id_t gs_grid_global_to_local(grid_t *grid, tuple_id_t tuple
             case AT_RANDOM:
                 // Assert that interval list is sorted. If sort state is not cached,
                 // re-evaluate the state and check again
-                assert (vector_issorted(grid->tuple_ids, CCP_USECACHE, NULL) ||
-                        vector_issorted(grid->tuple_ids, CCP_IGNORECACHE, gs_interval_tuple_id_comp_by_lower_bound));
+                assert (vec_issorted(grid->tuple_ids, CCP_USECACHE, NULL) ||
+                                vec_issorted(grid->tuple_ids, CCP_IGNORECACHE, gs_interval_tuple_id_comp_by_lower_bound));
 
                 // TODO: apply evolutionary algorithm here to find choice of alternatives once alternatives exists
                 // Alternatives besides bsearch might be linear search w/o multi-threading from cache or start/end, ...
@@ -205,8 +205,8 @@ static inline tuplet_id_t gs_grid_global_to_local(grid_t *grid, tuple_id_t tuple
                 // intervals contained in the list: intervals do not overlap and the needle can be used to state whether
                 // a lower or higher interval must be considered during search if the needle is not contained in the
                 // current interval.
-                cursor = vector_bsearch(grid->tuple_ids, &tuple_id,
-                                        gs_interval_tuple_id_comp_by_lower_bound, interval_tuple_id_comp_by_element);
+                cursor = vec_bsearch(grid->tuple_ids, &tuple_id,
+                                     gs_interval_tuple_id_comp_by_lower_bound, interval_tuple_id_comp_by_element);
                 break;
             default: panic(BADBRANCH, grid);
         }
@@ -216,7 +216,7 @@ static inline tuplet_id_t gs_grid_global_to_local(grid_t *grid, tuple_id_t tuple
 
     // TODO: Cache this!
     // calculate the number of tuplets that fall into preceding intervals
-    for (const tuple_id_interval_t *it = vector_begin(grid->tuple_ids); it < end; it++) {
+    for (const tuple_id_interval_t *it = vec_begin(grid->tuple_ids); it < end; it++) {
         result += (tuple_id >= it->begin) ? gs_interval_get_span(it) : 0;
     }
     // calculate the exact identifier for the given tuple in the 'cursor' interval
@@ -235,7 +235,7 @@ static inline tuple_id_t gs_grid_local_to_global(grid_t *grid, tuplet_id_t tuple
     // TODO: Cache this!
     tuple_id_t num_tuple_covereed = 0;
 
-    const tuple_id_interval_t *it = vector_begin(grid->tuple_ids);
+    const tuple_id_interval_t *it = vec_begin(grid->tuple_ids);
     // since tuples in the interval list maps bidirectional to tuplets, it holds with all other assumptions on the
     // interval list and the construction of the mapping: in the order-preserving union of all intervals,
     // the i-th tuple is mapped to the tuplet is i.

@@ -20,7 +20,7 @@
 
 #define NOSUCHFILE          "unable to load configuration file '%s' (file not found)"
 
-vector_t *
+vec_t *
 read_lines(
         const char *file
 );
@@ -51,10 +51,10 @@ pref_load(
                                    NUM_INIT_CONFIG_STATEMENTS, 1.7f, 0.75f,
                                    str_equals, clean_up, true);
 
-    vector_t *lines = read_lines(file);
+    vec_t *lines = read_lines(file);
 
     for (int i = 0; i < lines->num_elements; i++) {
-        const char *line = *(const char **) vector_at(lines, i);
+        const char *line = *(const char **) vec_at(lines, i);
         token_t token = TOKEN_UNKNOWN;
 
         const char *key_begin = NULL, *key_end, *value_begin = NULL, *value_end = NULL;
@@ -116,7 +116,7 @@ next_line:
         }
     }
 
-    vector_free__str(lines);
+    vec_free__str(lines);
 }
 
 void
@@ -173,7 +173,7 @@ void pref_get_size_t(
     *out = (strtoul(value, 0L, 10));
 }
 
-vector_t *
+vec_t *
 read_lines(
     const char *file)
 {
@@ -181,7 +181,7 @@ read_lines(
     char * line = NULL;
     size_t len = 0;
     ssize_t read;
-    vector_t *result = vector_create(sizeof(char *), 100);
+    vec_t *result = vec_create(sizeof(char *), 100);
 
     fp = fopen(file, "r");
     panic_if((fp == NULL), NOSUCHFILE, file);
@@ -192,7 +192,7 @@ read_lines(
         }
 
         const char *dup = strdup(line);
-        vector_add(result, 1, &dup);
+        vec_pushback(result, 1, &dup);
     }
 
     fclose(fp);

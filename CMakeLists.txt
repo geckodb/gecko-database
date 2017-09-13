@@ -35,7 +35,7 @@ set(SOURCE_FILES
         include/containers/dict.h
         include/containers/dicts/hash_table.h
         include/containers/list.h
-        include/containers/vector.h
+        include/containers/vec.h
         include/frags/frag_host_vm.h
         include/error.h
         include/tuplet_field.h
@@ -72,7 +72,7 @@ set(SOURCE_FILES
         containers/dict.c
         containers/dicts/hash_table.c
         containers/list.c
-        containers/vector.c
+        containers/vec.c
         frags/frag_host_vm.c
         error.c
         tuplet_field.c

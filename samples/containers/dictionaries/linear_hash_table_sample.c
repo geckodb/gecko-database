@@ -105,9 +105,9 @@ void run_with_hash_function(hash_function_t *hash_function, const char *hash_fun
      ******************************************************************************************************************/
 
     start = clock();
-    vector_t *gets_result1 = dict_gets(dict, NUM_ELEMENTS, keys);
+    vec_t *gets_result1 = dict_gets(dict, NUM_ELEMENTS, keys);
     stop = clock();
-    vector_free(gets_result1);
+    vec_free(gets_result1);
     double gets_call_elapsed_keyfound = (double)(stop - start) * 1000.0 / CLOCKS_PER_SEC;
 
 
@@ -121,9 +121,9 @@ void run_with_hash_function(hash_function_t *hash_function, const char *hash_fun
     }
 
     start = clock();
-    vector_t *gets_result2 = dict_gets(dict, NUM_ELEMENTS, other_keys);
+    vec_t *gets_result2 = dict_gets(dict, NUM_ELEMENTS, other_keys);
     stop = clock();
-    vector_free(gets_result2);
+    vec_free(gets_result2);
     double gets_call_elapsed_nokey = (double)(stop - start) * 1000.0 / CLOCKS_PER_SEC;
 
 

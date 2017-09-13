@@ -42,7 +42,7 @@ bool dict_contains_key(const dict_t *dict, const void *key)
     return DELEGATE_CALL_WARGS(dict, contains_key, key);
 }
 
-const struct vector_t *dict_keyset(const dict_t *dict)
+const struct vec_t *dict_keyset(const dict_t *dict)
 {
     return DELEGATE_CALL(dict, keyset);
 }
@@ -52,7 +52,7 @@ const void *dict_get(const dict_t *dict, const void *key)
     return DELEGATE_CALL_WARGS(dict, get, key);
 }
 
-struct vector_t *dict_gets(const dict_t *dict, size_t num_keys, const void *keys)
+struct vec_t *dict_gets(const dict_t *dict, size_t num_keys, const void *keys)
 {
     return DELEGATE_CALL_WARGS(dict, gets, num_keys, keys);
 }

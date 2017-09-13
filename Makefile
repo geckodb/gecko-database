@@ -537,47 +537,47 @@ containers/list.c.s:
 	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/containers/list.c.s
 .PHONY : containers/list.c.s
 
-containers/vector.o: containers/vector.c.o
+containers/vec.o: containers/vec.c.o
 
-.PHONY : containers/vector.o
+.PHONY : containers/vec.o
 
 # target to build an object file
-containers/vector.c.o:
-	$(MAKE) -f CMakeFiles/gridtables.dir/build.make CMakeFiles/gridtables.dir/containers/vector.c.o
-	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/containers/vector.c.o
-	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/containers/vector.c.o
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/vector.c.o
-	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/containers/vector.c.o
-	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/containers/vector.c.o
-.PHONY : containers/vector.c.o
+containers/vec.c.o:
+	$(MAKE) -f CMakeFiles/gridtables.dir/build.make CMakeFiles/gridtables.dir/containers/vec.c.o
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/containers/vec.c.o
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/containers/vec.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/vec.c.o
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/containers/vec.c.o
+	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/containers/vec.c.o
+.PHONY : containers/vec.c.o
 
-containers/vector.i: containers/vector.c.i
+containers/vec.i: containers/vec.c.i
 
-.PHONY : containers/vector.i
+.PHONY : containers/vec.i
 
 # target to preprocess a source file
-containers/vector.c.i:
-	$(MAKE) -f CMakeFiles/gridtables.dir/build.make CMakeFiles/gridtables.dir/containers/vector.c.i
-	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/containers/vector.c.i
-	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/containers/vector.c.i
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/vector.c.i
-	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/containers/vector.c.i
-	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/containers/vector.c.i
-.PHONY : containers/vector.c.i
+containers/vec.c.i:
+	$(MAKE) -f CMakeFiles/gridtables.dir/build.make CMakeFiles/gridtables.dir/containers/vec.c.i
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/containers/vec.c.i
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/containers/vec.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/vec.c.i
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/containers/vec.c.i
+	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/containers/vec.c.i
+.PHONY : containers/vec.c.i
 
-containers/vector.s: containers/vector.c.s
+containers/vec.s: containers/vec.c.s
 
-.PHONY : containers/vector.s
+.PHONY : containers/vec.s
 
 # target to generate assembly for a file
-containers/vector.c.s:
-	$(MAKE) -f CMakeFiles/gridtables.dir/build.make CMakeFiles/gridtables.dir/containers/vector.c.s
-	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/containers/vector.c.s
-	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/containers/vector.c.s
-	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/vector.c.s
-	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/containers/vector.c.s
-	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/containers/vector.c.s
-.PHONY : containers/vector.c.s
+containers/vec.c.s:
+	$(MAKE) -f CMakeFiles/gridtables.dir/build.make CMakeFiles/gridtables.dir/containers/vec.c.s
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/containers/vec.c.s
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/containers/vec.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/containers/vec.c.s
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/containers/vec.c.s
+	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/containers/vec.c.s
+.PHONY : containers/vec.c.s
 
 error.o: error.c.o
 
@@ -2166,9 +2166,9 @@ help:
 	@echo "... containers/list.o"
 	@echo "... containers/list.i"
 	@echo "... containers/list.s"
-	@echo "... containers/vector.o"
-	@echo "... containers/vector.i"
-	@echo "... containers/vector.s"
+	@echo "... containers/vec.o"
+	@echo "... containers/vec.i"
+	@echo "... containers/vec.s"
 	@echo "... error.o"
 	@echo "... error.i"
 	@echo "... error.s"

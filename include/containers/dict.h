@@ -19,7 +19,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <stdinc.h>
-#include <containers/vector.h>
+#include <containers/vec.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 // D A T A   T Y P E S
@@ -37,9 +37,9 @@ typedef struct dict_t {
     void (*clear)(struct dict_t *self);
     bool (*empty)(const struct dict_t *self);
     bool (*contains_key)(const struct dict_t *self, const void *key);
-    const struct vector_t *(*keyset)(const struct dict_t *self);
+    const struct vec_t *(*keyset)(const struct dict_t *self);
     const void *(*get)(const struct dict_t *self, const void *key);
-    struct vector_t *(*gets)(const struct dict_t *self, size_t num_keys, const void *keys);
+    struct vec_t *(*gets)(const struct dict_t *self, size_t num_keys, const void *keys);
     bool (*remove)(struct dict_t *self, size_t num_keys, const void *keys);
     void (*put)(struct dict_t *self, const void *key, const void *value);
     void (*puts)(struct dict_t *self, size_t num_elements, const void *keys, const void *values);
@@ -57,9 +57,9 @@ bool dict_free(dict_t *dict);
 void dict_clear(dict_t *dict);
 bool dict_empty(const dict_t *dict);
 bool dict_contains_key(const dict_t *dict, const void *key);
-const struct vector_t *dict_keyset(const dict_t *dict);
+const struct vec_t *dict_keyset(const dict_t *dict);
 const void *dict_get(const dict_t *dict, const void *key);
-struct vector_t *dict_gets(const dict_t *dict, size_t num_keys, const void *keys);
+struct vec_t *dict_gets(const dict_t *dict, size_t num_keys, const void *keys);
 bool dict_remove(dict_t *dict, size_t num_keys, const void *keys);
 void dict_put(dict_t *dict, const void *key, const void *value);
 void dict_puts(dict_t *dict, size_t num_elements, const void *keys, const void *values);

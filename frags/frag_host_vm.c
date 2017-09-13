@@ -19,7 +19,7 @@
 #include <operators/scan.h>
 #include <tuplet_field.h>
 #include <schema.h>
-#include <containers/vector.h>
+#include <containers/vec.h>
 #include <attr.h>
 
 // ---------------------------------------------------------------------------------------------------------------------

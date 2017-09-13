@@ -24,14 +24,14 @@ void gs_hashset_create(hashset_t *out, size_t elem_size, size_t capacity)
     REQUIRE_NONZERO(elem_size)
     REQUIRE_NONZERO(capacity)
     out->dict = hash_table_create_jenkins(elem_size, sizeof(bool), capacity, 1.7f, 0.75f);
-    out->vec  = vector_create(sizeof(elem_size), capacity);
+    out->vec  = vec_create(sizeof(elem_size), capacity);
 }
 
 void gs_hashset_free(hashset_t *set)
 {
     REQUIRE_NONNULL(set)
     dict_free(set->dict);
-    vector_free(set->vec);
+    vec_free(set->vec);
     set->dict = NULL;
     set->vec = NULL;
 }
@@ -44,7 +44,7 @@ void gs_hashset_add(hashset_t *set, const void *data, size_t num_elems)
     REQUIRE_NONNULL(data)
     REQUIRE_NONZERO(num_elems)
     if (!dict_contains_key(set->dict, data)) {
-        vector_add(set->vec, num_elems, data);
+        vec_pushback(set->vec, num_elems, data);
         bool dummy;
         dict_put(set->dict, data, &dummy);
     }
@@ -66,12 +66,12 @@ const void *gs_hashset_begin(const hashset_t *set)
 {
     REQUIRE_NONNULL(set)
     REQUIRE_NONNULL(set->vec)
-    return vector_begin(set->vec);
+    return vec_begin(set->vec);
 }
 
 const void *gs_hashset_end(const hashset_t *set)
 {
     REQUIRE_NONNULL(set)
     REQUIRE_NONNULL(set->vec)
-    return vector_end(set->vec);
+    return vec_end(set->vec);
 }

@@ -18,7 +18,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <stdinc.h>
-#include <containers/vector.h>
+#include <containers/vec.h>
 #include <containers/dicts/hash_table.h>
 #include <containers/list.h>
 #include <math.h>
@@ -112,13 +112,13 @@ typedef struct {
 
 typedef struct {
         page_id_t     next_page_id;
-        vector_t *    free_page_ids_stack;  /* page ids that are free to be recycled */
+        vec_t *    free_page_ids_stack;  /* page ids that are free to be recycled */
 
         dict_t *      hot_store;
         list_t *      hot_store_page_ids;
 
         cold_store_t  cold_store;
-        vector_t *    cold_store_page_ids;  /* all page ids that are in use who live in cold-store */
+        vec_t *    cold_store_page_ids;  /* all page ids that are in use who live in cold-store */
 } page_anticache_t;
 
 typedef struct {

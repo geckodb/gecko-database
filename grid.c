@@ -64,8 +64,8 @@ static inline bool free_grids(void *capture, void *begin, void *end)
 void gs_grid_table_free(grid_table_t *table)
 {
     gs_schema_free(table->schema);
-    vector_foreach(table->grid_ptrs, NULL, free_grids);
-    vector_free(table->grid_ptrs);
+    vec_foreach(table->grid_ptrs, NULL, free_grids);
+    vec_free(table->grid_ptrs);
     gs_vindex_free(table->schema_cover);
     gs_hindex_free(table->tuple_cover);
     gs_freelist_free(&table->tuple_id_freelist);
@@ -77,7 +77,7 @@ void gs_grid_free(grid_t * grid)
 {
     gs_frag_free(grid->frag);
     dict_free(grid->schema_map_indicies);
-    vector_free(grid->tuple_ids);
+    vec_free(grid->tuple_ids);
 }
 
 const char *gs_grid_table_name(const grid_table_t *table)
@@ -222,7 +222,7 @@ const grid_t *gs_grid_by_id(const grid_table_t *table, grid_id_t id)
 {
     REQUIRE_NONNULL(table);
     REQUIRE_LESSTHAN(id, table->grid_ptrs->num_elements);
-    return *(const grid_t **) vector_at(table->grid_ptrs, id);
+    return *(const grid_t **) vec_at(table->grid_ptrs, id);
 }
 
 size_t gs_grid_num_of_attributes(const grid_t *grid)
@@ -231,13 +231,13 @@ size_t gs_grid_num_of_attributes(const grid_t *grid)
     return grid->frag->schema->attr->num_elements;
 }
 
-vector_t *gs_grid_table_grids_by_attr(const grid_table_t *table, const attr_id_t *attr_ids, size_t nattr_ids)
+vec_t *gs_grid_table_grids_by_attr(const grid_table_t *table, const attr_id_t *attr_ids, size_t nattr_ids)
 {
     panic(NOTIMPLEMENTED, to_string(gs_grid_table_grids_by_attr))
     return NULL;
 }
 
-vector_t *gs_grid_table_grids_by_tuples(const grid_table_t *table, const tuple_id_t *tuple_ids, size_t ntuple_ids)
+vec_t *gs_grid_table_grids_by_tuples(const grid_table_t *table, const tuple_id_t *tuple_ids, size_t ntuple_ids)
 {
     panic(NOTIMPLEMENTED, to_string(gs_grid_table_grids_by_tuples))
     return NULL;
@@ -365,7 +365,7 @@ void gs_grid_table_structure_print(FILE *file, const grid_table_t *table, size_t
                     const char *g_attr_name = gs_schema_attr_by_id(gs_frag_get_schema(grid->frag), grid_attr_id)->name;
                     if (strcmp(t_attr_name, g_attr_name) == 0) {
                         for (size_t i = 0; i < grid->tuple_ids->num_elements; i++) {
-                            const tuple_id_interval_t *span = vector_at(grid->tuple_ids, i);
+                            const tuple_id_interval_t *span = vec_at(grid->tuple_ids, i);
                             if (GS_INTERVAL_CONTAINS(span, write_tuplet.tuplet_id)) {
                                 gs_tuplet_field_seek(&write_field, &write_tuplet, read_field.table_attr_id);
                                 gs_tuplet_field_write(&write_field, &grid_id, false);
@@ -393,7 +393,7 @@ static inline void create_indexes(grid_table_t *table, size_t approx_num_horizon
 
 static inline void create_grid_ptr_store(grid_table_t *table)
 {
-    table->grid_ptrs = vector_create(sizeof(grid_t *), 10);
+    table->grid_ptrs = vec_create(sizeof(grid_t *), 10);
 }
 
 static inline void create_tuple_id_store(grid_table_t *table)
@@ -417,7 +417,7 @@ static inline grid_t *create_grid(grid_table_t *table, const attr_id_t *attr, si
                 &(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen}, sizeof(attr_id_t), sizeof(attr_id_t),
                 nattr + 1, 1.7f, 1.0f
         ),
-        .tuple_ids = vector_create(sizeof(tuple_id_interval_t), ntuple_ids),
+        .tuple_ids = vec_create(sizeof(tuple_id_interval_t), ntuple_ids),
         .last_interval_cache = NULL
             // TODO: add mutex init here
     };
@@ -426,7 +426,7 @@ static inline grid_t *create_grid(grid_table_t *table, const attr_id_t *attr, si
         gs_frag_insert(NULL, result->frag, gs_interval_get_span((tuple_ids + i)));
     }
 
-    vector_add(result->tuple_ids, ntuple_ids, tuple_ids);
+    vec_pushback(result->tuple_ids, ntuple_ids, tuple_ids);
 
     for (size_t i = 0; i < nattr; i++) {
         dict_put(result->schema_map_indicies, attr + i, &i);
@@ -460,6 +460,6 @@ static inline void indexes_insert(grid_table_t *table, grid_t *grid, const attr_
 
 static inline void register_grid(grid_table_t *table, grid_t *grid)
 {
-    vector_add(table->grid_ptrs, 1, &grid);
-    grid->grid_id = vector_num_elements(table->grid_ptrs) - 1;
+    vec_pushback(table->grid_ptrs, 1, &grid);
+    grid->grid_id = vec_length(table->grid_ptrs) - 1;
 }

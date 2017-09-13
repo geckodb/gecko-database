@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdinc.h>
 #include <time.h>
-#include <containers/vector.h>
+#include <containers/vec.h>
 #include <containers/dicts/hash_table.h>
 
 const size_t SIZEOF_KEY = 100;
@@ -22,13 +22,13 @@ const size_t SIZEOF_VALUE = sizeof(size_t);
     clear_buffer(buffer, size)                                                                                         \
     strcpy(buffer, src);
 
-static vector_t *read_all_lines(const char *file)
+static vec_t *read_all_lines(const char *file)
 {
     FILE * fp;
     char * line = NULL;
     size_t len = 0;
     ssize_t read;
-    vector_t *result = vector_create(SIZEOF_KEY, 69199328);
+    vec_t *result = vec_create(SIZEOF_KEY, 69199328);
 
     fp = fopen(file, "r");
     if (fp == NULL)
@@ -42,7 +42,7 @@ static vector_t *read_all_lines(const char *file)
             line[min(strlen(line) - 1, SIZEOF_KEY - 1)] = '\0'; // removing the newline character
             set_buffer_direct(buffer, line, SIZEOF_KEY);
 
-            vector_add(result, 1, &buffer);
+            vec_pushback(result, 1, &buffer);
         }
     }
 
@@ -78,7 +78,7 @@ int main(void)
                                      SIZEOF_KEY, SIZEOF_VALUE, NUM_SLOTS, 1.7f, MAX_LOAD_FACTOR);
 
     // TODO: The file can be downloaded here: https://www.dropbox.com/sh/kf5sbw74rru3kco/AAB07Cwy0oVbRih33nef_FTFa?dl=0
-    vector_t *words = read_all_lines("/Users/marcus/temp/linux-words");
+    vec_t *words = read_all_lines("/Users/marcus/temp/linux-words");
 
 
     char *key = REQUIRE_MALLOC(SIZEOF_KEY);

@@ -52,7 +52,7 @@ static inline bool attr_key_equals(const void *key_lhs, const void *key_rhs)
 
 static inline void cleanup_vectors(void *key, void *value)
 {
-    vector_free_data((vector_t *) value);
+    vec_dispose((vec_t *) value);
 }
 
 vindex_t *hash_vindex_create(size_t key_size, size_t num_init_slots)
@@ -70,7 +70,7 @@ vindex_t *hash_vindex_create(size_t key_size, size_t num_init_slots)
     gs_hashset_create(&result->keys, key_size, num_init_slots);
 
     result->extra = hash_table_create_ex(
-            &(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen}, key_size, sizeof(vector_t),
+            &(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen}, key_size, sizeof(vec_t),
             num_init_slots, num_init_slots, 1.7f, 0.75f, attr_key_equals, cleanup_vectors, false
     );
     REQUIRE_NONNULL(result->extra);
@@ -86,16 +86,16 @@ static inline void this_add(struct vindex_t *self, const attr_id_t *key, const s
     REQUIRE_INSTANCEOF_THIS(self);
     dict_t *dict = ((dict_t *)self->extra);
     if (!dict_contains_key(dict, key)) {
-        vector_t *vec = vector_create(sizeof(struct grid_t *), 10);
+        vec_t *vec = vec_create(sizeof(struct grid_t *), 10);
         dict_put(dict, key, vec);
         // Notice, this frees up pointer to vec, but does not cleanup the vector (especially the data pointer).
         // That's required since dict_put copies all members of vec and is responsible to free up resources.
         // The allocated memory for the pointer to original vector "vec", however, must be freed also.
         free (vec);
     }
-    vector_t *vec = (vector_t *) dict_get(dict, key);
+    vec_t *vec = (vec_t *) dict_get(dict, key);
     REQUIRE_NONNULL(vec);
-    vector_add(vec, 1, &grid);
+    vec_pushback(vec, 1, &grid);
 }
 
 static inline void this_remove(struct vindex_t *self, const attr_id_t *key)
@@ -127,8 +127,8 @@ static inline void this_query(grid_cursor_t *result, const struct vindex_t *self
     for (const attr_id_t *key = key_begin; key != key_end; key++) {
         if (this_contains(self, key)) {
             dict_t *dict = ((dict_t *)self->extra);
-            const struct vector_t *vec = dict_get(dict, key);
-            vector_add_all(result->extra, vec);
+            const struct vec_t *vec = dict_get(dict, key);
+            vec_add_all(result->extra, vec);
         }
     }
 }

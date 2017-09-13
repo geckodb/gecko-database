@@ -16,7 +16,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <attr.h>
-#include <containers/vector.h>
+#include <containers/vec.h>
 #include <tuplet_field.h>
 #include <frag.h>
 #include <schema.h>
@@ -46,7 +46,7 @@ attr_id_t _attr_create(const char *name, enum field_type data_type, size_t data_
 
     strcpy(attr.name, name);
     memset(attr.checksum, 0, MD5_DIGEST_LENGTH);
-    vector_add(schema->attr, 1, &attr);
+    vec_pushback(schema->attr, 1, &attr);
     return attr.id;
 }
 

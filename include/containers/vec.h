@@ -42,95 +42,95 @@ typedef enum {
     auto_resize = 1 << 1,
 } vector_flags;
 
-typedef struct vector_t {
+typedef struct vec_t {
     size_t sizeof_element, num_elements, element_capacity;
     vector_flags flags;
     float grow_factor;
     void *data;
     bool is_sorted;
-} vector_t;
+} vec_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-vector_t *vector_create(size_t element_size, size_t capacity);
+vec_t *vec_create(size_t element_size, size_t capacity);
 
-vector_t *vector_create_ex(size_t element_size, size_t capacity, vector_flags flags, float grow_factor);
+vec_t *vec_create_ex(size_t element_size, size_t capacity, vector_flags flags, float grow_factor);
 
-bool vector_resize(vector_t *vec, size_t num_elements);
+bool vec_resize(vec_t *vec, size_t num_elements);
 
-bool vector_reserve(vector_t *vec, size_t num_elements);
+bool vec_reserve(vec_t *vec, size_t num_elements);
 
-size_t vector_num_elements(const vector_t *vec);
+size_t vec_length(const vec_t *vec);
 
-void vector_memset(vector_t *vec, size_t pos_start, size_t num_elements, const void *data);
+void vec_memset(vec_t *vec, size_t pos_start, size_t num_elements, const void *data);
 
-vector_t *vector_deep_cpy(vector_t *proto);
+vec_t *vec_cpy_deep(vec_t *proto);
 
-void vector_shallow_cpy(vector_t *dst, vector_t *src);
+void vec_cpy_shallow(vec_t *dst, vec_t *src);
 
-void vector_free(struct vector_t *vec);
+void vec_free(struct vec_t *vec);
 
-void vector_free_data(struct vector_t *vec);
+void vec_dispose(struct vec_t *vec);
 
-void vector_free_ex(vector_t *vec, void *capture, bool (*func)(void *capture, void *begin, void *end));
+void vec_free_ex(vec_t *vec, void *capture, bool (*func)(void *capture, void *begin, void *end));
 
-void *vector_get(vector_t *vec);
+void *vec_data(vec_t *vec);
 
-void *vector_at(const vector_t *vec, size_t pos);
+void *vec_at(const vec_t *vec, size_t pos);
 
-void *vector_peek(const vector_t *vec);
+void *vec_peek(const vec_t *vec);
 
-void *vector_begin(const vector_t *vec);
+void *vec_begin(const vec_t *vec);
 
-void *vector_end(const vector_t *vec);
+void *vec_end(const vec_t *vec);
 
-bool vector_issorted(vector_t *vec, cache_consideration_policy policy, comp_t comp);
+bool vec_issorted(vec_t *vec, cache_consideration_policy policy, comp_t comp);
 
-bool vector_updatesort(vector_t *vec, comp_t comp);
+bool vec_updatesort(vec_t *vec, comp_t comp);
 
-void *vector_pop_unsafe(vector_t *vec);
+void *vec_pop_unsafe(vec_t *vec);
 
-void *vector_peek_unsafe(vector_t *vec);
+void *vec_peek_unsafe(vec_t *vec);
 
-bool vector_set(vector_t *vec, size_t idx, size_t num_elements, const void *data);
+bool vec_set(vec_t *vec, size_t idx, size_t num_elements, const void *data);
 
-bool vector_add(vector_t *vec, size_t num_elements, const void *data);
+bool vec_pushback(vec_t *vec, size_t num_elements, const void *data);
 
-bool vector_add_all(vector_t *dest, const vector_t *src);
+bool vec_add_all(vec_t *dest, const vec_t *src);
 
-bool vector_add_all_unsafe(vector_t *dest, const vector_t *src);
+bool vec_add_all_unsafe(vec_t *dest, const vec_t *src);
 
-void vector_add_unsafe(vector_t *vec, size_t num_elements, const void *data);
+void vec_add_unsafe(vec_t *vec, size_t num_elements, const void *data);
 
-bool vector_comp(const vector_t *lhs, const vector_t *rhs, comp_t comp);
+bool vec_comp(const vec_t *lhs, const vec_t *rhs, comp_t comp);
 
-bool vector_foreach(vector_t *vec, void *capture, bool (*func)(void *capture, void *begin, void *end));
+bool vec_foreach(vec_t *vec, void *capture, bool (*func)(void *capture, void *begin, void *end));
 
-void vector_dedup(vector_t *vec);
+void vec_dedup(vec_t *vec);
 
-void vector_swap(vector_t *lhs, vector_t *rhs);
+void vec_swap(vec_t *lhs, vec_t *rhs);
 
-size_t vector_count(vector_t *vec, void *capture, bool (*pred)(void *capture, void *it));
+size_t vec_count(vec_t *vec, void *capture, bool (*pred)(void *capture, void *it));
 
-bool vector_contains(vector_t *vec, void *needle);
+bool vec_contains(vec_t *vec, void *needle);
 
-size_t vector_memused(vector_t *vec);
+size_t vec_memused(vec_t *vec);
 
-size_t vector_memused__str(vector_t *vec);
+size_t vec_memused__str(vec_t *vec);
 
-size_t vector_sizeof(const vector_t *vec);
+size_t vec_sizeof(const vec_t *vec);
 
-void vector_sort(vector_t *vec, comp_t comp);
+void vec_sort(vec_t *vec, comp_t comp);
 
-void *vector_bsearch(vector_t *vec, const void *needle, comp_t sort_comp, comp_t find_comp);
+void *vec_bsearch(vec_t *vec, const void *needle, comp_t sort_comp, comp_t find_comp);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // C O N V E N I E N C E  F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-void vector_free__str(vector_t *vec);
+void vec_free__str(vec_t *vec);
 
 bool free_strings(void *capture, void *begin, void *end);
 

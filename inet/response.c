@@ -106,7 +106,7 @@ void gs_response_end(response_t *response, http_status_code_t code)
     response->code = code;
 }
 
-const struct vector_t *gs_response_fields(response_t *response)
+const struct vec_t *gs_response_fields(response_t *response)
 {
     REQUIRE_NONNULL(response);
     return dict_keyset(response->fields);
@@ -125,11 +125,11 @@ const char *gs_response_format_fields(const dict_t *fields)
 {
     REQUIRE_NONNULL(fields);
 
-    const struct vector_t *keys = dict_keyset(fields);
+    const struct vec_t *keys = dict_keyset(fields);
     size_t length_fields = 0;
-    size_t num_elements = vector_num_elements(keys);
+    size_t num_elements = vec_length(keys);
     for (size_t i = 0; i < num_elements; i++) {
-        const char *field_name = (const char *) vector_at(keys, i);
+        const char *field_name = (const char *) vec_at(keys, i);
         const void *value = dict_get(fields, field_name);
         const char *value_str = (value != NULL ? (const char *) value : "");
         length_fields += strlen(field_name) + 2 + strlen(value_str) + 2;    // "str: " + "value_str\r\n";
@@ -139,7 +139,7 @@ const char *gs_response_format_fields(const dict_t *fields)
     char *formatted_str = REQUIRE_MALLOC(length_fields);
     size_t offset = 0;
     for (size_t i = 0; i < num_elements; i++) {
-        const char *field_name = (const char *) vector_at(keys, i);
+        const char *field_name = (const char *) vec_at(keys, i);
         const void *value = dict_get(fields, field_name);
         const char *value_str = (value != NULL ? (const char *) value : "");
         memcpy(formatted_str + offset, field_name, strlen(field_name));

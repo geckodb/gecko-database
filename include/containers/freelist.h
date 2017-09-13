@@ -29,7 +29,7 @@ typedef void (*inc_t)(void *element);
 typedef struct freelist_t {
     inc_t inc;
     void *next_element;
-    vector_t *free_elem;
+    vec_t *free_elem;
 } freelist_t;
 
 // ---------------------------------------------------------------------------------------------------------------------

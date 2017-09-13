@@ -27,7 +27,7 @@ void gs_freelist_create(freelist_t *list, size_t elem_size, size_t capacity, ini
     REQUIRE_NONNULL(list);
     REQUIRE_NONNULL(inc);
     REQUIRE((elem_size > 0), BADINT);
-    list->free_elem = vector_create(elem_size, capacity);
+    list->free_elem = vec_create(elem_size, capacity);
     list->next_element = REQUIRE_MALLOC(elem_size);
     list->inc = inc;
     init(list->next_element);
@@ -36,7 +36,7 @@ void gs_freelist_create(freelist_t *list, size_t elem_size, size_t capacity, ini
 void gs_freelist_free(freelist_t *list)
 {
     REQUIRE_NONNULL(list);
-    vector_free(list->free_elem);
+    vec_free(list->free_elem);
     free(list->next_element);
 }
 
@@ -50,7 +50,7 @@ void gs_freelist_bind(void *out, const freelist_t *list, size_t num_elem)
         const void *data;
 
         if (list->free_elem->num_elements > 0) {
-            data = vector_pop_unsafe(list->free_elem);
+            data = vec_pop_unsafe(list->free_elem);
             memcpy(out, data, sizeof_element);
         } else {
             data = list->next_element;
@@ -73,5 +73,5 @@ void gs_freelist_pushback(freelist_t *list, size_t num_elem, void *elem)
     REQUIRE_NONNULL(list);
     REQUIRE_NONNULL(elem);
     REQUIRE((num_elem > 0), BADINT);
-    vector_add(list->free_elem, num_elem, elem);
+    vec_pushback(list->free_elem, num_elem, elem);
 }

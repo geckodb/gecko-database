@@ -94,7 +94,7 @@
 
 #define CHECKFOR_LOCAL_FRAGID(frag_id)                                                                                 \
     CHECKFOR((frag_id >= vm->fragments->num_elements ||                                                                \
-             ((local_fragment_t *)vector_at(vm->fragments, frag_id))->is_dropped),                                     \
+             ((local_fragment_t *)vec_at(vm->fragments, frag_id))->is_dropped),                                        \
              MVM_EC_NOFRAGMENT,                                                                                        \
              "instruction at line '%d' in '%s' failed: no such fragment in local space: %lld",                         \
              (vm->pc - 1), program_name(vm->program), frag_id)
@@ -147,15 +147,15 @@
 
 
 #define OPERAND_STACK_POP()                                                                                            \
-    *(u64*) vector_pop_unsafe(vm->operand_stack)
+    *(u64*) vec_pop_unsafe(vm->operand_stack)
 
 #define OPERAND_STACK_PEEK()                                                                                           \
-    *(u64*) vector_peek_unsafe(vm->operand_stack)
+    *(u64*) vec_peek_unsafe(vm->operand_stack)
 
 #define OPERAND_STACK_PUSH(value)                                                                                      \
 {                                                                                                                      \
     CHECKFOR_STACKOVERFLOW()                                                                                           \
-    vector_add_unsafe(vm->operand_stack, 1, &value);                                                                   \
+    vec_add_unsafe(vm->operand_stack, 1, &value);                                                                      \
 }
 
 typedef u64 operand_t;
@@ -206,12 +206,12 @@ struct mondrian_vm_t
     int error_code;
     char *error_details;
 
-    vector_t *operand_stack;
-    vector_t *locks;
-    vector_t *latches;
-    vector_t *variables;
-    vector_t *temp_names;
-    vector_t *fragments;
+    vec_t *operand_stack;
+    vec_t *locks;
+    vec_t *latches;
+    vec_t *variables;
+    vec_t *temp_names;
+    vec_t *fragments;
 
     const program_t *program;
     mondrian_t *db;
@@ -229,7 +229,7 @@ typedef struct program_t
     char *prog_author;
     char *prog_comments;
 
-    vector_t *instructions;
+    vec_t *instructions;
 
 } program_t;
 
@@ -367,12 +367,12 @@ int mondrian_vm_create(mondrian_vm_t **out, mondrian_t *db)
             .rollback = false,
             .return_value = 0,
             .temp_name_counter = 0,
-            .operand_stack = vector_create(sizeof(operand_t), OPERAND_STACK_CAPACITY),
-            .locks = vector_create(sizeof(shared_resource_release_state_t), 5),
-            .latches = vector_create(sizeof(shared_resource_release_state_t), 5),
-            .variables = vector_create(sizeof(variable_entry_t), 10),
-            .temp_names = vector_create(sizeof(char *), 10),
-            .fragments = vector_create(sizeof(local_fragment_t), 10),
+            .operand_stack = vec_create(sizeof(operand_t), OPERAND_STACK_CAPACITY),
+            .locks = vec_create(sizeof(shared_resource_release_state_t), 5),
+            .latches = vec_create(sizeof(shared_resource_release_state_t), 5),
+            .variables = vec_create(sizeof(variable_entry_t), 10),
+            .temp_names = vec_create(sizeof(char *), 10),
+            .fragments = vec_create(sizeof(local_fragment_t), 10),
             .program = NULL,
             .db = db,
             .error_code = MVM_EC_NOERR,
@@ -380,7 +380,7 @@ int mondrian_vm_create(mondrian_vm_t **out, mondrian_t *db)
         };
 
         if ((*out)->variables) {
-            vector_memset((*out)->variables, 0, (*out)->variables->element_capacity, &EMPTY_ENTRY);
+            vec_memset((*out)->variables, 0, (*out)->variables->element_capacity, &EMPTY_ENTRY);
         }
 
         return ((*out)->operand_stack != NULL && (*out)->locks != NULL && (*out)->latches != NULL &&
@@ -443,12 +443,12 @@ int mondrian_vm_free(mondrian_vm_t *vm)
               program_name(vm->program), vm->program,
               vm->locks->num_elements,
               vm->latches->num_elements,
-              vector_memused(vm->operand_stack),
-              vector_memused(vm->locks),
-              vector_memused(vm->latches),
-              vector_memused(vm->variables),
-              vector_memused(vm->fragments),
-              vector_memused__str(vm->temp_names));
+              vec_memused(vm->operand_stack),
+              vec_memused(vm->locks),
+              vec_memused(vm->latches),
+              vec_memused(vm->variables),
+              vec_memused(vm->fragments),
+              vec_memused__str(vm->temp_names));
 
     for (lock_id_t id = 0; id < vm->locks->num_elements; id++) {
         mondrian_vm_release_lock(vm, id);
@@ -479,11 +479,11 @@ int mondrian_vm_free(mondrian_vm_t *vm)
         }
     }
 
-    vector_free(vm->operand_stack);
-    vector_free(vm->locks);
-    vector_free(vm->latches);
-    vector_free(vm->variables);
-    vector_free__str(vm->temp_names);
+    vec_free(vm->operand_stack);
+    vec_free(vm->locks);
+    vec_free(vm->latches);
+    vec_free(vm->variables);
+    vec_free__str(vm->temp_names);
 
     vm->operand_stack = vm->locks = vm->latches = vm->variables = vm->temp_names = NULL;
     free(vm);
@@ -501,7 +501,7 @@ int program_new(program_t **out, const char *prog_name, const char *prog_author,
 
     *out = REQUIRE_MALLOC(sizeof(program_t));
     **out = (program_t) {
-        .instructions = vector_create(sizeof(instruction_t), 10),
+        .instructions = vec_create(sizeof(instruction_t), 10),
         .magic_word   = MVM_MAGIC_WORD,
         .mvm_version_major = MVM_MAJOR_VERSION,
         .mvm_version_minor = MVM_MINOR_VERSION,
@@ -516,7 +516,7 @@ int program_add(program_t *out, instruction_t *inst)
 {
     assert(out);
     assert(inst);
-    vector_add(out->instructions, 1, inst);
+    vec_pushback(out->instructions, 1, inst);
     return MONDRIAN_OK;
 }
 
@@ -525,8 +525,8 @@ int program_print(FILE *out, const program_t *program)
     if (out == NULL || program == NULL)
         return MONDRIAN_ERROR;
 
-    size_t num_instructions = vector_num_elements(program->instructions);
-    instruction_t *data = (instruction_t *) vector_get(program->instructions);
+    size_t num_instructions = vec_length(program->instructions);
+    instruction_t *data = (instruction_t *) vec_data(program->instructions);
 
     printf("# -----------------------------------------------------------------------------------\n");
     printf("# mvm bytecode of '%s' (%p)\n", program_name(program), program);
@@ -549,7 +549,7 @@ int program_print(FILE *out, const program_t *program)
 
 size_t program_sizeof(const program_t *program)
 {
-    return (program == NULL ? 0 : vector_sizeof(program->instructions));
+    return (program == NULL ? 0 : vec_sizeof(program->instructions));
 }
 
 const char *program_name(const program_t *program)
@@ -561,14 +561,14 @@ program_t *program_cpy(const program_t *program)
 {
     program_t *cpy = NULL;
     if(program_new(&cpy, program->prog_name, program->prog_author, program->prog_comments) == MONDRIAN_OK) {
-        cpy->instructions = vector_deep_cpy(program->instructions);
+        cpy->instructions = vec_cpy_deep(program->instructions);
     }
     return cpy;
 }
 
 int program_free(program_t *program)
 {
-    vector_free(program->instructions);
+    vec_free(program->instructions);
     free(program);
     return MONDRIAN_OK;
 }
@@ -580,7 +580,7 @@ static inline int mondrian_vm_tick(mondrian_vm_t *vm)
     assert (vm);
     assert (vm->operand_stack);
     if ((vm->pc >= 0) && (vm->pc < vm->program->instructions->num_elements)) {
-        instruction_t *inst = vector_at(vm->program->instructions, vm->pc++);
+        instruction_t *inst = vec_at(vm->program->instructions, vm->pc++);
         panic_if((inst->opcode > ARRAY_LEN_OF(mvm_opcode_register)),
                  "internal error: opcode '0x%02x' exceeds register.", inst->opcode);
         if((mvm_opcode_register[inst->opcode].function(vm, inst->operand)) != MONDRIAN_OK) {
@@ -618,7 +618,7 @@ static inline lock_id_t mondrian_vm_ackn_lock(mondrian_vm_t *vm, shared_resource
         .resource = target,
         .is_released = false
     };
-    vector_add(vm->locks, 1, &state);
+    vec_pushback(vm->locks, 1, &state);
     return lock_id;
 }
 
@@ -662,10 +662,10 @@ static inline void mondrian_vm_set_var(mondrian_vm_t *vm, u64 index, u64 *value)
     size_t vec_elem = vm->variables->num_elements;
     if (vec_elem + 1 >= vm->variables->element_capacity) {
         size_t new_vec_cap = 2 * vec_elem;
-        vector_resize(vm->variables, new_vec_cap);
-        vector_memset(vm->variables, vec_elem, new_vec_cap, &EMPTY_ENTRY);
+        vec_resize(vm->variables, new_vec_cap);
+        vec_memset(vm->variables, vec_elem, new_vec_cap, &EMPTY_ENTRY);
     }
-    vector_set(vm->variables, index, 1, &entry);
+    vec_set(vm->variables, index, 1, &entry);
 }
 
 static inline int mondrian_vm_get_var(u64 *out, mondrian_vm_t *vm, u64 index)
@@ -673,7 +673,7 @@ static inline int mondrian_vm_get_var(u64 *out, mondrian_vm_t *vm, u64 index)
     if (vm == NULL || out == NULL) {
         return MONDRIAN_ERROR;
     } else {
-        const variable_entry_t *entry = (const variable_entry_t *) vector_at(vm->variables, index);
+        const variable_entry_t *entry = (const variable_entry_t *) vec_at(vm->variables, index);
         if (entry != NULL && entry->initialized) {
             *out = entry->value;
             return MONDRIAN_OK;
@@ -688,13 +688,13 @@ static inline int mondrian_vm_install_frag_local(frag_id_t *out, mondrian_vm_t *
         .fragment = frag
     };
     *out = vm->fragments->num_elements;
-    vector_add(vm->fragments, 1, &local);
+    vec_pushback(vm->fragments, 1, &local);
     return MONDRIAN_OK;
 }
 
 static inline frag_t *mondrian_vm_get_frag_local(mondrian_vm_t *vm, frag_id_t id)
 {
-    const local_fragment_t *local = (const local_fragment_t *) vector_at(vm->fragments, id);
+    const local_fragment_t *local = (const local_fragment_t *) vec_at(vm->fragments, id);
     return (local == NULL ? NULL : local->fragment);
 }
 
@@ -819,7 +819,7 @@ static int exec_fwrite(mondrian_vm_t *vm, u64 operand)
 
 static int exec_push(mondrian_vm_t *vm, u64 operand)
 {
-    vector_add(vm->operand_stack, 1, &operand);
+    vec_pushback(vm->operand_stack, 1, &operand);
     return MONDRIAN_OK;
 }
 
@@ -1122,7 +1122,7 @@ static int exec_temp_name(mondrian_vm_t *vm, u64 operand)
     char buffer[256];
     sprintf(buffer, "%s@%p:#%d", program_name(vm->program), vm->program, vm->temp_name_counter++);
     char *temp_name = strdup(buffer);
-    vector_add(vm->temp_names, 1, &temp_name);
+    vec_pushback(vm->temp_names, 1, &temp_name);
     OPERAND_STACK_PUSH(temp_name);
     return MONDRIAN_OK;
 }

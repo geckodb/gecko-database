@@ -376,7 +376,7 @@
 			<Option target="expr"/>
 			<Option target="mondrian"/>
 		</Unit>
-		<Unit filename="/Users/marcus/git/myimdb/containers/vector.c">
+		<Unit filename="/Users/marcus/git/myimdb/containers/vec.c">
 			<Option target="gridtables"/>
 			<Option target="buffmgr"/>
 			<Option target="sample_linuxwc"/>
@@ -536,7 +536,7 @@
 			<Option target="expr"/>
 			<Option target="mondrian"/>
 		</Unit>
-		<Unit filename="/Users/marcus/git/myimdb/include/containers/vector.h">
+		<Unit filename="/Users/marcus/git/myimdb/include/containers/vec.h">
 			<Option target="gridtables"/>
 			<Option target="buffmgr"/>
 			<Option target="sample_linuxwc"/>
