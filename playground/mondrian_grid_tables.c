@@ -407,7 +407,7 @@ int main(void) {
 
     table_delete(table);
     free (table);
-    gs_schema_delete(schema);
+    schema_delete(schema);
 
     return 0;
 }

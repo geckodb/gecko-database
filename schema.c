@@ -64,7 +64,7 @@ schema_t *schema_subset(schema_t *super, const attr_id_t *indicies, size_t nindi
     return schema;
 }
 
-void gs_schema_delete(schema_t *schema)
+void schema_delete(schema_t *schema)
 {
     assert (schema);
     vec_free(schema->attr);
@@ -137,5 +137,5 @@ void schema_print(FILE *file, schema_t *schema)
     frag_print(file, frag, 0, INT_MAX);
 
     frag_delete(frag);
-    gs_schema_delete(print_schema);
+    schema_delete(print_schema);
 }

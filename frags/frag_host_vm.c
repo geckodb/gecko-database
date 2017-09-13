@@ -106,7 +106,7 @@ static inline frag_t *frag_create(schema_t *schema, size_t tuplet_capacity, enum
 void frag_dipose(frag_t *self)
 {
     free (self->tuplet_data);
-    gs_schema_delete(self->schema);
+    schema_delete(self->schema);
     free (self);
 }
 

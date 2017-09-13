@@ -107,6 +107,6 @@ void vindex_print(FILE *file, vindex_t *index)
 
     frag_print(file, frag, 0, INT_MAX);
     frag_delete(frag);
-    gs_schema_delete(print_schema);
+    schema_delete(print_schema);
 
 }

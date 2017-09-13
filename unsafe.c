@@ -102,7 +102,7 @@ char *unsafe_field_str(enum field_type type, const void *data)
             sprintf(buffer, "%zu", *(SIZE *) data);
             break;
         case FT_TFORMAT:
-            sprintf(buffer, "%s", gs_tuplet_format_str(*(TFORMAT *) data));
+            sprintf(buffer, "%s", tuplet_format_str(*(TFORMAT *) data));
             break;
         default:
             perror("Unknown type");

@@ -69,7 +69,7 @@ size_t grid_cursor_numelem(const grid_cursor_t *cursor)
     return ((vec_t * ) cursor->extra)->num_elements;
 }
 
-bool gs_grid_cursor_is_empty(const grid_cursor_t *cursor)
+bool grid_cursor_is_empty(const grid_cursor_t *cursor)
 {
     REQUIRE_NONNULL(cursor)
     return (vec_length(cursor->extra) == 0);

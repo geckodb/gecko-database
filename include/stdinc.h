@@ -132,7 +132,7 @@ typedef MD5_CTX checksum_context_t;
         instance->fun(instance,__VA_ARGS__);                                                                           \
     })
 
-static inline const char *gs_tuplet_format_str(enum tuplet_format format)
+static inline const char *tuplet_format_str(enum tuplet_format format)
 {
     switch (format) {
         case TF_NSM: return "row";

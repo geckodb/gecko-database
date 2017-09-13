@@ -34,7 +34,7 @@ typedef struct {
 // ---------------------------------------------------------------------------------------------------------------------
 
 schema_t *schema_new(const char *table_name);
-void gs_schema_delete(schema_t *schema);
+void schema_delete(schema_t *schema);
 schema_t *schema_subset(schema_t *super, const attr_id_t *indicies, size_t nindicies);
 schema_t *schema_cpy(const schema_t *schema);
 const struct attr_t *schema_attr_by_id(const schema_t *schema, attr_id_t attr_id);

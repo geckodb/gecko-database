@@ -130,5 +130,5 @@ void hindex_print(FILE *file, const hindex_t *index)
     frag_print(file, frag, 0, INT_MAX);
     grid_cursor_delete(cursor);
     frag_delete(frag);
-    gs_schema_delete(print_schema);
+    schema_delete(print_schema);
 }

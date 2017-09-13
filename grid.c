@@ -63,7 +63,7 @@ static inline bool free_grids(void *capture, void *begin, void *end)
 
 void table_delete(table_t *table)
 {
-    gs_schema_delete(table->schema);
+    schema_delete(table->schema);
     vec_foreach(table->grid_ptrs, NULL, free_grids);
     vec_free(table->grid_ptrs);
     vindex_delete(table->schema_cover);
@@ -129,7 +129,7 @@ grid_cursor_t *table_find(const table_t *table, const attr_id_t *attr_ids, size_
     grid_cursor_t *result = grid_cursor_new(grid_cursor_numelem(larger));
 
     /* Hash-join intersection */
-    panic_if(gs_grid_cursor_is_empty(smaller), "No grid found. Does the table field cover for %p contain gaps?", table);
+    panic_if(grid_cursor_is_empty(smaller), "No grid found. Does the table field cover for %p contain gaps?", table);
     dict_t* hash_table = hash_table_new_jenkins(sizeof(grid_t *), sizeof(bool),
                                                 10 * grid_cursor_numelem(smaller), 1.7f, 0.95f);
 
@@ -178,7 +178,7 @@ table_t *table_melt(enum frag_impl_type_t type, const table_t *src_table, const 
         }
     }
     tuple_cursor_dispose(&dst_cursor);
-    gs_schema_delete(dst_schema);
+    schema_delete(dst_schema);
     return dst_table;
 }
 
@@ -303,7 +303,7 @@ void table_grid_list_print(FILE *file, const table_t *table, size_t row_offset, 
     frag_print(file, frag, 0, INT_MAX);
 
     frag_delete(frag);
-    gs_schema_delete(print_schema);
+    schema_delete(print_schema);
 }
 
 void table_print(FILE *file, const table_t *table, size_t row_offset, size_t limit)
@@ -381,7 +381,7 @@ void table_structure_print(FILE *file, const table_t *table, size_t row_offset, 
     frag_print(file, write_frag, row_offset, limit);
 
     frag_delete(write_frag);
-    gs_schema_delete(write_schema);
+    schema_delete(write_schema);
 }
 
 static inline void create_indexes(table_t *table, size_t approx_num_horizontal_partitions)
@@ -432,7 +432,7 @@ static inline grid_t *create_grid(table_t *table, const attr_id_t *attr, size_t 
         dict_put(result->schema_map_indicies, attr + i, &i);
     }
 
-    gs_schema_delete(grid_schema);
+    schema_delete(grid_schema);
 
     return result;
 }
