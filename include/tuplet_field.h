@@ -42,30 +42,16 @@ typedef struct tuplet_field_t {
 // I N T E R F A C E   D E C L A R A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-void gs_tuplet_field_open(tuplet_field_t *dst, tuplet_t *tuplet);
-
-void gs_tuplet_field_seek(tuplet_field_t *dst, tuplet_t *tuplet, attr_id_t attr_id);
-
-bool gs_tuplet_field_next(tuplet_field_t *field, bool auto_next);
-
-const void *gs_tuplet_field_read(tuplet_field_t *field);
-
-void gs_tuplet_field_update(tuplet_field_t *field, const void *data);
-
-bool gs_tuplet_field_write(tuplet_field_t *field, const void *data, bool auto_next);
-
-bool gs_tuplet_field_write_eval(tuplet_field_t *field, bool eval, bool auto_next);
-
-void gs_tuplet_field_set_null(tuplet_field_t *field);
-
-bool gs_tuplet_field_is_null(tuplet_field_t *field);
-
-size_t gs_tuplet_field_size(tuplet_field_t *field);
-
-size_t gs_attr_total_size(const struct attr_t *attr);
-
-size_t gs_tuplet_field_get_printlen(const tuplet_field_t *field);
-
-enum field_type gs_tuplet_field_get_type(const tuplet_field_t *field);
-
-char *gs_tuplet_field_to_string(const tuplet_field_t *field);
+void tuplet_field_open(tuplet_field_t *dst, tuplet_t *tuplet);
+void tuplet_field_seek(tuplet_field_t *dst, tuplet_t *tuplet, attr_id_t attr_id);
+bool tuplet_field_next(tuplet_field_t *field, bool auto_next);
+const void *tuplet_field_read(tuplet_field_t *field);
+void tuplet_field_update(tuplet_field_t *field, const void *data);
+bool tuplet_field_write(tuplet_field_t *field, const void *data, bool auto_next);
+bool tuplet_field_write_eval(tuplet_field_t *field, bool eval, bool auto_next);
+void tuplet_field_set_null(tuplet_field_t *field);
+bool tuplet_field_is_null(tuplet_field_t *field);
+size_t tuplet_field_size(tuplet_field_t *field);
+size_t tuplet_field_printlen(const tuplet_field_t *field);
+enum field_type tuplet_field_get_type(const tuplet_field_t *field);
+char *tuplet_field_str(const tuplet_field_t *field);

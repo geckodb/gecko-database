@@ -18,16 +18,16 @@
 #include <grid_cursor.h>
 #include <containers/dicts/hash_table.h>
 
-grid_cursor_t *grid_cursor_create(size_t cursor)
+grid_cursor_t *grid_cursor_new(size_t cursor)
 {
     grid_cursor_t *result = REQUIRE_MALLOC(sizeof(grid_cursor_t));
     *result = (grid_cursor_t) {
-            .extra = vec_create(sizeof(struct grid_t *), cursor)
+            .extra = vec_new(sizeof(struct grid_t *), cursor)
     };
     return result;
 }
 
-void grid_cursor_close(grid_cursor_t *cursor)
+void grid_cursor_delete(grid_cursor_t *cursor)
 {
     vec_free(cursor->extra);
     free (cursor);

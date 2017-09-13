@@ -46,7 +46,7 @@ pref_load(
    // panic_if((access(file, F_OK ) == -1), NOSUCHFILE, file); // TODO: Hack
 
     pref->last_read = time(NULL);
-    pref->dict = hash_table_create_ex(&(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen},
+    pref->dict = hash_table_new_ex(&(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen},
                                    sizeof(char *), sizeof(char *), NUM_INIT_CONFIG_STATEMENTS,
                                    NUM_INIT_CONFIG_STATEMENTS, 1.7f, 0.75f,
                                    str_equals, clean_up, true);
@@ -120,12 +120,12 @@ next_line:
 }
 
 void
-pref_free(
-    pref_t *pref)
+pref_delete(
+        pref_t *pref)
 {
     if (pref) {
         if (pref->dict)
-            dict_free(pref->dict);
+            dict_delete(pref->dict);
         free (pref);
     }
 }
@@ -181,7 +181,7 @@ read_lines(
     char * line = NULL;
     size_t len = 0;
     ssize_t read;
-    vec_t *result = vec_create(sizeof(char *), 100);
+    vec_t *result = vec_new(sizeof(char *), 100);
 
     fp = fopen(file, "r");
     panic_if((fp == NULL), NOSUCHFILE, file);

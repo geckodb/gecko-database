@@ -33,12 +33,12 @@ int progpool_create(progpool_t **pool)
     if (*pool == NULL)
         return MONDRIAN_ERROR;
     else {
-        (*pool)->entries = vec_create(sizeof(pool_entry_t), 10);
+        (*pool)->entries = vec_new(sizeof(pool_entry_t), 10);
         return ((*pool)->entries != NULL ? MONDRIAN_OK : MONDRIAN_ERROR);
     }
 }
 
-int progpool_free(progpool_t *pool)
+int progpool_dispose(progpool_t *pool)
 {
     vec_free(pool->entries);
     free(pool);

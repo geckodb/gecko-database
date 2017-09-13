@@ -62,8 +62,6 @@ typedef struct _future_t *future_t;
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-future_t future_create(const void *capture, promise_t func, future_eval_policy policy);
-
+future_t future_new(const void *capture, promise_t func, future_eval_policy policy);
 void future_wait_for(future_t future);
-
 const void *future_resolve(promise_result *return_type, future_t future);

@@ -64,7 +64,7 @@ typedef struct tuplet_t {
  *        [in] tuplet_id the tuplet id. Must be valid.
  * @return A pointer to the first tuplet in <i>frag</i>, or <b>NULL</b> if the fragment does not contains any tuplets.
  * */
-void gs_tuplet_open(tuplet_t *dst, struct frag_t *frag, tuplet_id_t tuplet_id);
+void tuplet_open(tuplet_t *dst, struct frag_t *frag, tuplet_id_t tuplet_id);
 
 /*!
  * @brief Moves the input tuplet cursor to its successor inside its fragment.
@@ -82,7 +82,7 @@ void gs_tuplet_open(tuplet_t *dst, struct frag_t *frag, tuplet_id_t tuplet_id);
  * @return <b>true</b> is the tuplet cursor was moved to its successor and the end of the fragment was not reached,
  * or <b>false</b> otherwise.
  */
-bool gs_tuplet_next(tuplet_t *tuplet);
+bool tuplet_next(tuplet_t *tuplet);
 
 /*!
  * @brief Resets the tuplet pointer to the begin of the first tuplet in its fragment.
@@ -93,18 +93,18 @@ bool gs_tuplet_next(tuplet_t *tuplet);
  * @param tuplet A valid tuplet inside a fragment (mus be non-null)
  * @return The first tuplet in the fragment of the input tuplet.
  */
-void gs_tuplet_rewind(tuplet_t *tuplet);
+void tuplet_rewind(tuplet_t *tuplet);
 
-void gs_tuplet_set_null(tuplet_t *tuplet);
+void tuplet_set_null(tuplet_t *tuplet);
 
-bool gs_tuplet_is_null(tuplet_t *tuplet);
+bool tuplet_is_null(tuplet_t *tuplet);
 
-size_t gs_tuplet_size(tuplet_t *tuplet);
+size_t tuplet_size(tuplet_t *tuplet);
 
-void *gs_update(void *dst, schema_t *frag, attr_id_t attr_id, void *src);
+void *tuplet_update(void *dst, schema_t *frag, attr_id_t attr_id, void *src);
 
-size_t gs_tuplet_size_by_schema(const schema_t *schema);
+size_t tuplet_size_by_schema(const schema_t *schema);
 
-enum field_type gs_tuplet_get_field_type(const tuplet_t *tuplet, attr_id_t id);
+enum field_type tuplet_field_type(const tuplet_t *tuplet, attr_id_t id);
 
-size_t gs_tuplet_printlen(const attr_t *attr, const void *field_data);
+size_t tuplet_printlen(const attr_t *attr, const void *field_data);

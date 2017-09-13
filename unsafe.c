@@ -19,9 +19,9 @@
 #include <frag.h>
 #include <grid.h>
 
-size_t gs_unsafe_field_get_println(enum field_type type, const void *data)
+size_t unsafe_field_println(enum field_type type, const void *data)
 {
-    char *buffer = gs_unsafe_field_to_string(type, data);
+    char *buffer = unsafe_field_str(type, data);
     size_t print_len = strlen(buffer);
     free (buffer);
     return print_len;
@@ -36,7 +36,7 @@ char *clip(const char *str, size_t max_len)
     return out;
 }
 
-char *gs_unsafe_field_to_string(enum field_type type, const void *data)
+char *unsafe_field_str(enum field_type type, const void *data)
 {
     const size_t INIT_BUFFER_LEN = 2048;
     char *buffer = REQUIRE_MALLOC(INIT_BUFFER_LEN);
@@ -96,7 +96,7 @@ char *gs_unsafe_field_to_string(enum field_type type, const void *data)
             sprintf(buffer, "%u", *(TUPLEID *) data);
             break;
         case FT_FRAGTYPE:
-            sprintf(buffer, "%s", gs_frag_str(*(FRAGTYPE *) data));
+            sprintf(buffer, "%s", frag_str(*(FRAGTYPE *) data));
             break;
         case FT_SIZE:
             sprintf(buffer, "%zu", *(SIZE *) data);

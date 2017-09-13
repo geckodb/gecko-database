@@ -46,6 +46,5 @@ enum field_type {
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t gs_field_type_sizeof(enum field_type type);
-
-const char *gs_field_type_str(enum field_type type);
+size_t field_type_sizeof(enum field_type type);
+const char *field_type_str(enum field_type type);

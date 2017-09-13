@@ -86,7 +86,7 @@ size_t find_type_match(enum frag_impl_type_t type)
 }
 
 
-frag_t *gs_fragment_alloc(schema_t *schema, size_t tuplet_capacity, enum frag_impl_type_t type)
+frag_t *frag_new(schema_t *schema, size_t tuplet_capacity, enum frag_impl_type_t type)
 {
     REQUIRE((tuplet_capacity > 0), "capacity of tuplets must be non zero");
 
@@ -100,7 +100,7 @@ frag_t *gs_fragment_alloc(schema_t *schema, size_t tuplet_capacity, enum frag_im
     return result;
 }
 
-void gs_frag_insert(struct tuplet_t *out, frag_t *frag, size_t ntuplets)
+void frag_insert(struct tuplet_t *out, frag_t *frag, size_t ntuplets)
 {
     assert (frag);
     assert (ntuplets > 0);
@@ -116,23 +116,23 @@ void gs_frag_insert(struct tuplet_t *out, frag_t *frag, size_t ntuplets)
     }
 }
 
-void gs_frag_print(FILE *file, frag_t *frag, size_t row_offset, size_t limit)
+void frag_print(FILE *file, frag_t *frag, size_t row_offset, size_t limit)
 {
-    gs_frag_print_ex(file, FPTT_CONSOLE_PRINTER, frag, row_offset, limit);
+    frag_print_ex(file, FPTT_CONSOLE_PRINTER, frag, row_offset, limit);
 }
 
-void gs_frag_print_ex(FILE *file, enum frag_printer_type_tag type, frag_t *frag, size_t row_offset, size_t limit)
+void frag_print_ex(FILE *file, enum frag_printer_type_tag type, frag_t *frag, size_t row_offset, size_t limit)
 {
-    gs_frag_printer_print(file, type, frag, row_offset, limit);
+    frag_printer_print(file, type, frag, row_offset, limit);
 }
 
-void gs_frag_free(frag_t *frag)
+void frag_delete(frag_t *frag)
 {
     assert(frag);
     frag->_dispose(frag);
 }
 
-const char *gs_frag_str(enum frag_impl_type_t type)
+const char *frag_str(enum frag_impl_type_t type)
 {
     switch (type) {
         case FIT_HOST_NSM_VM: return "host/vm nsm";
@@ -141,26 +141,26 @@ const char *gs_frag_str(enum frag_impl_type_t type)
     }
 }
 
-size_t gs_fragment_num_of_attributes(const frag_t *frag)
+size_t frag_num_of_attributes(const frag_t *frag)
 {
     assert (frag);
-    return gs_schema_num_attributes(frag->schema);
+    return schema_num_attributes(frag->schema);
 }
 
-size_t gs_fragment_num_of_tuplets(const frag_t *frag)
+size_t frag_num_of_tuplets(const frag_t *frag)
 {
     assert (frag);
     return frag->ntuplets;
 }
 
-schema_t *gs_frag_get_schema(const frag_t *frag)
+schema_t *frag_schema(const frag_t *frag)
 {
     assert(frag);
     return frag->schema;
 }
 
-enum field_type gs_fragment_get_field_type(const frag_t *frag, attr_id_t id)
+enum field_type frag_field_type(const frag_t *frag, attr_id_t id)
 {
     assert (frag);
-    return gs_schema_attr_type(frag->schema, id);
+    return schema_attr_type(frag->schema, id);
 }

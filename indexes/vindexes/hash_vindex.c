@@ -55,7 +55,7 @@ static inline void cleanup_vectors(void *key, void *value)
     vec_dispose((vec_t *) value);
 }
 
-vindex_t *hash_vindex_create(size_t key_size, size_t num_init_slots)
+vindex_t *hash_vindex_new(size_t key_size, size_t num_init_slots)
 {
     vindex_t *result = REQUIRE_MALLOC(sizeof(vindex_t));
     *result = (vindex_t) {
@@ -67,9 +67,9 @@ vindex_t *hash_vindex_create(size_t key_size, size_t num_init_slots)
         .tag = GI_VINDEX_HASH
     };
 
-    gs_hashset_create(&result->keys, key_size, num_init_slots);
+    hashset_create(&result->keys, key_size, num_init_slots);
 
-    result->extra = hash_table_create_ex(
+    result->extra = hash_table_new_ex(
             &(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen}, key_size, sizeof(vec_t),
             num_init_slots, num_init_slots, 1.7f, 0.75f, attr_key_equals, cleanup_vectors, false
     );
@@ -86,7 +86,7 @@ static inline void this_add(struct vindex_t *self, const attr_id_t *key, const s
     REQUIRE_INSTANCEOF_THIS(self);
     dict_t *dict = ((dict_t *)self->extra);
     if (!dict_contains_key(dict, key)) {
-        vec_t *vec = vec_create(sizeof(struct grid_t *), 10);
+        vec_t *vec = vec_new(sizeof(struct grid_t *), 10);
         dict_put(dict, key, vec);
         // Notice, this frees up pointer to vec, but does not cleanup the vector (especially the data pointer).
         // That's required since dict_put copies all members of vec and is responsible to free up resources.
@@ -115,8 +115,8 @@ static inline bool this_contains(const struct vindex_t *self, const attr_id_t *k
 void this_free(struct vindex_t *self)
 {
     REQUIRE_INSTANCEOF_THIS(self);
-    dict_free((dict_t *) self->extra);
-    gs_hashset_free(&self->keys);
+    dict_delete((dict_t *) self->extra);
+    hashset_dispose(&self->keys);
 }
 
 

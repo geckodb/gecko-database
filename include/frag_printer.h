@@ -46,12 +46,12 @@ static struct frag_printer_register_entry {
     frag_printer_type_tag type;
     frag_printer_t *(*create)();
 } frag_printer_register[] = {
-    { FPTT_CONSOLE_PRINTER, console_printer_create }
+    { FPTT_CONSOLE_PRINTER, console_printer_new }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   D E C L A R A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-void gs_frag_printer_print(FILE *file, frag_printer_type_tag type, struct frag_t *frag, size_t row_offset, size_t limit);
+void frag_printer_print(FILE *file, frag_printer_type_tag type, struct frag_t *frag, size_t row_offset, size_t limit);
 

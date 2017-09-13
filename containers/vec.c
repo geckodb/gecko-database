@@ -38,12 +38,12 @@ static inline bool advance(vec_t *, size_t, size_t);
 // I N T E R F A C E  I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-vec_t *vec_create(size_t element_size, size_t capacity)
+vec_t *vec_new(size_t element_size, size_t capacity)
 {
-    return vec_create_ex(element_size, capacity, auto_resize, GROW_FACTOR);
+    return vec_new_ex(element_size, capacity, auto_resize, GROW_FACTOR);
 }
 
-vec_t *vec_create_ex(size_t element_size, size_t capacity, vector_flags flags, float grow_factor)
+vec_t *vec_new_ex(size_t element_size, size_t capacity, vector_flags flags, float grow_factor)
 {
     vec_t *result = NULL;
     if (check_create_args(element_size, flags, grow_factor)) {
@@ -91,7 +91,7 @@ vec_t *vec_cpy_deep(vec_t *proto)
     vec_t *result = NULL;
     REQUIRE_NONNULL(proto)
     REQUIRE_NONNULL(proto->data)
-    if ((result = vec_create_ex(proto->sizeof_element, proto->element_capacity, proto->flags, proto->grow_factor))) {
+    if ((result = vec_new_ex(proto->sizeof_element, proto->element_capacity, proto->flags, proto->grow_factor))) {
         vec_set(result, 0, proto->num_elements, proto->data);
     }
     return result;
@@ -272,13 +272,13 @@ bool vec_foreach(vec_t *vec, void *capture, bool (*func)(void *capture, void *be
 
 void vec_dedup(vec_t *vec)
 {
-    dict_t *dict = hash_table_create_jenkins(vec->sizeof_element, sizeof(bool), vec->num_elements, 2.0f, 0.75f);
+    dict_t *dict = hash_table_new_jenkins(vec->sizeof_element, sizeof(bool), vec->num_elements, 2.0f, 0.75f);
     void *end = vec_end(vec);
     bool dummy;
     for (void *it = vec_begin(vec); it < end; dict_put(dict, it++, &dummy));
     vec_t *dedups = (vec_t *) dict_keyset(dict);
     vec_swap(vec, dedups);
-    dict_free(dict);
+    dict_delete(dict);
     vec_free(dedups);
 }
 

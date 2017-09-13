@@ -53,7 +53,7 @@ typedef struct dict_t {
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool dict_free(dict_t *dict);
+bool dict_delete(dict_t *dict);
 void dict_clear(dict_t *dict);
 bool dict_empty(const dict_t *dict);
 bool dict_contains_key(const dict_t *dict, const void *key);

@@ -22,13 +22,13 @@
 #include <schema.h>
 
 #define DEFINE_ATTRIBUTE_CREATE(type_name,internal_type)                                                               \
-attr_id_t gs_attr_create_##type_name(const char *name, schema_t *schema) {                                             \
-    return gs_attr_create(name, internal_type, 1, schema);                                                             \
+attr_id_t attr_create_##type_name(const char *name, schema_t *schema) {                                                \
+    return attr_create(name, internal_type, 1, schema);                                                                \
 }
 
 #define DEFINE_ATTRIBUTE_ARRAY_CREATE(type_name,internal_type)                                                         \
-attr_id_t gs_attr_create_##type_name(const char *name, size_t length, schema_t *schema) {                              \
-    return gs_attr_create(name, internal_type, length, schema);                                                        \
+attr_id_t attr_create_##type_name(const char *name, size_t length, schema_t *schema) {                                 \
+    return attr_create(name, internal_type, length, schema);                                                           \
 }
 
 attr_id_t _attr_create(const char *name, enum field_type data_type, size_t data_type_rep, ATTR_FLAGS attr_flags, schema_t *schema)
@@ -50,40 +50,45 @@ attr_id_t _attr_create(const char *name, enum field_type data_type, size_t data_
     return attr.id;
 }
 
-const char *gs_attr_get_name(const struct attr_t *attr)
+const char *attr_name(const struct attr_t *attr)
 {
     assert (attr);
     return attr->name;
 }
 
-size_t gs_attr_get_str_format_max_len(attr_t *attr)
+size_t attr_str_max_len(attr_t *attr)
 {
     assert (attr);
     return attr->str_format_mlen;
 }
 
-enum field_type gs_attr_get_type(const attr_t *attr)
+enum field_type attr_type(const attr_t *attr)
 {
     assert (attr);
     return attr->type;
 }
 
-const attr_t *gs_attr_cpy(const attr_t *template, schema_t *new_owner)
+const attr_t *attr_cpy(const attr_t *template, schema_t *new_owner)
 {
     assert (template);
     assert(new_owner);
     attr_id_t id = _attr_create(template->name, template->type, template->type_rep, template->flags, new_owner);
-    return gs_schema_attr_by_id(new_owner, id);
+    return schema_attr_by_id(new_owner, id);
 }
 
-attr_id_t gs_attr_create(const char *name, enum field_type data_type, size_t data_type_rep, schema_t *schema)
+size_t attr_total_size(const struct attr_t *attr)
+{
+    return attr->type_rep * field_type_sizeof(attr->type);
+}
+
+attr_id_t attr_create(const char *name, enum field_type data_type, size_t data_type_rep, schema_t *schema)
 {
     return _attr_create(name, data_type, data_type_rep,
                         (ATTR_FLAGS) { .autoinc = 0, .foreign = 0, .nullable = 0, .primary = 0, .unique = 0 },
                         schema);
 }
 
-bool gs_attr_isstring(const attr_t *attr)
+bool attr_isstring(const attr_t *attr)
 {
     return (attr == NULL ? false : (attr->type == FT_CHAR));
 }

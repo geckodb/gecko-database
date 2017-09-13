@@ -20,7 +20,7 @@
 #define IMPL_COMPLETE(printer)                                                                                         \
     (printer->_print != NULL && printer->_free != NULL)                                                                \
 
-void gs_frag_printer_print(FILE *file, frag_printer_type_tag type, frag_t *frag, size_t row_offset, size_t limit)
+void frag_printer_print(FILE *file, frag_printer_type_tag type, frag_t *frag, size_t row_offset, size_t limit)
 {
     REQUIRE_NONNULL(file);
     REQUIRE_NONNULL(frag);

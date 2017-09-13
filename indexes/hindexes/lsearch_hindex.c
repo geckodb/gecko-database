@@ -44,7 +44,7 @@ static inline void this_add(struct hindex_t *self, const tuple_id_interval_t *ke
 static inline void this_remove_interval(struct hindex_t *self, const tuple_id_interval_t *key);
 static inline void this_remove_intersec(struct hindex_t *self, tuple_id_t tid);
 static inline bool this_contains(const struct hindex_t *self, tuple_id_t tid);
-static inline void this_free(struct hindex_t *self);
+static inline void this_delete(struct hindex_t *self);
 static inline void this_query(grid_cursor_t *result, const struct hindex_t *self, const tuple_id_t *tid_begin,
                               const tuple_id_t *tid_end);
 static inline tuple_id_t this_minbegin(struct hindex_t *self);
@@ -58,7 +58,7 @@ static inline void find_all_by_point(vec_t *result, vec_t *haystack, const tuple
 // I N T E R F A C E  I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-hindex_t *lesearch_hindex_create(size_t approx_num_horizontal_partitions, const schema_t *table_schema)
+hindex_t *lesearch_hindex_new(size_t approx_num_horizontal_partitions, const schema_t *table_schema)
 {
     REQUIRE_NONNULL(table_schema);
 
@@ -71,11 +71,11 @@ hindex_t *lesearch_hindex_create(size_t approx_num_horizontal_partitions, const 
         ._remove_intersec = this_remove_intersec,
         ._contains = this_contains,
         ._query = this_query,
-        ._free = this_free,
+        ._delete = this_delete,
         ._minbegin = this_minbegin,
         ._maxend = this_maxend,
 
-        .extra = vec_create(sizeof(entry_t), approx_num_horizontal_partitions),
+        .extra = vec_new(sizeof(entry_t), approx_num_horizontal_partitions),
         .table_schema = table_schema
     };
 
@@ -91,7 +91,7 @@ static inline entry_t *find_interval(vec_t *haystack, const tuple_id_interval_t 
     entry_t *it = (entry_t *) haystack->data;
     size_t num_elements = haystack->num_elements;
     while (num_elements--) {
-        if (gs_interval_equals((&(it->interval)), needle))
+        if (INTERVAL_EQUALS((&(it->interval)), needle))
             return it;
         else it++;
     }
@@ -103,7 +103,7 @@ static inline void find_all_by_point(vec_t *result, vec_t *haystack, const tuple
     const entry_t *it = (const entry_t *) haystack->data;
     size_t num_elements = haystack->num_elements;
     while (num_elements--) {
-        if (GS_INTERVAL_CONTAINS((&it->interval), needle)) {
+        if (INTERVAL_CONTAINS((&it->interval), needle)) {
             vec_add_all(result, it->grids);
         }
         it++;
@@ -123,7 +123,7 @@ static inline void this_add(struct hindex_t *self, const tuple_id_interval_t *ke
     } else {
         entry_t entry = {
                 .interval = *key,
-                .grids = vec_create(sizeof(struct grid_t *), 16)
+                .grids = vec_new(sizeof(struct grid_t *), 16)
         };
         vec_pushback(entry.grids, 1, &grid);
         vec_pushback(vec, 1, &entry);
@@ -169,7 +169,7 @@ static inline bool free_entires(void *capture, void *begin, void *end)
     return true;
 }
 
-static inline void this_free(struct hindex_t *self)
+static inline void this_delete(struct hindex_t *self)
 {
     REQUIRE_INSTANCEOF_THIS(self);
     vec_foreach(self->extra, NULL, free_entires);

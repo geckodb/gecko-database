@@ -38,17 +38,17 @@ typedef struct tuple_id_interval_t {
 // M A C R O S
 // ---------------------------------------------------------------------------------------------------------------------
 
-#define gs_interval_get_span(interval)                                   \
+#define INTERVAL_SPAN(interval)                                          \
     ({                                                                   \
         (interval->end - interval->begin);                               \
     })
 
-#define GS_INTERVAL_CONTAINS(interval, elem)                             \
+#define INTERVAL_CONTAINS(interval, elem)                                \
     ({                                                                   \
         (elem >= interval->begin && elem < interval->end);               \
     })
 
-#define gs_interval_equals(a, b)                                         \
+#define INTERVAL_EQUALS(a, b)                                            \
     ({                                                                   \
         (a->begin == b->begin && a->end == b->end);                      \
     })
@@ -57,7 +57,7 @@ typedef struct tuple_id_interval_t {
 // I N L I N E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-static inline int gs_interval_tuple_id_comp_by_lower_bound(const void *lhs, const void *rhs)
+static inline int interval_tuple_id_comp_by_lower_bound(const void *lhs, const void *rhs)
 {
     const tuple_id_interval_t *a = lhs;
     const tuple_id_interval_t *b = rhs;

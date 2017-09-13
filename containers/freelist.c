@@ -22,25 +22,25 @@
 // I N T E R F A C E  I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-void gs_freelist_create(freelist_t *list, size_t elem_size, size_t capacity, init_t init, inc_t inc)
+void freelist_create(freelist_t *list, size_t elem_size, size_t capacity, init_t init, inc_t inc)
 {
     REQUIRE_NONNULL(list);
     REQUIRE_NONNULL(inc);
     REQUIRE((elem_size > 0), BADINT);
-    list->free_elem = vec_create(elem_size, capacity);
+    list->free_elem = vec_new(elem_size, capacity);
     list->next_element = REQUIRE_MALLOC(elem_size);
     list->inc = inc;
     init(list->next_element);
 }
 
-void gs_freelist_free(freelist_t *list)
+void freelist_dispose(freelist_t *list)
 {
     REQUIRE_NONNULL(list);
     vec_free(list->free_elem);
     free(list->next_element);
 }
 
-void gs_freelist_bind(void *out, const freelist_t *list, size_t num_elem)
+void freelist_bind(void *out, const freelist_t *list, size_t num_elem)
 {
     REQUIRE_NONNULL(out);
     REQUIRE_NONNULL(list);
@@ -62,13 +62,13 @@ void gs_freelist_bind(void *out, const freelist_t *list, size_t num_elem)
     }
 }
 
-const void *gs_freelist_peek_new(const freelist_t *list)
+const void *freelist_peek_new(const freelist_t *list)
 {
     REQUIRE_NONNULL(list);
     return list->next_element;
 }
 
-void gs_freelist_pushback(freelist_t *list, size_t num_elem, void *elem)
+void freelist_pushback(freelist_t *list, size_t num_elem, void *elem)
 {
     REQUIRE_NONNULL(list);
     REQUIRE_NONNULL(elem);

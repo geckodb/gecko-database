@@ -40,12 +40,8 @@ typedef struct tuple_field_t
 // I N T E R F A C E   D E C L A R A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-void gs_tuple_field_open(tuple_field_t *field, tuple_t *tuple);
-
-void gs_tuple_field_seek(tuple_field_t *tuple_field, tuple_t *tuple, attr_id_t table_attr_id);
-
-void gs_tuple_field_next(tuple_field_t *field);
-
-void gs_tuple_field_write(tuple_field_t *field, const void *data);
-
-const void *gs_tuple_field_read(tuple_field_t *field);
+void tuple_field_open(tuple_field_t *field, tuple_t *tuple);
+void tuple_field_seek(tuple_field_t *tuple_field, tuple_t *tuple, attr_id_t table_attr_id);
+void tuple_field_next(tuple_field_t *field);
+void tuple_field_write(tuple_field_t *field, const void *data);
+const void *tuple_field_read(tuple_field_t *field);

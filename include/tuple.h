@@ -23,12 +23,12 @@
 // D A T A   T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-struct grid_table_t;
+struct table_t;
 
 typedef uint32_t tuple_id_t;
 
 typedef struct tuple_t {
-    const struct grid_table_t *table;
+    const struct table_t *table;
     tuple_id_t tuple_id;
 } tuple_t;
 
@@ -36,8 +36,7 @@ typedef struct tuple_t {
 // I N T E R F A C E   D E C L A R A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-void gs_tuple_open(tuple_t *tuple, const struct grid_table_t *table, tuple_id_t tuple_id);
+void tuple_open(tuple_t *tuple, const struct table_t *table, tuple_id_t tuple_id);
 
-void gs_tuple_id_init(void *data);
-
-void gs_tuple_id_inc(void *data);
+void tuple_id_init(void *data);
+void tuple_id_inc(void *data);

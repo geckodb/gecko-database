@@ -80,4 +80,4 @@ typedef struct db_config_t {
 
 #define CONF_INET_PORT          1316
 
-void gs_db_config_load(db_config_t *config);
+void db_config_load(db_config_t *config);

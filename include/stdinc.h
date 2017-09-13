@@ -148,75 +148,57 @@ static inline const char *gs_tuplet_format_str(enum tuplet_format format)
 #ifndef BOOL
 #define BOOL      bool
 #endif
-
 #ifndef INT8
 #define INT8      int8_t
 #endif
-
 #ifndef INT16
 #define INT16     int16_t
 #endif
-
 #ifndef INT32
 #define INT32     int32_t
 #endif
-
 #ifndef INT64
 #define INT64     int64_t
 #endif
-
 #ifndef UINT8
 #define UINT8     uint8_t
 #endif
-
 #ifndef UINT16
 #define UINT16    uint16_t
 #endif
-
 #ifndef UINT32
 #define UINT32    uint32_t
 #endif
-
 #ifndef UINT64
 #define UINT64    uint64_t
 #endif
-
 #ifndef FLOAT32
 #define FLOAT32   float
 #endif
-
 #ifndef FLOAT64
 #define FLOAT64   double
 #endif
-
 #ifndef CHAR
 #define CHAR      char
 #endif
-
 #ifndef STRPTR
 #define STRPTR    char*
 #endif
-
 #ifndef ATTRID
 #define ATTRID    attr_id_t
 #endif
-
 #ifndef GRIDID
 #define GRIDID    grid_id_t
 #endif
-
 #ifndef TUPLEID
 #define TUPLEID   tuple_id_t
 #endif
-
 #ifndef FRAGTYPE
 #define FRAGTYPE  enum frag_impl_type_t
 #endif
-
 #ifndef SIZE
 #define SIZE      size_t
 #endif
-
 #ifndef TFORMAT
 #define TFORMAT   enum tuplet_format
 #endif

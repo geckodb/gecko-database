@@ -30,6 +30,5 @@ struct frag_t;
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-struct frag_t *gs_frag_host_vm_nsm_create(schema_t *schema, size_t tuplet_capacity);
-
-struct frag_t *gs_frag_host_vm_dsm_create(schema_t *schema, size_t tuplet_capacity);
+struct frag_t *frag_host_vm_nsm_new(schema_t *schema, size_t tuplet_capacity);
+struct frag_t *frag_host_vm_dsm_new(schema_t *schema, size_t tuplet_capacity);

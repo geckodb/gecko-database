@@ -20,7 +20,7 @@
 #include <debug.h>
 #include <inet/response.h>
 
-void gs_server_create(server_t *server, in_port_t port)
+void server_create(server_t *server, in_port_t port)
 {
     REQUIRE_NONNULL(server);
 
@@ -46,7 +46,7 @@ void gs_server_create(server_t *server, in_port_t port)
     printf("listening to port %d\n", (int) ntohs(server->server_addr.sin_port));
 }
 
-void gs_server_start(server_t *server)
+void server_start(server_t *server)
 {
     REQUIRE_NONNULL(server);
     int fd_client;
@@ -68,15 +68,15 @@ void gs_server_start(server_t *server)
           //      LOG_DEBUG("incoming request\n--------------------------------------------------------------\n%s", buffer);
 
                 response_t res;
-                gs_response_create(&res);
-                gs_response_content_type_set(&res, MIME_CONTENT_TYPE_TEXT_PLAIN);
-                gs_response_body_set(&res, "Hello World");
-                gs_response_end(&res, HTTP_STATUS_CODE_200_OK);
-                char *response_text = gs_response_pack(&res);
+            response_create(&res);
+            response_content_type_set(&res, MIME_CONTENT_TYPE_TEXT_PLAIN);
+            response_body_set(&res, "Hello World");
+            response_end(&res, HTTP_STATUS_CODE_200_OK);
+                char *response_text = response_pack(&res);
 
                 write(fd_client, response_text, strlen(response_text));
                 free (response_text);
-                gs_response_free(&res);
+            response_dispose(&res);
 
 
                 close (fd_client);

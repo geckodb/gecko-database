@@ -25,12 +25,12 @@ void write_data(tuple_field_t *field, uint64_t a_field, uint32_t b_field, uint16
 
 int main(void) {
 
-    schema_t *schema = gs_schema_create("My Grid Table");
-    gs_attr_create_uint64("A", schema); // attribute id 0
-    gs_attr_create_uint32("B", schema); // attribute id 1
-    gs_attr_create_uint16("C", schema); // attribute id 2
-    gs_attr_create_uint16("D", schema); // attribute id 3
-    grid_table_t *table = gs_grid_table_create(schema, 16);
+    schema_t *schema = schema_new("My Grid Table");
+    attr_create_uint64("A", schema); // attribute id 0
+    attr_create_uint32("B", schema); // attribute id 1
+    attr_create_uint16("C", schema); // attribute id 2
+    attr_create_uint16("D", schema); // attribute id 3
+    table_t *table = table_new(schema, 16);
     attr_id_t cover[] = { 0, 1, 2, 3};
 
     tuple_t tuple;
@@ -58,24 +58,24 @@ int main(void) {
     tuple_id_interval_t g01_tid_cover[] = {
             { .begin = 0, .end = 3 }
     };
-    grid_id_t g01 = gs_grid_table_add_grid(table, &cover[0], 4, &g01_tid_cover[0], 1, FIT_HOST_NSM_VM);
+    grid_id_t g01 = table_add(table, &cover[0], 4, &g01_tid_cover[0], 1, FIT_HOST_NSM_VM);
 
-    gs_grid_table_insert(&resultset, table, 3);
-    while (gs_tuple_cursor_next(&tuple, &resultset)) {
-        gs_tuple_field_open(&field, &tuple);
-        gs_tuple_field_write(&field, &a);
-        gs_tuple_field_write(&field, &b);
-        gs_tuple_field_write(&field, &c);
-        gs_tuple_field_write(&field, &d);
+    grid_insert(&resultset, table, 3);
+    while (tuple_cursor_next(&tuple, &resultset)) {
+        tuple_field_open(&field, &tuple);
+        tuple_field_write(&field, &a);
+        tuple_field_write(&field, &b);
+        tuple_field_write(&field, &c);
+        tuple_field_write(&field, &d);
         a += 4;
         b += 4;
         c += 4;
         d += 4;
     }
 
-    gs_tuple_cursor_free(&resultset);
+    tuple_cursor_dispose(&resultset);
     printf("grid 0:\n");
-    gs_grid_print(stdout, table, g01, 0, UINT64_MAX);
+    grid_print(stdout, table, g01, 0, UINT64_MAX);
 
 
 
@@ -91,24 +91,24 @@ int main(void) {
     tuple_id_interval_t g02_tid_cover[] = {
             { .begin = 3, .end = 6 }
     };
-    grid_id_t g02 = gs_grid_table_add_grid(table, &cover[0], 4, &g02_tid_cover[0], 1, FIT_HOST_DSM_VM);
+    grid_id_t g02 = table_add(table, &cover[0], 4, &g02_tid_cover[0], 1, FIT_HOST_DSM_VM);
 
-    gs_grid_table_insert(&resultset, table, 3);
-    while (gs_tuple_cursor_next(&tuple, &resultset)) {
-        gs_tuple_field_open(&field, &tuple);
-        gs_tuple_field_write(&field, &a);
-        gs_tuple_field_write(&field, &b);
-        gs_tuple_field_write(&field, &c);
-        gs_tuple_field_write(&field, &d);
+    grid_insert(&resultset, table, 3);
+    while (tuple_cursor_next(&tuple, &resultset)) {
+        tuple_field_open(&field, &tuple);
+        tuple_field_write(&field, &a);
+        tuple_field_write(&field, &b);
+        tuple_field_write(&field, &c);
+        tuple_field_write(&field, &d);
         a += 4;
         b += 4;
         c += 4;
         d += 4;
     }
 
-    gs_tuple_cursor_free(&resultset);
+    tuple_cursor_dispose(&resultset);
     printf("grid 1:\n");
-    gs_grid_print(stdout, table, g02, 0, UINT64_MAX);
+    grid_print(stdout, table, g02, 0, UINT64_MAX);
 
 
 
@@ -126,24 +126,24 @@ int main(void) {
     tuple_id_interval_t g03_tid_cover[] = {
             { .begin = 6, .end = 9 }
     };
-    grid_id_t g03 = gs_grid_table_add_grid(table, &cover[0], 4, &g03_tid_cover[0], 1, FIT_HOST_NSM_VM);
+    grid_id_t g03 = table_add(table, &cover[0], 4, &g03_tid_cover[0], 1, FIT_HOST_NSM_VM);
 
-    gs_grid_table_insert(&resultset, table, 3);
-    while (gs_tuple_cursor_next(&tuple, &resultset)) {
-        gs_tuple_field_open(&field, &tuple);
-        gs_tuple_field_write(&field, &a);
-        gs_tuple_field_write(&field, &b);
-        gs_tuple_field_write(&field, &c);
-        gs_tuple_field_write(&field, &d);
+    grid_insert(&resultset, table, 3);
+    while (tuple_cursor_next(&tuple, &resultset)) {
+        tuple_field_open(&field, &tuple);
+        tuple_field_write(&field, &a);
+        tuple_field_write(&field, &b);
+        tuple_field_write(&field, &c);
+        tuple_field_write(&field, &d);
         a += 4;
         b += 4;
         c += 4;
         d += 4;
     }
 
-    gs_tuple_cursor_free(&resultset);
+    tuple_cursor_dispose(&resultset);
     printf("grid 2:\n");
-    gs_grid_print(stdout, table, g03, 0, UINT64_MAX);
+    grid_print(stdout, table, g03, 0, UINT64_MAX);
 
     //  Add full grid with same altered schema orientation, column-store
     //           +===============================+
@@ -158,24 +158,24 @@ int main(void) {
     tuple_id_interval_t g04_tid_cover[] = {
             { .begin = 9, .end = 12 }
     };
-    grid_id_t g04 = gs_grid_table_add_grid(table, &cover[0], 4, &g04_tid_cover[0], 1, FIT_HOST_DSM_VM);
+    grid_id_t g04 = table_add(table, &cover[0], 4, &g04_tid_cover[0], 1, FIT_HOST_DSM_VM);
 
-    gs_grid_table_insert(&resultset, table, 3);
-    while (gs_tuple_cursor_next(&tuple, &resultset)) {
-        gs_tuple_field_open(&field, &tuple);
-        gs_tuple_field_write(&field, &a);
-        gs_tuple_field_write(&field, &b);
-        gs_tuple_field_write(&field, &c);
-        gs_tuple_field_write(&field, &d);
+    grid_insert(&resultset, table, 3);
+    while (tuple_cursor_next(&tuple, &resultset)) {
+        tuple_field_open(&field, &tuple);
+        tuple_field_write(&field, &a);
+        tuple_field_write(&field, &b);
+        tuple_field_write(&field, &c);
+        tuple_field_write(&field, &d);
         a += 4;
         b += 4;
         c += 4;
         d += 4;
     }
 
-    gs_tuple_cursor_free(&resultset);
+    tuple_cursor_dispose(&resultset);
     printf("grid 3:\n");
-    gs_grid_print(stdout, table, g04, 0, UINT64_MAX);
+    grid_print(stdout, table, g04, 0, UINT64_MAX);
 
     //  Add partial grids with same original schema orientation, column-store + row-store
     //           +===============|===============+
@@ -192,29 +192,28 @@ int main(void) {
             { .begin = 12, .end = 15 }
     };
 
-    grid_id_t g07 = gs_grid_table_add_grid(table, &cover[0],     2, &g0506_tid_cover[0], 1, FIT_HOST_DSM_VM);
-    grid_id_t g08 = gs_grid_table_add_grid(table, &cover[0] + 2, 2, &g0506_tid_cover[0], 1, FIT_HOST_NSM_VM);
+    grid_id_t g07 = table_add(table, &cover[0], 2, &g0506_tid_cover[0], 1, FIT_HOST_DSM_VM);
+    grid_id_t g08 = table_add(table, &cover[0] + 2, 2, &g0506_tid_cover[0], 1, FIT_HOST_NSM_VM);
 
 
-
-    gs_grid_table_insert(&resultset, table, 3);
-    while (gs_tuple_cursor_next(&tuple, &resultset)) {
-        gs_tuple_field_open(&field, &tuple);
-        gs_tuple_field_write(&field, &a);
-        gs_tuple_field_write(&field, &b);
-        gs_tuple_field_write(&field, &c);
-        gs_tuple_field_write(&field, &d);
+    grid_insert(&resultset, table, 3);
+    while (tuple_cursor_next(&tuple, &resultset)) {
+        tuple_field_open(&field, &tuple);
+        tuple_field_write(&field, &a);
+        tuple_field_write(&field, &b);
+        tuple_field_write(&field, &c);
+        tuple_field_write(&field, &d);
         a += 4;
         b += 4;
         c += 4;
         d += 4;
     }
 
-    gs_tuple_cursor_free(&resultset);
+    tuple_cursor_dispose(&resultset);
     printf("grid 4:\n");
-    gs_grid_print(stdout, table, g07, 0, UINT64_MAX);
+    grid_print(stdout, table, g07, 0, UINT64_MAX);
     printf("grid 5:\n");
-    gs_grid_print(stdout, table, g08, 0, UINT64_MAX);
+    grid_print(stdout, table, g08, 0, UINT64_MAX);
 
     //  Add partial grids with one having same original schema orientation other altered, column-store + row-store
     //           +===============|===============+
@@ -231,27 +230,27 @@ int main(void) {
             { .begin = 15, .end = 18 }
     };
 
-    grid_id_t g09 = gs_grid_table_add_grid(table, &cover[0],     2, &g0910_tid_cover[0], 1, FIT_HOST_DSM_VM);
-    grid_id_t g10 = gs_grid_table_add_grid(table, &cover[0] + 2, 2, &g0910_tid_cover[0], 1, FIT_HOST_NSM_VM);
+    grid_id_t g09 = table_add(table, &cover[0], 2, &g0910_tid_cover[0], 1, FIT_HOST_DSM_VM);
+    grid_id_t g10 = table_add(table, &cover[0] + 2, 2, &g0910_tid_cover[0], 1, FIT_HOST_NSM_VM);
 
-    gs_grid_table_insert(&resultset, table, 3);
-    while (gs_tuple_cursor_next(&tuple, &resultset)) {
-        gs_tuple_field_open(&field, &tuple);
-        gs_tuple_field_write(&field, &a);
-        gs_tuple_field_write(&field, &b);
-        gs_tuple_field_write(&field, &c);
-        gs_tuple_field_write(&field, &d);
+    grid_insert(&resultset, table, 3);
+    while (tuple_cursor_next(&tuple, &resultset)) {
+        tuple_field_open(&field, &tuple);
+        tuple_field_write(&field, &a);
+        tuple_field_write(&field, &b);
+        tuple_field_write(&field, &c);
+        tuple_field_write(&field, &d);
         a += 4;
         b += 4;
         c += 4;
         d += 4;
     }
 
-    gs_tuple_cursor_free(&resultset);
+    tuple_cursor_dispose(&resultset);
     printf("grid 6:\n");
-    gs_grid_print(stdout, table, g09, 0, UINT64_MAX);
+    grid_print(stdout, table, g09, 0, UINT64_MAX);
     printf("grid 7:\n");
-    gs_grid_print(stdout, table, g10, 0, UINT64_MAX);
+    grid_print(stdout, table, g10, 0, UINT64_MAX);
 
 
   //  Add 2 partial interleaved grids with original schema orientation, column-store + row-store
@@ -269,27 +268,27 @@ int main(void) {
             { .begin = 18, .end = 21 }
     };
 
-    grid_id_t g11 = gs_grid_table_add_grid(table, &cover[0],     2, &g1112_tid_cover[0], 1, FIT_HOST_DSM_VM);
-    grid_id_t g12 = gs_grid_table_add_grid(table, &cover[0] + 2, 2, &g1112_tid_cover[0], 1, FIT_HOST_NSM_VM);
+    grid_id_t g11 = table_add(table, &cover[0], 2, &g1112_tid_cover[0], 1, FIT_HOST_DSM_VM);
+    grid_id_t g12 = table_add(table, &cover[0] + 2, 2, &g1112_tid_cover[0], 1, FIT_HOST_NSM_VM);
 
-    gs_grid_table_insert(&resultset, table, 3);
-    while (gs_tuple_cursor_next(&tuple, &resultset)) {
-        gs_tuple_field_open(&field, &tuple);
-        gs_tuple_field_write(&field, &a);
-        gs_tuple_field_write(&field, &b);
-        gs_tuple_field_write(&field, &c);
-        gs_tuple_field_write(&field, &d);
+    grid_insert(&resultset, table, 3);
+    while (tuple_cursor_next(&tuple, &resultset)) {
+        tuple_field_open(&field, &tuple);
+        tuple_field_write(&field, &a);
+        tuple_field_write(&field, &b);
+        tuple_field_write(&field, &c);
+        tuple_field_write(&field, &d);
         a += 4;
         b += 4;
         c += 4;
         d += 4;
     }
 
-    gs_tuple_cursor_free(&resultset);
+    tuple_cursor_dispose(&resultset);
     printf("grid 8:\n");
-    gs_grid_print(stdout, table, g11, 0, UINT64_MAX);
+    grid_print(stdout, table, g11, 0, UINT64_MAX);
     printf("grid 9:\n");
-    gs_grid_print(stdout, table, g12, 0, UINT64_MAX);
+    grid_print(stdout, table, g12, 0, UINT64_MAX);
 
 
   //  Add 2 partial interleaved grids with one having alternate schema orientation, column-store + row-store
@@ -307,27 +306,27 @@ int main(void) {
             { .begin = 21, .end = 24 }
     };
 
-    grid_id_t g13 = gs_grid_table_add_grid(table, &cover[0],     2, &g1314_tid_cover[0], 1, FIT_HOST_DSM_VM);
-    grid_id_t g14 = gs_grid_table_add_grid(table, &cover[0] + 2, 2, &g1314_tid_cover[0], 1, FIT_HOST_NSM_VM);
+    grid_id_t g13 = table_add(table, &cover[0], 2, &g1314_tid_cover[0], 1, FIT_HOST_DSM_VM);
+    grid_id_t g14 = table_add(table, &cover[0] + 2, 2, &g1314_tid_cover[0], 1, FIT_HOST_NSM_VM);
 
-    gs_grid_table_insert(&resultset, table, 3);
-    while (gs_tuple_cursor_next(&tuple, &resultset)) {
-        gs_tuple_field_open(&field, &tuple);
-        gs_tuple_field_write(&field, &a);
-        gs_tuple_field_write(&field, &b);
-        gs_tuple_field_write(&field, &c);
-        gs_tuple_field_write(&field, &d);
+    grid_insert(&resultset, table, 3);
+    while (tuple_cursor_next(&tuple, &resultset)) {
+        tuple_field_open(&field, &tuple);
+        tuple_field_write(&field, &a);
+        tuple_field_write(&field, &b);
+        tuple_field_write(&field, &c);
+        tuple_field_write(&field, &d);
         a += 4;
         b += 4;
         c += 4;
         d += 4;
     }
 
-    gs_tuple_cursor_free(&resultset);
+    tuple_cursor_dispose(&resultset);
     printf("grid 10:\n");
-    gs_grid_print(stdout, table, g13, 0, UINT64_MAX);
+    grid_print(stdout, table, g13, 0, UINT64_MAX);
     printf("grid 11:\n");
-    gs_grid_print(stdout, table, g14, 0, UINT64_MAX);
+    grid_print(stdout, table, g14, 0, UINT64_MAX);
 
 
   //  Add complex interleaved grid layout with having alternate schema orientation, column-store + row-store
@@ -354,69 +353,69 @@ int main(void) {
             { .begin = 24, .end = 30 }
     };
 
-    grid_id_t g15 = gs_grid_table_add_grid(table, &cover[0],     1, &tid_cover[0], 1, FIT_HOST_DSM_VM);
+    grid_id_t g15 = table_add(table, &cover[0], 1, &tid_cover[0], 1, FIT_HOST_DSM_VM);
 
     tuple_id_interval_t tid_cover2[] = {
             { .begin = 24, .end = 25 }, { .begin = 28, .end = 30 }
     };
 
-    grid_id_t g16 = gs_grid_table_add_grid(table, &cover[0] + 1, 3, &tid_cover2[0], 2, FIT_HOST_NSM_VM);
+    grid_id_t g16 = table_add(table, &cover[0] + 1, 3, &tid_cover2[0], 2, FIT_HOST_NSM_VM);
 
     cover[0] = 0; cover[1] = 2;
     tuple_id_interval_t tid_cover3[] = { { .begin = 25, .end = 28 }};
-    grid_id_t g17 = gs_grid_table_add_grid(table, &cover[0],     2, &tid_cover3[0], 1, FIT_HOST_NSM_VM);
+    grid_id_t g17 = table_add(table, &cover[0], 2, &tid_cover3[0], 1, FIT_HOST_NSM_VM);
 
     cover[0] = 1;
     tuple_id_interval_t tid_cover4[] = { { .begin = 25, .end = 28 }};
-    grid_id_t g18 = gs_grid_table_add_grid(table, &cover[0],     1, &tid_cover4[0], 1, FIT_HOST_DSM_VM);
+    grid_id_t g18 = table_add(table, &cover[0], 1, &tid_cover4[0], 1, FIT_HOST_DSM_VM);
 
-    gs_grid_table_insert(&resultset, table, 6);
-    while (gs_tuple_cursor_next(&tuple, &resultset)) {
-        gs_tuple_field_open(&field, &tuple);
-        gs_tuple_field_write(&field, &a);
-        gs_tuple_field_write(&field, &b);
-        gs_tuple_field_write(&field, &c);
-        gs_tuple_field_write(&field, &d);
+    grid_insert(&resultset, table, 6);
+    while (tuple_cursor_next(&tuple, &resultset)) {
+        tuple_field_open(&field, &tuple);
+        tuple_field_write(&field, &a);
+        tuple_field_write(&field, &b);
+        tuple_field_write(&field, &c);
+        tuple_field_write(&field, &d);
         a += 4;
         b += 4;
         c += 4;
         d += 4;
     }
 
-    gs_tuple_cursor_free(&resultset);
+    tuple_cursor_dispose(&resultset);
     printf("grid 12:\n");
-    gs_grid_print(stdout, table, g15, 0, UINT64_MAX);
+    grid_print(stdout, table, g15, 0, UINT64_MAX);
     printf("grid 13:\n");
-    gs_grid_print(stdout, table, g16, 0, UINT64_MAX);
+    grid_print(stdout, table, g16, 0, UINT64_MAX);
     printf("grid 14:\n");
-    gs_grid_print(stdout, table, g17, 0, UINT64_MAX);
+    grid_print(stdout, table, g17, 0, UINT64_MAX);
     printf("grid 15:\n");
-    gs_grid_print(stdout, table, g18, 0, UINT64_MAX);
+    grid_print(stdout, table, g18, 0, UINT64_MAX);
 
     printf("grid table schema:\n");
-    gs_schema_print(stdout, table->schema);
+    schema_print(stdout, table->schema);
     printf("grid table grid list:\n");
-    gs_grid_table_grid_list_print(stdout, table, 0, UINT64_MAX);
+    table_grid_list_print(stdout, table, 0, UINT64_MAX);
     printf("grid table structure:\n");
-    gs_grid_table_structure_print(stdout, table, 0, UINT64_MAX);
+    table_structure_print(stdout, table, 0, UINT64_MAX);
     printf("grid table:\n");
-    gs_grid_table_print(stdout, table, 0, UINT64_MAX);
+    table_print(stdout, table, 0, UINT64_MAX);
     printf("grid table hindex:\n");
-    gs_hindex_print(stdout, table->tuple_cover);
+    hindex_print(stdout, table->tuple_cover);
     printf("grid table vindex:\n");
-    gs_vindex_print(stdout, table->schema_cover);
+    vindex_print(stdout, table->schema_cover);
 
-    gs_grid_table_free(table);
+    table_delete(table);
     free (table);
-    gs_schema_free(schema);
+    gs_schema_delete(schema);
 
     return 0;
 }
 
 void write_data(tuple_field_t *field, uint64_t a_field, uint32_t b_field, uint16_t c_field, uint16_t d_field)
 {
-    gs_tuple_field_write(field, &a_field);
-    gs_tuple_field_write(field, &b_field);
-    gs_tuple_field_write(field, &c_field);
-    gs_tuple_field_write(field, &d_field);
+    tuple_field_write(field, &a_field);
+    tuple_field_write(field, &b_field);
+    tuple_field_write(field, &c_field);
+    tuple_field_write(field, &d_field);
 }

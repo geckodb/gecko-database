@@ -823,7 +823,7 @@ bool buf_free(
 {
     EXPECT_NONNULL(buf, false);
     EXPECT_NONNULL(buf->page_anticache.hot_store, false);
-    bool free_page_reg = dict_free(buf->page_anticache.hot_store);
+    bool free_page_reg = dict_delete(buf->page_anticache.hot_store);
     if (free_page_reg) {
         free (buf);
     }
@@ -867,9 +867,9 @@ static inline void
 anticache_freelist_init(
     anti_buf_t *   buf)
 {
-    buf->page_anticache.free_page_ids_stack = vec_create_ex(sizeof(page_id_t),
-                                                            ANTICACHE_PAGEID_FREELIST_INITCAP, auto_resize,
-                                                            ANTICACHE_PAGEID_FREELIST_GROW_FACTOR);
+    buf->page_anticache.free_page_ids_stack = vec_new_ex(sizeof(page_id_t),
+                                                         ANTICACHE_PAGEID_FREELIST_INITCAP, auto_resize,
+                                                         ANTICACHE_PAGEID_FREELIST_GROW_FACTOR);
     REQUIRE((buf->page_anticache.free_page_ids_stack), BADFREELISTINIT);
 }
 
@@ -990,7 +990,7 @@ hotstore_init(
     panic_if((buf == NULL), BADARGNULL, to_string(buf));
     panic_if((buf == NULL), BADARGZERO, to_string(num_pages));
     panic_if(!dict_empty(buf->page_anticache.hot_store), BADPOOLINIT, buf);
-    buf->page_anticache.hot_store_page_ids = list_create(sizeof(page_id_t));
+    buf->page_anticache.hot_store_page_ids = list_new(sizeof(page_id_t));
     REQUIRE((buf->page_anticache.hot_store_page_ids), BADCOLDSTOREINIT);
 }
 
@@ -1069,9 +1069,9 @@ static inline void
 coldstore_init(
     anti_buf_t *   buf)
 {
-    buf->page_anticache.cold_store_page_ids = vec_create_ex(sizeof(page_id_t),
-                                                            ANTICACHE_COLDSTORELIST_INITCAP, auto_resize,
-                                                            ANTICACHE_COLDSTORELIST_GROW_FACTOR);
+    buf->page_anticache.cold_store_page_ids = vec_new_ex(sizeof(page_id_t),
+                                                         ANTICACHE_COLDSTORELIST_INITCAP, auto_resize,
+                                                         ANTICACHE_COLDSTORELIST_GROW_FACTOR);
     REQUIRE((buf->page_anticache.cold_store_page_ids), BADCOLDSTOREINIT);
 
 }
@@ -1969,7 +1969,7 @@ freespace_merge(
     assert (page);
     freespace_reg_t * reg = freespace(page);
     size_t            len = freespace_len(page);
-    vec_t *        vec = vec_create(sizeof(range_t), len);
+    vec_t *        vec = vec_new(sizeof(range_t), len);
 
     size_t idx = len;
     while (idx--) {
@@ -1980,7 +1980,7 @@ freespace_merge(
     void *raw_data = vec_data(vec);
     qsort(raw_data, len, sizeof(range_t), freespace_comp_by_start);
 
-    vec_t *stack = vec_create(sizeof(range_t), len);
+    vec_t *stack = vec_new(sizeof(range_t), len);
     vec_pushback(stack, 1, raw_data);
 
     for (size_t range_idx = 0; range_idx < len; range_idx++) {
@@ -2229,7 +2229,7 @@ static inline void
 buf_init(
     anti_buf_t *   buf)
 {
-    buf->page_anticache.hot_store = hash_table_create(
+    buf->page_anticache.hot_store = hash_table_new(
             &(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen},
             sizeof(page_id_t), sizeof(void *), HOTSTORE_INITCAP,
             HOTSTORE_GROW_FACTOR, HOTSTORE_MAX_FILL_FAC);

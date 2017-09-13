@@ -44,7 +44,7 @@ static header_t *_get_node_ptr(const void *);
 // I N T E R F A C E  I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-list_t *list_create(size_t element_size)
+list_t *list_new(size_t element_size)
 {
     list_t *list = NULL;
     if (_check_create_args(element_size) && ((list = REQUIRE_MALLOC(sizeof(list_t))))) {
@@ -55,7 +55,7 @@ list_t *list_create(size_t element_size)
     return list;
 }
 
-void list_free(list_t *list)
+void list_delete(list_t *list)
 {
     list_clear(list);
     free (list);
@@ -137,7 +137,7 @@ void list_remove(const void *data)
     assert ((list->num_elements != 0) || ((list->tail == list->root) && (list->root == NULL)));
 }
 
-size_t list_num_elements(const list_t *list)
+size_t list_length(const list_t *list)
 {
     REQUIRE_NONNULL(list)
     return list->num_elements;

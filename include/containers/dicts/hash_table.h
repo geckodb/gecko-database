@@ -76,23 +76,19 @@ typedef struct {
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-dict_t *hash_table_create(const hash_function_t *hash_function, size_t key_size, size_t elem_size,
-                          size_t num_slots, float grow_factor, float max_load_factor);
-
-dict_t *hash_table_create_jenkins(size_t key_size, size_t elem_size, size_t num_slots, float grow_factor,
-                                  float max_load_factor);
-
-dict_t *hash_table_create_ex(const hash_function_t *hash_function, size_t key_size, size_t elem_size,
+dict_t *hash_table_new(const hash_function_t *hash_function, size_t key_size, size_t elem_size,
+                       size_t num_slots, float grow_factor, float max_load_factor);
+dict_t *hash_table_new_jenkins(size_t key_size, size_t elem_size, size_t num_slots, float grow_factor,
+                               float max_load_factor);
+dict_t *hash_table_new_ex(const hash_function_t *hash_function, size_t key_size, size_t elem_size,
                           size_t num_slots, size_t approx_num_keys, float grow_factor, float max_load_factor,
                           bool (*equals)(const void *key_lhs, const void *key_rhs),
                           void (*cleanup)(void *key, void *value), bool key_is_str);
-
+bool hash_table_delete(dict_t *dict);
 void hash_table_lock(dict_t *dict);
 void hash_table_unlock(dict_t *dict);
-bool hash_table_free(dict_t *dict);
 void hash_reset_counters(dict_t *dict);
 void hash_table_info(dict_t *dict, linear_hash_table_info_t *info);
-
 bool str_equals(const void *lhs, const void *rhs);
 void clean_up(void *key, void *value);
 

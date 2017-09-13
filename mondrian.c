@@ -51,9 +51,9 @@ int mondrian_open(mondrian_t **instance)
     assert (instance);
     *instance = REQUIRE_MALLOC(sizeof(mondrian_t));
     (*instance)->start = time(NULL);
-    (*instance)->vm_programs = list_create(sizeof(vm_exec_info));
+    (*instance)->vm_programs = list_new(sizeof(vm_exec_info));
     progpool_create(&((*instance)->progpool));
-    gs_db_config_load(&(*instance)->config);
+    db_config_load(&(*instance)->config);
     return MONDRIAN_OK;
 }
 
@@ -144,7 +144,7 @@ static inline int mondrian_start_vm(mvm_handle_t *out, mondrian_t *instance, con
 
         LOG_DEBUG(instance, "intent to execute mvm job '%s' (%p) received", program_name(program), program);
 
-        retval = future_create(args, promise_mondrian_vm_exec, run_policy);
+        retval = future_new(args, promise_mondrian_vm_exec, run_policy);
         vm_exec_info info = {
                 .future = retval,
                 .start  = time(NULL)

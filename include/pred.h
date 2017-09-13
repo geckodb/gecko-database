@@ -64,23 +64,14 @@ typedef struct pred_tree_t {
 // I N T E R F A C E   D E C L A R A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-pred_tree_t *gs_pred_tree_create(expr_t *expr);
-
-pred_tree_t *gs_pred_tree_and(pred_tree_t *subj, pred_tree_t *other);
-
-pred_tree_t *gs_pred_tree_or(pred_tree_t *subj, pred_tree_t *other);
-
-bool gs_pred_tree_eval(pred_tree_t *tree);
-
-expr_t *gs_pred_expr_create_var(enum expr_type type, struct tuplet_field_t *field_lhs, struct tuplet_field_t *field_rhs);
-
-expr_t *gs_pred_expr_create_const(enum expr_type type, struct tuplet_field_t *field, const void *value);
-
-void gs_pred_expr_bind(expr_t *expr, const void *value);
-
-void gs_pred_expr_bind2(expr_t *expr, const void *value_lhs, const void *value_rhs);
-
-bool gs_pred_eval(expr_t *expr);
-
-expr_t *gs_pred_expr_create_not(expr_t *other);
+pred_tree_t *pred_tree_create(expr_t *expr);
+pred_tree_t *pred_tree_and(pred_tree_t *subj, pred_tree_t *other);
+pred_tree_t *pred_tree_or(pred_tree_t *subj, pred_tree_t *other);
+bool pred_tree_eval(pred_tree_t *tree);
+expr_t *pred_expr_create_var(enum expr_type type, struct tuplet_field_t *field_lhs, struct tuplet_field_t *field_rhs);
+expr_t *pred_expr_create_const(enum expr_type type, struct tuplet_field_t *field, const void *value);
+void pred_expr_bind(expr_t *expr, const void *value);
+void pred_expr_bind2(expr_t *expr, const void *value_lhs, const void *value_rhs);
+bool pred_eval(expr_t *expr);
+expr_t *pred_expr_create_not(expr_t *other);
 

@@ -67,8 +67,8 @@ static struct frag_type_pool_t {
     enum frag_impl_type_t binding;
     frag_t *(*_create)(schema_t *schema, size_t tuplet_capacity);
 } frag_type_pool[] = {
-    { FIT_HOST_NSM_VM, gs_frag_host_vm_nsm_create },
-    { FIT_HOST_DSM_VM, gs_frag_host_vm_dsm_create },
+    { FIT_HOST_NSM_VM, frag_host_vm_nsm_new },
+    { FIT_HOST_DSM_VM, frag_host_vm_dsm_new },
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -77,40 +77,27 @@ static struct frag_type_pool_t {
 
 __BEGIN_DECLS
 
-frag_t *gs_fragment_alloc(schema_t *schema, size_t tuplet_capacity, enum frag_impl_type_t type);
+frag_t *frag_new(schema_t *schema, size_t tuplet_capacity, enum frag_impl_type_t type);
+void frag_delete(frag_t *frag);
 
-void gs_frag_insert(struct tuplet_t *out, frag_t *frag, size_t ntuplets);
-
-void gs_frag_print(FILE *file, frag_t *frag, size_t row_offset, size_t limit);
-
-void gs_frag_print_ex(FILE *file, enum frag_printer_type_tag printer_type, frag_t *frag, size_t row_offset, size_t limit);
-
-void gs_frag_free(frag_t *frag);
-
-const char *gs_frag_str(enum frag_impl_type_t type);
-
-size_t gs_fragment_num_of_attributes(const frag_t *frag);
-
-size_t gs_fragment_num_of_tuplets(const frag_t *frag);
-
-schema_t *gs_frag_get_schema(const frag_t *frag);
-
-enum field_type gs_fragment_get_field_type(const frag_t *frag, attr_id_t id);
+void frag_insert(struct tuplet_t *out, frag_t *frag, size_t ntuplets);
+void frag_print(FILE *file, frag_t *frag, size_t row_offset, size_t limit);
+void frag_print_ex(FILE *file, enum frag_printer_type_tag printer_type, frag_t *frag, size_t row_offset, size_t limit);
+const char *frag_str(enum frag_impl_type_t type);
+size_t frag_num_of_attributes(const frag_t *frag);
+size_t frag_num_of_tuplets(const frag_t *frag);
+schema_t *frag_schema(const frag_t *frag);
+enum field_type frag_field_type(const frag_t *frag, attr_id_t id);
 
 void gs_checksum_nsm(schema_t *tab, const void *tuplets, size_t ntuplets);
-
 void gs_checksum_dms(schema_t *tab, const void *tuplets, size_t ntuplets);
-
 void gs_checksum_begin(checksum_context_t *context);
-
 void gs_checksum_update(checksum_context_t *context, const void *begin, const void *end);
-
 void gs_checksum_end(unsigned char *checksum_out, checksum_context_t *context);
 
 // F I E L D   T Y P E   O P E R A T I O N S ---------------------------------------------------------------------------
 
-size_t gs_field_type_sizeof(enum field_type type);
-
-const char *gs_type_str(enum field_type t);
+size_t field_type_sizeof(enum field_type type);
+const char *get_type_str(enum field_type t);
 
 __END_DECLS

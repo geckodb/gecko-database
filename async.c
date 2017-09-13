@@ -38,7 +38,7 @@ static void _future_free(future_t future);
 // I N T E R F A C E  I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-future_t future_create(const void *capture, promise_t func, future_eval_policy policy)
+future_t future_new(const void *capture, promise_t func, future_eval_policy policy)
 {
     REQUIRE_NONNULL(capture)
     REQUIRE_NONNULL(func);

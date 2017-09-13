@@ -38,18 +38,11 @@ typedef struct grid_cursor_t {
 // F O R W A R D   D E C L A R A T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-grid_cursor_t *grid_cursor_create(size_t cursor);
-
-void grid_cursor_close(grid_cursor_t *cursor);
-
+grid_cursor_t *grid_cursor_new(size_t cursor);
+void grid_cursor_delete(grid_cursor_t *cursor);
 void grid_cursor_pushback(grid_cursor_t *cursor, const void *data);
-
 void grid_cursor_append(grid_cursor_t *dst, grid_cursor_t *src);
-
 void grid_cursor_dedup(grid_cursor_t *cursor);
-
 struct grid_t *grid_cursor_next(grid_cursor_t *cursor);
-
 size_t grid_cursor_numelem(const grid_cursor_t *cursor);
-
 bool gs_grid_cursor_is_empty(const grid_cursor_t *cursor);

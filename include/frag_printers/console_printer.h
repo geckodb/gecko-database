@@ -23,4 +23,4 @@
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-struct frag_printer_t *console_printer_create();
+struct frag_printer_t *console_printer_new();

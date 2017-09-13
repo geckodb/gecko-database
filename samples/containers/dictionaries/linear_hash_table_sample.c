@@ -23,8 +23,8 @@ void run_with_hash_function(hash_function_t *hash_function, const char *hash_fun
     const size_t NUM_ELEMENTS = 4000000 * 2;
     const size_t NUM_SLOTS = NUM_ELEMENTS * 2;
 
-    dict_t *dict = hash_table_create(hash_function,
-                                     sizeof(size_t), sizeof(test_data_t), NUM_SLOTS, GROW_FACTOR, 0.7f);
+    dict_t *dict = hash_table_new(hash_function,
+                                  sizeof(size_t), sizeof(test_data_t), NUM_SLOTS, GROW_FACTOR, 0.7f);
 
     clock_t start, stop;
 
@@ -157,7 +157,7 @@ void run_with_hash_function(hash_function_t *hash_function, const char *hash_fun
 
            gets_call_elapsed_keyfound, gets_call_elapsed_nokey);
 
-    hash_table_free(dict);
+    hash_table_delete(dict);
 }
 
 int main(void)

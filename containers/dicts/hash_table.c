@@ -156,21 +156,21 @@ static inline bool key_comp(const char *a, const char *b);
 // I N T E R F A C E  I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-dict_t *hash_table_create(const hash_function_t *hash_function, size_t key_size, size_t elem_size,
-                          size_t num_slots, float grow_factor, float max_load_factor)
+dict_t *hash_table_new(const hash_function_t *hash_function, size_t key_size, size_t elem_size,
+                       size_t num_slots, float grow_factor, float max_load_factor)
 {
-    return hash_table_create_ex(hash_function, key_size, elem_size, num_slots, num_slots,
-                                grow_factor, max_load_factor, NULL, NULL, false);
+    return hash_table_new_ex(hash_function, key_size, elem_size, num_slots, num_slots,
+                             grow_factor, max_load_factor, NULL, NULL, false);
 }
 
-dict_t *hash_table_create_jenkins(size_t key_size, size_t elem_size, size_t num_slots, float grow_factor,
-                                  float max_load_factor)
+dict_t *hash_table_new_jenkins(size_t key_size, size_t elem_size, size_t num_slots, float grow_factor,
+                               float max_load_factor)
 {
-    return hash_table_create(&(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen}, key_size, elem_size,
-                             num_slots, grow_factor, max_load_factor);
+    return hash_table_new(&(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen}, key_size, elem_size,
+                          num_slots, grow_factor, max_load_factor);
 }
 
-dict_t *hash_table_create_ex(const hash_function_t *hash_function, size_t key_size, size_t elem_size,
+dict_t *hash_table_new_ex(const hash_function_t *hash_function, size_t key_size, size_t elem_size,
                           size_t num_slots, size_t approx_num_keys, float grow_factor, float max_load_factor,
                           bool (*equals)(const void *key_lhs, const void *key_rhs),
                           void (*cleanup)(void *key, void *value), bool key_is_str)
@@ -184,7 +184,7 @@ dict_t *hash_table_create_ex(const hash_function_t *hash_function, size_t key_si
         .tag = dict_type_linear_hash_table,
         .key_size = key_size,
         .elem_size = elem_size,
-        .free_dict = hash_table_free,
+        .free_dict = hash_table_delete,
         .clear = this_clear,
         .empty = this_empty,
         .contains_key = this_contains_key,
@@ -215,7 +215,7 @@ dict_t *hash_table_create_ex(const hash_function_t *hash_function, size_t key_si
         .equals = equals,
         .cleanup = cleanup,
         .key_is_str = key_is_str,
-        .keyset = (struct vec_t*) vec_create(key_size, approx_num_keys)
+        .keyset = (struct vec_t*) vec_new(key_size, approx_num_keys)
     };
 
     if (key_is_str) {
@@ -246,7 +246,7 @@ void hash_table_unlock(dict_t *dict)
     pthread_mutex_unlock(&(((hash_table_extra_t*) dict->extra)->mutex));
 }
 
-bool hash_table_free(dict_t *dict)
+bool hash_table_delete(dict_t *dict)
 {
     if (dict != NULL) {
         REQUIRE_INSTANCEOF_THIS(dict);
@@ -391,7 +391,7 @@ struct vec_t *this_gets(const struct dict_t *self, size_t num_keys, const void *
     REQUIRE_NONNULL(keys);
     require_not_zero(num_keys);
 
-    vec_t *result = vec_create(sizeof(void *), num_keys);
+    vec_t *result = vec_new(sizeof(void *), num_keys);
     hash_table_extra_t *extra = (hash_table_extra_t *) self->extra;
 
     while (num_keys--) {
@@ -612,8 +612,8 @@ static inline void rebuild(const dict_t *self, hash_table_extra_t *extra)
     assert (self && extra && extra->grow_factor > 1);
 
     size_t new_num_slots = ceil(extra->num_slots * extra->grow_factor);
-    dict_t *tmp = hash_table_create(&extra->hash_function, self->key_size, self->elem_size,
-                                    new_num_slots, extra->grow_factor, extra->max_load_factor);
+    dict_t *tmp = hash_table_new(&extra->hash_function, self->key_size, self->elem_size,
+                                 new_num_slots, extra->grow_factor, extra->max_load_factor);
 
     size_t slot_idx = extra->num_slots;
     size_t slot_size = (self->key_size + self->elem_size);
@@ -629,7 +629,7 @@ static inline void rebuild(const dict_t *self, hash_table_extra_t *extra)
     counters.num_rebuilds++;
     swap((hash_table_extra_t *) tmp->extra, extra);
     extra->counters = counters;
-    hash_table_free(tmp);
+    hash_table_delete(tmp);
 }
 
 static inline void swap(hash_table_extra_t *a, hash_table_extra_t *b)

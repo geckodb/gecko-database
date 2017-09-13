@@ -32,7 +32,7 @@
 typedef size_t grid_id_t;
 
 typedef struct grid_t {
-    struct grid_table_t *context; /*<! The grid table in which this grid exists. */
+    struct table_t *context; /*<! The grid table in which this grid exists. */
     grid_id_t grid_id; /*<! The id of this grid in context of the grid table. */
     frag_t *frag; /*<! The physical data fragment including the applied physical schema of this grid. */
     dict_t *schema_map_indicies; /*<! An (inverted) index that allows direct access from a table schema attribute to
@@ -85,7 +85,7 @@ typedef struct grids_by_attr_index_elem_t {
     vec_t *grid_ptrs;
 } grids_by_attr_index_elem_t;
 
-typedef struct grid_table_t {
+typedef struct table_t {
     schema_t *schema; /*<! The schema assigned to this table. Note that this schema is 'logical', i.e., grids
                            have their own schema that might be a subset of this schema with another order on the
                            attributes. The table's schema is used to give a logical structure to a caller. */
@@ -104,71 +104,49 @@ typedef struct grid_table_t {
                             With other words, each tuple identifier in the right open interval [0, num_tuples) is
                             accessible. However, it's neither guaranteed that a tuple associated with an identifier in
                             this interval is not marked as 'deleted' nor that the tuple data is initialized. */
-} grid_table_t;
+} table_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E  D E C L A R A T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-grid_table_t *gs_grid_table_create(const schema_t *schema, size_t approx_num_horizontal_partitions);
+table_t *table_new(const schema_t *schema, size_t approx_num_horizontal_partitions);
+void table_delete(table_t *table);
+const char *table_name(const table_t *table);
+grid_id_t table_add(table_t *table, const attr_id_t *attr_ids_covered, size_t nattr_ids_covered,
+                    const tuple_id_interval_t *tuple_ids_covered, size_t ntuple_ids_covered, enum frag_impl_type_t type);
+const freelist_t *table_freelist(const struct table_t *table);
+grid_cursor_t *table_find(const table_t *table, const attr_id_t *attr_ids, size_t nattr_ids,
+                          const tuple_id_t *tuple_ids, size_t ntuple_ids);
+table_t *table_melt(enum frag_impl_type_t type, const table_t *src_table, const tuple_id_t *tuple_ids,
+                    size_t ntuple_ids, const attr_id_t *attr_ids, size_t nattr_ids);
+const attr_t *table_attr_by_id(const table_t *table, attr_id_t id);
+const char *table_attr_name_by_id(const table_t *table, attr_id_t id);
+size_t table_num_of_attributes(const table_t *table);
+size_t table_num_of_tuples(const table_t *table);
+size_t table_num_of_grids(const table_t *table);
+const attr_id_t *table_attr_id_to_frag_attr_id(const grid_t *grid, attr_id_t table_attr_id);
+vec_t *table_grids_by_attr(const table_t *table, const attr_id_t *attr_ids, size_t nattr_ids);
+vec_t *table_grids_by_tuples(const table_t *table, const tuple_id_t *tuple_ids, size_t ntuple_ids);
+bool table_is_valide(table_t *table);
 
-void gs_grid_table_free(grid_table_t *table);
-
-void gs_grid_free(grid_t * grid);
-
-const char *gs_grid_table_name(const grid_table_t *table);
-
-grid_id_t gs_grid_table_add_grid(grid_table_t *table, const attr_id_t *attr_ids_covered, size_t nattr_ids_covered,
-                                 const tuple_id_interval_t *tuple_ids_covered, size_t ntuple_ids_covered, enum frag_impl_type_t type);
-
-const freelist_t *gs_grid_table_freelist(const struct grid_table_t *table);
-
-grid_cursor_t *gs_grid_table_grid_find(const grid_table_t *table, const attr_id_t *attr_ids, size_t nattr_ids,
-                                  const tuple_id_t *tuple_ids, size_t ntuple_ids);
-
-grid_table_t *gs_grid_table_melt(enum frag_impl_type_t type, const grid_table_t *src_table, const tuple_id_t *tuple_ids,
-                           size_t ntuple_ids, const attr_id_t *attr_ids, size_t nattr_ids);
-
-const attr_t *gs_grid_table_attr_by_id(const grid_table_t *table, attr_id_t id);
-
-const char *gs_grid_table_attr_name_by_id(const grid_table_t *table, attr_id_t id);
-
-size_t gs_grid_table_num_of_attributes(const grid_table_t *table);
-
-size_t gs_grid_table_num_of_tuples(const grid_table_t *table);
-
-size_t gs_grid_table_num_of_grids(const grid_table_t *table);
-
-const attr_id_t *gs_grid_table_attr_id_to_frag_attr_id(const grid_t *grid, attr_id_t table_attr_id);
-
-const grid_t *gs_grid_by_id(const grid_table_t *table, grid_id_t id);
-
-size_t gs_grid_num_of_attributes(const grid_t *grid);
-
-vec_t *gs_grid_table_grids_by_attr(const grid_table_t *table, const attr_id_t *attr_ids, size_t nattr_ids);
-
-vec_t *gs_grid_table_grids_by_tuples(const grid_table_t *table, const tuple_id_t *tuple_ids, size_t ntuple_ids);
-
-bool gs_grid_table_is_valide(grid_table_t *table);
-
-void gs_grid_table_insert(tuple_cursor_t *resultset, grid_table_t *table, size_t ntuplets);
-
-void gs_grid_print(FILE *file, const grid_table_t *table, grid_id_t grid_id, size_t row_offset, size_t limit);
-
-void gs_grid_table_grid_list_print(FILE *file, const grid_table_t *table, size_t row_offset, size_t limit);
-
-void gs_grid_table_print(FILE *file, const grid_table_t *table, size_t row_offset, size_t limit);
-
-void gs_grid_table_structure_print(FILE *file, const grid_table_t *table, size_t row_offset, size_t limit);
+void grid_delete(grid_t *grid);
+const grid_t *grid_by_id(const table_t *table, grid_id_t id);
+size_t grid_num_of_attributes(const grid_t *grid);
+void grid_insert(tuple_cursor_t *resultset, table_t *table, size_t ntuplets);
+void grid_print(FILE *file, const table_t *table, grid_id_t grid_id, size_t row_offset, size_t limit);
+void table_grid_list_print(FILE *file, const table_t *table, size_t row_offset, size_t limit);
+void table_print(FILE *file, const table_t *table, size_t row_offset, size_t limit);
+void table_structure_print(FILE *file, const table_t *table, size_t row_offset, size_t limit);
 
 static inline int interval_tuple_id_comp_by_element(const void *needle, const void *element)
 {
     tuple_id_t tuple_id = *(const tuple_id_t *) needle;
     const tuple_id_interval_t *interval = element;
-    return (GS_INTERVAL_CONTAINS(interval, tuple_id) ? 0 : (tuple_id < interval->begin ? - 1 : + 1));
+    return (INTERVAL_CONTAINS(interval, tuple_id) ? 0 : (tuple_id < interval->begin ? - 1 : + 1));
 }
 
-static inline tuplet_id_t gs_grid_global_to_local(grid_t *grid, tuple_id_t tuple_id, access_type type)
+static inline tuplet_id_t global_to_local(grid_t *grid, tuple_id_t tuple_id, access_type type)
 {
     // TODO: apply a bunch of strategy alternatives here. For instance, one can buffer the distances for a given
     // Cursor and all its processors. Then the translation does not require to scan the entire interval list in order
@@ -185,18 +163,18 @@ static inline tuplet_id_t gs_grid_global_to_local(grid_t *grid, tuple_id_t tuple
     // a valid coverage of the given 'tuple_id' in this grid
     const tuple_id_interval_t *end = vec_end(grid->tuple_ids);
 
-    if (!GS_INTERVAL_CONTAINS(cursor, tuple_id)) {
+    if (!INTERVAL_CONTAINS(cursor, tuple_id)) {
         switch (type) {
             case AT_SEQUENTIAL:
                 // seek to interval that contains the tuple, move cursor to successor since its guaranteed not in the
                 // current one
-                for (cursor++; cursor < end && !GS_INTERVAL_CONTAINS(cursor, tuple_id); cursor++);
+                for (cursor++; cursor < end && !INTERVAL_CONTAINS(cursor, tuple_id); cursor++);
                 break;
             case AT_RANDOM:
                 // Assert that interval list is sorted. If sort state is not cached,
                 // re-evaluate the state and check again
                 assert (vec_issorted(grid->tuple_ids, CCP_USECACHE, NULL) ||
-                                vec_issorted(grid->tuple_ids, CCP_IGNORECACHE, gs_interval_tuple_id_comp_by_lower_bound));
+                                vec_issorted(grid->tuple_ids, CCP_IGNORECACHE, interval_tuple_id_comp_by_lower_bound));
 
                 // TODO: apply evolutionary algorithm here to find choice of alternatives once alternatives exists
                 // Alternatives besides bsearch might be linear search w/o multi-threading from cache or start/end, ...
@@ -206,7 +184,7 @@ static inline tuplet_id_t gs_grid_global_to_local(grid_t *grid, tuple_id_t tuple
                 // a lower or higher interval must be considered during search if the needle is not contained in the
                 // current interval.
                 cursor = vec_bsearch(grid->tuple_ids, &tuple_id,
-                                     gs_interval_tuple_id_comp_by_lower_bound, interval_tuple_id_comp_by_element);
+                                     interval_tuple_id_comp_by_lower_bound, interval_tuple_id_comp_by_element);
                 break;
             default: panic(BADBRANCH, grid);
         }
@@ -217,7 +195,7 @@ static inline tuplet_id_t gs_grid_global_to_local(grid_t *grid, tuple_id_t tuple
     // TODO: Cache this!
     // calculate the number of tuplets that fall into preceding intervals
     for (const tuple_id_interval_t *it = vec_begin(grid->tuple_ids); it < end; it++) {
-        result += (tuple_id >= it->begin) ? gs_interval_get_span(it) : 0;
+        result += (tuple_id >= it->begin) ? INTERVAL_SPAN(it) : 0;
     }
     // calculate the exact identifier for the given tuple in the 'cursor' interval
     result += (tuple_id - cursor->end);
@@ -228,7 +206,7 @@ static inline tuplet_id_t gs_grid_global_to_local(grid_t *grid, tuple_id_t tuple
     return result;
 }
 
-static inline tuple_id_t gs_grid_local_to_global(grid_t *grid, tuplet_id_t tuplet_id)
+static inline tuple_id_t local_to_global(grid_t *grid, tuplet_id_t tuplet_id)
 {
     assert (tuplet_id < grid->frag->ntuplets);
 
@@ -241,7 +219,7 @@ static inline tuple_id_t gs_grid_local_to_global(grid_t *grid, tuplet_id_t tuple
     // the i-th tuple is mapped to the tuplet is i.
 
     // sum up the number of tuples covered in each interval until this sum exceeds 'tuplet_id'
-    for (; num_tuple_covereed <= tuplet_id; num_tuple_covereed += gs_interval_get_span(it), it++);
+    for (; num_tuple_covereed <= tuplet_id; num_tuple_covereed += INTERVAL_SPAN(it), it++);
 
     // return the tuple identifier that is mapped to the tuplet id
     return (it->end - (num_tuple_covereed - tuplet_id) - 1);

@@ -367,12 +367,12 @@ int mondrian_vm_create(mondrian_vm_t **out, mondrian_t *db)
             .rollback = false,
             .return_value = 0,
             .temp_name_counter = 0,
-            .operand_stack = vec_create(sizeof(operand_t), OPERAND_STACK_CAPACITY),
-            .locks = vec_create(sizeof(shared_resource_release_state_t), 5),
-            .latches = vec_create(sizeof(shared_resource_release_state_t), 5),
-            .variables = vec_create(sizeof(variable_entry_t), 10),
-            .temp_names = vec_create(sizeof(char *), 10),
-            .fragments = vec_create(sizeof(local_fragment_t), 10),
+            .operand_stack = vec_new(sizeof(operand_t), OPERAND_STACK_CAPACITY),
+            .locks = vec_new(sizeof(shared_resource_release_state_t), 5),
+            .latches = vec_new(sizeof(shared_resource_release_state_t), 5),
+            .variables = vec_new(sizeof(variable_entry_t), 10),
+            .temp_names = vec_new(sizeof(char *), 10),
+            .fragments = vec_new(sizeof(local_fragment_t), 10),
             .program = NULL,
             .db = db,
             .error_code = MVM_EC_NOERR,
@@ -501,7 +501,7 @@ int program_new(program_t **out, const char *prog_name, const char *prog_author,
 
     *out = REQUIRE_MALLOC(sizeof(program_t));
     **out = (program_t) {
-        .instructions = vec_create(sizeof(instruction_t), 10),
+        .instructions = vec_new(sizeof(instruction_t), 10),
         .magic_word   = MVM_MAGIC_WORD,
         .mvm_version_major = MVM_MAJOR_VERSION,
         .mvm_version_minor = MVM_MINOR_VERSION,
@@ -704,7 +704,7 @@ static inline bool is_unique_fragment_name(mondrian_vm_t *vm, const char *name)
 {
     local_fragment_t *fragments = (local_fragment_t *) vm->fragments->data;
     for (size_t i = 0; i < vm->fragments->num_elements; i++) {
-        if ((!fragments[i].is_dropped) && (!strcmp(gs_frag_get_schema(fragments[i].fragment)->frag_name, name))) {
+        if ((!fragments[i].is_dropped) && (!strcmp(frag_schema(fragments[i].fragment)->frag_name, name))) {
             return false;
         }
     }
@@ -715,7 +715,7 @@ static inline int drop_fragment_with_name(mondrian_vm_t *vm, const char *name)
 {
     local_fragment_t *fragments = (local_fragment_t *) vm->fragments->data;
     for (size_t i = 0; i < vm->fragments->num_elements; i++) {
-        if (!strcmp(gs_frag_get_schema(fragments[i].fragment)->frag_name, name)) {
+        if (!strcmp(frag_schema(fragments[i].fragment)->frag_name, name)) {
             if (fragments[i].is_dropped) {
                 return MONDRIAN_ERROR;
             } else {
@@ -759,7 +759,7 @@ static int exec_addattr(mondrian_vm_t *vm, u64 operand)
     u64 flags        = OPERAND_STACK_POP();
     schema_t *schema = (schema_t *) OPERAND_STACK_PEEK();
 
-    if (schema == NULL || gs_schema_attr_by_name(schema, name) != NULL) {
+    if (schema == NULL || schema_attr_by_name(schema, name) != NULL) {
         return MONDRIAN_ERROR;
     }
 
@@ -771,7 +771,7 @@ static int exec_addattr(mondrian_vm_t *vm, u64 operand)
         flags |= FLAG_UNIQUE;
     }
 
-    attr_id_t attr_id = gs_attr_create(name, type, rep, schema);
+    attr_id_t attr_id = attr_create(name, type, rep, schema);
     OPERAND_STACK_PUSH(attr_id);
     return MONDRIAN_OK;
 }
@@ -866,7 +866,7 @@ static int exec_fcreate(mondrian_vm_t *vm, u64 force)
             } else {
                 drop_fragment_with_name(vm, name);
             }
-            schema = gs_schema_create(name);
+            schema = schema_new(name);
             OPERAND_STACK_PUSH(schema);
             return MONDRIAN_OK;
         case FRAGMENT_SCOPE_GLOBAL:
@@ -908,7 +908,7 @@ static int exec_finsert(mondrian_vm_t *vm, u64 operand)
             return MONDRIAN_ERROR;
         }
         tuplet_t *tuplet_ptr = REQUIRE_MALLOC(num * sizeof(tuplet_t *));
-        gs_frag_insert(tuplet_ptr, frag, num);
+        frag_insert(tuplet_ptr, frag, num);
         mondrian_vm_set_var(vm, VARIABLE_RTC, (u64 *)&tuplet_ptr);
         return MONDRIAN_OK;
     }
@@ -937,7 +937,7 @@ static int exec_finstall(mondrian_vm_t *vm, u64 _)
     }
 
     frag_id_t frag_id;
-    frag_t *frag = gs_fragment_alloc(schema, capacity, impl_type);
+    frag_t *frag = frag_new(schema, capacity, impl_type);
 
     switch (scope) {
         case FRAGMENT_SCOPE_GLOBAL:
@@ -1133,7 +1133,7 @@ static int exec_ofield(mondrian_vm_t *vm, u64 _)
     u64 mem_addr;
     mondrian_vm_get_var(&mem_addr, vm, VARIABLE_RTC);
 //    tuplet_t *tuplet = (tuplet_t *) mem_addr;
-    //field = gs_tuplet_field_open(tuplet);
+    //field = tuplet_field_open(tuplet);
     mondrian_vm_set_var(vm, VARIABLE_RFC, (u64 *) &field);
     panic("Not implemented '%s'!", "exec_ofield");
     return MONDRIAN_OK;
@@ -1146,7 +1146,7 @@ static int exec_wfield(mondrian_vm_t *vm, u64 _)
     mondrian_vm_get_var(&mem_addr, vm, VARIABLE_RFC);
     tuplet_field_t *cursor = (tuplet_field_t *) mem_addr;
     u64 data = OPERAND_STACK_POP();
-    gs_tuplet_field_write(cursor, &data, true);
+    tuplet_field_write(cursor, &data, true);
 
     return MONDRIAN_OK;
 }
@@ -1162,7 +1162,7 @@ static int exec_print(mondrian_vm_t *vm, u64 _)
         if (frag == NULL) {
             return MONDRIAN_ERROR;
         } else {
-            gs_frag_print(stdout, frag, 0, frag->ntuplets);
+            frag_print(stdout, frag, 0, frag->ntuplets);
             return MONDRIAN_OK;
         }
     }

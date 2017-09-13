@@ -18,25 +18,25 @@
 #include <containers/hashset.h>
 #include <containers/dicts/hash_table.h>
 
-void gs_hashset_create(hashset_t *out, size_t elem_size, size_t capacity)
+void hashset_create(hashset_t *out, size_t elem_size, size_t capacity)
 {
     REQUIRE_NONNULL(out)
     REQUIRE_NONZERO(elem_size)
     REQUIRE_NONZERO(capacity)
-    out->dict = hash_table_create_jenkins(elem_size, sizeof(bool), capacity, 1.7f, 0.75f);
-    out->vec  = vec_create(sizeof(elem_size), capacity);
+    out->dict = hash_table_new_jenkins(elem_size, sizeof(bool), capacity, 1.7f, 0.75f);
+    out->vec  = vec_new(sizeof(elem_size), capacity);
 }
 
-void gs_hashset_free(hashset_t *set)
+void hashset_dispose(hashset_t *set)
 {
     REQUIRE_NONNULL(set)
-    dict_free(set->dict);
+    dict_delete(set->dict);
     vec_free(set->vec);
     set->dict = NULL;
     set->vec = NULL;
 }
 
-void gs_hashset_add(hashset_t *set, const void *data, size_t num_elems)
+void hashset_add(hashset_t *set, const void *data, size_t num_elems)
 {
     REQUIRE_NONNULL(set)
     REQUIRE_NONNULL(set->vec)
@@ -50,26 +50,26 @@ void gs_hashset_add(hashset_t *set, const void *data, size_t num_elems)
     }
 }
 
-void gs_hashset_remove(hashset_t *set, const void *data, size_t num_elems)
+void hashset_remove(hashset_t *set, const void *data, size_t num_elems)
 {
-    panic("Not implemented: '%s'. Hashtable remove is not implemented correctly currently", "gs_hashset_remove");
+    panic("Not implemented: '%s'. Hashtable remove is not implemented correctly currently", "hashset_remove");
 }
 
-bool gs_hashset_contains(const hashset_t *set, const void *data)
+bool hashset_contains(const hashset_t *set, const void *data)
 {
     REQUIRE_NONNULL(set)
     REQUIRE_NONNULL(set->dict)
     return dict_contains_key(set->dict, data);
 }
 
-const void *gs_hashset_begin(const hashset_t *set)
+const void *hashset_begin(const hashset_t *set)
 {
     REQUIRE_NONNULL(set)
     REQUIRE_NONNULL(set->vec)
     return vec_begin(set->vec);
 }
 
-const void *gs_hashset_end(const hashset_t *set)
+const void *hashset_end(const hashset_t *set)
 {
     REQUIRE_NONNULL(set)
     REQUIRE_NONNULL(set->vec)

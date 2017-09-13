@@ -22,7 +22,7 @@
 // I N T E R F A C E  I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool dict_free(dict_t *dict)
+bool dict_delete(dict_t *dict)
 {
     return DELEGATE_CALL(dict, free_dict);
 }

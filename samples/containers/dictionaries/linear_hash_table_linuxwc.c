@@ -28,7 +28,7 @@ static vec_t *read_all_lines(const char *file)
     char * line = NULL;
     size_t len = 0;
     ssize_t read;
-    vec_t *result = vec_create(SIZEOF_KEY, 69199328);
+    vec_t *result = vec_new(SIZEOF_KEY, 69199328);
 
     fp = fopen(file, "r");
     if (fp == NULL)
@@ -74,8 +74,8 @@ void query(char *key, dict_t *dict, const char *query)
 
 int main(void)
 {
-    dict_t *dict = hash_table_create(&(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen},
-                                     SIZEOF_KEY, SIZEOF_VALUE, NUM_SLOTS, 1.7f, MAX_LOAD_FACTOR);
+    dict_t *dict = hash_table_new(&(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen},
+                                  SIZEOF_KEY, SIZEOF_VALUE, NUM_SLOTS, 1.7f, MAX_LOAD_FACTOR);
 
     // TODO: The file can be downloaded here: https://www.dropbox.com/sh/kf5sbw74rru3kco/AAB07Cwy0oVbRih33nef_FTFa?dl=0
     vec_t *words = read_all_lines("/Users/marcus/temp/linux-words");

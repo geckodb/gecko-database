@@ -169,9 +169,9 @@ load_config_file(
 
 dict_t *conf_load()
 {
-    dict_t *env = hash_table_create_ex(&(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen},
-                                       sizeof(char *), sizeof(char *), NUM_INIT_ENV_VARS, NUM_INIT_ENV_VARS, 1.7f, 0.75f,
-                                       str_equals, clean_up, true);
+    dict_t *env = hash_table_new_ex(&(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen},
+                                    sizeof(char *), sizeof(char *), NUM_INIT_ENV_VARS, NUM_INIT_ENV_VARS, 1.7f, 0.75f,
+                                    str_equals, clean_up, true);
 
     get_home_dir(env);
 
@@ -194,7 +194,7 @@ dict_t *conf_load()
         update_dir(env, &soft_link_config, CONF_VAR_MYIMDB_ETC, "etc_path", etc_path);
         update_dir(env, &soft_link_config, CONF_VAR_MYIMDB_SWAP, "swap_path", swap_path);
 
-       // pref_free(&soft_link_config); // TODO: freeing up pref_free causes freeing up unallocated pointer
+       // pref_free(&soft_link_config); // TODO: freeing up pref_delete causes freeing up unallocated pointer
     }
 
     free (bin_path);
@@ -220,7 +220,7 @@ dict_t *conf_load()
 
 void conf_free(struct dict_t * conf)
 {
-    hash_table_free(conf);
+    hash_table_delete(conf);
 }
 
 const char *
@@ -242,7 +242,7 @@ conf_get_size_t(
     pref_get_size_t(out, &swapbuf_config, settings_key, &default_value);
 }
 
-void gs_db_config_load(db_config_t *config)
+void db_config_load(db_config_t *config)
 {
     REQUIRE_NONNULL(config);
     config->inet.port = CONF_INET_PORT;

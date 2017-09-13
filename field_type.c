@@ -18,7 +18,7 @@
 #include <field_type.h>
 #include <grid.h>
 
-size_t gs_field_type_sizeof(enum field_type type)
+size_t field_type_sizeof(enum field_type type)
 {
     switch (type) {
         case FT_CHAR:
@@ -66,7 +66,7 @@ size_t gs_field_type_sizeof(enum field_type type)
     }
 }
 
-const char *gs_field_type_str(enum field_type type)
+const char *field_type_str(enum field_type type)
 {
     switch (type) {
         case FT_CHAR:
