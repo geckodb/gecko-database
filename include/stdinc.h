@@ -70,6 +70,16 @@ typedef uint32_t tuplet_id_t;
 
 typedef uint32_t http_status_code_t;
 
+typedef enum capture_type {
+    SOMETHING
+} capture_type;
+
+typedef struct capture_t
+{
+    capture_type type;
+    void *extra;
+} capture_t;
+
 typedef enum content_type_t
 {
     MEDIA_MULTI_PART_FORM_DATA

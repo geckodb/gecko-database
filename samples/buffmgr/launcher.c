@@ -52,7 +52,7 @@ int main() {
         exit(1);
 
         pref_t pref;
-        pref_load(&pref, "/Users/marcus/temp/test.conf", NULL, NULL);
+        pref_load(&pref, "/Users/marcus/temp/tests.conf", NULL, NULL);
         const char *value = pref_get_str(&pref, "ein.schlüssel", "nütschs");
         printf(">> value = '%s'\n", value);
         const char *value2 = pref_get_str(&pref, "ein.schlüssel2", "nütschs");

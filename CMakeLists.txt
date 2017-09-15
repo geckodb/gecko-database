@@ -66,59 +66,60 @@ set(SOURCE_FILES
         include/mvm.h
         include/progpool.h
 
-        async.c
-        attr.c
-        conf.c
-        containers/dict.c
-        containers/dicts/hash_table.c
-        containers/list.c
-        containers/vec.c
-        frags/frag_host_vm.c
-        error.c
-        tuplet_field.c
-        frag.c
-        hash.c
-        pred.c
-        pref.c
-        schema.c
-        storage/memory.c
-        tuplet.c
-        operators/scan.c
-        mondrian.c
-        frag_printer.c
-        frag_printers/console_printer.c
-        unsafe.c
-        timer.c
-        field_type.c
-        tuple.c
-        inet/server.c
-        global.c
-        inet/request.c
-        inet/response.c
-        mvm.c
-        progpool.c
-        grid.c
+        src/async.c
+        src/attr.c
+        src/conf.c
+        src/containers/dict.c
+        src/containers/dicts/hash_table.c
+        src/containers/list.c
+        src/containers/vec.c
+        src/frags/frag_host_vm.c
+        src/error.c
+        src/tuplet_field.c
+        src/frag.c
+        src/hash.c
+        src/pred.c
+        src/pref.c
+        src/schema.c
+        src/storage/memory.c
+        src/tuplet.c
+        src/operators/scan.c
+        src/mondrian.c
+        src/frag_printer.c
+        src/frag_printers/console_printer.c
+        src/unsafe.c
+        src/timer.c
+        src/field_type.c
+        src/tuple.c
+        src/inet/server.c
+        src/global.c
+        src/inet/request.c
+        src/inet/response.c
+        src/mvm.c
+        src/progpool.c
+        src/grid.c
         include/grid.h
-        interval.c
+        src/interval.c
         include/interval.h
-        tuple_field.c
+        src/tuple_field.c
         include/tuple_field.h
-        indexes/vindex.c
+        src/indexes/vindex.c
         include/indexes/vindex.h
         include/indexes/vindexes/hash_vindex.h
-        indexes/vindexes/hash_vindex.c
+        src/indexes/vindexes/hash_vindex.c
         include/containers/freelist.h
-        containers/freelist.c
+        src/containers/freelist.c
         include/tuple_cursor.h
-        tuple_cursor.c
+        src/tuple_cursor.c
         include/indexes/hindex.h
-        indexes/hindex.c
+        src/indexes/hindex.c
         include/indexes/hindexes/lsearch_hindex.h
-        indexes/hindexes/lsearch_hindex.c
-        grid_cursor.c
+        src/indexes/hindexes/lsearch_hindex.c
+        src/grid_cursor.c
         include/grid_cursor.h
-        containers/hashset.c
+        src/containers/hashset.c
         include/containers/hashset.h
+        include/routers/api/types/create/router.h
         )
 
 add_executable(

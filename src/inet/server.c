@@ -33,7 +33,7 @@ str_clean_up(
     free (*key_string);
 }
 
-void server_create(server_t *server, in_port_t port)
+void server_create(server_t *server, unsigned short port, capture_t *capture)
 {
     REQUIRE_NONNULL(server);
 
@@ -46,7 +46,8 @@ void server_create(server_t *server, in_port_t port)
     setsockopt(server->server_desc, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(int));
     server->server_addr.sin_family = AF_INET;
     server->server_addr.sin_addr.s_addr = INADDR_ANY;
-    server->server_addr.sin_port = port;
+    server->server_addr.sin_port = htons(port);
+    server->capture = capture;
 
     int succ = bind(server->server_desc, (const struct sockaddr *) &server->server_addr, sizeof(server->server_addr));
     panic_if((succ < 0), "unable to bind to port %d (%s).", (int) ntohs(server->server_addr.sin_port), strerror(errno));
@@ -95,8 +96,8 @@ void server_start(server_t *server, router_t catch)
                     } else {
                         const router_t *router;
                         if ((router = dict_get(server->routers, &request.resource)) != NULL) {
-                            (*router)(&request, &response);
-                        } else catch(&request, &response);
+                            (*router)(server->capture, &request, &response);
+                        } else catch(server->capture, &request, &response);
                     }
                     request_print(stdout, &request);
             } else {

@@ -20,27 +20,19 @@
 #include <tuple_field.h>
 #include <inet/server.h>
 
-void request_handler(const request_t *request, response_t *response)
-{
-    response_content_type_set(response, "text/html");//MIME_CONTENT_TYPE_TEXT_PLAIN);
-    response_field_set(response, "Connection", "close");
-    response_field_set(response, "Content-Length", "40");
-    response_body_set(response, "<html><body>Hello routers</body></html>\n");
-    response_end(response, HTTP_STATUS_CODE_200_OK);
-}
+#include <routers/catch.h>
+#include <routers/api/types/create/router.h>
 
-void request_catch(const request_t *request, response_t *response)
-{
-    response_body_set(response, "Unknown resource\n");
-    response_end(response, HTTP_STATUS_CODE_400_BAD_REQUEST);
-}
+// curl -i -G -d "key=val" -d "abs=[1,2,3,4]" http://localhost:36895/api/test
 
 int main(void)
 {
     server_t server;
-    server_create(&server, 8080);
-    server_router_add(&server, "/api/test", request_handler);
-    server_start(&server, request_catch);
+    server_create(&server, 8080, NULL);
+
+    server_router_add(&server, "/api/tests", router_api_types_create);
+
+    server_start(&server, router_catch);
 
 
 
