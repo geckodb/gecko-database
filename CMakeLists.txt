@@ -133,8 +133,8 @@ add_executable(
         ${SOURCE_FILES})
 
 add_executable(
-        gs-ycsb
-        playground/grid_store_ycsb.c
+        basement
+        basement.c
         ${SOURCE_FILES})
 
 add_executable(
@@ -207,7 +207,9 @@ target_link_libraries(
         ${OPENSSL_LIBRARIES})
 
 target_link_libraries(
-        gs-ycsb
+        basement
+        /usr/local/opt/argp-standalone/lib
+        /usr/local/opt/argp-standalone/lib/libargp.a
         ${OPENSSL_LIBRARIES})
 
 #target_link_libraries(
