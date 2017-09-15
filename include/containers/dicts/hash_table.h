@@ -90,7 +90,7 @@ void hash_table_unlock(dict_t *dict);
 void hash_reset_counters(dict_t *dict);
 void hash_table_info(dict_t *dict, linear_hash_table_info_t *info);
 bool str_equals(const void *lhs, const void *rhs);
-void clean_up(void *key, void *value);
+void str_str_clean_up(void *key, void *value);
 
 
 

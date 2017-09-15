@@ -23,9 +23,6 @@
 // C O N S T A N T S
 // ---------------------------------------------------------------------------------------------------------------------
 
-#define HTTP_STATUS_CODE_200_OK             200
-#define HTTP_STATUS_CODE_500_INTERNAL_ERR   500
-
 #define MIME_CONTENT_TYPE                   "Content-Type"
 #define MIME_CONTENT_TYPE_TEXT_PLAIN        "text/plain"
 
@@ -38,8 +35,6 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // D A T A   T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
-
-typedef uint32_t http_status_code_t;
 
 typedef struct response_t {
     http_status_code_t code;
@@ -62,5 +57,4 @@ const char *response_content_type_get(response_t *response);
 const char *response_body_get(response_t *response);
 void response_end(response_t *response, http_status_code_t code);
 const struct vec_t *response_fields(response_t *response);
-const char *response_code_str(http_status_code_t code);
 const char *response_format_fields(const dict_t *fields);

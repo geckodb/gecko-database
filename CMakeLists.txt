@@ -132,6 +132,11 @@ add_executable(
         ${SOURCE_FILES})
 
 add_executable(
+        gs-ycsb
+        playground/grid_store_ycsb.c
+        ${SOURCE_FILES})
+
+add_executable(
         sample_lin_hash
         samples/containers/dictionaries/linear_hash_table_sample.c
         ${SOURCE_FILES})
@@ -198,6 +203,10 @@ target_link_libraries(
 
 target_link_libraries(
         gridtables
+        ${OPENSSL_LIBRARIES})
+
+target_link_libraries(
+        gs-ycsb
         ${OPENSSL_LIBRARIES})
 
 #target_link_libraries(

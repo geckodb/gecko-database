@@ -171,7 +171,7 @@ dict_t *conf_load()
 {
     dict_t *env = hash_table_new_ex(&(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen},
                                     sizeof(char *), sizeof(char *), NUM_INIT_ENV_VARS, NUM_INIT_ENV_VARS, 1.7f, 0.75f,
-                                    str_equals, clean_up, true);
+                                    str_equals, str_str_clean_up, true);
 
     get_home_dir(env);
 

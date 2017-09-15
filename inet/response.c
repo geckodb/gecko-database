@@ -26,14 +26,14 @@ void response_create(response_t *response)
     response->fields = hash_table_new_ex(&(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen},
                                          sizeof(char *), sizeof(char *), RESPONSE_DICT_CAPACITY,
                                          RESPONSE_DICT_CAPACITY, 1.7f, 0.75f,
-                                         str_equals, clean_up, true);
+                                         str_equals, str_str_clean_up, true);
 }
 
 char *response_pack(response_t *response)
 {
     REQUIRE_NONNULL(response);
-    const char *pack = "HTTP/1.1 %s\r\n%s\r\n\r\n%s";
-    const char *code = response_code_str(response->code);
+    const char *pack = "HTTP/1.1 %s\r\n%s\r\n%s";
+    const char *code = codestr(response->code);
     const char *mime = response_format_fields(response->fields);
     const char *body = response_body_get(response);
     char *buffer = REQUIRE_MALLOC(strlen(pack) + 1 + strlen(mime) + 1 + strlen(body) + 1);
@@ -112,15 +112,6 @@ const struct vec_t *response_fields(response_t *response)
     return dict_keyset(response->fields);
 }
 
-const char *response_code_str(http_status_code_t code)
-{
-    switch (code) {
-        case HTTP_STATUS_CODE_200_OK:               return "200 OK";
-        case HTTP_STATUS_CODE_500_INTERNAL_ERR:
-        default:                                    return "500 Internal Server Error";
-    }
-}
-
 const char *response_format_fields(const dict_t *fields)
 {
     REQUIRE_NONNULL(fields);
@@ -129,27 +120,28 @@ const char *response_format_fields(const dict_t *fields)
     size_t length_fields = 0;
     size_t num_elements = vec_length(keys);
     for (size_t i = 0; i < num_elements; i++) {
-        const char *field_name = (const char *) vec_at(keys, i);
-        const void *value = dict_get(fields, field_name);
-        const char *value_str = (value != NULL ? (const char *) value : "");
+        const char *field_name = *(const char **) vec_at(keys, i);
+        const char *value = *(const char **) dict_get(fields, &field_name);
+        const char *value_str = (value != NULL ? value : "");
         length_fields += strlen(field_name) + 2 + strlen(value_str) + 2;    // "str: " + "value_str\r\n";
     }
-    length_fields += 1; // null terminator
+    length_fields += 2; // null terminator
 
     char *formatted_str = REQUIRE_MALLOC(length_fields);
     size_t offset = 0;
     for (size_t i = 0; i < num_elements; i++) {
-        const char *field_name = (const char *) vec_at(keys, i);
-        const void *value = dict_get(fields, field_name);
-        const char *value_str = (value != NULL ? (const char *) value : "");
-        memcpy(formatted_str + offset, field_name, strlen(field_name));
+        const char *field_name = *(const char **) vec_at(keys, i);
+        const char *value = *(const char **) dict_get(fields, &field_name);
+        const char *value_str = (value != NULL ? value : "");
+        strcpy(formatted_str + offset, field_name);
         offset += strlen(field_name);
-        memcpy(formatted_str + offset, ": ", 2);
+        strcpy(formatted_str + offset, ": ");
         offset += 2;
-        memcpy(formatted_str + offset, value_str, strlen(value_str));
+        strcpy(formatted_str + offset, value_str);
         offset += strlen(value_str);
-        memcpy(formatted_str + offset, "\r\n", 2);
+        strcpy(formatted_str + offset, "\r\n");
+        offset += 2;
     }
-    memcpy(formatted_str + offset, "\r\n", 2);
+    strcpy(formatted_str + offset, "\0");
     return formatted_str;
 }

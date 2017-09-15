@@ -335,7 +335,7 @@ str_equals(
 }
 
 void
-clean_up(
+str_str_clean_up(
         void *key,
         void *value)
 {
@@ -502,7 +502,7 @@ void this_puts(struct dict_t *self, size_t num_elements, const void *keys, const
         size_t round_trip_slot_id = ROUND_TRIP_OF(slot_id, extra);
 
         bool slot_found = TEST_SLOT(self, extra, slot_id);
-        bool new_key    = false;
+        bool new_key    = true;
         if (!slot_found) {
             while ((round_trip_slot_id != slot_id) && !slot_found) {
                 const void *old_key = GET_KEY(self, extra, slot_id);
@@ -513,7 +513,7 @@ void this_puts(struct dict_t *self, size_t num_elements, const void *keys, const
                     //break;
                 } else {
                     extra->counters.num_updates++;
-                    new_key = true;
+                    new_key = false;
                     break;
                 }
                 slot_found = TEST_SLOT(self, extra, slot_id);

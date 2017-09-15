@@ -49,7 +49,7 @@ pref_load(
     pref->dict = hash_table_new_ex(&(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen},
                                    sizeof(char *), sizeof(char *), NUM_INIT_CONFIG_STATEMENTS,
                                    NUM_INIT_CONFIG_STATEMENTS, 1.7f, 0.75f,
-                                   str_equals, clean_up, true);
+                                   str_equals, str_str_clean_up, true);
 
     vec_t *lines = read_lines(file);
 

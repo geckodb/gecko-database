@@ -19,6 +19,17 @@
 
 #include <stdinc.h>
 
-typedef struct request_t {
+typedef enum method_t {
+    HTTP_GET, HTTP_POST, HTTP_PUT, HTTP_DELETE, HTTP_OTHERS
+} method_t;
 
+typedef struct request_t {
+    method_t method;
+    char *resource;
+    char *params;
+    bool valid;
 } request_t;
+
+void request_parse(request_t *request, const char *request_str);
+
+void request_print(FILE *file, const request_t *request);

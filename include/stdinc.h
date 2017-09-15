@@ -68,6 +68,31 @@ typedef uint64_t attr_id_t;
 
 typedef uint32_t tuplet_id_t;
 
+typedef uint32_t http_status_code_t;
+
+typedef enum content_type_t
+{
+    MEDIA_MULTI_PART_FORM_DATA
+} content_type_t;
+
+#define HTTP_STATUS_CODE_100_CONTINUE        100
+#define HTTP_STATUS_CODE_200_OK              200
+#define HTTP_STATUS_CODE_500_INTERNAL_ERR    500
+#define HTTP_STATUS_CODE_400_BAD_REQUEST     400
+#define HTTP_STATUS_CODE_408_REQUEST_TIMEOUT 408
+
+static inline const char *codestr(http_status_code_t code)
+{
+    switch (code) {
+        case HTTP_STATUS_CODE_100_CONTINUE:         return "100 Continue";
+        case HTTP_STATUS_CODE_200_OK:               return "200 OK";
+        case HTTP_STATUS_CODE_400_BAD_REQUEST:      return "400 Bad Request";
+        case HTTP_STATUS_CODE_408_REQUEST_TIMEOUT:  return "408 Request Timeout";
+        case HTTP_STATUS_CODE_500_INTERNAL_ERR:
+        default:                                    return "500 Internal Server Error";
+    }
+}
+
 typedef uint8_t     u8;
 typedef uint16_t   u16;
 typedef uint32_t   u32;

@@ -18,6 +18,8 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <stdinc.h>
+#include "response.h"
+#include "request.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 // C O N S T A N T S
@@ -39,11 +41,15 @@ typedef struct server_t
     struct sockaddr_in client_addr;
     int server_desc;
     socklen_t socket_len;
+    dict_t *routers;
 } server_t;
+
+typedef void (*router_t)(const request_t *req, response_t *res);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
 void server_create(server_t *server, in_port_t port);
-void server_start(server_t *server);
+void server_router_add(server_t *server, const char *resource, router_t router);
+void server_start(server_t *server, router_t catch);
