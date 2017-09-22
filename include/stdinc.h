@@ -89,6 +89,7 @@ typedef enum content_type_t
 #define HTTP_STATUS_CODE_200_OK              200
 #define HTTP_STATUS_CODE_500_INTERNAL_ERR    500
 #define HTTP_STATUS_CODE_400_BAD_REQUEST     400
+#define HTTP_STATUS_CODE_404_NOT_FOUND       404
 #define HTTP_STATUS_CODE_408_REQUEST_TIMEOUT 408
 
 static inline const char *codestr(http_status_code_t code)
@@ -98,6 +99,7 @@ static inline const char *codestr(http_status_code_t code)
         case HTTP_STATUS_CODE_200_OK:               return "200 OK";
         case HTTP_STATUS_CODE_400_BAD_REQUEST:      return "400 Bad Request";
         case HTTP_STATUS_CODE_408_REQUEST_TIMEOUT:  return "408 Request Timeout";
+        case HTTP_STATUS_CODE_404_NOT_FOUND:        return "404 Not Found";
         case HTTP_STATUS_CODE_500_INTERNAL_ERR:
         default:                                    return "500 Internal Server Error";
     }

@@ -26,7 +26,7 @@ typedef enum method_t {
 typedef struct request_t {
     method_t method;
     char *resource;
-    char *params;
+    dict_t *params;
     bool valid;
 } request_t;
 

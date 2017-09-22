@@ -2293,6 +2293,51 @@ src/unsafe.c.s:
 	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/src/unsafe.c.s
 .PHONY : src/unsafe.c.s
 
+third-party/json-parser/json.o: third-party/json-parser/json.c.o
+
+.PHONY : third-party/json-parser/json.o
+
+# target to build an object file
+third-party/json-parser/json.c.o:
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/third-party/json-parser/json.c.o
+	$(MAKE) -f CMakeFiles/gridtables.dir/build.make CMakeFiles/gridtables.dir/third-party/json-parser/json.c.o
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/third-party/json-parser/json.c.o
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/third-party/json-parser/json.c.o
+	$(MAKE) -f CMakeFiles/basement.dir/build.make CMakeFiles/basement.dir/third-party/json-parser/json.c.o
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/third-party/json-parser/json.c.o
+	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/third-party/json-parser/json.c.o
+.PHONY : third-party/json-parser/json.c.o
+
+third-party/json-parser/json.i: third-party/json-parser/json.c.i
+
+.PHONY : third-party/json-parser/json.i
+
+# target to preprocess a source file
+third-party/json-parser/json.c.i:
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/third-party/json-parser/json.c.i
+	$(MAKE) -f CMakeFiles/gridtables.dir/build.make CMakeFiles/gridtables.dir/third-party/json-parser/json.c.i
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/third-party/json-parser/json.c.i
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/third-party/json-parser/json.c.i
+	$(MAKE) -f CMakeFiles/basement.dir/build.make CMakeFiles/basement.dir/third-party/json-parser/json.c.i
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/third-party/json-parser/json.c.i
+	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/third-party/json-parser/json.c.i
+.PHONY : third-party/json-parser/json.c.i
+
+third-party/json-parser/json.s: third-party/json-parser/json.c.s
+
+.PHONY : third-party/json-parser/json.s
+
+# target to generate assembly for a file
+third-party/json-parser/json.c.s:
+	$(MAKE) -f CMakeFiles/buffmgr.dir/build.make CMakeFiles/buffmgr.dir/third-party/json-parser/json.c.s
+	$(MAKE) -f CMakeFiles/gridtables.dir/build.make CMakeFiles/gridtables.dir/third-party/json-parser/json.c.s
+	$(MAKE) -f CMakeFiles/sample_linuxwc.dir/build.make CMakeFiles/sample_linuxwc.dir/third-party/json-parser/json.c.s
+	$(MAKE) -f CMakeFiles/sample_lin_hash.dir/build.make CMakeFiles/sample_lin_hash.dir/third-party/json-parser/json.c.s
+	$(MAKE) -f CMakeFiles/basement.dir/build.make CMakeFiles/basement.dir/third-party/json-parser/json.c.s
+	$(MAKE) -f CMakeFiles/expr.dir/build.make CMakeFiles/expr.dir/third-party/json-parser/json.c.s
+	$(MAKE) -f CMakeFiles/mondrian.dir/build.make CMakeFiles/mondrian.dir/third-party/json-parser/json.c.s
+.PHONY : third-party/json-parser/json.c.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -2456,6 +2501,9 @@ help:
 	@echo "... src/unsafe.o"
 	@echo "... src/unsafe.i"
 	@echo "... src/unsafe.s"
+	@echo "... third-party/json-parser/json.o"
+	@echo "... third-party/json-parser/json.i"
+	@echo "... third-party/json-parser/json.s"
 .PHONY : help
 
 

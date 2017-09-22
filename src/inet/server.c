@@ -87,9 +87,10 @@ void server_start(server_t *server, router_t catch)
             memset (buffer, 0, sizeof(buffer));
             struct pollfd pollfd = { .fd = client, .events = POLLIN };
             response_create(&response);
-            if (poll(&pollfd, 1, 100)) {
+            if (poll(&pollfd, 1, 1000)) {
                     recv(client, buffer, sizeof(buffer), 0);
                     request_parse(&request, buffer);
+                    request_print(stdout, &request);
                     if (!request.valid) {
                         response_content_type_set(&response, MIME_CONTENT_TYPE_TEXT_PLAIN);
                         response_end(&response, HTTP_STATUS_CODE_400_BAD_REQUEST);
@@ -99,7 +100,6 @@ void server_start(server_t *server, router_t catch)
                             (*router)(server->capture, &request, &response);
                         } else catch(server->capture, &request, &response);
                     }
-                    request_print(stdout, &request);
             } else {
                 response_end(&response, HTTP_STATUS_CODE_408_REQUEST_TIMEOUT);
             }

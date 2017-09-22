@@ -25,6 +25,7 @@
 
 #define MIME_CONTENT_TYPE                   "Content-Type"
 #define MIME_CONTENT_TYPE_TEXT_PLAIN        "text/plain"
+#define MIME_CONTENT_TYPE_APPLICATION_JSON  "application/json"
 
 // ---------------------------------------------------------------------------------------------------------------------
 // C O N F I G

@@ -45,7 +45,6 @@ const char *argp_program_bug_address = "<pinnecke@ovgu.de>";
 struct arguments
 {
     size_t port;
-    char *app_manifest;
 };
 
 static struct argp_option options[] =
@@ -64,7 +63,7 @@ parse_opt (int key, char *arg, struct argp_state *state)
         case 'p':
             arguments->port = strtoint(arg);
             break;
-        case ARGP_KEY_ARG:
+      /*  case ARGP_KEY_ARG:
             if (state->arg_num >= 1)
             {
                 argp_usage(state);
@@ -76,7 +75,7 @@ parse_opt (int key, char *arg, struct argp_state *state)
             {
                 argp_usage (state);
             }
-            break;
+            break;*/
         default:
             return ARGP_ERR_UNKNOWN;
     }
@@ -94,21 +93,21 @@ int main(int argc, char* argv[])
 {
     struct arguments arguments;
 
-    arguments.app_manifest = "";
-    arguments.port = 8080;
+    //arguments.app_manifest = "";
+    arguments.port = 35497;
 
     argp_parse (&argp, argc, argv, 0, 0, &arguments);
 
-    if( access(arguments.app_manifest, F_OK ) != -1 ) {
+    //if( access(arguments.app_manifest, F_OK ) != -1 ) {
         server_t server;
         server_create(&server, arguments.port, NULL);
-        server_router_add(&server, "/api/tests", router_api_types_create);
+        server_router_add(&server, "/api/types/create", router_api_types_create);
         server_start(&server, router_catch);
         return EXIT_SUCCESS;
-    } else {
-        fprintf(stderr, "App manifest '%s': no such file\n", arguments.app_manifest);
-        return EXIT_FAILURE;
-    }
+    //} else {
+    //    fprintf(stderr, "App manifest '%s': no such file\n", arguments.app_manifest);
+    //    return EXIT_FAILURE;
+    //}
 
 
 

@@ -35,6 +35,7 @@
 				<Option compiler="gcc"/>
 				<Compiler>
 					<Add directory="/Users/marcus/git/basement/include"/>
+					<Add directory="/Users/marcus/git/basement/third-party"/>
 					<Add directory="/usr/local/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
@@ -57,6 +58,7 @@
 				<Option compiler="gcc"/>
 				<Compiler>
 					<Add directory="/Users/marcus/git/basement/include"/>
+					<Add directory="/Users/marcus/git/basement/third-party"/>
 					<Add directory="/usr/local/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
@@ -79,6 +81,7 @@
 				<Option compiler="gcc"/>
 				<Compiler>
 					<Add directory="/Users/marcus/git/basement/include"/>
+					<Add directory="/Users/marcus/git/basement/third-party"/>
 					<Add directory="/usr/local/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
@@ -101,6 +104,7 @@
 				<Option compiler="gcc"/>
 				<Compiler>
 					<Add directory="/Users/marcus/git/basement/include"/>
+					<Add directory="/Users/marcus/git/basement/third-party"/>
 					<Add directory="/usr/local/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
@@ -133,6 +137,7 @@
 				<Option compiler="gcc"/>
 				<Compiler>
 					<Add directory="/Users/marcus/git/basement/include"/>
+					<Add directory="/Users/marcus/git/basement/third-party"/>
 					<Add directory="/usr/local/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
@@ -155,6 +160,7 @@
 				<Option compiler="gcc"/>
 				<Compiler>
 					<Add directory="/Users/marcus/git/basement/include"/>
+					<Add directory="/Users/marcus/git/basement/third-party"/>
 					<Add directory="/usr/local/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
@@ -177,6 +183,7 @@
 				<Option compiler="gcc"/>
 				<Compiler>
 					<Add directory="/Users/marcus/git/basement/include"/>
+					<Add directory="/Users/marcus/git/basement/third-party"/>
 					<Add directory="/usr/local/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
@@ -199,6 +206,7 @@
 				<Option compiler="gcc"/>
 				<Compiler>
 					<Add directory="/Users/marcus/git/basement/include"/>
+					<Add directory="/Users/marcus/git/basement/third-party"/>
 					<Add directory="/usr/local/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
@@ -221,6 +229,7 @@
 				<Option compiler="gcc"/>
 				<Compiler>
 					<Add directory="/Users/marcus/git/basement/include"/>
+					<Add directory="/Users/marcus/git/basement/third-party"/>
 					<Add directory="/usr/local/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
@@ -243,6 +252,7 @@
 				<Option compiler="gcc"/>
 				<Compiler>
 					<Add directory="/Users/marcus/git/basement/include"/>
+					<Add directory="/Users/marcus/git/basement/third-party"/>
 					<Add directory="/usr/local/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
@@ -275,6 +285,7 @@
 				<Option compiler="gcc"/>
 				<Compiler>
 					<Add directory="/Users/marcus/git/basement/include"/>
+					<Add directory="/Users/marcus/git/basement/third-party"/>
 					<Add directory="/usr/local/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
@@ -297,6 +308,7 @@
 				<Option compiler="gcc"/>
 				<Compiler>
 					<Add directory="/Users/marcus/git/basement/include"/>
+					<Add directory="/Users/marcus/git/basement/third-party"/>
 					<Add directory="/usr/local/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
@@ -319,6 +331,7 @@
 				<Option compiler="gcc"/>
 				<Compiler>
 					<Add directory="/Users/marcus/git/basement/include"/>
+					<Add directory="/Users/marcus/git/basement/third-party"/>
 					<Add directory="/usr/local/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
@@ -341,6 +354,7 @@
 				<Option compiler="gcc"/>
 				<Compiler>
 					<Add directory="/Users/marcus/git/basement/include"/>
+					<Add directory="/Users/marcus/git/basement/third-party"/>
 					<Add directory="/usr/local/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
@@ -1188,6 +1202,24 @@
 			<Option target="mondrian"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/basement/src/unsafe.c">
+			<Option target="buffmgr"/>
+			<Option target="gridtables"/>
+			<Option target="sample_linuxwc"/>
+			<Option target="sample_lin_hash"/>
+			<Option target="basement"/>
+			<Option target="expr"/>
+			<Option target="mondrian"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/third-party/json-parser/json.c">
+			<Option target="buffmgr"/>
+			<Option target="gridtables"/>
+			<Option target="sample_linuxwc"/>
+			<Option target="sample_lin_hash"/>
+			<Option target="basement"/>
+			<Option target="expr"/>
+			<Option target="mondrian"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/third-party/json-parser/json.h">
 			<Option target="buffmgr"/>
 			<Option target="gridtables"/>
 			<Option target="sample_linuxwc"/>

@@ -6,6 +6,7 @@
 
 static inline void router_api_types_create(capture_t *capture, const request_t *request, response_t *response)
 {
+
     response_content_type_set(response, "text/html");//MIME_CONTENT_TYPE_TEXT_PLAIN);
     response_field_set(response, "Connection", "close");
     response_field_set(response, "Content-Length", "40");

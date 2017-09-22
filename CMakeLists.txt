@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
 project(gridstore)
 
-include_directories("include")
+include_directories("include"
+                    "third-party")
 include_directories("/usr/local/include/")
 
 find_package(OpenSSL REQUIRED)
@@ -120,6 +121,8 @@ set(SOURCE_FILES
         src/containers/hashset.c
         include/containers/hashset.h
         include/routers/api/types/create/router.h
+        third-party/json-parser/json.c
+        third-party/json-parser/json.h
         )
 
 add_executable(
