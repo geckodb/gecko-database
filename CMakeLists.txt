@@ -1,11 +1,16 @@
 cmake_minimum_required(VERSION 3.5)
 project(gridstore)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
+
 include_directories("include"
-                    "third-party")
+                    "third-party"
+                    ${APR_INCLUDE_DIR})
 include_directories("/usr/local/include/")
 
+find_package(APR REQUIRED)
 find_package(OpenSSL REQUIRED)
+
 include_directories(${OPENSSL_INCLUDE_DIR})
 
 message("OPENSSL_INCLUDE_DIR: ${OPENSSL_INCLUDE_DIR}")
@@ -123,105 +128,24 @@ set(SOURCE_FILES
         include/routers/api/types/create/router.h
         third-party/json-parser/json.c
         third-party/json-parser/json.h
+        include/utils.h
+        src/utils.c
+        src/dispatch.c
+        include/dispatch.h
         )
 
 add_executable(
-        mondrian
-        playground/mondrian_virtual_machine.c
-        ${SOURCE_FILES})
-
-add_executable(
-        gridtables
-        playground/mondrian_grid_tables.c
-        ${SOURCE_FILES})
-
-add_executable(
-        basement
-        basement.c
-        ${SOURCE_FILES})
-
-add_executable(
-        sample_lin_hash
-        samples/containers/dictionaries/linear_hash_table_sample.c
+        gridstore
+        gridstore.c
         ${SOURCE_FILES})
 
 target_link_libraries(
-        sample_lin_hash
-        ${OPENSSL_LIBRARIES})
-
-add_executable(
-        sample_linuxwc
-        samples/containers/dictionaries/linear_hash_table_linuxwc.c
-        ${SOURCE_FILES})
-
-target_link_libraries(
-        sample_linuxwc
-        ${OPENSSL_LIBRARIES})
-
-#add_executable(
-#        exp_os_paging
-#        experiments/vm/os_paging/launcher.c
-#        ${SOURCE_FILES})
-
-#target_link_libraries(
-#        exp_os_paging
-#        ${OPENSSL_LIBRARIES})
-
-#add_executable(
-#        tpch-convert utils/tpch_convert/launcher.c
-#        utils/tpch_convert/common.h
-#        utils/tpch_convert/types.h
-#        utils/tpch_convert/tables/customer.h
-#        utils/tpch_convert/tables/lineitem.h
-#        utils/tpch_convert/tables/nation.h
-#        utils/tpch_convert/tables/orders.h
-#        utils/tpch_convert/tables/part.h
-#        utils/tpch_convert/tables/partsupp.h
-#        utils/tpch_convert/tables/region.h
-#        utils/tpch_convert/tables/supplier.h
-#        ${SOURCE_FILES})
-
-#add_executable(
-#        tableimg utils/tableimg/launcher.c
-#        ${SOURCE_FILES})
-
-add_executable(
-        buffmgr samples/buffmgr/launcher.c
-        ${SOURCE_FILES})
-
-target_link_libraries(
-        buffmgr
-        ${OPENSSL_LIBRARIES})
-
-add_executable(
-        expr samples/core/pred.c
-        ${SOURCE_FILES})
-
-target_link_libraries(
-        expr
-        ${OPENSSL_LIBRARIES})
-
-target_link_libraries(
-        mondrian
-        ${OPENSSL_LIBRARIES})
-
-target_link_libraries(
-        gridtables
-        ${OPENSSL_LIBRARIES})
-
-target_link_libraries(
-        basement
+        gridstore
+        ${APR_LIBRARIES}
+        ${APRUTIL_LIBRARIES}
         /usr/local/opt/argp-standalone/lib
         /usr/local/opt/argp-standalone/lib/libargp.a
         ${OPENSSL_LIBRARIES})
-
-#target_link_libraries(
-#        tpch-convert
-#        ${OPENSSL_LIBRARIES})
-
-#target_link_libraries(
-#        tableimg
-#        ${OPENSSL_LIBRARIES})
 
 if(DOXYGEN_FOUND)
     #configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)

@@ -38,7 +38,7 @@
 const struct _json_value json_value_none;
 
 #include <stdio.h>
-#include <string.h>
+#include <utils.h>
 #include <ctype.h>
 #include <math.h>
 

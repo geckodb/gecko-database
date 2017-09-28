@@ -80,6 +80,7 @@ dict_t *hash_table_new(const hash_function_t *hash_function, size_t key_size, si
                        size_t num_slots, float grow_factor, float max_load_factor);
 dict_t *hash_table_new_jenkins(size_t key_size, size_t elem_size, size_t num_slots, float grow_factor,
                                float max_load_factor);
+dict_t *hash_table_new_defaults(size_t key_size, size_t elem_size);
 dict_t *hash_table_new_ex(const hash_function_t *hash_function, size_t key_size, size_t elem_size,
                           size_t num_slots, size_t approx_num_keys, float grow_factor, float max_load_factor,
                           bool (*equals)(const void *key_lhs, const void *key_rhs),

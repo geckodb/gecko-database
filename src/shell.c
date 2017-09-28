@@ -1,6 +1,6 @@
 #include <shell.h>
 #include <curses.h>
-#include <string.h>
+#include <utils.h>
 #include <mondrian.h>
 
 static bool loader_is_running = true;

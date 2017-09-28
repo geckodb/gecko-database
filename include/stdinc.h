@@ -39,7 +39,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <string.h>
+#include <utils.h>
 #include <sys/stat.h>
 
 #include <openssl/md5.h>

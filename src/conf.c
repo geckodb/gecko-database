@@ -15,10 +15,11 @@
 // I N C L U D E S
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <stdinc.h>
 #include <containers/dict.h>
 #include <containers/dicts/hash_table.h>
 #include <conf.h>
-
+#include <utils.h>
 
 
 #define BADCWD          "Unable to get working directory (file name might exceed limit of %d)"

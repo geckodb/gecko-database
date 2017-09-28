@@ -14,6 +14,24 @@
 # EXTERNAL cache entries
 ########################
 
+//Path to a file.
+APRUTIL_INCLUDE_DIR:PATH=/usr/include/apr-1
+
+//Path to a library.
+APRUTIL_LIBRARY:FILEPATH=/usr/lib/libaprutil-1.dylib
+
+//The directory containing a CMake configuration file for APR.
+APR_DIR:PATH=APR_DIR-NOTFOUND
+
+//Path to a file.
+APR_INCLUDE_DIR:PATH=/usr/include/apr-1
+
+//Path to a library.
+APR_LIBRARY:FILEPATH=/usr/lib/libapr-1.dylib
+
+//The directory containing a CMake configuration file for Apr.
+Apr_DIR:PATH=Apr_DIR-NOTFOUND
+
 //API documentation requires Doxygen
 BUILD_DOCUMENTATION:BOOL=ON
 
@@ -233,6 +251,14 @@ gridstore_SOURCE_DIR:STATIC=/Users/marcus/git/basement
 # INTERNAL cache entries
 ########################
 
+//ADVANCED property for variable: APRUTIL_INCLUDE_DIR
+APRUTIL_INCLUDE_DIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: APRUTIL_LIBRARY
+APRUTIL_LIBRARY-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: APR_INCLUDE_DIR
+APR_INCLUDE_DIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: APR_LIBRARY
+APR_LIBRARY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_AR
 CMAKE_AR-ADVANCED:INTERNAL=1
 //This is the directory where this CMakeCache.txt was created

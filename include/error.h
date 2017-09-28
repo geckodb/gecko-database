@@ -44,7 +44,8 @@ typedef enum {
     err_constraint_violated,
     err_limitreached,
     err_no_free_space,
-    err_notincharge
+    err_notincharge,
+    err_dispatcher_terminated
 } error_code;
 
 void error(error_code code);
