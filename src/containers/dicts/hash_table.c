@@ -45,7 +45,7 @@
     REQUIRE((dict->tag == dict_type_linear_hash_table), BADTAG);
 
 #define REQUIRE_INSTANCEOF_THIS(dict)                                                                                  \
-    { REQUIRE_NONNULL(dict); REQUIRE_NONNULL(dict->extra); REQUIRE_HASHTABLE_TAG(dict); }
+    { GS_REQUIRE_NONNULL(dict); GS_REQUIRE_NONNULL(dict->extra); REQUIRE_HASHTABLE_TAG(dict); }
 
 #define HASH_CODE(self, extra, key)                                                                                    \
     (extra->hash_function.hash_code(extra->hash_function.capture, extra->key_is_str ? strlen(*((char **) key)) :       \
@@ -180,11 +180,11 @@ dict_t *hash_table_new_ex(const hash_function_t *hash_function, size_t key_size,
                           bool (*equals)(const void *key_lhs, const void *key_rhs),
                           void (*cleanup)(void *key, void *value), bool key_is_str)
 {
-    REQUIRE_NONNULL(hash_function);
-    REQUIRE_NONNULL(hash_function->hash_code);
+    GS_REQUIRE_NONNULL(hash_function);
+    GS_REQUIRE_NONNULL(hash_function->hash_code);
     require_not_zero(num_slots);
 
-    dict_t *result = REQUIRE_MALLOC(sizeof(dict_t));
+    dict_t *result = GS_REQUIRE_MALLOC(sizeof(dict_t));
     *result = (dict_t) {
         .tag = dict_type_linear_hash_table,
         .key_size = key_size,
@@ -202,7 +202,7 @@ dict_t *hash_table_new_ex(const hash_function_t *hash_function, size_t key_size,
         .num_elements = this_num_elements,
         .for_each = this_for_each,
 
-        .extra = REQUIRE_MALLOC(sizeof(hash_table_extra_t))
+        .extra = GS_REQUIRE_MALLOC(sizeof(hash_table_extra_t))
     };
 
     panic_if ((key_is_str && key_size != sizeof(char *)), BADARG, "key must be pointer to string");
@@ -214,8 +214,8 @@ dict_t *hash_table_new_ex(const hash_function_t *hash_function, size_t key_size,
         .num_inuse = 0,
         .grow_factor = grow_factor,
         .max_load_factor = max_load_factor,
-        .slots = REQUIRE_MALLOC(num_slots * (key_size + elem_size)),
-        .empty_indicator = key_is_str ? REQUIRE_MALLOC(sizeof(char **)) : REQUIRE_MALLOC(key_size),
+        .slots = GS_REQUIRE_MALLOC(num_slots * (key_size + elem_size)),
+        .empty_indicator = key_is_str ? GS_REQUIRE_MALLOC(sizeof(char **)) : GS_REQUIRE_MALLOC(key_size),
         .mutex = PTHREAD_MUTEX_INITIALIZER,
         .equals = equals,
         .cleanup = cleanup,
@@ -224,7 +224,7 @@ dict_t *hash_table_new_ex(const hash_function_t *hash_function, size_t key_size,
     };
 
     if (key_is_str) {
-        char *empty_str = REQUIRE_MALLOC(1);
+        char *empty_str = GS_REQUIRE_MALLOC(1);
         *empty_str = '\0';
         extra->empty_indicator = &empty_str;
     } else {
@@ -256,8 +256,8 @@ bool hash_table_delete(dict_t *dict)
     if (dict != NULL) {
         REQUIRE_INSTANCEOF_THIS(dict);
         hash_table_extra_t *extra = (hash_table_extra_t *) dict->extra;
-        REQUIRE_NONNULL(extra->slots);
-        REQUIRE_NONNULL(extra->empty_indicator);
+        GS_REQUIRE_NONNULL(extra->slots);
+        GS_REQUIRE_NONNULL(extra->empty_indicator);
 
         if (extra->cleanup != NULL) {
             for (size_t slot_id = 0; slot_id < extra->num_slots; slot_id++) {
@@ -393,7 +393,7 @@ const void *this_get(const struct dict_t *self, const void *key)
 struct vec_t *this_gets(const struct dict_t *self, size_t num_keys, const void *keys)
 {
     REQUIRE_INSTANCEOF_THIS(self);
-    REQUIRE_NONNULL(keys);
+    GS_REQUIRE_NONNULL(keys);
     require_not_zero(num_keys);
 
     vec_t *result = vec_new(sizeof(void *), num_keys);
@@ -436,7 +436,7 @@ bool this_remove(struct dict_t *self, size_t num_keys, const void *keys)
     panic("The function '%s' is not properly implemented.", "this_remove"); // TODO: Mark removed elements as "deleted". Actually removing them causes issues with chained entries for linear probing
 
     REQUIRE_INSTANCEOF_THIS(self);
-    REQUIRE_NONNULL(keys);
+    GS_REQUIRE_NONNULL(keys);
     require_not_zero(num_keys);
 
     bool removed_one_entry = false;
@@ -478,14 +478,14 @@ bool this_remove(struct dict_t *self, size_t num_keys, const void *keys)
 void this_put(struct dict_t *self, const void *key, const void *value)
 {
     REQUIRE_INSTANCEOF_THIS(self);
-    REQUIRE_NONNULL(key && value);
+    GS_REQUIRE_NONNULL(key && value);
     this_puts(self, 1, key, value);
 }
 
 void this_puts(struct dict_t *self, size_t num_elements, const void *keys, const void *values)
 {
     REQUIRE_INSTANCEOF_THIS(self);
-    REQUIRE_NONNULL(keys && values);
+    GS_REQUIRE_NONNULL(keys && values);
     require_not_zero(num_elements);
 
     hash_table_extra_t *extra = (hash_table_extra_t *) self->extra;

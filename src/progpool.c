@@ -29,7 +29,7 @@ struct progpool_t {
 
 int progpool_create(progpool_t **pool)
 {
-    *pool = REQUIRE_MALLOC(sizeof(progpool_t));
+    *pool = GS_REQUIRE_MALLOC(sizeof(progpool_t));
     if (*pool == NULL)
         return MONDRIAN_ERROR;
     else {
@@ -68,7 +68,7 @@ int progpool_list(prog_id_t **ids, size_t *num_progs, const progpool_t *pool)
         return MONDRIAN_ERROR;
     } else {
         *num_progs = pool->entries->num_elements;
-        *ids = REQUIRE_MALLOC(*num_progs * sizeof(prog_id_t));
+        *ids = GS_REQUIRE_MALLOC(*num_progs * sizeof(prog_id_t));
         const pool_entry_t *entries = (const pool_entry_t *) pool->entries->data;
         for (size_t i = 0, j = 0; i < *num_progs; i++) {
             if (!entries[i].deleted) {

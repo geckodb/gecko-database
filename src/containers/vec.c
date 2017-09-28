@@ -56,7 +56,7 @@ vec_t *vec_new_ex(size_t element_size, size_t capacity, vector_flags flags, floa
 
 bool vec_resize(vec_t *vec, size_t num_elements)
 {
-    REQUIRE_NONNULL(vec)
+    GS_REQUIRE_NONNULL(vec)
     REQUIRE_NONZERO(num_elements)
     if (advance(vec, 0, num_elements)) {
         vec->num_elements = num_elements;
@@ -71,13 +71,13 @@ bool vec_reserve(vec_t *vec, size_t num_elements)
 
 size_t vec_length(const vec_t *vec)
 {
-    REQUIRE_NONNULL(vec);
+    GS_REQUIRE_NONNULL(vec);
     return (vec->num_elements);
 }
 
 void vec_memset(vec_t *vec, size_t pos_start, size_t num_elements, const void *data)
 {
-    REQUIRE_NONNULL(vec);
+    GS_REQUIRE_NONNULL(vec);
     REQUIRE((num_elements > 0), "illegal argument");
     REQUIRE((pos_start + num_elements <= vec->element_capacity), "out of bounds");
     for (size_t i = pos_start; i < pos_start + num_elements; i++) {
@@ -89,8 +89,8 @@ void vec_memset(vec_t *vec, size_t pos_start, size_t num_elements, const void *d
 vec_t *vec_cpy_deep(vec_t *proto)
 {
     vec_t *result = NULL;
-    REQUIRE_NONNULL(proto)
-    REQUIRE_NONNULL(proto->data)
+    GS_REQUIRE_NONNULL(proto)
+    GS_REQUIRE_NONNULL(proto->data)
     if ((result = vec_new_ex(proto->sizeof_element, proto->element_capacity, proto->flags, proto->grow_factor))) {
         vec_set(result, 0, proto->num_elements, proto->data);
     }
@@ -99,8 +99,8 @@ vec_t *vec_cpy_deep(vec_t *proto)
 
 void vec_free(struct vec_t *vec)
 {
-    REQUIRE_NONNULL(vec)
-    REQUIRE_NONNULL(vec->data)
+    GS_REQUIRE_NONNULL(vec)
+    GS_REQUIRE_NONNULL(vec->data)
     vec_dispose(vec);
     free (vec);
 }
@@ -165,13 +165,13 @@ void vec_add_unsafe(vec_t *vec, size_t num_elements, const void *data)
 
 void *vec_data(vec_t *vec)
 {
-    REQUIRE_NONNULL(vec)
+    GS_REQUIRE_NONNULL(vec)
     return vec->data;
 }
 
 void *vec_at(const vec_t *vec, size_t pos)
 {
-    REQUIRE_NONNULL(vec)
+    GS_REQUIRE_NONNULL(vec)
     REQUIRE_LESSTHAN(pos, vec->num_elements)
     void *result = (vec->data + pos * vec->sizeof_element);
     return result;
@@ -179,7 +179,7 @@ void *vec_at(const vec_t *vec, size_t pos)
 
 void *vec_peek(const vec_t *vec)
 {
-    REQUIRE_NONNULL(vec)
+    GS_REQUIRE_NONNULL(vec)
     REQUIRE_NONZERO(vec->num_elements)
     void *result = vec_at(vec, vec->num_elements - 1);
     return result;
@@ -187,30 +187,31 @@ void *vec_peek(const vec_t *vec)
 
 void *vec_begin(const vec_t *vec)
 {
-    REQUIRE_NONNULL(vec)
-    REQUIRE_NONZERO(vec->num_elements)
-    void *result = vec_at(vec, 0);
-    return result;
+    if (vec) {
+        REQUIRE_NONZERO(vec->num_elements)
+        void *result = vec_at(vec, 0);
+        return result;
+    } else return NULL;
 }
 
 void *vec_end(const vec_t *vec)
 {
-    REQUIRE_NONNULL(vec)
+    GS_REQUIRE_NONNULL(vec)
     void *result = (vec->data + vec->num_elements * vec->sizeof_element);
     return result;
 }
 
 bool vec_issorted(vec_t *vec, cache_consideration_policy policy, comp_t comp)
 {
-    REQUIRE_NONNULL(vec);
+    GS_REQUIRE_NONNULL(vec);
     REQUIRE((policy != CCP_IGNORECACHE || (comp != NULL)), "Null pointer to required function pointer");
     return (policy == CCP_USECACHE) ? vec->is_sorted : vec_updatesort(vec, comp);
 }
 
 bool vec_updatesort(vec_t *vec, comp_t comp)
 {
-    REQUIRE_NONNULL(vec);
-    REQUIRE_NONNULL(comp);
+    GS_REQUIRE_NONNULL(vec);
+    GS_REQUIRE_NONNULL(comp);
 
     // update sort state
     vec->is_sorted = true;
@@ -236,7 +237,7 @@ void *vec_peek_unsafe(vec_t *vec)
 
 bool vec_set(vec_t *vec, size_t idx, size_t num_elements, const void *data)
 {
-    REQUIRE_NONNULL(vec)
+    GS_REQUIRE_NONNULL(vec)
     if (check_set_args(vec, num_elements, data)) {
         vec->is_sorted = false;
         size_t last_idx = idx + num_elements;
@@ -252,20 +253,20 @@ bool vec_set(vec_t *vec, size_t idx, size_t num_elements, const void *data)
 
 size_t vector_get_num_elements(vec_t *vec)
 {
-    REQUIRE_NONNULL(vec)
+    GS_REQUIRE_NONNULL(vec)
     return vec->num_elements;
 }
 
 size_t vector_get_elements_size(vec_t *vec)
 {
-    REQUIRE_NONNULL(vec)
+    GS_REQUIRE_NONNULL(vec)
     return vec->sizeof_element;
 }
 
 bool vec_foreach(vec_t *vec, void *capture, bool (*func)(void *capture, void *begin, void *end))
 {
-    REQUIRE_NONNULL(vec)
-    REQUIRE_NONNULL(func)
+    GS_REQUIRE_NONNULL(vec)
+    GS_REQUIRE_NONNULL(func)
     vec->is_sorted = false;
     return func(capture, vec->data, vec->data + vec->num_elements * vec->sizeof_element);
 }
@@ -303,8 +304,8 @@ void vec_swap(vec_t *lhs, vec_t *rhs)
 
 size_t vec_count(vec_t *vec, void *capture, bool (*pred)(void *capture, void *it))
 {
-    REQUIRE_NONNULL(vec)
-    REQUIRE_NONNULL(pred)
+    GS_REQUIRE_NONNULL(vec)
+    GS_REQUIRE_NONNULL(pred)
     size_t count = 0;
     void *end = (vec->data + vec->num_elements * vec->sizeof_element);
     for (void *it = vec->data; it != end; it += vec->sizeof_element) {
@@ -315,8 +316,8 @@ size_t vec_count(vec_t *vec, void *capture, bool (*pred)(void *capture, void *it
 
 bool vec_contains(vec_t *vec, void *needle)
 {
-    REQUIRE_NONNULL(vec)
-    REQUIRE_NONNULL(needle)
+    GS_REQUIRE_NONNULL(vec)
+    GS_REQUIRE_NONNULL(needle)
 
     void *end = (vec->data + vec->num_elements * vec->sizeof_element);
     for (void *chunk_start = vec->data; chunk_start < end; chunk_start += vec->sizeof_element) {
@@ -355,8 +356,8 @@ size_t vec_sizeof(const vec_t *vec)
 
 void vec_sort(vec_t *vec, comp_t comp)
 {
-    REQUIRE_NONNULL(vec);
-    REQUIRE_NONNULL(comp);
+    GS_REQUIRE_NONNULL(vec);
+    GS_REQUIRE_NONNULL(comp);
 
     if (!vec->is_sorted) {
         mergesort(vec->data, vec->num_elements, vec->sizeof_element, comp);
@@ -366,10 +367,10 @@ void vec_sort(vec_t *vec, comp_t comp)
 
 void *vec_bsearch(vec_t *vec, const void *needle, comp_t sort_comp, comp_t find_comp)
 {
-    REQUIRE_NONNULL(vec);
-    REQUIRE_NONNULL(needle);
-    REQUIRE_NONNULL(sort_comp);
-    REQUIRE_NONNULL(find_comp);
+    GS_REQUIRE_NONNULL(vec);
+    GS_REQUIRE_NONNULL(needle);
+    GS_REQUIRE_NONNULL(sort_comp);
+    GS_REQUIRE_NONNULL(find_comp);
 
     vec_sort(vec, sort_comp);
 
@@ -397,8 +398,8 @@ void *vec_bsearch(vec_t *vec, const void *needle, comp_t sort_comp, comp_t find_
 
 bool vec_comp(const vec_t *lhs, const vec_t *rhs, comp_t comp)
 {
-    REQUIRE_NONNULL(lhs)
-    REQUIRE_NONNULL(rhs)
+    GS_REQUIRE_NONNULL(lhs)
+    GS_REQUIRE_NONNULL(rhs)
     if ((lhs->num_elements == rhs->num_elements) && (lhs->sizeof_element == rhs->sizeof_element)) {
         size_t step = lhs->sizeof_element;
         size_t end = lhs->num_elements * step;
@@ -434,8 +435,8 @@ void vec_free__str(vec_t *vec)
 
 bool free_strings(void *capture, void *begin, void *end)
 {
-    REQUIRE_NONNULL(begin)
-    REQUIRE_NONNULL(end)
+    GS_REQUIRE_NONNULL(begin)
+    GS_REQUIRE_NONNULL(end)
     REQUIRE_LESSTHAN(begin, end)
     for (char **it = (char **) begin; it < (char **) end; it++) {
         free (*it);
@@ -445,8 +446,8 @@ bool free_strings(void *capture, void *begin, void *end)
 
 bool get_sizeof_strings(void *capture, void *begin, void *end)
 {
-    REQUIRE_NONNULL(begin)
-    REQUIRE_NONNULL(end)
+    GS_REQUIRE_NONNULL(begin)
+    GS_REQUIRE_NONNULL(end)
     REQUIRE_LESSTHAN(begin, end)
 
     size_t total_size = 0;
@@ -466,7 +467,7 @@ static inline bool check_create_args(size_t size, vector_flags flags, float grow
 
 static inline vec_t *alloc_vector()
 {
-    vec_t *result = REQUIRE_MALLOC (sizeof(vec_t));
+    vec_t *result = GS_REQUIRE_MALLOC (sizeof(vec_t));
     error_if((result == NULL), err_bad_malloc);
     return result;
 }
@@ -475,7 +476,7 @@ static inline vec_t *alloc_data(vec_t *vec, vector_flags flags, size_t capacity,
 {
     if (__builtin_expect((vec != NULL) && (vec->data = ((flags & zero_memory) == zero_memory) ?
                                                        calloc(capacity, size) :
-                                                       REQUIRE_MALLOC(capacity * size)) == NULL, false)) {
+                                                       GS_REQUIRE_MALLOC(capacity * size)) == NULL, false)) {
         error(err_bad_malloc);
         free(vec);
         return NULL;

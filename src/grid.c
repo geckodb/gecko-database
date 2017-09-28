@@ -42,7 +42,7 @@ static inline void register_grid(table_t *table, grid_t *grid);
 table_t *table_new(const schema_t *schema, size_t approx_num_horizontal_partitions)
 {
     if (schema != NULL) {
-        table_t *result = REQUIRE_MALLOC(sizeof(table_t));
+        table_t *result = GS_REQUIRE_MALLOC(sizeof(table_t));
         result->schema = schema_cpy(schema);
         result->num_tuples = 0;
         create_indexes(result, approx_num_horizontal_partitions);
@@ -82,17 +82,17 @@ void grid_delete(grid_t *grid)
 
 const char *table_name(const table_t *table)
 {
-    REQUIRE_NONNULL(table);
+    GS_REQUIRE_NONNULL(table);
     return (table->schema->frag_name);
 }
 
 grid_id_t table_add(table_t *table, const attr_id_t *attr_ids_covered, size_t nattr_ids_covered,
                     const tuple_id_interval_t *tuple_ids_covered, size_t ntuple_ids_covered, enum frag_impl_type_t type)
 {
-    REQUIRE_NONNULL(table);
-    REQUIRE_NONNULL(table->schema);
-    REQUIRE_NONNULL(attr_ids_covered);
-    REQUIRE_NONNULL(tuple_ids_covered);
+    GS_REQUIRE_NONNULL(table);
+    GS_REQUIRE_NONNULL(table->schema);
+    GS_REQUIRE_NONNULL(attr_ids_covered);
+    GS_REQUIRE_NONNULL(tuple_ids_covered);
 
     grid_t *grid = create_grid(table, attr_ids_covered, nattr_ids_covered, tuple_ids_covered, ntuple_ids_covered, type);
     indexes_insert(table, grid, attr_ids_covered, nattr_ids_covered, tuple_ids_covered, ntuple_ids_covered);
@@ -112,7 +112,7 @@ grid_id_t table_add(table_t *table, const attr_id_t *attr_ids_covered, size_t na
 
 const freelist_t *table_freelist(const struct table_t *table)
 {
-    REQUIRE_NONNULL(table);
+    GS_REQUIRE_NONNULL(table);
     return &(table->tuple_id_freelist);
 }
 
@@ -185,7 +185,7 @@ table_t *table_melt(enum frag_impl_type_t type, const table_t *src_table, const 
 // This function returns NULL, if the table attribute is not covered by this grid
 const attr_id_t *table_attr_id_to_frag_attr_id(const grid_t *grid, attr_id_t table_attr_id)
 {
-    REQUIRE_NONNULL(grid);
+    GS_REQUIRE_NONNULL(grid);
     const attr_id_t *frag_attr_id = dict_get(grid->schema_map_indicies, &table_attr_id);
     return frag_attr_id;
 }
@@ -202,32 +202,32 @@ const char *table_attr_name_by_id(const table_t *table, attr_id_t id)
 
 size_t table_num_of_attributes(const table_t *table)
 {
-    REQUIRE_NONNULL(table)
+    GS_REQUIRE_NONNULL(table)
     return table->schema->attr->num_elements;
 }
 
 size_t table_num_of_tuples(const table_t *table)
 {
-    REQUIRE_NONNULL(table)
+    GS_REQUIRE_NONNULL(table)
     return table->num_tuples;
 }
 
 size_t table_num_of_grids(const table_t *table)
 {
-    REQUIRE_NONNULL(table)
+    GS_REQUIRE_NONNULL(table)
     return table->grid_ptrs->num_elements;
 }
 
 const grid_t *grid_by_id(const table_t *table, grid_id_t id)
 {
-    REQUIRE_NONNULL(table);
+    GS_REQUIRE_NONNULL(table);
     REQUIRE_LESSTHAN(id, table->grid_ptrs->num_elements);
     return *(const grid_t **) vec_at(table->grid_ptrs, id);
 }
 
 size_t grid_num_of_attributes(const grid_t *grid)
 {
-    REQUIRE_NONNULL(grid);
+    GS_REQUIRE_NONNULL(grid);
     return grid->frag->schema->attr->num_elements;
 }
 
@@ -251,18 +251,18 @@ bool table_is_valide(table_t *table)
 
 void grid_insert(tuple_cursor_t *resultset, table_t *table, size_t ntuplets)
 {
-    REQUIRE_NONNULL(table);
-    REQUIRE_NONNULL(resultset);
+    GS_REQUIRE_NONNULL(table);
+    GS_REQUIRE_NONNULL(resultset);
     REQUIRE((ntuplets > 0), BADINT);
-    tuple_id_t *tuple_ids = REQUIRE_MALLOC(ntuplets * sizeof(tuple_id_t));
+    tuple_id_t *tuple_ids = GS_REQUIRE_MALLOC(ntuplets * sizeof(tuple_id_t));
     freelist_bind(tuple_ids, &table->tuple_id_freelist, ntuplets);
     tuple_cursor_create(resultset, table, tuple_ids, ntuplets);
 }
 
 void grid_print(FILE *file, const table_t *table, grid_id_t grid_id, size_t row_offset, size_t limit)
 {
-    REQUIRE_NONNULL(file)
-    REQUIRE_NONNULL(table)
+    GS_REQUIRE_NONNULL(file)
+    GS_REQUIRE_NONNULL(table)
     const grid_t *grid = grid_by_id(table, grid_id);
     frag_print(stdout, grid->frag, row_offset, limit);
 }
@@ -308,10 +308,10 @@ void table_grid_list_print(FILE *file, const table_t *table, size_t row_offset, 
 
 void table_print(FILE *file, const table_t *table, size_t row_offset, size_t limit)
 {
-    REQUIRE_NONNULL(table);
+    GS_REQUIRE_NONNULL(table);
 
-    tuple_id_t *tuple_ids = REQUIRE_MALLOC(table->num_tuples * sizeof(tuple_id_t));
-    attr_id_t *attr_ids = REQUIRE_MALLOC(table_num_of_attributes(table) * sizeof(attr_id_t));
+    tuple_id_t *tuple_ids = GS_REQUIRE_MALLOC(table->num_tuples * sizeof(tuple_id_t));
+    attr_id_t *attr_ids = GS_REQUIRE_MALLOC(table_num_of_attributes(table) * sizeof(attr_id_t));
 
     for (size_t i = 0; i < table->num_tuples; tuple_ids[i] = i, i++);
     for (size_t i = 0; i < table_num_of_attributes(table); attr_ids[i] = i, i++);
@@ -404,7 +404,7 @@ static inline void create_tuple_id_store(table_t *table)
 static inline grid_t *create_grid(table_t *table, const attr_id_t *attr, size_t nattr,
                                   const tuple_id_interval_t *tuple_ids, size_t ntuple_ids, enum frag_impl_type_t type)
 {
-    grid_t *result = REQUIRE_MALLOC(sizeof(grid_t));
+    grid_t *result = GS_REQUIRE_MALLOC(sizeof(grid_t));
 
     schema_t *grid_schema = schema_subset(table->schema, attr, nattr);
     assert (grid_schema);

@@ -26,8 +26,8 @@ void tuple_field_open(tuple_field_t *field, tuple_t *tuple)
 
 void tuple_field_seek(tuple_field_t *tuple_field, tuple_t *tuple, attr_id_t table_attr_id)
 {
-    REQUIRE_NONNULL(tuple_field);
-    REQUIRE_NONNULL(tuple);
+    GS_REQUIRE_NONNULL(tuple_field);
+    GS_REQUIRE_NONNULL(tuple);
 
     grid_cursor_t *cursor = table_find(tuple->table, &table_attr_id, 1, &tuple->tuple_id, 1);
     REQUIRE_WARGS((grid_cursor_numelem(cursor) == 1),

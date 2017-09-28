@@ -26,7 +26,7 @@
     REQUIRE((index->tag == GI_VINDEX_HASH), BADTAG);
 
 #define REQUIRE_INSTANCEOF_THIS(index)                                                                                 \
-    { REQUIRE_NONNULL(index); REQUIRE_NONNULL(index->extra); require_besearch_hindex_tag(index); }
+    { GS_REQUIRE_NONNULL(index); GS_REQUIRE_NONNULL(index->extra); require_besearch_hindex_tag(index); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 // H E L P E R   P R O T O T Y P E S
@@ -57,7 +57,7 @@ static inline void cleanup_vectors(void *key, void *value)
 
 vindex_t *hash_vindex_new(size_t key_size, size_t num_init_slots)
 {
-    vindex_t *result = REQUIRE_MALLOC(sizeof(vindex_t));
+    vindex_t *result = GS_REQUIRE_MALLOC(sizeof(vindex_t));
     *result = (vindex_t) {
         ._add = this_add,
         ._contains = this_contains,
@@ -73,7 +73,7 @@ vindex_t *hash_vindex_new(size_t key_size, size_t num_init_slots)
             &(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen}, key_size, sizeof(vec_t),
             num_init_slots, num_init_slots, 1.7f, 0.75f, attr_key_equals, cleanup_vectors, false
     );
-    REQUIRE_NONNULL(result->extra);
+    GS_REQUIRE_NONNULL(result->extra);
     return result;
 }
 
@@ -94,7 +94,7 @@ static inline void this_add(struct vindex_t *self, const attr_id_t *key, const s
         free (vec);
     }
     vec_t *vec = (vec_t *) dict_get(dict, key);
-    REQUIRE_NONNULL(vec);
+    GS_REQUIRE_NONNULL(vec);
     vec_pushback(vec, 1, &grid);
 }
 
@@ -108,7 +108,7 @@ static inline bool this_contains(const struct vindex_t *self, const attr_id_t *k
 {
     REQUIRE_INSTANCEOF_THIS(self);
     dict_t *dict = ((dict_t *)self->extra);
-    REQUIRE_NONNULL(dict);
+    GS_REQUIRE_NONNULL(dict);
     return dict_contains_key(dict, key);
 }
 
@@ -123,7 +123,7 @@ void this_free(struct vindex_t *self)
 static inline void this_query(grid_cursor_t *result, const struct vindex_t *self, const attr_id_t *key_begin,
                               const attr_id_t *key_end)
 {
-    REQUIRE_NONNULL(result->extra);
+    GS_REQUIRE_NONNULL(result->extra);
     for (const attr_id_t *key = key_begin; key != key_end; key++) {
         if (this_contains(self, key)) {
             dict_t *dict = ((dict_t *)self->extra);

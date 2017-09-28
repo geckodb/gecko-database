@@ -108,8 +108,8 @@ void frag_insert(struct tuplet_t *out, frag_t *frag, size_t ntuplets)
 
     tuplet_t tmp;
     frag->_insert(&tmp, frag, ntuplets);
-    REQUIRE_NONNULL(tmp.fragment)
-    REQUIRE_NONNULL(tmp.attr_base)
+    GS_REQUIRE_NONNULL(tmp.fragment)
+    GS_REQUIRE_NONNULL(tmp.attr_base)
 
     if (out != NULL) {
         *out = tmp;

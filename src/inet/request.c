@@ -179,7 +179,7 @@ static inline bool strstart(const char *string, const char *substr)
 }
 
 void request_parse(request_t *request, const char *string) {
-    REQUIRE_NONNULL(request)
+    GS_REQUIRE_NONNULL(request)
     char *request_str = strdup(string);
     request_str[strstr(request_str, "\n") - request_str] = '\0';
     fprintf(stderr, "%s\n", request_str );
@@ -242,8 +242,8 @@ const char *methodstr(http_status_code_t code) {
 
 void request_print(FILE *file, const request_t *request)
 {
-    REQUIRE_NONNULL(file)
-    REQUIRE_NONNULL(request)
+    GS_REQUIRE_NONNULL(file)
+    GS_REQUIRE_NONNULL(request)
     printf("request{method=%s, is_valid='%d', resource='%s', params='%s'}\n",
            methodstr(request->method), request->valid, request->resource, "...");
 }

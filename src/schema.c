@@ -41,7 +41,7 @@ const struct attr_t *schema_attr_by_name(const schema_t *schema, const char *nam
 schema_t *schema_new(const char *table_name)
 {
     assert (table_name);
-    schema_t *result = REQUIRE_MALLOC(sizeof(schema_t));
+    schema_t *result = GS_REQUIRE_MALLOC(sizeof(schema_t));
     result->attr = vec_new(sizeof(attr_t), 100);
     result->frag_name = strdup(table_name);
     return result;
@@ -49,8 +49,8 @@ schema_t *schema_new(const char *table_name)
 
 schema_t *schema_subset(schema_t *super, const attr_id_t *indicies, size_t nindicies)
 {
-    REQUIRE_NONNULL(super);
-    REQUIRE_NONNULL(indicies);
+    GS_REQUIRE_NONNULL(super);
+    GS_REQUIRE_NONNULL(indicies);
 
     panic_if(nindicies > super->attr->num_elements, BADINTERNAL,
              "selected indices of super schema illegal.");
@@ -75,7 +75,7 @@ void schema_delete(schema_t *schema)
 schema_t *schema_cpy(const schema_t *schema)
 {
     assert (schema);
-    schema_t *cpy = REQUIRE_MALLOC(sizeof(schema_t));
+    schema_t *cpy = GS_REQUIRE_MALLOC(sizeof(schema_t));
     cpy->attr = vec_cpy_deep(schema->attr);
     cpy->frag_name = strdup(schema->frag_name);
     return cpy;

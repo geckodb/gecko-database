@@ -35,8 +35,8 @@ void hindex_delete(struct hindex_t *index)
 
 void hindex_add(struct hindex_t *index, const tuple_id_interval_t *key, const struct grid_t *grid)
 {
-    REQUIRE_NONNULL(index)
-    REQUIRE_NONNULL(key)
+    GS_REQUIRE_NONNULL(index)
+    GS_REQUIRE_NONNULL(key)
     index->bounds.begin = min(index->bounds.begin, key->begin);
     index->bounds.end   = max(index->bounds.end, key->end);
     DELEGATE_CALL_WARGS(index, _add, key, grid);
@@ -44,8 +44,8 @@ void hindex_add(struct hindex_t *index, const tuple_id_interval_t *key, const st
 
 void hindex_remove(struct hindex_t *index, const tuple_id_interval_t *key)
 {
-    REQUIRE_NONNULL(index)
-    REQUIRE_NONNULL(key)
+    GS_REQUIRE_NONNULL(index)
+    GS_REQUIRE_NONNULL(key)
     DELEGATE_CALL_WARGS(index, _remove_interval, key);
     index->bounds.begin = (key->begin == index->bounds.begin)? DELEGATE_CALL(index, _minbegin) : index->bounds.begin;
     index->bounds.end = (key->end == index->bounds.end)? DELEGATE_CALL(index, _maxend) : index->bounds.end;
@@ -64,8 +64,8 @@ bool hindex_contains(const struct hindex_t *index, tuple_id_t tid)
 grid_cursor_t *hindex_query(const struct hindex_t *index, const tuple_id_t *tid_begin,
                             const tuple_id_t *tid_end)
 {
-    REQUIRE_NONNULL(tid_begin);
-    REQUIRE_NONNULL(tid_end);
+    GS_REQUIRE_NONNULL(tid_begin);
+    GS_REQUIRE_NONNULL(tid_end);
     REQUIRE(tid_begin < tid_end, "Corrupted range");
     size_t approx_result_capacity = ((tid_end - tid_begin) * schema_num_attributes(index->table_schema));
     grid_cursor_t *result = grid_cursor_new(approx_result_capacity);
@@ -85,8 +85,8 @@ void hindex_close(grid_cursor_t *result_set)
 
 void hindex_bounds(tuple_id_interval_t *bounds, const hindex_t *index)
 {
-    REQUIRE_NONNULL(bounds);
-    REQUIRE_NONNULL(index);
+    GS_REQUIRE_NONNULL(bounds);
+    GS_REQUIRE_NONNULL(index);
     bounds->begin = index->bounds.begin;
     bounds->end = index->bounds.end;
 }
@@ -99,7 +99,7 @@ void hindex_print(FILE *file, const hindex_t *index)
     attr_create_gridid("grid id", print_schema);
     frag_t *frag = frag_new(print_schema, 1, FIT_HOST_NSM_VM);
     size_t dist = index->bounds.end - index->bounds.begin;
-    tuple_id_t *ids = REQUIRE_MALLOC(dist * sizeof(tuple_id_t));
+    tuple_id_t *ids = GS_REQUIRE_MALLOC(dist * sizeof(tuple_id_t));
     for (tuple_id_t i = index->bounds.begin; i < index->bounds.end; i++) {
         ids[i] = i;
     }

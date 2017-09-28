@@ -39,7 +39,7 @@ char *clip(const char *str, size_t max_len)
 char *unsafe_field_str(enum field_type type, const void *data)
 {
     const size_t INIT_BUFFER_LEN = 2048;
-    char *buffer = REQUIRE_MALLOC(INIT_BUFFER_LEN);
+    char *buffer = GS_REQUIRE_MALLOC(INIT_BUFFER_LEN);
     switch (type) {
         case FT_BOOL:
             strcpy (buffer, *((bool *) data) == true? "true" : "false");

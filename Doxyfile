@@ -1833,7 +1833,7 @@ GENERATE_MAN           = NO
 MAN_OUTPUT             = man
 
 # The MAN_EXTENSION tag determines the extension that is added to the generated
-# man pages. In case the manual section does not start with a number, the number
+# man pages. In case the manual section does not start_system with a number, the number
 # 3 is prepended. The dot (.) at the beginning of the MAN_EXTENSION tag is
 # optional.
 # The default value is: .3.
@@ -2104,7 +2104,7 @@ PERL_PATH              = /usr/bin/perl
 
 CLASS_DIAGRAMS         = YES
 
-# You can define message sequence charts within doxygen comments using the \msc
+# You can define tag sequence charts within doxygen comments using the \msc
 # command. Doxygen will then run the mscgen tool (see:
 # http://www.mcternan.me.uk/mscgen/)) to produce the chart and insert it in the
 # documentation. The MSCGEN_PATH tag allows you to specify the directory where

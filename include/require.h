@@ -36,7 +36,7 @@ typedef enum {
 // M A C R O S
 // ---------------------------------------------------------------------------------------------------------------------
 
-#define REQUIRE_NONNULL(x)                                                                                             \
+#define GS_REQUIRE_NONNULL(x)                                                                                             \
     panic_if((x == NULL), BADARG, "parameter '" to_string(x) "' is null");
 
 #define REQUIRE_IMPL(fun)                                                                                              \
@@ -57,7 +57,7 @@ typedef enum {
 #define require_not_zero(value)                                                                                        \
     REQUIRE(value > 0, to_string(value) " is not allowed to be zero")
 
-#define REQUIRE_MALLOC(size)                                                                                           \
+#define GS_REQUIRE_MALLOC(size)                                                                                           \
     ({                                                                                                                 \
         void *block = malloc(size);                                                                                    \
         panic_if((block == NULL), BADMALLOC, "request to allocate '" to_string(size) "' bytes failed");                \

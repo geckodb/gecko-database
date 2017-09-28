@@ -22,44 +22,44 @@
 void tuplet_open(tuplet_t *dst, struct frag_t *frag, tuplet_id_t tuplet_id)
 {
     if (frag->ntuplets > 0) {
-        REQUIRE_NONNULL(frag);
-        REQUIRE_NONNULL(frag->_open);
+        GS_REQUIRE_NONNULL(frag);
+        GS_REQUIRE_NONNULL(frag->_open);
         frag->_open(dst, frag, tuplet_id);
     }
 }
 
 bool tuplet_next(tuplet_t *tuplet)
 {
-    REQUIRE_NONNULL(tuplet);
-    REQUIRE_NONNULL(tuplet->_next);
+    GS_REQUIRE_NONNULL(tuplet);
+    GS_REQUIRE_NONNULL(tuplet->_next);
     return tuplet->_next(tuplet);
 }
 
 void tuplet_rewind(tuplet_t *tuplet)
 {
-    REQUIRE_NONNULL(tuplet);
+    GS_REQUIRE_NONNULL(tuplet);
     frag_t *frag = tuplet->fragment;
     tuplet_open(tuplet, frag, 0);
 }
 
 void tuplet_set_null(tuplet_t *tuplet)
 {
-    REQUIRE_NONNULL(tuplet);
-    REQUIRE_NONNULL(tuplet->_set_null);
+    GS_REQUIRE_NONNULL(tuplet);
+    GS_REQUIRE_NONNULL(tuplet->_set_null);
     tuplet->_set_null(tuplet);
 }
 
 bool tuplet_is_null(tuplet_t *tuplet)
 {
-    REQUIRE_NONNULL(tuplet);
-    REQUIRE_NONNULL(tuplet->_is_null);
+    GS_REQUIRE_NONNULL(tuplet);
+    GS_REQUIRE_NONNULL(tuplet->_is_null);
     return (tuplet->_is_null(tuplet));
 }
 
 size_t tuplet_size(tuplet_t *tuplet)
 {
-    REQUIRE_NONNULL(tuplet);
-    REQUIRE_NONNULL(tuplet->fragment);
+    GS_REQUIRE_NONNULL(tuplet);
+    GS_REQUIRE_NONNULL(tuplet->fragment);
     return tuplet->fragment->tuplet_size;
 }
 

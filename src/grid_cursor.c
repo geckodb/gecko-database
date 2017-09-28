@@ -20,7 +20,7 @@
 
 grid_cursor_t *grid_cursor_new(size_t cursor)
 {
-    grid_cursor_t *result = REQUIRE_MALLOC(sizeof(grid_cursor_t));
+    grid_cursor_t *result = GS_REQUIRE_MALLOC(sizeof(grid_cursor_t));
     *result = (grid_cursor_t) {
             .extra = vec_new(sizeof(struct grid_t *), cursor)
     };
@@ -65,12 +65,12 @@ struct grid_t *grid_cursor_next(grid_cursor_t *cursor)
 
 size_t grid_cursor_numelem(const grid_cursor_t *cursor)
 {
-    REQUIRE_NONNULL(cursor);
+    GS_REQUIRE_NONNULL(cursor);
     return ((vec_t * ) cursor->extra)->num_elements;
 }
 
 bool grid_cursor_is_empty(const grid_cursor_t *cursor)
 {
-    REQUIRE_NONNULL(cursor)
+    GS_REQUIRE_NONNULL(cursor)
     return (vec_length(cursor->extra) == 0);
 }

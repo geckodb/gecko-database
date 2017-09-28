@@ -79,7 +79,7 @@ struct frag_t *frag_host_vm_dsm_new(schema_t *schema, size_t tuplet_capacity)
 
 static inline frag_t *frag_create(schema_t *schema, size_t tuplet_capacity, enum tuplet_format format)
 {
-    frag_t *fragment = REQUIRE_MALLOC(sizeof(frag_t));
+    frag_t *fragment = GS_REQUIRE_MALLOC(sizeof(frag_t));
     size_t tuplet_size   = tuplet_size_by_schema(schema);
     size_t required_size = tuplet_size * tuplet_capacity;
     *fragment = (frag_t) {
@@ -87,7 +87,7 @@ static inline frag_t *frag_create(schema_t *schema, size_t tuplet_capacity, enum
             .format = format,
             .ntuplets = 0,
             .ncapacity = tuplet_capacity,
-            .tuplet_data = REQUIRE_MALLOC (required_size),
+            .tuplet_data = GS_REQUIRE_MALLOC (required_size),
             .tuplet_size = tuplet_size,
             ._scan = scan_mediator,
             ._dispose = frag_dipose,
@@ -128,7 +128,7 @@ static inline void tuplet_rebase(tuplet_t *tuplet, frag_t *frag, tuplet_id_t tup
 
 static inline void frag_open_internal(tuplet_t *out, frag_t *self, size_t pos)
 {
-    REQUIRE_NONNULL(out)
+    GS_REQUIRE_NONNULL(out)
     if (self->ntuplets > 0) {
         *out = (tuplet_t) {
             ._next = tuplet_step,
@@ -202,7 +202,7 @@ static inline void field_movebase(tuplet_field_t *field)
 
 static inline void tuplet_bind(tuplet_field_t *dst, tuplet_t *self)
 {
-    REQUIRE_NONNULL(dst)
+    GS_REQUIRE_NONNULL(dst)
     assert (self);
     assert (self->fragment);
     assert (self->fragment->ntuplets);

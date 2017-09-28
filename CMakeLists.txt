@@ -130,9 +130,14 @@ set(SOURCE_FILES
         third-party/json-parser/json.h
         include/utils.h
         src/utils.c
-        src/dispatch.c
-        include/dispatch.h
-        )
+        src/dispatcher.c
+        include/dispatcher.h
+        src/gs_event.c
+        include/gs_event.h
+        src/gs_gridstore.c
+        include/gs_gridstore.h
+        include/info.h
+        include/shell.h src/shell.c)
 
 add_executable(
         gridstore

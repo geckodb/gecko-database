@@ -45,8 +45,17 @@ typedef enum {
     err_limitreached,
     err_no_free_space,
     err_notincharge,
-    err_dispatcher_terminated
+    err_dispatcher_terminated,
+    err_apr_initfailed,
+    err_init_failed,
+    err_connect_failed
 } error_code;
+
+#define GS_SUCCESS          0
+#define GS_CATCHED          2
+#define GS_SKIPPED          3
+
+typedef int gs_status_t;
 
 void error(error_code code);
 
@@ -78,9 +87,16 @@ void trace_print(FILE *file);
 
 #define warn(msg, args...)                                                                                             \
     {                                                                                                                  \
-        /*begin_write("WARNING");                                                                                      \
+        begin_write("WARNING");                                                                                        \
         fprintf(stderr, msg, args);                                                                                    \
-        end_write();  */                                                                                               \
+        end_write();                                                                                                   \
+    }
+
+#define GS_DEBUG(msg, args...)                                                                                         \
+    {                                                                                                                  \
+        fprintf(stderr, "# DEBUG: ");                                                                                  \
+        fprintf(stderr, msg, args);                                                                                    \
+        fprintf(stderr, "\n");                                                                                         \
     }
 
 #define panic_if(expr, msg, args...)                                                                                   \

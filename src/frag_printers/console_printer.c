@@ -35,7 +35,7 @@ static inline void print_frag_body(FILE *file, frag_t *frag, vec_t *field_print_
 
 struct frag_printer_t *console_printer_new()
 {
-    frag_printer_t *result = REQUIRE_MALLOC(sizeof(frag_printer_t));
+    frag_printer_t *result = GS_REQUIRE_MALLOC(sizeof(frag_printer_t));
     *result = (frag_printer_t) {
         ._print = console_printer_print,
         ._free  = console_printer_free,

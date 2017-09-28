@@ -35,7 +35,7 @@ str_clean_up(
 
 void server_create(server_t *server, unsigned short port, capture_t *capture)
 {
-    REQUIRE_NONNULL(server);
+    GS_REQUIRE_NONNULL(server);
 
     server->socket_len = sizeof(server->client_addr);
     int on = 1;
@@ -54,7 +54,7 @@ void server_create(server_t *server, unsigned short port, capture_t *capture)
 
     if (listen(server->server_desc, 10) < 0) {
         close(server->server_desc);
-        panic("unable to start listening to port %d (%s).", (int) ntohs(server->server_addr.sin_port), strerror(errno));
+        panic("unable to start_system listening to port %d (%s).", (int) ntohs(server->server_addr.sin_port), strerror(errno));
     }
 
     server->routers = hash_table_new_ex(&(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen},
@@ -67,13 +67,13 @@ void server_create(server_t *server, unsigned short port, capture_t *capture)
 
 void server_router_add(server_t *server, const char *resource, router_t router)
 {
-    REQUIRE_NONNULL(server)
+    GS_REQUIRE_NONNULL(server)
     dict_put(server->routers, &resource, &router);
 }
 
 void server_start(server_t *server, router_t catch)
 {
-    REQUIRE_NONNULL(server);
+    GS_REQUIRE_NONNULL(server);
     int client;
     char buffer[131072];
     request_t request;

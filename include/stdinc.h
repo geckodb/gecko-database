@@ -141,12 +141,14 @@ typedef MD5_CTX checksum_context_t;
 #define max(x,y) (x > y ? x : y)
 
 #if defined(__cplusplus)
-#define	__BEGIN_EXTERN	extern "C" {
-#define	__END_EXTERN	}
+#define	__BEGIN_DECLS	extern "C" {
+#define	__END_DECLS	}
 #else
 #define	__BEGIN_DECLS
 #define	__END_DECLS
 #endif
+
+#define GS_DECLARE(type) type
 
 #define to_string2(x)   to_string(x)
 #define to_string(x)    #x
@@ -157,14 +159,14 @@ typedef MD5_CTX checksum_context_t;
 
 #define DELEGATE_CALL(instance, fun)                                                                                   \
     ({                                                                                                                 \
-        REQUIRE_NONNULL(instance);                                                                                     \
+        GS_REQUIRE_NONNULL(instance);                                                                                  \
         REQUIRE_IMPL(instance->fun);                                                                                   \
         instance->fun(instance);                                                                                       \
     })
 
 #define DELEGATE_CALL_WARGS(instance, fun, ...)                                                                        \
     ({                                                                                                                 \
-        REQUIRE_NONNULL(instance);                                                                                     \
+        GS_REQUIRE_NONNULL(instance);                                                                                  \
         REQUIRE_IMPL(instance->fun);                                                                                   \
         instance->fun(instance,__VA_ARGS__);                                                                           \
     })
@@ -177,6 +179,9 @@ static inline const char *tuplet_format_str(enum tuplet_format format)
         default: perror("Unknown tuple format"); abort();
     }
 }
+
+#define GS_CONNECT(sig, slot)                                                                                          \
+    error_if((gs_dispatcher_connect(dispatcher, sig, slot) != GS_SUCCESS), err_connect_failed);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // D E F I N E S

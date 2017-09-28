@@ -15,76 +15,84 @@
 // I N C L U D E S
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <stdinc.h>
 #include <argp.h>
-
-#include <stdio.h>
-#include <grid.h>
-#include <tuple_field.h>
-#include <inet/server.h>
-
-#include <routers/catch.h>
-#include <routers/api/types/create/router.h>
+#include <info.h>
+#include <dispatcher.h>
 
 // curl -i -G -d "key=val" -d "abs=[1,2,3,4]" http://localhost:36895/api/test
 
-const char *argp_program_version     = "v1.0.0";
-const char *argp_program_bug_address = "<pinnecke@ovgu.de>";
+gs_gridstore_t    *gridstore;
+gs_dispatcher_t   *dispatcher;
 
-struct arguments
-{
-    size_t port;
-};
-
-static struct argp_option options[] =
-{
-        {"port", 'p', "NUMBER",         0, "Listening to a specific port"},
-        {0}
-};
-
-static error_t parse_opt (int key, char *arg, struct argp_state *state)
-{
-    struct arguments *arguments = state->input;
-
-    switch (key)
-    {
-        case 'p':
-            arguments->port = strtoint(arg);
-            break;
-        default:
-            return ARGP_ERR_UNKNOWN;
-    }
-    return 0;
-}
-
-static char args_doc[] = "app.manifest";
-
-static char doc[] =
-        "Grid Store -- a fancy database system";
-
-static struct argp argp = {options, parse_opt, args_doc, doc};
-
-//static inline void enter_main_loop(unsigned short port_num);
+static inline void setup_config(int argc, char **argv);
+static inline void setup_core();
+static inline void setup_shell();
+static inline void setup_server();
+static inline void setup_events();
+static inline void start_system();
 
 int main(int argc, char* argv[])
 {
-    struct arguments arguments;
+    setup_config(argc, argv);
+    setup_core();
+    setup_shell();
+    setup_server();
+    setup_events();
 
-    arguments.port = 35497;
+    gs_dispatcher_publish(dispatcher, gs_event_gridstore_test(gridstore));
+    gs_dispatcher_publish(dispatcher, gs_event_dispatcher_shutdown(dispatcher));
 
-    argp_parse (&argp, argc, argv, 0, 0, &arguments);
-   // enter_main_loop(arguments.port);
+    start_system();
 
-    printf("If you see this message, you did good.");
+
 
     return EXIT_SUCCESS;
 }
 
-/*static inline void enter_main_loop(unsigned short port_num)
+static inline void setup_config(int argc, char **argv)
+{
+    startup_config.port = 35497;
+
+    argp_parse (&argp, argc, argv, 0, 0, &startup_config);
+}
+
+static inline void setup_core()
+{
+    error_if((apr_initialize() != APR_SUCCESS), err_apr_initfailed);
+    gs_gridstore_create(&gridstore);
+}
+
+static inline void setup_shell()
 {
 
+}
 
-    server_t server;
-    server_create(&server, port_num, NULL);
-    server_router_add(&server, "/api/types/create", router_api_types_create);
-    server_start(&server, router_catch);
-}*/
+static inline void setup_server()
+{
+    /*server_t server;
+  server_create(&server, port_num, NULL);
+  server_router_add(&server, "/api/types/create", router_api_types_create);
+  server_start(&server, router_catch);*/
+}
+
+static inline void setup_events()
+{
+    gs_status_t dispatcher_shutdown(const gs_event_t *event);
+
+    error_if((gs_dispatcher_create(&dispatcher) != GS_SUCCESS), err_init_failed);
+
+    GS_CONNECT(GS_SIG_SHUTDOWN, dispatcher_shutdown);
+
+    GS_CONNECT(GS_SIG_TEST,     gs_gridstore_handle_events);
+}
+
+static inline void start_system()
+{
+    gs_dispatcher_start(dispatcher);
+}
+
+gs_status_t dispatcher_shutdown(const gs_event_t *event) {
+    gs_dispatcher_shutdown(dispatcher);
+    return GS_SUCCESS;
+}

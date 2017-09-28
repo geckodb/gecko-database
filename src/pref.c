@@ -40,8 +40,8 @@ pref_load(
         dict_t *dict,
         char * (*resolve_variables)(dict_t *dict, const char *string))
 {
-    REQUIRE_NONNULL(pref)
-    REQUIRE_NONNULL(file)
+    GS_REQUIRE_NONNULL(pref)
+    GS_REQUIRE_NONNULL(file)
 
    // panic_if((access(file, F_OK ) == -1), NOSUCHFILE, file); // TODO: Hack
 
@@ -143,9 +143,9 @@ const char *pref_get_str(
     const char *key,
     const char *default_val)
 {
-    REQUIRE_NONNULL(pref);
-    REQUIRE_NONNULL(pref->dict);
-    REQUIRE_NONNULL(key);
+    GS_REQUIRE_NONNULL(pref);
+    GS_REQUIRE_NONNULL(pref->dict);
+    GS_REQUIRE_NONNULL(key);
 
     const char **value = (const char **) dict_get(pref->dict, &key);
     return (value != NULL ? (*value) : default_val);

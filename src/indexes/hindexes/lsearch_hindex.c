@@ -34,7 +34,7 @@ typedef struct entry_t {
     REQUIRE((index->tag == HT_LINEAR_SEARCH), BADTAG);
 
 #define REQUIRE_INSTANCEOF_THIS(index)                                                                                 \
-    { REQUIRE_NONNULL(index); REQUIRE_NONNULL(index->extra); require_besearch_hindex_tag(index); }
+    { GS_REQUIRE_NONNULL(index); GS_REQUIRE_NONNULL(index->extra); require_besearch_hindex_tag(index); }
 
 // ---------------------------------------------------------------------------------------------------------------------
 // H E L P E R   P R O T O T Y P E S
@@ -60,9 +60,9 @@ static inline void find_all_by_point(vec_t *result, vec_t *haystack, const tuple
 
 hindex_t *lesearch_hindex_new(size_t approx_num_horizontal_partitions, const schema_t *table_schema)
 {
-    REQUIRE_NONNULL(table_schema);
+    GS_REQUIRE_NONNULL(table_schema);
 
-    hindex_t *result = REQUIRE_MALLOC(sizeof(hindex_t));
+    hindex_t *result = GS_REQUIRE_MALLOC(sizeof(hindex_t));
     *result = (hindex_t) {
         .tag = HT_LINEAR_SEARCH,
 
@@ -113,8 +113,8 @@ static inline void find_all_by_point(vec_t *result, vec_t *haystack, const tuple
 static inline void this_add(struct hindex_t *self, const tuple_id_interval_t *key, const struct grid_t *grid)
 {
     REQUIRE_INSTANCEOF_THIS(self);
-    REQUIRE_NONNULL(key);
-    REQUIRE_NONNULL(grid);
+    GS_REQUIRE_NONNULL(key);
+    GS_REQUIRE_NONNULL(grid);
 
     vec_t *vec = self->extra;
     entry_t *result = find_interval(vec, key);
@@ -134,9 +134,9 @@ static inline void this_query(grid_cursor_t *result, const struct hindex_t *self
                               const tuple_id_t *tid_end)
 {
     REQUIRE_INSTANCEOF_THIS(self);
-    REQUIRE_NONNULL(result);
-    REQUIRE_NONNULL(tid_begin);
-    REQUIRE_NONNULL(tid_end);
+    GS_REQUIRE_NONNULL(result);
+    GS_REQUIRE_NONNULL(tid_begin);
+    GS_REQUIRE_NONNULL(tid_end);
     REQUIRE(tid_begin < tid_end, "Corrupted range");
     for (const tuple_id_t *needle = tid_begin; needle != tid_end; needle++) {
         find_all_by_point((vec_t *) result->extra, (vec_t *) self->extra, *needle);

@@ -40,7 +40,7 @@ static char *replace(const char *in, const char *pattern, const char *by)
 {
     size_t outsize = strlen(in) + 1;
     // TODO maybe avoid reallocing by counting the non-overlapping occurences of pattern
-    char *res = REQUIRE_MALLOC(outsize);
+    char *res = GS_REQUIRE_MALLOC(outsize);
     // use this to iterate over the output
     size_t resoffset = 0;
 
@@ -75,7 +75,7 @@ get_home_dir(
     char *      myimdb_home          = NULL;
     const char *myimdb_home_path     = NULL;
     const char *env_myimdb_home      = getenv(CONF_ENV_VAR_MYIMDB_HOME);
-    myimdb_home                      = REQUIRE_MALLOC(strlen(CONF_VAR_MYIMDB_HOME) + 1);
+    myimdb_home                      = GS_REQUIRE_MALLOC(strlen(CONF_VAR_MYIMDB_HOME) + 1);
     strcpy(myimdb_home, CONF_VAR_MYIMDB_HOME);
 
     if (env_myimdb_home) {
@@ -245,7 +245,7 @@ conf_get_size_t(
 
 void db_config_load(db_config_t *config)
 {
-    REQUIRE_NONNULL(config);
+    GS_REQUIRE_NONNULL(config);
     config->inet.port = CONF_INET_PORT;
     config->log.debug = config->log.warn = config->log.error = true;
 }

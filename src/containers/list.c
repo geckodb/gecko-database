@@ -47,7 +47,7 @@ static header_t *_get_node_ptr(const void *);
 list_t *list_new(size_t element_size)
 {
     list_t *list = NULL;
-    if (_check_create_args(element_size) && ((list = REQUIRE_MALLOC(sizeof(list_t))))) {
+    if (_check_create_args(element_size) && ((list = GS_REQUIRE_MALLOC(sizeof(list_t))))) {
         list->element_size = element_size;
         list->num_elements = 0;
         list->root = list->tail = NULL;
@@ -63,13 +63,13 @@ void list_delete(list_t *list)
 
 bool list_is_empty(const list_t *list)
 {
-    REQUIRE_NONNULL(list)
+    GS_REQUIRE_NONNULL(list)
     return (list->num_elements == 0);
 }
 
 void list_clear(list_t *list)
 {
-    REQUIRE_NONNULL(list)
+    GS_REQUIRE_NONNULL(list)
     header_t *it = list->root, *next = NULL;
     while (it) {
         next = it->next;
@@ -80,10 +80,10 @@ void list_clear(list_t *list)
 
 bool list_push(list_t *list, const void *data)
 {
-    REQUIRE_NONNULL(list)
-    REQUIRE_NONNULL(data)
+    GS_REQUIRE_NONNULL(list)
+    GS_REQUIRE_NONNULL(data)
     header_t *node = NULL;
-    if ((node = REQUIRE_MALLOC(sizeof(header_t) + list->element_size))) {
+    if ((node = GS_REQUIRE_MALLOC(sizeof(header_t) + list->element_size))) {
         node->prev = node->next = NULL;
         memcpy(node + 1, data, list->element_size);
         if (list_is_empty(list)) {
@@ -101,13 +101,13 @@ bool list_push(list_t *list, const void *data)
 
 const void *list_begin(const list_t *list)
 {
-    REQUIRE_NONNULL(list)
+    GS_REQUIRE_NONNULL(list)
     return ((!list_is_empty(list))) ? _get_data_ptr(list->root) : NULL;
 }
 
 const void *list_next(const void *data)
 {
-    REQUIRE_NONNULL(data)
+    GS_REQUIRE_NONNULL(data)
     const header_t *node;
     return ((node = _get_node_ptr(data)) && (node->next) && (node->list->tail != node)) ?
             _get_data_ptr(node->next) : NULL;
@@ -115,7 +115,7 @@ const void *list_next(const void *data)
 
 void list_remove(const void *data)
 {
-    REQUIRE_NONNULL(data)
+    GS_REQUIRE_NONNULL(data)
     header_t *node = _get_node_ptr(data);
     list_t *list = node->list;
     if (node->prev) {
@@ -139,7 +139,7 @@ void list_remove(const void *data)
 
 size_t list_length(const list_t *list)
 {
-    REQUIRE_NONNULL(list)
+    GS_REQUIRE_NONNULL(list)
     return list->num_elements;
 }
 

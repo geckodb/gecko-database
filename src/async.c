@@ -40,11 +40,11 @@ static void _future_free(future_t future);
 
 future_t future_new(const void *capture, promise_t func, future_eval_policy policy)
 {
-    REQUIRE_NONNULL(capture)
-    REQUIRE_NONNULL(func);
+    GS_REQUIRE_NONNULL(capture)
+    GS_REQUIRE_NONNULL(func);
     future_t future = NULL;
 
-    if ((future = REQUIRE_MALLOC(sizeof(struct _future_t)))) {
+    if ((future = GS_REQUIRE_MALLOC(sizeof(struct _future_t)))) {
             future->call_result = NULL;
             future->capture = capture;
             future->func = func;
@@ -58,7 +58,7 @@ future_t future_new(const void *capture, promise_t func, future_eval_policy poli
 
 void future_wait_for(future_t future)
 {
-    REQUIRE_NONNULL(future)
+    GS_REQUIRE_NONNULL(future)
     if (future->eval_policy == future_lazy) {
         _start_thread(future);
     }
@@ -68,8 +68,8 @@ void future_wait_for(future_t future)
 const void *future_resolve(promise_result *return_type, future_t future)
 {
     void *result = NULL;
-    REQUIRE_NONNULL(future)
-    REQUIRE_NONNULL(future->thread_args)
+    GS_REQUIRE_NONNULL(future)
+    GS_REQUIRE_NONNULL(future->thread_args)
 
     if (!atomic_load(&future->promise_settled))
         future_wait_for(future);
@@ -99,8 +99,8 @@ const void *future_resolve(promise_result *return_type, future_t future)
 
 bool _eval(future_t future, future_eval_policy policy)
 {
-    REQUIRE_NONNULL(future)
-    REQUIRE_NONNULL(future->func)
+    GS_REQUIRE_NONNULL(future)
+    GS_REQUIRE_NONNULL(future->func)
 
     promise_result return_value = rejected;
     void *call_result = NULL;
@@ -161,9 +161,9 @@ bool _lazy_exec(void *call_result, future_t future, promise_result return_value)
 {
     thrd_t *thread;
     _this_exec_args* args;
-    REQUIRE_NONNULL(future)
+    GS_REQUIRE_NONNULL(future)
 
-    if ((args = REQUIRE_MALLOC(sizeof(_this_exec_args))) && (thread = REQUIRE_MALLOC(sizeof(thrd_t)))) {
+    if ((args = GS_REQUIRE_MALLOC(sizeof(_this_exec_args))) && (thread = GS_REQUIRE_MALLOC(sizeof(thrd_t)))) {
         args->call_result = call_result;
         args->future = future;
         args->return_value = return_value;
@@ -190,7 +190,7 @@ void _start_thread(future_t future)
 
 void _future_free(future_t future)
 {
-    REQUIRE_NONNULL(future)
+    GS_REQUIRE_NONNULL(future)
     if (future->call_result != NULL)
         free(future->call_result);
     if (future->thread_args)

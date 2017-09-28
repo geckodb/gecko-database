@@ -155,7 +155,7 @@ static inline tuplet_id_t global_to_local(grid_t *grid, tuple_id_t tuple_id, acc
     // The tuplet identifier that is mapped in this grid to the given 'tuplet_id'
     tuplet_id_t result = 0;
 
-    // Determine where to start in the interval list. The last position was cached, so start here if possible
+    // Determine where to start in the interval list. The last position was cached, so start_system here if possible
     tuple_id_interval_t *cursor = (grid->last_interval_cache != NULL ? grid->last_interval_cache : grid->tuple_ids->data);
 
     // Determine the end of the interval list. If cursor reaches this end, the tuple is not mapped into this grid.
@@ -177,7 +177,7 @@ static inline tuplet_id_t global_to_local(grid_t *grid, tuple_id_t tuple_id, acc
                                 vec_issorted(grid->tuple_ids, CCP_IGNORECACHE, interval_tuple_id_comp_by_lower_bound));
 
                 // TODO: apply evolutionary algorithm here to find choice of alternatives once alternatives exists
-                // Alternatives besides bsearch might be linear search w/o multi-threading from cache or start/end, ...
+                // Alternatives besides bsearch might be linear search w/o multi-threading from cache or start_system/end, ...
 
                 // Perform binary search. Note here that this only works, because we exploit an assumption on the
                 // intervals contained in the list: intervals do not overlap and the needle can be used to state whether

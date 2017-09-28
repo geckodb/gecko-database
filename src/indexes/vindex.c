@@ -44,8 +44,8 @@ bool vindex_contains(const vindex_t *index, const attr_id_t *key)
 grid_cursor_t *vindex_query(const struct vindex_t *index, const attr_id_t *key_range_begin,
                             const attr_id_t *key_range_end)
 {
-    REQUIRE_NONNULL(key_range_begin);
-    REQUIRE_NONNULL(key_range_end);
+    GS_REQUIRE_NONNULL(key_range_begin);
+    GS_REQUIRE_NONNULL(key_range_end);
     REQUIRE(key_range_begin < key_range_end, "Corrupted range");
     size_t result_capacity = (key_range_end - key_range_begin);
     grid_cursor_t *result = grid_cursor_new(result_capacity);
@@ -72,20 +72,20 @@ void vindex_close(grid_cursor_t *result_set)
 
 const attr_id_t *vindex_begin(const vindex_t *index)
 {
-    REQUIRE_NONNULL(index);
+    GS_REQUIRE_NONNULL(index);
     return hashset_begin(&index->keys);
 }
 
 const attr_id_t *vindex_end(const vindex_t *index)
 {
-    REQUIRE_NONNULL(index);
+    GS_REQUIRE_NONNULL(index);
     return hashset_end(&index->keys);
 }
 
 void vindex_print(FILE *file, vindex_t *index)
 {
-    REQUIRE_NONNULL(file);
-    REQUIRE_NONNULL(index);
+    GS_REQUIRE_NONNULL(file);
+    GS_REQUIRE_NONNULL(index);
 
     schema_t *print_schema = schema_new("ad hoc info");
     attr_create_strptr("attribute", print_schema);

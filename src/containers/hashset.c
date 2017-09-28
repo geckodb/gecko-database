@@ -20,7 +20,7 @@
 
 void hashset_create(hashset_t *out, size_t elem_size, size_t capacity)
 {
-    REQUIRE_NONNULL(out)
+    GS_REQUIRE_NONNULL(out)
     REQUIRE_NONZERO(elem_size)
     REQUIRE_NONZERO(capacity)
     out->dict = hash_table_new_jenkins(elem_size, sizeof(bool), capacity, 1.7f, 0.75f);
@@ -29,7 +29,7 @@ void hashset_create(hashset_t *out, size_t elem_size, size_t capacity)
 
 void hashset_dispose(hashset_t *set)
 {
-    REQUIRE_NONNULL(set)
+    GS_REQUIRE_NONNULL(set)
     dict_delete(set->dict);
     vec_free(set->vec);
     set->dict = NULL;
@@ -38,10 +38,10 @@ void hashset_dispose(hashset_t *set)
 
 void hashset_add(hashset_t *set, const void *data, size_t num_elems)
 {
-    REQUIRE_NONNULL(set)
-    REQUIRE_NONNULL(set->vec)
-    REQUIRE_NONNULL(set->dict)
-    REQUIRE_NONNULL(data)
+    GS_REQUIRE_NONNULL(set)
+    GS_REQUIRE_NONNULL(set->vec)
+    GS_REQUIRE_NONNULL(set->dict)
+    GS_REQUIRE_NONNULL(data)
     REQUIRE_NONZERO(num_elems)
     if (!dict_contains_key(set->dict, data)) {
         vec_pushback(set->vec, num_elems, data);
@@ -57,21 +57,21 @@ void hashset_remove(hashset_t *set, const void *data, size_t num_elems)
 
 bool hashset_contains(const hashset_t *set, const void *data)
 {
-    REQUIRE_NONNULL(set)
-    REQUIRE_NONNULL(set->dict)
+    GS_REQUIRE_NONNULL(set)
+    GS_REQUIRE_NONNULL(set->dict)
     return dict_contains_key(set->dict, data);
 }
 
 const void *hashset_begin(const hashset_t *set)
 {
-    REQUIRE_NONNULL(set)
-    REQUIRE_NONNULL(set->vec)
+    GS_REQUIRE_NONNULL(set)
+    GS_REQUIRE_NONNULL(set->vec)
     return vec_begin(set->vec);
 }
 
 const void *hashset_end(const hashset_t *set)
 {
-    REQUIRE_NONNULL(set)
-    REQUIRE_NONNULL(set->vec)
+    GS_REQUIRE_NONNULL(set)
+    GS_REQUIRE_NONNULL(set->vec)
     return vec_end(set->vec);
 }
