@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdinc.h>
+#include <gs.h>
 #include <gs_event.h>
 
 #include <apr.h>

@@ -17,7 +17,7 @@
 // I N C L U D E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <stdinc.h>
+#include <gs.h>
 #include <frag.h>
 #include <frag_printers/console_printer.h>
 

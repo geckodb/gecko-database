@@ -1,7 +1,7 @@
 
 #include <stddef.h>
 #include <stdlib.h>
-#include <stdinc.h>
+#include <gs.h>
 #include <time.h>
 #include <containers/dict.h>
 #include <containers/dicts/hash_table.h>

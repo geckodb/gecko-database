@@ -17,7 +17,7 @@
 // I N C L U D E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <stdinc.h>
+#include <gs.h>
 #include <containers/dict.h>
 
 #define NUM_INIT_ENV_VARS       10

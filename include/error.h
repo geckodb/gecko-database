@@ -17,7 +17,7 @@
 // I N C L U D E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <stdinc.h>
+#include <gs.h>
 
 #define MONDRIAN_OK                 1
 #define MONDRIAN_CONTINUE           1
@@ -48,12 +48,17 @@ typedef enum {
     err_dispatcher_terminated,
     err_apr_initfailed,
     err_init_failed,
-    err_connect_failed
+    err_connect_failed,
+    err_no_stdin,
+    err_no_stdout
 } error_code;
 
-#define GS_SUCCESS          0
+#define GS_SUCCESS          true
+#define GS_FAILED           false
 #define GS_CATCHED          2
 #define GS_SKIPPED          3
+#define GS_ILLEGALARG       4
+#define GS_TRYAGAIN         5
 
 typedef int gs_status_t;
 
@@ -96,6 +101,13 @@ void trace_print(FILE *file);
     {                                                                                                                  \
         fprintf(stderr, "# DEBUG: ");                                                                                  \
         fprintf(stderr, msg, args);                                                                                    \
+        fprintf(stderr, "\n");                                                                                         \
+    }
+
+#define GS_DEBUG2(msg)                                                                                                 \
+    {                                                                                                                  \
+        fprintf(stderr, "# DEBUG: ");                                                                                  \
+        fprintf(stderr, msg);                                                                                          \
         fprintf(stderr, "\n");                                                                                         \
     }
 

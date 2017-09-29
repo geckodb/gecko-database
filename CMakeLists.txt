@@ -52,7 +52,7 @@ set(SOURCE_FILES
         include/pref.h
         include/require.h
         include/schema.h
-        include/stdinc.h
+        include/gs.h
         include/storage/memory.h
         include/tableimg.h
         include/tuplet.h
@@ -130,14 +130,14 @@ set(SOURCE_FILES
         third-party/json-parser/json.h
         include/utils.h
         src/utils.c
-        src/dispatcher.c
-        include/dispatcher.h
+        src/gs_dispatcher.c
+        include/gs_dispatcher.h
         src/gs_event.c
         include/gs_event.h
         src/gs_gridstore.c
         include/gs_gridstore.h
         include/info.h
-        include/shell.h src/shell.c)
+        include/gs_shell.h src/gs_shell.c)
 
 add_executable(
         gridstore

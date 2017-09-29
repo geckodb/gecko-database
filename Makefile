@@ -406,33 +406,6 @@ src/containers/vec.c.s:
 	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/containers/vec.c.s
 .PHONY : src/containers/vec.c.s
 
-src/dispatcher.o: src/dispatcher.c.o
-
-.PHONY : src/dispatcher.o
-
-# target to build an object file
-src/dispatcher.c.o:
-	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/dispatcher.c.o
-.PHONY : src/dispatcher.c.o
-
-src/dispatcher.i: src/dispatcher.c.i
-
-.PHONY : src/dispatcher.i
-
-# target to preprocess a source file
-src/dispatcher.c.i:
-	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/dispatcher.c.i
-.PHONY : src/dispatcher.c.i
-
-src/dispatcher.s: src/dispatcher.c.s
-
-.PHONY : src/dispatcher.s
-
-# target to generate assembly for a file
-src/dispatcher.c.s:
-	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/dispatcher.c.s
-.PHONY : src/dispatcher.c.s
-
 src/error.o: src/error.c.o
 
 .PHONY : src/error.o
@@ -676,6 +649,33 @@ src/grid_cursor.c.s:
 	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/grid_cursor.c.s
 .PHONY : src/grid_cursor.c.s
 
+src/gs_dispatcher.o: src/gs_dispatcher.c.o
+
+.PHONY : src/gs_dispatcher.o
+
+# target to build an object file
+src/gs_dispatcher.c.o:
+	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/gs_dispatcher.c.o
+.PHONY : src/gs_dispatcher.c.o
+
+src/gs_dispatcher.i: src/gs_dispatcher.c.i
+
+.PHONY : src/gs_dispatcher.i
+
+# target to preprocess a source file
+src/gs_dispatcher.c.i:
+	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/gs_dispatcher.c.i
+.PHONY : src/gs_dispatcher.c.i
+
+src/gs_dispatcher.s: src/gs_dispatcher.c.s
+
+.PHONY : src/gs_dispatcher.s
+
+# target to generate assembly for a file
+src/gs_dispatcher.c.s:
+	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/gs_dispatcher.c.s
+.PHONY : src/gs_dispatcher.c.s
+
 src/gs_event.o: src/gs_event.c.o
 
 .PHONY : src/gs_event.o
@@ -729,6 +729,33 @@ src/gs_gridstore.s: src/gs_gridstore.c.s
 src/gs_gridstore.c.s:
 	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/gs_gridstore.c.s
 .PHONY : src/gs_gridstore.c.s
+
+src/gs_shell.o: src/gs_shell.c.o
+
+.PHONY : src/gs_shell.o
+
+# target to build an object file
+src/gs_shell.c.o:
+	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/gs_shell.c.o
+.PHONY : src/gs_shell.c.o
+
+src/gs_shell.i: src/gs_shell.c.i
+
+.PHONY : src/gs_shell.i
+
+# target to preprocess a source file
+src/gs_shell.c.i:
+	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/gs_shell.c.i
+.PHONY : src/gs_shell.c.i
+
+src/gs_shell.s: src/gs_shell.c.s
+
+.PHONY : src/gs_shell.s
+
+# target to generate assembly for a file
+src/gs_shell.c.s:
+	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/gs_shell.c.s
+.PHONY : src/gs_shell.c.s
 
 src/hash.o: src/hash.c.o
 
@@ -1162,33 +1189,6 @@ src/schema.c.s:
 	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/schema.c.s
 .PHONY : src/schema.c.s
 
-src/shell.o: src/shell.c.o
-
-.PHONY : src/shell.o
-
-# target to build an object file
-src/shell.c.o:
-	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/shell.c.o
-.PHONY : src/shell.c.o
-
-src/shell.i: src/shell.c.i
-
-.PHONY : src/shell.i
-
-# target to preprocess a source file
-src/shell.c.i:
-	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/shell.c.i
-.PHONY : src/shell.c.i
-
-src/shell.s: src/shell.c.s
-
-.PHONY : src/shell.s
-
-# target to generate assembly for a file
-src/shell.c.s:
-	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/shell.c.s
-.PHONY : src/shell.c.s
-
 src/storage/memory.o: src/storage/memory.c.o
 
 .PHONY : src/storage/memory.o
@@ -1499,9 +1499,6 @@ help:
 	@echo "... src/containers/vec.o"
 	@echo "... src/containers/vec.i"
 	@echo "... src/containers/vec.s"
-	@echo "... src/dispatcher.o"
-	@echo "... src/dispatcher.i"
-	@echo "... src/dispatcher.s"
 	@echo "... src/error.o"
 	@echo "... src/error.i"
 	@echo "... src/error.s"
@@ -1529,12 +1526,18 @@ help:
 	@echo "... src/grid_cursor.o"
 	@echo "... src/grid_cursor.i"
 	@echo "... src/grid_cursor.s"
+	@echo "... src/gs_dispatcher.o"
+	@echo "... src/gs_dispatcher.i"
+	@echo "... src/gs_dispatcher.s"
 	@echo "... src/gs_event.o"
 	@echo "... src/gs_event.i"
 	@echo "... src/gs_event.s"
 	@echo "... src/gs_gridstore.o"
 	@echo "... src/gs_gridstore.i"
 	@echo "... src/gs_gridstore.s"
+	@echo "... src/gs_shell.o"
+	@echo "... src/gs_shell.i"
+	@echo "... src/gs_shell.s"
 	@echo "... src/hash.o"
 	@echo "... src/hash.i"
 	@echo "... src/hash.s"
@@ -1583,9 +1586,6 @@ help:
 	@echo "... src/schema.o"
 	@echo "... src/schema.i"
 	@echo "... src/schema.s"
-	@echo "... src/shell.o"
-	@echo "... src/shell.i"
-	@echo "... src/shell.s"
 	@echo "... src/storage/memory.o"
 	@echo "... src/storage/memory.i"
 	@echo "... src/storage/memory.s"

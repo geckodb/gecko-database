@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdinc.h>
+#include <gs.h>
 #include <inet/request.h>
 #include <inet/response.h>
 

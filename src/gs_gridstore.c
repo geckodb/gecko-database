@@ -1,5 +1,5 @@
 #include <gs_gridstore.h>
-#include <dispatcher.h>
+#include <gs_dispatcher.h>
 
 typedef struct gs_gridstore_t {
 
@@ -26,12 +26,20 @@ GS_DECLARE(gs_status_t) gs_gridstore_dispose(gs_gridstore_t **gridstore)
 GS_DECLARE(gs_status_t) gs_gridstore_handle_events(const gs_event_t *event)
 {
     GS_REQUIRE_NONNULL(event);
-    switch (gs_event_get_signal(event)) {
+    GS_EVENT_FILTER_BY_RECEIVER_TAG(GS_OBJECT_TYPE_GRIDSTORE);
+
+    gs_gridstore_t   *self   = GS_EVENT_GET_RECEIVER(gs_gridstore_t);
+    gs_signal_type_e  signal = GS_EVENT_GET_SIGNAL();
+
+    switch (signal) {
+        case GS_SIG_SHUTDOWN:
+            printf("Gid store should shutdown, yeah\n");
+            return GS_CATCHED;
         case GS_SIG_TEST:
-            printf("HEY!\n");
+            printf("Hey, yeah\n");
             return GS_CATCHED;
         default:
-            warn("gridstore received event for signal %d that is not handled", gs_event_get_signal(event));
+        warn("gridstore %p received event for signal %d that is not handled", self, signal);
             return GS_SKIPPED;
     }
 }

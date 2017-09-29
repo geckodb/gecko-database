@@ -112,3 +112,21 @@ void server_start(server_t *server, router_t catch)
         close (client);
     }
 }
+
+GS_DECLARE(gs_status_t) gs_server_handle_events(const gs_event_t *event)
+{
+    GS_REQUIRE_NONNULL(event);
+    GS_EVENT_FILTER_BY_RECEIVER_TAG(GS_OBJECT_TYPE_SERVER);
+
+    server_t         *server = GS_EVENT_GET_RECEIVER(server_t);
+    gs_signal_type_e  signal = GS_EVENT_GET_SIGNAL();
+
+    switch (signal) {
+        case GS_SIG_SHUTDOWN:
+            printf("server shutdown\n");
+            return GS_SKIPPED;
+        default:
+        warn("server %p received event for signal %d that is not handled", server, signal);
+            return GS_SKIPPED;
+    }
+}

@@ -17,7 +17,7 @@
 // I N C L U D E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <stdinc.h>
+#include <gs.h>
 #include <grid_cursor.h>
 #include <containers/hashset.h>
 

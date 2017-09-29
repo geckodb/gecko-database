@@ -15,7 +15,7 @@
 // I N C L U D E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <stdinc.h>
+#include <gs.h>
 #include <containers/dict.h>
 #include <containers/dicts/hash_table.h>
 #include <conf.h>

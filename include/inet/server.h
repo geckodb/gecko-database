@@ -17,9 +17,10 @@
 // I N C L U D E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <stdinc.h>
-#include "response.h"
-#include "request.h"
+#include <gs.h>
+#include <gs_event.h>
+#include <inet/response.h>
+#include <inet/request.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 // C O N S T A N T S
@@ -54,3 +55,5 @@ typedef void (*router_t)(capture_t *capture, const request_t *req, response_t *r
 void server_create(server_t *server, unsigned short port, capture_t *capture);
 void server_router_add(server_t *server, const char *resource, router_t router);
 void server_start(server_t *server, router_t catch);
+
+GS_DECLARE(gs_status_t) gs_server_handle_events(const gs_event_t *event);

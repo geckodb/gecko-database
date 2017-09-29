@@ -132,9 +132,6 @@
 		<Unit filename="/Users/marcus/git/basement/include/debug.h">
 			<Option target="gridstore"/>
 		</Unit>
-		<Unit filename="/Users/marcus/git/basement/include/dispatcher.h">
-			<Option target="gridstore"/>
-		</Unit>
 		<Unit filename="/Users/marcus/git/basement/include/error.h">
 			<Option target="gridstore"/>
 		</Unit>
@@ -162,10 +159,19 @@
 		<Unit filename="/Users/marcus/git/basement/include/grid_cursor.h">
 			<Option target="gridstore"/>
 		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs.h">
+			<Option target="gridstore"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_dispatcher.h">
+			<Option target="gridstore"/>
+		</Unit>
 		<Unit filename="/Users/marcus/git/basement/include/gs_event.h">
 			<Option target="gridstore"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/basement/include/gs_gridstore.h">
+			<Option target="gridstore"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_shell.h">
 			<Option target="gridstore"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/basement/include/hash.h">
@@ -228,12 +234,6 @@
 		<Unit filename="/Users/marcus/git/basement/include/schema.h">
 			<Option target="gridstore"/>
 		</Unit>
-		<Unit filename="/Users/marcus/git/basement/include/shell.h">
-			<Option target="gridstore"/>
-		</Unit>
-		<Unit filename="/Users/marcus/git/basement/include/stdinc.h">
-			<Option target="gridstore"/>
-		</Unit>
 		<Unit filename="/Users/marcus/git/basement/include/storage/memory.h">
 			<Option target="gridstore"/>
 		</Unit>
@@ -291,9 +291,6 @@
 		<Unit filename="/Users/marcus/git/basement/src/containers/vec.c">
 			<Option target="gridstore"/>
 		</Unit>
-		<Unit filename="/Users/marcus/git/basement/src/dispatcher.c">
-			<Option target="gridstore"/>
-		</Unit>
 		<Unit filename="/Users/marcus/git/basement/src/error.c">
 			<Option target="gridstore"/>
 		</Unit>
@@ -321,10 +318,16 @@
 		<Unit filename="/Users/marcus/git/basement/src/grid_cursor.c">
 			<Option target="gridstore"/>
 		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/gs_dispatcher.c">
+			<Option target="gridstore"/>
+		</Unit>
 		<Unit filename="/Users/marcus/git/basement/src/gs_event.c">
 			<Option target="gridstore"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/basement/src/gs_gridstore.c">
+			<Option target="gridstore"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/gs_shell.c">
 			<Option target="gridstore"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/basement/src/hash.c">
@@ -373,9 +376,6 @@
 			<Option target="gridstore"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/basement/src/schema.c">
-			<Option target="gridstore"/>
-		</Unit>
-		<Unit filename="/Users/marcus/git/basement/src/shell.c">
 			<Option target="gridstore"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/basement/src/storage/memory.c">

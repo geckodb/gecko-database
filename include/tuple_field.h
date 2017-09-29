@@ -17,7 +17,7 @@
 // I N C L U D E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <stdinc.h>
+#include <gs.h>
 #include <tuple.h>
 #include <tuplet_field.h>
 #include <grid.h>

@@ -74,6 +74,7 @@ const char *error_str(error_code code)
         case err_notincharge:            return "Request was rejected: not in charge";
         case err_dispatcher_terminated:  return "Event dispatcher has been terminated unexpectedly";
         case err_apr_initfailed:         return "apr initialization failed";
+        case err_no_stdin:               return "unable to open stdin";
         default: return "Unknown";
     }
 }

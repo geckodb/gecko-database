@@ -17,7 +17,7 @@
 // I N C L U D E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <stdinc.h>
+#include <gs.h>
 
 typedef enum method_t {
     HTTP_GET, HTTP_POST, HTTP_PUT, HTTP_DELETE, HTTP_OTHERS

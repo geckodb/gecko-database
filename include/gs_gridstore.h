@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdinc.h>
+#include <gs.h>
 
 __BEGIN_DECLS
 

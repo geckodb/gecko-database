@@ -1,4 +1,4 @@
-#include <dispatcher.h>
+#include <gs_dispatcher.h>
 #include <containers/dicts/hash_table.h>
 
 typedef struct gs_dispatcher_t
@@ -33,7 +33,6 @@ GS_DECLARE(gs_status_t) gs_dispatcher_start(gs_dispatcher_t *dispatcher)
     GS_REQUIRE_NONNULL(dispatcher)
 
     apr_status_t status;
-    gs_status_t catched;
     gs_signal_type_e signal;
     gs_event_t *event;
     vec_t *handlers;
@@ -50,12 +49,11 @@ GS_DECLARE(gs_status_t) gs_dispatcher_start(gs_dispatcher_t *dispatcher)
             assert (status == APR_SUCCESS && event != NULL);
             signal = gs_event_get_signal(event);
             handlers = dispatcher_get_handler(dispatcher, signal);
-            catched = GS_SUCCESS;
             WARN_IF(((signal != GS_SIG_HEARTBEAT) && (!handlers)), "no handler for signal '%d' registered", signal);
             GS_DEBUG("dispatcher %p received event for signal %d", dispatcher, signal);
             for (gs_event_handler_t *it = vec_begin(handlers);
-                (it && (catched != GS_CATCHED) && (it != vec_end(handlers))); it++) {
-                catched = (*it)(event);
+                (it && (it != vec_end(handlers))); it++) {
+                (*it)(event); // TODO: handler can return void
             }
             gs_event_free(event);
         }
