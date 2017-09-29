@@ -19,12 +19,6 @@
 #include <containers/dicts/hash_table.h>
 #include <json-parser/json.h>
 
-#define HTTP_GET_STRING    "GET"
-#define HTTP_PUT_STRING    "PUT"
-#define HTTP_POST_STRING   "POST"
-#define HTTP_DELETE_STRING "DELETE"
-
-
 json_value *json_get(const json_value* value, const char *key, json_type type)
 {
     if (value == NULL) {
@@ -182,7 +176,6 @@ void request_parse(request_t *request, const char *string) {
     GS_REQUIRE_NONNULL(request)
     char *request_str = strdup(string);
     request_str[strstr(request_str, "\n") - request_str] = '\0';
-    fprintf(stderr, "%s\n", request_str );
     request->params = hash_table_new_ex(&(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen},
                                         sizeof(char *), sizeof(char *), 15,
                                         15, 1.7f, 0.75f,
@@ -227,16 +220,6 @@ void request_parse(request_t *request, const char *string) {
         request->valid = true;
     } else {
         request->valid = false;
-    }
-}
-
-const char *methodstr(http_status_code_t code) {
-    switch (code) {
-        case HTTP_GET:    return HTTP_GET_STRING;
-        case HTTP_POST:   return HTTP_POST_STRING;
-        case HTTP_PUT:    return HTTP_PUT_STRING;
-        case HTTP_DELETE: return HTTP_DELETE_STRING;
-        default: return "(unknown)";
     }
 }
 

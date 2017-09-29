@@ -189,13 +189,13 @@
 		<Unit filename="/Users/marcus/git/basement/include/indexes/vindexes/hash_vindex.h">
 			<Option target="gridstore"/>
 		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/inet/gs_server.h">
+			<Option target="gridstore"/>
+		</Unit>
 		<Unit filename="/Users/marcus/git/basement/include/inet/request.h">
 			<Option target="gridstore"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/basement/include/inet/response.h">
-			<Option target="gridstore"/>
-		</Unit>
-		<Unit filename="/Users/marcus/git/basement/include/inet/server.h">
 			<Option target="gridstore"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/basement/include/info.h">
@@ -345,13 +345,13 @@
 		<Unit filename="/Users/marcus/git/basement/src/indexes/vindexes/hash_vindex.c">
 			<Option target="gridstore"/>
 		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/inet/gs_server.c">
+			<Option target="gridstore"/>
+		</Unit>
 		<Unit filename="/Users/marcus/git/basement/src/inet/request.c">
 			<Option target="gridstore"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/basement/src/inet/response.c">
-			<Option target="gridstore"/>
-		</Unit>
-		<Unit filename="/Users/marcus/git/basement/src/inet/server.c">
 			<Option target="gridstore"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/basement/src/interval.c">

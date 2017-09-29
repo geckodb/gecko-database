@@ -892,6 +892,33 @@ src/indexes/vindexes/hash_vindex.c.s:
 	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/indexes/vindexes/hash_vindex.c.s
 .PHONY : src/indexes/vindexes/hash_vindex.c.s
 
+src/inet/gs_server.o: src/inet/gs_server.c.o
+
+.PHONY : src/inet/gs_server.o
+
+# target to build an object file
+src/inet/gs_server.c.o:
+	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/inet/gs_server.c.o
+.PHONY : src/inet/gs_server.c.o
+
+src/inet/gs_server.i: src/inet/gs_server.c.i
+
+.PHONY : src/inet/gs_server.i
+
+# target to preprocess a source file
+src/inet/gs_server.c.i:
+	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/inet/gs_server.c.i
+.PHONY : src/inet/gs_server.c.i
+
+src/inet/gs_server.s: src/inet/gs_server.c.s
+
+.PHONY : src/inet/gs_server.s
+
+# target to generate assembly for a file
+src/inet/gs_server.c.s:
+	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/inet/gs_server.c.s
+.PHONY : src/inet/gs_server.c.s
+
 src/inet/request.o: src/inet/request.c.o
 
 .PHONY : src/inet/request.o
@@ -945,33 +972,6 @@ src/inet/response.s: src/inet/response.c.s
 src/inet/response.c.s:
 	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/inet/response.c.s
 .PHONY : src/inet/response.c.s
-
-src/inet/server.o: src/inet/server.c.o
-
-.PHONY : src/inet/server.o
-
-# target to build an object file
-src/inet/server.c.o:
-	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/inet/server.c.o
-.PHONY : src/inet/server.c.o
-
-src/inet/server.i: src/inet/server.c.i
-
-.PHONY : src/inet/server.i
-
-# target to preprocess a source file
-src/inet/server.c.i:
-	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/inet/server.c.i
-.PHONY : src/inet/server.c.i
-
-src/inet/server.s: src/inet/server.c.s
-
-.PHONY : src/inet/server.s
-
-# target to generate assembly for a file
-src/inet/server.c.s:
-	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/inet/server.c.s
-.PHONY : src/inet/server.c.s
 
 src/interval.o: src/interval.c.o
 
@@ -1553,15 +1553,15 @@ help:
 	@echo "... src/indexes/vindexes/hash_vindex.o"
 	@echo "... src/indexes/vindexes/hash_vindex.i"
 	@echo "... src/indexes/vindexes/hash_vindex.s"
+	@echo "... src/inet/gs_server.o"
+	@echo "... src/inet/gs_server.i"
+	@echo "... src/inet/gs_server.s"
 	@echo "... src/inet/request.o"
 	@echo "... src/inet/request.i"
 	@echo "... src/inet/request.s"
 	@echo "... src/inet/response.o"
 	@echo "... src/inet/response.i"
 	@echo "... src/inet/response.s"
-	@echo "... src/inet/server.o"
-	@echo "... src/inet/server.i"
-	@echo "... src/inet/server.s"
 	@echo "... src/interval.o"
 	@echo "... src/interval.i"
 	@echo "... src/interval.s"

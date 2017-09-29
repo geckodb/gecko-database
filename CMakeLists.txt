@@ -64,7 +64,7 @@ set(SOURCE_FILES
         include/timer.h
         include/field_type.h
         include/tuple.h
-        include/inet/server.h
+        include/inet/gs_server.h
         include/debug.h
         include/global.h
         include/inet/request.h
@@ -97,7 +97,7 @@ set(SOURCE_FILES
         src/timer.c
         src/field_type.c
         src/tuple.c
-        src/inet/server.c
+        src/inet/gs_server.c
         src/global.c
         src/inet/request.c
         src/inet/response.c

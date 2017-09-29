@@ -32,19 +32,13 @@ static char response[] =
         "<!doctype html>\r\n"
         "<html><head>MyTitle</head><body><h1>Hello World</h1></body></html>\r\n";
 
+__BEGIN_DECLS
+
 // ---------------------------------------------------------------------------------------------------------------------
 // D A T A   T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-typedef struct server_t
-{
-    struct sockaddr_in server_addr;
-    struct sockaddr_in client_addr;
-    int server_desc;
-    socklen_t socket_len;
-    capture_t *capture;
-    dict_t *routers;
-} server_t;
+typedef struct gs_server_t gs_server_t;
 
 typedef void (*router_t)(capture_t *capture, const request_t *req, response_t *res);
 
@@ -52,8 +46,17 @@ typedef void (*router_t)(capture_t *capture, const request_t *req, response_t *r
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-void server_create(server_t *server, unsigned short port, capture_t *capture);
-void server_router_add(server_t *server, const char *resource, router_t router);
-void server_start(server_t *server, router_t catch);
+GS_DECLARE(gs_status_t) gs_server_create(gs_server_t **server, unsigned short port, capture_t *capture,
+                                         gs_dispatcher_t *dispatcher);
+
+GS_DECLARE(gs_status_t) gs_server_router_add(gs_server_t *server, const char *resource, router_t router);
+
+GS_DECLARE(gs_status_t) gs_server_start(gs_server_t *server, router_t catch);
+
+GS_DECLARE(gs_status_t) gs_server_dispose(gs_server_t **server);
+
+GS_DECLARE(gs_status_t) gs_server_shutdown(gs_server_t *server);
 
 GS_DECLARE(gs_status_t) gs_server_handle_events(const gs_event_t *event);
+
+__END_DECLS

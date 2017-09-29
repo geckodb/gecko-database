@@ -12,15 +12,17 @@ typedef struct gs_shell_t {
     bool                 is_disposable;
     apr_uid_t            user_id;
     apr_gid_t            group_id;
-    char                 *user_name;
+    char                *user_name;
+    apr_time_t           uptime;
 } gs_shell_t;
 
 static inline int shell_loop(void *args);
 
-static inline void process_input(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input);
+static inline bool process_input(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input);
 
 static inline void process_command_help(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input);
 static inline void process_command_exit(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input);
+static inline void process_command_uptime(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input);
 
 GS_DECLARE(gs_status_t) gs_shell_create(gs_shell_t **shell, gs_dispatcher_t *dispatcher)
 {
@@ -30,6 +32,7 @@ GS_DECLARE(gs_status_t) gs_shell_create(gs_shell_t **shell, gs_dispatcher_t *dis
     apr_pool_create(&result->pool, NULL);
     apr_uid_current(&result->user_id, &result->group_id, result->pool);
     apr_uid_name_get(&result->user_name, result->user_id, result->pool);
+    result->uptime = apr_time_now();
     *shell = result;
     return GS_SUCCESS;
 }
@@ -54,7 +57,10 @@ GS_DECLARE(gs_status_t) gs_shell_dispose(gs_shell_t **shell_ptr)
     GS_REQUIRE_NONNULL(*shell_ptr);
     gs_shell_t *shell = *shell_ptr;
     if (shell->is_disposable) {
+        apr_pool_destroy(shell->pool);
+        GS_DEBUG("shell %p disposed", shell);
         free(shell);
+        *shell_ptr = NULL;
         return GS_SUCCESS;
     } else return GS_TRYAGAIN;
 }
@@ -97,47 +103,61 @@ static inline int shell_loop(void *args)
     gs_shell_t   *shell = (gs_shell_t *) args;
     apr_file_t   *in, *out;
     char          buffer[STDIN_BUFFER_SIZE];
+    bool          accept_input = true;
 
     error_if((apr_file_open_stdin(&in, shell->pool) != APR_SUCCESS), err_no_stdin);
     error_if((apr_file_open_stdout(&out, shell->pool) != APR_SUCCESS), err_no_stdout);
 
     GS_DEBUG("shell %p enters main loop", shell);
-    apr_file_printf(out, "Type '.help' for hints on usage of this shell.\n\n");
+    apr_file_printf(out, "Type 'help' for hints on usage of this shell.\n\n");
     while (shell->is_running) {
-        apr_file_printf(out, "%s@gs> ", shell->user_name);
-        apr_file_gets(buffer, STDIN_BUFFER_SIZE, in);
-        process_input(shell, in, out, buffer);
-        apr_file_flush(out);
+        if (accept_input) {
+            apr_file_printf(out, "%s@gs> ", shell->user_name);
+            apr_file_gets(buffer, STDIN_BUFFER_SIZE, in);
+            accept_input = process_input(shell, in, out, buffer);
+            apr_file_flush(out);
+        }
     }
     GS_DEBUG("shell %p left main loop", shell);
     shell->is_disposable = true;
     return EXIT_SUCCESS;
 }
 
-static inline void process_input(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input)
+static inline bool process_input(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input)
 {
-    apr_collapse_spaces(input, input);
-
-    if (apr_strnatcasecmp(input, ".help") == 0) {
+    if (apr_strnatcasecmp(input, "help") == 0) {
         process_command_help(shell, in, out, input);
-    } else if (apr_strnatcasecmp(input, ".exit") == 0) {
+    } else if (apr_strnatcasecmp(input, "exit") == 0) {
         process_command_exit(shell, in, out, input);
+        return false;
+    } else if (apr_strnatcasecmp(input, "uptime") == 0) {
+        process_command_uptime(shell, in, out, input);
     } else {
-        apr_file_printf(out, "no such command: '%s'\n", input);
+        apr_file_printf(out, "no such command: %s", input);
     }
+    return true;
 }
 
 static inline void process_command_help(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input)
 {
-    GS_DEBUG("shell %p command '.help' entered", shell);
+    GS_DEBUG("shell %p command 'help' entered", shell);
     apr_file_printf(out, "Available commands:\n");
-    apr_file_printf(out, "   .help    Shows this help message\n");
-    apr_file_printf(out, "   .exit    Shutdowns the system, and exit the shell\n");
+    apr_file_printf(out, "  help    Shows this help message\n");
+    apr_file_printf(out, "  uptime  Shows how long the system is running\n");
+    apr_file_printf(out, "  exit    Shutdowns the system, and exit the shell\n");
 
 }
 
 static inline void process_command_exit(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input)
 {
-    GS_DEBUG("shell %p command '.exit' entered", shell);
+    GS_DEBUG("shell %p command 'exit' entered", shell);
     gs_dispatcher_publish(shell->dispatcher, gs_event_system_exit(shell->dispatcher, GS_OBJECT_TYPE_SHELL, shell));
+}
+
+static inline void process_command_uptime(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input)
+{
+    GS_DEBUG("shell %p command 'uptime' entered", shell);
+    apr_time_exp_t result;
+    apr_time_exp_gmt(&result, apr_time_now() - shell->uptime);
+    printf("%dh, %dmin, %dsec\n", result.tm_hour, result.tm_min, result.tm_sec);
 }

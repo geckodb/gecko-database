@@ -19,10 +19,6 @@
 
 #include <gs.h>
 
-typedef enum method_t {
-    HTTP_GET, HTTP_POST, HTTP_PUT, HTTP_DELETE, HTTP_OTHERS
-} method_t;
-
 typedef struct request_t {
     method_t method;
     char *resource;

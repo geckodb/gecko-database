@@ -21,14 +21,15 @@
 #include <gs_dispatcher.h>
 #include <gs_shell.h>
 #include <routers/api/types/create/router.h>
-#include <inet/server.h>
+#include <routers/catch.h>
+#include <inet/gs_server.h>
 
 // curl -i -G -d "key=val" -d "abs=[1,2,3,4]" http://localhost:36895/api/test
 
 gs_gridstore_t    *gridstore;
 gs_dispatcher_t   *dispatcher;
 gs_shell_t        *shell;
-server_t          server;
+gs_server_t       *server;
 
 static inline void setup_config(int argc, char **argv);
 static inline void setup_core();
@@ -38,6 +39,8 @@ static inline void setup_server();
 static inline void setup_events();
 static inline void start_system();
 static inline void stop_system();
+static inline void cleanup();
+static inline void stop_event_loop();
 
 int main(int argc, char* argv[])
 {
@@ -50,7 +53,12 @@ int main(int argc, char* argv[])
 
     start_system();
 
+    cleanup();
+    stop_event_loop();
 
+    //gs_dispatcher_shutdown(dispatcher);
+
+    apr_terminate();
 
     return EXIT_SUCCESS;
 }
@@ -80,22 +88,48 @@ static inline void setup_shell()
 
 static inline void setup_server()
 {
-    server_create(&server, startup_config.port, NULL);
-    server_router_add(&server, "/api/types/create", router_api_types_create);
+    gs_server_create(&server, startup_config.port, NULL, dispatcher);
+    gs_server_router_add(server, "/api/types/create", router_api_types_create);
+    gs_server_start(server, router_catch);
 
-    /*server_t server;
-  server_create(&server, port_num, NULL);
-  server_router_add(&server, "/api/types/create", router_api_types_create);
-  server_start(&server, router_catch);*/
+    /*gs_server_t server;
+  gs_server_create(&server, port_num, NULL);
+  gs_server_router_add(&server, "/api/types/create", router_api_types_create);
+  gs_server_start(&server, router_catch);*/
 }
 
 static inline void stop_system()
 {
     GS_DEBUG2("stopping system modules");
     gs_dispatcher_publish(dispatcher, gs_event_shell_shutdown(dispatcher, shell));
-    gs_dispatcher_publish(dispatcher, gs_event_server_shutdown(dispatcher, &server));
+    gs_dispatcher_publish(dispatcher, gs_event_server_shutdown(dispatcher, server));
     gs_dispatcher_publish(dispatcher, gs_event_gridstore_shutdown(dispatcher, gridstore));
     gs_dispatcher_publish(dispatcher, gs_event_dispatcher_shutdown(dispatcher));
+
+}
+
+static inline void cleanup()
+{
+    //GS_DEBUG("dispose server %p", server);
+   // while (gs_server_dispose(&server) != GS_SUCCESS)
+   //     ;
+
+   // GS_DEBUG("dispose gridstore %p", gridstore);
+   // while (gs_gridstore_dispose(gridstore) != GS_SUCCESS);
+
+    GS_DEBUG("dispose shell %p", shell);
+    while (gs_shell_dispose(&shell) != GS_SUCCESS)
+        ;
+
+    GS_DEBUG("dispose dispatcher %p", dispatcher);
+    while (gs_dispatcher_dispose(&dispatcher) != GS_SUCCESS)
+        ;
+}
+
+static inline void stop_event_loop()
+{
+    //GS_DEBUG("shutting down dispatcher %p", dispatcher);
+    //gs_dispatcher_shutdown(dispatcher);
 }
 
 static inline gs_status_t system_handle_events(const gs_event_t *event)
@@ -111,7 +145,7 @@ static inline gs_status_t system_handle_events(const gs_event_t *event)
             stop_system();
             return GS_CATCHED;
         default:
-        warn("shell %p received event for signal %d that is not handled", shell, signal);
+        warn("system %p received event for signal %d that is not handled", shell, signal);
             return GS_SKIPPED;
     }
 }
@@ -141,6 +175,8 @@ static inline void start_system()
 }
 
 gs_status_t dispatcher_shutdown(const gs_event_t *event) {
+    GS_EVENT_FILTER_BY_RECEIVER_TAG(GS_OBJECT_TYPE_DISPATCHER);
+
     gs_dispatcher_shutdown(dispatcher);
     return GS_SUCCESS;
 }

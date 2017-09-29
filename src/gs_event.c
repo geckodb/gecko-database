@@ -68,7 +68,7 @@ gs_event_t *gs_event_shell_shutdown(gs_dispatcher_t *dispatcher, gs_shell_t *she
     return gs_event_new(GS_SIG_SHUTDOWN, GS_OBJECT_TYPE_NONE, NULL, GS_OBJECT_TYPE_SHELL, shell, NULL, NULL);
 }
 
-gs_event_t *gs_event_server_shutdown(gs_dispatcher_t *dispatcher, server_t *server)
+gs_event_t *gs_event_server_shutdown(gs_dispatcher_t *dispatcher, gs_server_t *server)
 {
     return gs_event_new(GS_SIG_SHUTDOWN, GS_OBJECT_TYPE_NONE, NULL, GS_OBJECT_TYPE_SERVER, server, NULL, NULL);
 }

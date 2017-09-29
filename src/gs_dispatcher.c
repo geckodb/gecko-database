@@ -22,9 +22,16 @@ GS_DECLARE(gs_status_t) gs_dispatcher_create(gs_dispatcher_t **dispatcher)
     return GS_SUCCESS;
 }
 
-GS_DECLARE(gs_status_t) gs_dispatcher_dispose(gs_dispatcher_t **dispatcher)
+GS_DECLARE(gs_status_t) gs_dispatcher_dispose(gs_dispatcher_t **dispatcher_ptr)
 {
-    GS_REQUIRE_NONNULL(dispatcher)
+    GS_REQUIRE_NONNULL(dispatcher_ptr)
+    GS_REQUIRE_NONNULL(*dispatcher_ptr)
+    gs_dispatcher_t *dispatcher = *dispatcher_ptr;
+    apr_pool_destroy(dispatcher->mem_pool);
+    dict_clear(dispatcher->handler_map);
+    GS_DEBUG("dispatcher %p disposed", dispatcher);
+    free(dispatcher);
+    *dispatcher_ptr = NULL;
     return GS_SUCCESS;
 }
 

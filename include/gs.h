@@ -85,12 +85,22 @@ typedef enum content_type_t
     MEDIA_MULTI_PART_FORM_DATA
 } content_type_t;
 
+typedef enum method_t {
+    HTTP_GET, HTTP_POST, HTTP_PUT, HTTP_DELETE, HTTP_OTHERS
+} method_t;
+
 #define HTTP_STATUS_CODE_100_CONTINUE        100
 #define HTTP_STATUS_CODE_200_OK              200
 #define HTTP_STATUS_CODE_500_INTERNAL_ERR    500
 #define HTTP_STATUS_CODE_400_BAD_REQUEST     400
 #define HTTP_STATUS_CODE_404_NOT_FOUND       404
 #define HTTP_STATUS_CODE_408_REQUEST_TIMEOUT 408
+
+#define HTTP_GET_STRING    "GET"
+#define HTTP_PUT_STRING    "PUT"
+#define HTTP_POST_STRING   "POST"
+#define HTTP_DELETE_STRING "DELETE"
+
 
 static inline const char *codestr(http_status_code_t code)
 {
@@ -104,6 +114,17 @@ static inline const char *codestr(http_status_code_t code)
         default:                                    return "500 Internal Server Error";
     }
 }
+
+static inline const char *methodstr(http_status_code_t code) {
+    switch (code) {
+        case HTTP_GET:    return HTTP_GET_STRING;
+        case HTTP_POST:   return HTTP_POST_STRING;
+        case HTTP_PUT:    return HTTP_PUT_STRING;
+        case HTTP_DELETE: return HTTP_DELETE_STRING;
+        default: return "(unknown)";
+    }
+}
+
 
 typedef uint8_t     u8;
 typedef uint16_t   u16;
