@@ -82,7 +82,7 @@ static inline void setup_shell()
 
 static inline void setup_server()
 {
-    gs_server_create(&server, startup_config.port, NULL, dispatcher);
+    gs_server_create(&server, startup_config.port, dispatcher);
     gs_server_router_add(server, "/api/types/create", router_api_types_create);
     gs_server_router_add(server, "/api/1.0/nodes",    router_api_1_0_nodes);
     gs_server_start(server, router_catch);

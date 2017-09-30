@@ -40,14 +40,13 @@ __BEGIN_DECLS
 
 typedef struct gs_server_t gs_server_t;
 
-typedef void (*router_t)(capture_t *capture, const gs_request_t *req, response_t *res);
+typedef void (*router_t)(const gs_request_t *req, response_t *res);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-GS_DECLARE(gs_status_t) gs_server_create(gs_server_t **server, unsigned short port, capture_t *capture,
-                                         gs_dispatcher_t *dispatcher);
+GS_DECLARE(gs_status_t) gs_server_create(gs_server_t **server, unsigned short port, gs_dispatcher_t *dispatcher);
 
 GS_DECLARE(gs_status_t) gs_server_router_add(gs_server_t *server, const char *resource, router_t router);
 

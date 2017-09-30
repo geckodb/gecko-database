@@ -35,7 +35,6 @@ typedef struct gs_server_t
     struct sockaddr_in   client_addr;
     int                  server_desc;
     socklen_t            socket_len;
-    capture_t           *capture;
     dict_t              *routers;
     thrd_t               thread;
     atomic_bool          is_running;
@@ -59,7 +58,7 @@ str_clean_up(
 
 static inline int server_loop(void *args);
 
-GS_DECLARE(gs_status_t) gs_server_create(gs_server_t **out, unsigned short port, capture_t *capture, gs_dispatcher_t *dispatcher)
+GS_DECLARE(gs_status_t) gs_server_create(gs_server_t **out, unsigned short port, gs_dispatcher_t *dispatcher)
 {
     gs_server_t *server = GS_REQUIRE_MALLOC(sizeof(gs_server_t));
 
@@ -84,7 +83,6 @@ GS_DECLARE(gs_status_t) gs_server_create(gs_server_t **out, unsigned short port,
     server->server_addr.sin_family = AF_INET;
     server->server_addr.sin_addr.s_addr = INADDR_ANY;
     server->server_addr.sin_port = htons(port);
-    server->capture = capture;
 
     int succ = bind(server->server_desc, (const struct sockaddr *) &server->server_addr, sizeof(server->server_addr));
     panic_if((succ < 0), "unable to bind to port %d (%s).", (int) ntohs(server->server_addr.sin_port), strerror(errno));
@@ -229,10 +227,10 @@ static inline int server_loop(void *args)
                     gs_request_resource(&resource, request);
                     if ((router = dict_get(loop_args->server->routers, &resource)) != NULL) {
                         GS_DEBUG("request delegated to router for resource '%s'", resource);
-                        (*router)(loop_args->server->capture, request, &response);
+                        (*router)(request, &response);
                     } else {
                         GS_DEBUG("no router installed for resource '%s'; delegate to default router", resource);
-                        loop_args->catch(loop_args->server->capture, request, &response);
+                        loop_args->catch(request, &response);
                     }
                 }
 
