@@ -1,7 +1,6 @@
 #pragma once
 
 #include <gs.h>
-#include <inet/request.h>
 #include <inet/response.h>
 #include <inet/gs_request.h>
 

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <gs.h>
-#include <inet/request.h>
 #include <inet/response.h>
 
 static inline void router_catch(capture_t *capture, const gs_request_t *request, response_t *response)

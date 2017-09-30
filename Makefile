@@ -946,33 +946,6 @@ src/inet/gs_server.c.s:
 	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/inet/gs_server.c.s
 .PHONY : src/inet/gs_server.c.s
 
-src/inet/request.o: src/inet/request.c.o
-
-.PHONY : src/inet/request.o
-
-# target to build an object file
-src/inet/request.c.o:
-	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/inet/request.c.o
-.PHONY : src/inet/request.c.o
-
-src/inet/request.i: src/inet/request.c.i
-
-.PHONY : src/inet/request.i
-
-# target to preprocess a source file
-src/inet/request.c.i:
-	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/inet/request.c.i
-.PHONY : src/inet/request.c.i
-
-src/inet/request.s: src/inet/request.c.s
-
-.PHONY : src/inet/request.s
-
-# target to generate assembly for a file
-src/inet/request.c.s:
-	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/inet/request.c.s
-.PHONY : src/inet/request.c.s
-
 src/inet/response.o: src/inet/response.c.o
 
 .PHONY : src/inet/response.o
@@ -1586,9 +1559,6 @@ help:
 	@echo "... src/inet/gs_server.o"
 	@echo "... src/inet/gs_server.i"
 	@echo "... src/inet/gs_server.s"
-	@echo "... src/inet/request.o"
-	@echo "... src/inet/request.i"
-	@echo "... src/inet/request.s"
 	@echo "... src/inet/response.o"
 	@echo "... src/inet/response.i"
 	@echo "... src/inet/response.s"

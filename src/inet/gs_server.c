@@ -19,7 +19,6 @@
 #include <conf.h>
 #include <debug.h>
 #include <inet/response.h>
-#include <inet/request.h>
 #include <sys/socket.h>
 #include <poll.h>
 #include <containers/dicts/hash_table.h>

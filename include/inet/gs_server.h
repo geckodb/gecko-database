@@ -20,7 +20,6 @@
 #include <gs.h>
 #include <gs_event.h>
 #include <inet/response.h>
-#include <inet/request.h>
 #include <inet/gs_request.h>
 
 // ---------------------------------------------------------------------------------------------------------------------

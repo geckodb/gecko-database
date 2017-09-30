@@ -40,7 +40,6 @@ static inline void setup_events();
 static inline void start_system();
 static inline void stop_system();
 static inline void cleanup();
-static inline void stop_event_loop();
 
 int main(int argc, char* argv[])
 {
@@ -54,12 +53,6 @@ int main(int argc, char* argv[])
     start_system();
 
     cleanup();
-    stop_event_loop();
-
-    //gs_dispatcher_shutdown(dispatcher);
-
-    apr_terminate();
-
     return EXIT_SUCCESS;
 }
 
@@ -91,11 +84,6 @@ static inline void setup_server()
     gs_server_create(&server, startup_config.port, NULL, dispatcher);
     gs_server_router_add(server, "/api/types/create", router_api_types_create);
     gs_server_start(server, router_catch);
-
-    /*gs_server_t server;
-  gs_server_create(&server, port_num, NULL);
-  gs_server_router_add(&server, "/api/types/create", router_api_types_create);
-  gs_server_start(&server, router_catch);*/
 }
 
 static inline void stop_system()
@@ -124,12 +112,8 @@ static inline void cleanup()
     GS_DEBUG("dispose dispatcher %p", dispatcher);
     while (gs_dispatcher_dispose(&dispatcher) != GS_SUCCESS)
         ;
-}
 
-static inline void stop_event_loop()
-{
-    //GS_DEBUG("shutting down dispatcher %p", dispatcher);
-    //gs_dispatcher_shutdown(dispatcher);
+    apr_terminate();
 }
 
 static inline gs_status_t system_handle_events(const gs_event_t *event)

@@ -67,7 +67,6 @@ set(SOURCE_FILES
         include/inet/gs_server.h
         include/debug.h
         include/global.h
-        include/inet/request.h
         include/inet/response.h
         include/mvm.h
         include/progpool.h
@@ -99,7 +98,6 @@ set(SOURCE_FILES
         src/tuple.c
         src/inet/gs_server.c
         src/global.c
-        src/inet/request.c
         src/inet/response.c
         src/mvm.c
         src/progpool.c
