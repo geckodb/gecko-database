@@ -101,6 +101,42 @@ The request will be rejected when one of the following conditions are violated:
 
 
 
+### Node Creation
+
+#### Create Node
+
+Creates a new node in the current database.
+
+##### Request
+
+> **`POST`** `${GRID_STORE_URL}/api/1.0/nodes`
+
+###### Body Params
+
+| Key    | Type       | Value                | Comment       |
+| ------ | ---------- | -------------------- | ------------- |
+| `name` | string     | The name of the type | **required**  |
+
+###### Headers
+
+No further information in the header is required.
+
+###### Sample
+
+````bash
+
+curl http://localhost:35497/api/1.0/nodes -X POST \
+  -F nodes='{[{"name":{"type":"string", value="mike"}, "age":{"type":"u8", value="32"}}]}' 
+
+````
+
+##### Response
+
+A `201` will be returned in case of success, otherwise `http-code`.
+
+#### Comments
+
+- Some comments and restrictions
 
 
 

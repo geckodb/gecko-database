@@ -228,6 +228,9 @@
 		<Unit filename="/Users/marcus/git/basement/include/require.h">
 			<Option target="gridstore"/>
 		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/routers/api/1.0/nodes.h">
+			<Option target="gridstore"/>
+		</Unit>
 		<Unit filename="/Users/marcus/git/basement/include/routers/api/types/create/router.h">
 			<Option target="gridstore"/>
 		</Unit>

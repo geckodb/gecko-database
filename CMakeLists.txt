@@ -135,7 +135,9 @@ set(SOURCE_FILES
         src/gs_gridstore.c
         include/gs_gridstore.h
         include/info.h
-        include/gs_shell.h src/gs_shell.c include/inet/gs_request.h src/inet/gs_request.c)
+        include/gs_shell.h src/gs_shell.c include/inet/gs_request.h src/inet/gs_request.c
+        include/routers/api/1.0/nodes.h)
+
 
 add_executable(
         gridstore

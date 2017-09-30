@@ -101,6 +101,12 @@ GS_DECLARE(gs_status_t) gs_request_method(gs_http_method_e *method, const gs_req
     return GS_SUCCESS;
 }
 
+GS_DECLARE(gs_status_t) gs_request_is_method(const gs_request_t *request, gs_http_method_e method)
+{
+    GS_REQUIRE_NONNULL(request);
+    return (request->method == method);
+}
+
 GS_DECLARE(gs_status_t) gs_request_resource(char **resource, const gs_request_t *request)
 {
     GS_REQUIRE_NONNULL(request);
