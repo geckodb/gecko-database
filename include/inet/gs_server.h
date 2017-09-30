@@ -21,6 +21,7 @@
 #include <gs_event.h>
 #include <inet/response.h>
 #include <inet/request.h>
+#include <inet/gs_request.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 // C O N S T A N T S
@@ -40,7 +41,7 @@ __BEGIN_DECLS
 
 typedef struct gs_server_t gs_server_t;
 
-typedef void (*router_t)(capture_t *capture, const request_t *req, response_t *res);
+typedef void (*router_t)(capture_t *capture, const gs_request_t *req, response_t *res);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S

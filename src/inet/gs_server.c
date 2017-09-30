@@ -26,6 +26,7 @@
 #include <apr_pools.h>
 #include <c11threads.h>
 #include <stdatomic.h>
+#include <inet/gs_request.h>
 
 typedef struct gs_server_t
 {
@@ -189,7 +190,6 @@ static inline int server_loop(void *args)
 
     int client;
     char buffer[131072];
-    request_t request;
     response_t response;
     fd_set set;
 
@@ -217,30 +217,32 @@ static inline int server_loop(void *args)
             struct pollfd pollfd = { .fd = client, .events = POLLIN };
             response_create(&response);
             if (poll(&pollfd, 1, 1000)) {
-                recv(client, buffer, sizeof(buffer), 0);
-                request_parse(&request, buffer);
+                gs_request_t *request;
+                gs_request_create(&request, client);
 
-                GS_DEBUG("incoming request (method: %s, is_valid: '%d', resource: '%s')",
-                         methodstr(request.method), request.valid, request.resource);
-
-                if (!request.valid) {
+                if (!gs_request_is_valid(request)) {
                     GS_DEBUG2("request rejected");
                     response_content_type_set(&response, MIME_CONTENT_TYPE_TEXT_PLAIN);
                     response_end(&response, HTTP_STATUS_CODE_400_BAD_REQUEST);
                 } else {
                     const router_t *router;
-                    if ((router = dict_get(loop_args->server->routers, &request.resource)) != NULL) {
-                        GS_DEBUG("request delegated to router for resource '%s'", request.resource);
-                        (*router)(loop_args->server->capture, &request, &response);
+                    char *resource;
+                    gs_request_resource(&resource, request);
+                    if ((router = dict_get(loop_args->server->routers, &resource)) != NULL) {
+                        GS_DEBUG("request delegated to router for resource '%s'", resource);
+                        (*router)(loop_args->server->capture, request, &response);
                     } else {
-                        GS_DEBUG("no router installed for resource '%s'; delegate to default router", request.resource);
-                        loop_args->catch(loop_args->server->capture, &request, &response);
+                        GS_DEBUG("no router installed for resource '%s'; delegate to default router", resource);
+                        loop_args->catch(loop_args->server->capture, request, &response);
                     }
                 }
+
+                gs_request_dispose(&request);
             } else {
                 response_end(&response, HTTP_STATUS_CODE_408_REQUEST_TIMEOUT);
             }
             char *response_text = response_pack(&response);
+            GS_DEBUG("RESPONSE TEXT: %s\n", response_text);
             write(client, response_text, strlen(response_text));
             free(response_text);
             response_dispose(&response);

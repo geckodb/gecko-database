@@ -892,6 +892,33 @@ src/indexes/vindexes/hash_vindex.c.s:
 	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/indexes/vindexes/hash_vindex.c.s
 .PHONY : src/indexes/vindexes/hash_vindex.c.s
 
+src/inet/gs_request.o: src/inet/gs_request.c.o
+
+.PHONY : src/inet/gs_request.o
+
+# target to build an object file
+src/inet/gs_request.c.o:
+	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/inet/gs_request.c.o
+.PHONY : src/inet/gs_request.c.o
+
+src/inet/gs_request.i: src/inet/gs_request.c.i
+
+.PHONY : src/inet/gs_request.i
+
+# target to preprocess a source file
+src/inet/gs_request.c.i:
+	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/inet/gs_request.c.i
+.PHONY : src/inet/gs_request.c.i
+
+src/inet/gs_request.s: src/inet/gs_request.c.s
+
+.PHONY : src/inet/gs_request.s
+
+# target to generate assembly for a file
+src/inet/gs_request.c.s:
+	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/inet/gs_request.c.s
+.PHONY : src/inet/gs_request.c.s
+
 src/inet/gs_server.o: src/inet/gs_server.c.o
 
 .PHONY : src/inet/gs_server.o
@@ -1553,6 +1580,9 @@ help:
 	@echo "... src/indexes/vindexes/hash_vindex.o"
 	@echo "... src/indexes/vindexes/hash_vindex.i"
 	@echo "... src/indexes/vindexes/hash_vindex.s"
+	@echo "... src/inet/gs_request.o"
+	@echo "... src/inet/gs_request.i"
+	@echo "... src/inet/gs_request.s"
 	@echo "... src/inet/gs_server.o"
 	@echo "... src/inet/gs_server.i"
 	@echo "... src/inet/gs_server.s"

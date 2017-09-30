@@ -173,6 +173,7 @@ static inline bool strstart(const char *string, const char *substr)
 }
 
 void request_parse(request_t *request, const char *string) {
+    fprintf(stderr, "%s\n", string);
     GS_REQUIRE_NONNULL(request)
     char *request_str = strdup(string);
     request_str[strstr(request_str, "\n") - request_str] = '\0';

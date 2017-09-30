@@ -59,6 +59,8 @@ typedef enum {
 #define GS_SKIPPED          3
 #define GS_ILLEGALARG       4
 #define GS_TRYAGAIN         5
+#define GS_TRUE             true
+#define GS_FALSE            false
 
 typedef int gs_status_t;
 
