@@ -26,6 +26,7 @@
 #include <c11threads.h>
 #include <stdatomic.h>
 #include <inet/gs_request.h>
+#include <apr_hash.h>
 
 typedef struct gs_server_t
 {
@@ -35,7 +36,7 @@ typedef struct gs_server_t
     struct sockaddr_in   client_addr;
     int                  server_desc;
     socklen_t            socket_len;
-    dict_t              *routers;
+    apr_hash_t          *routers;
     thrd_t               thread;
     atomic_bool          is_running;
     atomic_bool          is_disposable;
@@ -92,10 +93,11 @@ GS_DECLARE(gs_status_t) gs_server_create(gs_server_t **out, unsigned short port,
         panic("unable to start_system listening to port %d (%s).", (int) ntohs(server->server_addr.sin_port), strerror(errno));
     }
 
-    server->routers = hash_table_new_ex(&(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen},
+  /*  server->routers = hash_table_new_ex(&(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen},
                                         sizeof(char *), sizeof(router_t), RESPONSE_DICT_CAPACITY,
                                         RESPONSE_DICT_CAPACITY, 1.7f, 0.75f,
-                                        str_equals, str_clean_up, true);
+                                        str_equals, str_clean_up, true);*/
+    apr_hash_make(server->pool);
 
     printf("listening to port %d\n", (int) ntohs(server->server_addr.sin_port));
 
@@ -106,7 +108,8 @@ GS_DECLARE(gs_status_t) gs_server_create(gs_server_t **out, unsigned short port,
 GS_DECLARE(gs_status_t) gs_server_router_add(gs_server_t *server, const char *resource, router_t router)
 {
     GS_REQUIRE_NONNULL(server)
-    dict_put(server->routers, &resource, &router);
+   // dict_put(server->routers, &resource, &router);
+    apr_hash_set(server->routers, &resource, sizeof(char *), router);
     return GS_SUCCESS;
 }
 
@@ -139,7 +142,7 @@ GS_DECLARE(gs_status_t) gs_server_dispose(gs_server_t **server_ptr)
     gs_server_t *server = *server_ptr;
     if (atomic_load_explicit(&server->is_disposable, memory_order_seq_cst)) {
         apr_pool_destroy(server->pool);
-        dict_clear(server->routers);
+     //   dict_clear(server->routers);
         GS_DEBUG("server %p disposed", server);
         free(server);
         *server_ptr = NULL;
@@ -225,7 +228,7 @@ static inline int server_loop(void *args)
                     const router_t *router;
                     char *resource;
                     gs_request_resource(&resource, request);
-                    if ((router = dict_get(loop_args->server->routers, &resource)) != NULL) {
+                    if ((router = apr_hash_get(loop_args->server->routers, &resource, sizeof(char *))) != NULL) {
                         GS_DEBUG("request delegated to router for resource '%s'", resource);
                         (*router)(loop_args->server->dispatcher, request, &response);
                     } else {

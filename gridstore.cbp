@@ -384,6 +384,9 @@
 		<Unit filename="/Users/marcus/git/basement/src/progpool.c">
 			<Option target="gridstore"/>
 		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/routers/api/1.0/nodes.c">
+			<Option target="gridstore"/>
+		</Unit>
 		<Unit filename="/Users/marcus/git/basement/src/schema.c">
 			<Option target="gridstore"/>
 		</Unit>

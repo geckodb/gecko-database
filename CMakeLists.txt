@@ -23,7 +23,7 @@ include_directories(${CURSES_INCLUDE_DIR})
 find_package(Doxygen)
 option(BUILD_DOCUMENTATION "API documentation requires Doxygen" ${DOXYGEN_FOUND})
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -std=c11 -Wall -Werror")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -std=c11 -Wall -Werror")
 
 set(CMAKE_BINARY_DIR
         ${CMAKE_SOURCE_DIR}/bin)
@@ -136,7 +136,7 @@ set(SOURCE_FILES
         include/gs_gridstore.h
         include/info.h
         include/gs_shell.h src/gs_shell.c include/inet/gs_request.h src/inet/gs_request.c
-        include/routers/api/1.0/nodes.h include/gs_spinlock.h src/gs_spinlock.c)
+        include/routers/api/1.0/nodes.h include/gs_spinlock.h src/gs_spinlock.c src/routers/api/1.0/nodes.c)
 
 
 add_executable(

@@ -1189,6 +1189,33 @@ src/progpool.c.s:
 	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/progpool.c.s
 .PHONY : src/progpool.c.s
 
+src/routers/api/1.0/nodes.o: src/routers/api/1.0/nodes.c.o
+
+.PHONY : src/routers/api/1.0/nodes.o
+
+# target to build an object file
+src/routers/api/1.0/nodes.c.o:
+	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/routers/api/1.0/nodes.c.o
+.PHONY : src/routers/api/1.0/nodes.c.o
+
+src/routers/api/1.0/nodes.i: src/routers/api/1.0/nodes.c.i
+
+.PHONY : src/routers/api/1.0/nodes.i
+
+# target to preprocess a source file
+src/routers/api/1.0/nodes.c.i:
+	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/routers/api/1.0/nodes.c.i
+.PHONY : src/routers/api/1.0/nodes.c.i
+
+src/routers/api/1.0/nodes.s: src/routers/api/1.0/nodes.c.s
+
+.PHONY : src/routers/api/1.0/nodes.s
+
+# target to generate assembly for a file
+src/routers/api/1.0/nodes.c.s:
+	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/routers/api/1.0/nodes.c.s
+.PHONY : src/routers/api/1.0/nodes.c.s
+
 src/schema.o: src/schema.c.o
 
 .PHONY : src/schema.o
@@ -1613,6 +1640,9 @@ help:
 	@echo "... src/progpool.o"
 	@echo "... src/progpool.i"
 	@echo "... src/progpool.s"
+	@echo "... src/routers/api/1.0/nodes.o"
+	@echo "... src/routers/api/1.0/nodes.i"
+	@echo "... src/routers/api/1.0/nodes.s"
 	@echo "... src/schema.o"
 	@echo "... src/schema.i"
 	@echo "... src/schema.s"
