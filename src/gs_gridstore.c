@@ -38,6 +38,14 @@ GS_DECLARE(gs_status_t) gs_gridstore_handle_events(const gs_event_t *event)
         case GS_SIG_TEST:
             printf("Hey, yeah\n");
             return GS_CATCHED;
+        case GS_SIG_INVOKE:
+            GS_DEBUG2("Main Thread: invoke something");
+            GS_DEBUG2("Main Thread: sleep...");
+
+
+
+            GS_DEBUG2("Main Thread: wake up...");
+            return GS_CATCHED;
         default:
         warn("gridstore %p received event for signal %d that is not handled", self, signal);
             return GS_SKIPPED;

@@ -3,7 +3,7 @@
 #include <gs.h>
 #include <inet/response.h>
 
-static inline void router_catch(const gs_request_t *request, response_t *response)
+static inline void router_catch(gs_dispatcher_t *dispatcher, const gs_request_t *request, response_t *response)
 {
     char buffer[1024];
     char *resource;

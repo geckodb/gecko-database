@@ -1,5 +1,6 @@
 #include <gs_dispatcher.h>
 #include <containers/dicts/hash_table.h>
+#include <gs_spinlock.h>
 
 typedef struct gs_dispatcher_t
 {
@@ -105,6 +106,18 @@ GS_DECLARE(gs_status_t) gs_dispatcher_publish(gs_dispatcher_t *dispatcher, gs_ev
         GS_DEBUG("dispatcher %p is shutting down and skipped event %p", dispatcher, event);
         return GS_SKIPPED;
     }
+}
+
+GS_DECLARE(gs_status_t) gs_dispatcher_waitfor(gs_dispatcher_t *dispatcher, gs_event_t *event)
+{
+    volatile gs_spinlock_t *lock;
+    gs_spinlock_create(&lock);
+    gs_dispatcher_publish(dispatcher, gs_event_new_blocking(lock, event));
+    GS_DEBUG2("thread is being locked...");
+    gs_spinlock_lock(lock);
+    GS_DEBUG2("thread was unlocked...");
+    gs_spinlock_dispose(&lock);
+    return GS_SUCCESS;
 }
 
 static inline vec_t *dispatcher_get_handler(gs_dispatcher_t *dispatcher, gs_signal_type_e signal)

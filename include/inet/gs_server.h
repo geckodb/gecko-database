@@ -40,7 +40,7 @@ __BEGIN_DECLS
 
 typedef struct gs_server_t gs_server_t;
 
-typedef void (*router_t)(const gs_request_t *req, response_t *res);
+typedef void (*router_t)(gs_dispatcher_t *dispatcher, const gs_request_t *req, response_t *res);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S

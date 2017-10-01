@@ -757,6 +757,33 @@ src/gs_shell.c.s:
 	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/gs_shell.c.s
 .PHONY : src/gs_shell.c.s
 
+src/gs_spinlock.o: src/gs_spinlock.c.o
+
+.PHONY : src/gs_spinlock.o
+
+# target to build an object file
+src/gs_spinlock.c.o:
+	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/gs_spinlock.c.o
+.PHONY : src/gs_spinlock.c.o
+
+src/gs_spinlock.i: src/gs_spinlock.c.i
+
+.PHONY : src/gs_spinlock.i
+
+# target to preprocess a source file
+src/gs_spinlock.c.i:
+	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/gs_spinlock.c.i
+.PHONY : src/gs_spinlock.c.i
+
+src/gs_spinlock.s: src/gs_spinlock.c.s
+
+.PHONY : src/gs_spinlock.s
+
+# target to generate assembly for a file
+src/gs_spinlock.c.s:
+	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/gs_spinlock.c.s
+.PHONY : src/gs_spinlock.c.s
+
 src/hash.o: src/hash.c.o
 
 .PHONY : src/hash.o
@@ -1538,6 +1565,9 @@ help:
 	@echo "... src/gs_shell.o"
 	@echo "... src/gs_shell.i"
 	@echo "... src/gs_shell.s"
+	@echo "... src/gs_spinlock.o"
+	@echo "... src/gs_spinlock.i"
+	@echo "... src/gs_spinlock.s"
 	@echo "... src/hash.o"
 	@echo "... src/hash.i"
 	@echo "... src/hash.s"

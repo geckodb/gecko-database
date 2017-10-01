@@ -227,10 +227,10 @@ static inline int server_loop(void *args)
                     gs_request_resource(&resource, request);
                     if ((router = dict_get(loop_args->server->routers, &resource)) != NULL) {
                         GS_DEBUG("request delegated to router for resource '%s'", resource);
-                        (*router)(request, &response);
+                        (*router)(loop_args->server->dispatcher, request, &response);
                     } else {
                         GS_DEBUG("no router installed for resource '%s'; delegate to default router", resource);
-                        loop_args->catch(request, &response);
+                        loop_args->catch(loop_args->server->dispatcher, request, &response);
                     }
                 }
 

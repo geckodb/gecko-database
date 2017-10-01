@@ -152,6 +152,7 @@ static inline void setup_events()
     GS_CONNECT(GS_SIG_SHUTDOWN, gs_server_handle_events);
 
     GS_CONNECT(GS_SIG_TEST,     gs_gridstore_handle_events);
+    GS_CONNECT(GS_SIG_INVOKE,   gs_gridstore_handle_events);
 }
 
 static inline void start_system()

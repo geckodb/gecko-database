@@ -1,9 +1,11 @@
 #include <gs_event.h>
+#include <gs_spinlock.h>
 
 typedef struct gs_event_t {
     gs_signal_type_e        signal;
     gs_object_type_tag_e    sender_tag;
     gs_object_type_tag_e    receiver_tag;
+    bool                    is_blocking;
     void                   *sender;
     void                   *receiver;
     void                   *data;
@@ -21,6 +23,7 @@ gs_event_t *gs_event_new(gs_signal_type_e s, gs_object_type_tag_e sdr_t, void *s
     event->receiver = rcvr;
     event->data = data;
     event->dispose = d;
+    event->is_blocking = false;
     return event;
 }
 
@@ -44,6 +47,9 @@ void *gs_event_get_data(const gs_event_t *event)
     GS_REQUIRE_NONNULL(event);
     return (event->data);
 }
+
+static inline void *blocking_event_wrap_data(volatile gs_spinlock_t *lock, gs_event_t *contained_event);
+static inline void blocking_event_unlock_and_dispose(gs_event_t *blocking_event);
 
 gs_status_t gs_event_get_subject(gs_object_type_tag_e *type_tag, void **ptr, const gs_event_t *event, gs_subject_kind_e subj)
 {
@@ -94,4 +100,47 @@ gs_event_t *gs_event_heartbeat_new(gs_dispatcher_t *dispatcher)
 gs_event_t *gs_event_gridstore_test(gs_gridstore_t *gridstore)
 {
     return gs_event_new(GS_SIG_TEST, GS_OBJECT_TYPE_NONE, NULL, GS_OBJECT_TYPE_GRIDSTORE, gridstore, NULL, NULL);
+}
+
+gs_event_t *gs_event_gridstore_invoke()
+{
+    return gs_event_new(GS_SIG_INVOKE, GS_OBJECT_TYPE_NONE, NULL, GS_OBJECT_TYPE_GRIDSTORE, NULL, NULL, NULL);
+}
+
+
+typedef struct blocking_event_args_t
+{
+    volatile gs_spinlock_t *lock;
+    gs_event_t *contained_event;
+} blocking_event_args_t;
+
+gs_event_t *gs_event_new_blocking(volatile gs_spinlock_t *lock, gs_event_t *contained_event)
+{
+    gs_event_t *result = gs_event_new(contained_event->signal,
+                                      contained_event->sender_tag,
+                                      contained_event->sender,
+                                      contained_event->receiver_tag,
+                                      contained_event->receiver,
+                                      blocking_event_wrap_data(lock, contained_event),
+                                      NULL);
+    result->is_blocking = true;
+    result->dispose = blocking_event_unlock_and_dispose;
+    return result;
+}
+
+static inline void *blocking_event_wrap_data(volatile gs_spinlock_t *lock, gs_event_t *contained_event)
+{
+    blocking_event_args_t *result = GS_REQUIRE_MALLOC(sizeof(blocking_event_args_t));
+    result->lock = lock;
+    result->contained_event = contained_event;
+    return result;
+}
+
+static inline void blocking_event_unlock_and_dispose(gs_event_t *blocking_event)
+{
+    assert (blocking_event->is_blocking);
+    blocking_event_args_t *args = (blocking_event_args_t *) blocking_event->data;
+    gs_spinlock_unlock(args->lock);
+    gs_event_free(args->contained_event);
+    free (blocking_event->data);
 }

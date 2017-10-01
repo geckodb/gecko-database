@@ -3,6 +3,7 @@
 #include <gs.h>
 #include <gs_gridstore.h>
 #include <gs_shell.h>
+#include "gs_spinlock.h"
 
 typedef struct gs_dispatcher_t gs_dispatcher_t; /* forwarding */
 typedef struct gs_server_t gs_server_t; /* forwarding */
@@ -11,7 +12,8 @@ typedef enum gs_signal_type_e {
     GS_SIG_HEARTBEAT,
     GS_SIG_SYSEXIT,
     GS_SIG_SHUTDOWN,
-    GS_SIG_TEST
+    GS_SIG_TEST,
+    GS_SIG_INVOKE
 } gs_signal_type_e;
 
 typedef enum gs_object_type_tag_e {
@@ -21,6 +23,7 @@ typedef enum gs_object_type_tag_e {
     GS_OBJECT_TYPE_DISPATCHER,
     GS_OBJECT_TYPE_SHELL,
     GS_OBJECT_TYPE_SERVER,
+    GS_OBJECT_TYPE_EVENT_WRAPPER,
 } gs_object_type_tag_e;
 
 typedef enum gs_subject_kind_e {
@@ -64,6 +67,8 @@ typedef void (*gs_event_dispose)(gs_event_t *self);
 gs_event_t *gs_event_new(gs_signal_type_e s, gs_object_type_tag_e t, void *sdr, gs_object_type_tag_e rcvr_t,
                          void *rcvr, void *data, gs_event_dispose d);
 
+gs_event_t *gs_event_new_blocking(volatile gs_spinlock_t *lock, gs_event_t *contained_event);
+
 gs_event_t *gs_event_heartbeat_new(gs_dispatcher_t *dispatcher);
 
 void gs_event_free(gs_event_t *event);
@@ -89,5 +94,7 @@ gs_event_t *gs_event_server_shutdown(gs_dispatcher_t *dispatcher, gs_server_t *s
 gs_event_t *gs_event_gridstore_shutdown(gs_dispatcher_t *dispatcher, gs_gridstore_t *gridstore);
 
 gs_event_t *gs_event_gridstore_test(gs_gridstore_t *gridstore);
+
+gs_event_t *gs_event_gridstore_invoke();
 
 
