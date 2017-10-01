@@ -159,13 +159,13 @@ typedef enum {
 // H E L P E R   P R O T O T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-static inline void *
+ void *
 seek(
         const page_t *    page,
         seek_target       target
 );
 
-static inline void
+ void
 write_unsafe(
         page_t *          page,
         offset_t          offset,
@@ -173,54 +173,54 @@ write_unsafe(
         size_t            size
 );
 
-static inline void *
+ void *
 read_unsafe(
         const page_t *    page,
         offset_t          offset);
 
 // - F R E E S P A C E   R E G I S T E R -------------------------------------------------------------------------------
 
-static inline freespace_reg_t *
+ freespace_reg_t *
 freespace(
         const page_t *    page
 );
 
-static inline range_t *
+ range_t *
 freespace_at(
         const page_t *    page,
         size_t            pos
 );
 
-static inline size_t
+ size_t
 freespace_len(
         const page_t *    page
 );
 
-static inline bool
+ bool
 freespace_pop(
         range_t *         range,
         page_t *          page
 );
 
-static inline bool
+ bool
 freespace_push(
         page_t *          page,
         offset_t          begin,
         offset_t          end
 );
 
-static inline range_t *
+ range_t *
 freespace_new(
         const page_t *    page
 );
 
-static inline int
+ int
 freespace_comp_by_start(
         const void *      lhs,
         const void *      rhs
 );
 
-static inline bool
+ bool
 freespace_bind(
         range_t *         range,
         page_t *          page,
@@ -228,71 +228,71 @@ freespace_bind(
         block_pos         strat
 );
 
-static inline range_t
+ range_t
 freespace_split(
         page_t *          page,
         size_t            pos,
         size_t            size
 );
 
-static inline void
+ void
 freespace_rebuild(
         page_t *          page
 );
 
-static inline void
+ void
 freespace_cleanup(
         page_t *          page
 );
 
-static inline void
+ void
 freespace_merge(
         page_t *          page
 );
 
-static inline size_t
+ size_t
 freespace_find_first(
         const page_t *    page,
         size_t            capacity
 );
 
-static inline size_t
+ size_t
 freespace_largest(
         const page_t *    page
 );
 
 // - P A G E -----------------------------------------------------------------------------------------------------------
 
-static inline size_t
+ size_t
 page_approx_freespace(
         const page_t *    page
 );
 
-static inline void
+ void
 page_approx_freespace_inc(
         page_t *          page,
         size_t            size
 );
 
-static inline void
+ void
 page_approx_freespace_dec(
         page_t *          page,
         size_t            size
 );
 
-static inline size_t
+ size_t
 page_ext_header_sizeof(
         size_t            free_space_cap,
         size_t            lane_reg_cap
 );
 
-static inline size_t
+ size_t
 page_total_header_sizeof(
         size_t            free_space_cap,
         size_t            lane_reg_cap
 );
 
-static inline page_t *
+ page_t *
 page_create(
         anti_buf_t *      buf,
         page_id_t         id,
@@ -303,26 +303,26 @@ page_create(
         size_t            lane_reg_cap
 );
 
-static inline size_t
+ size_t
 page_get_free_space(
         page_t *          page,
         free_space_get_strat strat
 );
 
-static inline lane_handle_t *
+ lane_handle_t *
 lane_create(
         page_t *page,
         block_pos strat,
         size_t elem_size
 );
 
-static inline bool
+ bool
 page_equals(
         page_t *          lhs,
         page_t *          rhs
 );
 
-static inline void
+ void
 page_dump(
         FILE *            out,
         anti_buf_t *      buf,
@@ -332,7 +332,7 @@ page_dump(
 
 // - Z O N E  ----------------------------------------------------------------------------------------------------------
 
-static inline zone_t *
+ zone_t *
 zone_create(
         anti_buf_t *      buf,
         page_t *          lane_page,
@@ -341,20 +341,20 @@ zone_create(
         block_pos         strat
 );
 
-static inline zone_t *
+ zone_t *
 zone_first(
         anti_buf_t *      buf,
         page_t *          page,
         lane_id_t         id
 );
 
-static inline zone_t *
+ zone_t *
 zone_next(
         anti_buf_t *      buf,
         zone_t *          zone
 );
 
-static inline bool
+ bool
 zone_memcpy(
         zone_t *          zone,
         size_t            offset,
@@ -362,12 +362,12 @@ zone_memcpy(
         size_t            size
 );
 
-static inline void *
+ void *
 zone_get_data(
         zone_t *          zone
 );
 
-//static inline bool
+// bool
 //zone_rem(
 //        anti_buf_t *      buf,
 //        page_t *          page,
@@ -376,18 +376,18 @@ zone_get_data(
 
 // - P A G E  P O I N T E R --------------------------------------------------------------------------------------------
 
-static inline bool
+ bool
 ptr_is_null(
         const in_page_ptr *ptr
 );
 
-static inline bool
+ bool
 ptr_has_scope(
         const in_page_ptr *ptr,
         page_ptr_type      type
 );
 
-static inline void
+ void
 ptr_make(
         in_page_ptr *      ptr,
         page_t *           page,
@@ -396,24 +396,24 @@ ptr_make(
         offset_t           offset
 );
 
-static inline ptr_target
+ ptr_target
 ptr_typeof(
         const in_page_ptr *ptr
 );
 
-static inline void *
+ void *
 ptr_deref(
         anti_buf_t *       buf,
         const in_page_ptr *ptr
 );
 
-static inline zone_t *
+ zone_t *
 ptr_cast_zone(
         anti_buf_t *       buf,
         const in_page_ptr *ptr
 );
 
-//static inline lane_t *
+// lane_t *
 //ptr_cast_frame(
 //        anti_buf_t * buffer_manager,
 //        const in_page_ptr *ptr
@@ -421,79 +421,79 @@ ptr_cast_zone(
 
 // - L A N E   R E G I S T E R  ----------------------------------------------------------------------------------------
 
-//static inline lane_t *
+// lane_t *
 //lane_by_zone(
 //        anti_buf_t *manager,
 //        const zone_t     *zone
 //);
 
-static inline void
+ void
 lane_reg_init(
         page_t *          page,
         size_t            num_lanes
 );
 
-static inline lane_reg_t *
+ lane_reg_t *
 lane_reg(
         const page_t *    page
 );
 
-static inline offset_t *
+ offset_t *
 lane_offsetof(
         const page_t *    page,
         lane_id_t         frame_id
 );
 
-static inline lane_t *
+ lane_t *
 lane_by_id(
         const page_t *    page,
         lane_id_t         frame_id
 );
 
-static inline lane_id_t *
+ lane_id_t *
 lane_reg_entry_by_pos(
         const page_t *    page,
         size_t            pos
 );
 
-static inline bool
+ bool
 lane_reg_is_full(
         const page_t *    page
 );
 
-static inline lane_id_t
+ lane_id_t
 lane_new(
         page_t *          page,
         block_pos         strat,
         size_t            size
 );
 
-static inline void
+ void
 lane_reg_link(
         page_t *          page,
         lane_id_t         frame_id,
         offset_t          lane_offset
 );
 
-static inline lane_id_t
+ lane_id_t
 lane_reg_scan(
         const page_t *    page,
         lane_state        state
 );
 
-static inline bool
+ bool
 range_do_overlap(
         range_t *         lhs,
         range_t *         rhs);
 
 // - A N T I - B U F F E R ---------------------------------------------------------------------------------------------
 
-static inline void
+ void
 buf_init(
         anti_buf_t *      buf
 );
 
-static inline page_t *
+ page_t *
 generic_store_get(
         anti_buf_t *      buf,
         size_t            size,
@@ -502,76 +502,76 @@ generic_store_get(
         size_t            (*get_capacity)(page_t *, free_space_get_strat)
 );
 
-static inline void
+ void
 anticache_pin(
         anti_buf_t *      buf,
         page_t *          page
 );
 
-static inline void
+ void
 anticache_unpin(
         anti_buf_t *      buf,
         page_t *          page);
 
 // - A N T I - C A C H E -----------------------------------------------------------------------------------------------
 
-static inline void
+ void
 anticache_init(
         anti_buf_t *      buf
 );
 
-static inline page_t *
+ page_t *
 anticache_page_by_id(
         anti_buf_t *      buf,
         page_id_t         id
 );
 
-static inline void
+ void
 anticache_freelist_init(
         anti_buf_t *      buf
 );
 
-static inline void
+ void
 anticache_guarantee_page(
         anti_buf_t *      buf,
         page_id_t         id
 );
 
-static inline bool
+ bool
 anticache_is_freelist_empty(
         anti_buf_t *      buf
 );
 
-static inline page_t *
+ page_t *
 anticache_create_page_safe(
         anti_buf_t *      buf,
         size_t            min_payload_size
 );
 
-static inline page_id_t
+ page_id_t
 anticache_freelist_pop(
         anti_buf_t *      buf
 );
 
-static inline size_t
+ size_t
 anticache_new_page_id(
         anti_buf_t *      buf
 );
 
-static inline void
+ void
 anticache_add_page_safe(
         anti_buf_t *      buf,
         page_t *          page
 );
 
-static inline page_t *
+ page_t *
 anticache_page_by_freesize(
         anti_buf_t *      buf,
         size_t            size,
         page_t *          favored
 );
 
-static inline lane_id_t
+ lane_id_t
 anticache_create_lane(
         anti_buf_t *      buf,
         page_t *          page,
@@ -581,95 +581,95 @@ anticache_create_lane(
 
 // - H O T S T O R E ---------------------------------------------------------------------------------------------------
 
-static inline void
+ void
 hotstore_init(
         anti_buf_t *      buf
 );
 
-static inline void
+ void
 hotstore_set_unsafe(
         anti_buf_t *      buf,
         page_id_t         id,
         page_t *          page
 );
 
-static inline bool
+ bool
 hotstore_has_unsafe(
         anti_buf_t *      buf,
         page_id_t         id
 );
 
-//static inline bool
+// bool
 //hotstore_rem_unsafe(
 //        anti_buf_t *      buf,
 //        page_id_t         tuplet_id
 //);
 
-static inline page_t *
+ page_t *
 hotstore_get_unsafe(
         anti_buf_t *      buf,
         page_id_t         id
 );
 
-static inline const page_id_t *
+ const page_id_t *
 hotstore_iterate(
         anti_buf_t *      buf,
         const page_id_t * last
 );
 
-static inline bool
+ bool
 hotstore_is_empty(
         anti_buf_t *      buf
 );
 
 // - C O L D S T O R E -------------------------------------------------------------------------------------------------
 
-static inline void
+ void
 coldstore_init(
         anti_buf_t *      buf
 );
 
-//static inline void
+// void
 //coldstore_clear(
 //        anti_buf_t *      buf
 //);
 
-static inline page_t *
+ page_t *
 coldstore_fetch(
         anti_buf_t *      buf,
         page_id_t         id
 );
 
-//static inline void
+// void
 //coldstore_push(
 //        anti_buf_t *      buf,
 //        page_t *          page
 //);
 //
-//static inline void
+// void
 //coldstore_add(
 //        anti_buf_t *      buf,
 //        page_id_t         tuplet_id
 //);
 //
-//static inline void
+// void
 //coldstore_rem(
 //        anti_buf_t *      buf,
 //        page_id_t         tuplet_id
 //);
 
-static inline const page_id_t *
+ const page_id_t *
 coldstore_iterate(
         anti_buf_t *      buf,
         const page_id_t * last
 );
 
-static inline bool
+ bool
 coldstore_is_empty(
         anti_buf_t *      buf
 );
 
-//static inline void
+// void
 //anticache_free(
 //        anti_buf_t *      buf
 //);
@@ -834,7 +834,7 @@ bool buf_free(
 // H E L P E R   F U N C T I O N   I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-static inline void
+ void
 anticache_init(
     anti_buf_t *   buf)
 {
@@ -845,7 +845,7 @@ anticache_init(
     buf->page_anticache.next_page_id = 0;
 }
 
-static inline page_t *
+ page_t *
 anticache_page_by_id(
     anti_buf_t *      buf,
     page_id_t         id)
@@ -863,7 +863,7 @@ anticache_page_by_id(
     return result;
 }
 
-static inline void
+ void
 anticache_freelist_init(
     anti_buf_t *   buf)
 {
@@ -873,7 +873,7 @@ anticache_freelist_init(
     REQUIRE((buf->page_anticache.free_page_ids_stack), BADFREELISTINIT);
 }
 
-static inline void
+ void
 anticache_guarantee_page(
         anti_buf_t *buf,
         page_id_t id)
@@ -881,7 +881,7 @@ anticache_guarantee_page(
     anticache_page_by_id(buf, id);
 }
 
-static inline bool
+ bool
 anticache_is_freelist_empty(
     anti_buf_t *    buf)
 {
@@ -889,7 +889,7 @@ anticache_is_freelist_empty(
     return (buf->page_anticache.free_page_ids_stack->num_elements == 0);
 }
 
-static inline page_t *
+ page_t *
 anticache_create_page_safe(
     anti_buf_t *    buf,
     size_t          min_payload_size)
@@ -919,14 +919,14 @@ anticache_create_page_safe(
     return result;
 }
 
-static inline page_id_t
+ page_id_t
 anticache_freelist_pop(
     anti_buf_t *buf)
 {
     panic(NOTIMPLEMENTED, to_string(anticache_freelist_pop));   // TODO: Implement
 }
 
-static inline size_t
+ size_t
 anticache_new_page_id(
     anti_buf_t *buf)
 {
@@ -934,7 +934,7 @@ anticache_new_page_id(
     return buf->page_anticache.next_page_id++;
 }
 
-static inline void
+ void
 anticache_add_page_safe(
     anti_buf_t *buf,
     page_t *page)
@@ -944,7 +944,7 @@ anticache_add_page_safe(
     hotstore_set_unsafe(buf, page->header.id, page);
 }
 
-//static inline
+//
 //void coldstore_add(
 //    anti_buf_t *buf,
 //    page_id_t tuplet_id)
@@ -952,7 +952,7 @@ anticache_add_page_safe(
 //    panic(NOTIMPLEMENTED, to_string(coldstore_add));   // TODO: Implement
 //}
 //
-//static inline void
+// void
 //coldstore_rem(
 //    anti_buf_t *buf,
 //    page_id_t tuplet_id)
@@ -960,7 +960,7 @@ anticache_add_page_safe(
 //    panic(NOTIMPLEMENTED, to_string(coldstore_rem));   // TODO: Implement
 //}
 
-static inline const page_id_t *
+ const page_id_t *
 coldstore_iterate(
     anti_buf_t *     buf,
     const page_id_t *last)
@@ -968,7 +968,7 @@ coldstore_iterate(
     panic(NOTIMPLEMENTED, to_string(coldstore_iterate));   // TODO: Implement
 }
 
-static inline bool
+ bool
 coldstore_is_empty(
     anti_buf_t *     buf)
 {
@@ -976,14 +976,14 @@ coldstore_is_empty(
     return (buf->page_anticache.cold_store_page_ids->num_elements == 0);
 }
 
-//static inline void
+// void
 //anticache_free(
 //        anti_buf_t *buf)
 //{
 //    panic(NOTIMPLEMENTED, to_string(anticache_free));   // TODO: Implement
 //}
 
-static inline void
+ void
 hotstore_init(
     anti_buf_t *   buf)
 {
@@ -994,7 +994,7 @@ hotstore_init(
     REQUIRE((buf->page_anticache.hot_store_page_ids), BADCOLDSTOREINIT);
 }
 
-static inline void
+ void
 hotstore_set_unsafe(
     anti_buf_t *   buf,
     page_id_t      id,
@@ -1006,7 +1006,7 @@ hotstore_set_unsafe(
     list_push(buf->page_anticache.hot_store_page_ids, &id);
 }
 
-static inline bool
+ bool
 hotstore_has_unsafe(
     anti_buf_t *   buf,
     page_id_t      id)
@@ -1014,7 +1014,7 @@ hotstore_has_unsafe(
     return (hotstore_get_unsafe(buf, id) != NULL);
 }
 
-//static inline bool
+// bool
 //hotstore_rem_unsafe(
 //        anti_buf_t *buf,
 //        page_id_t tuplet_id)
@@ -1034,7 +1034,7 @@ hotstore_has_unsafe(
 //    return dict_remove(buf->page_anticache.hot_store, 1, &tuplet_id);
 //}
 
-static inline page_t *
+ page_t *
 hotstore_get_unsafe(
     anti_buf_t *   buf,
     page_id_t      id)
@@ -1048,7 +1048,7 @@ hotstore_get_unsafe(
     return (element != NULL ? *element : NULL);
 }
 
-static inline const page_id_t*
+ const page_id_t*
 hotstore_iterate(
     anti_buf_t *     buf,
     const page_id_t *last)
@@ -1057,7 +1057,7 @@ hotstore_iterate(
             list_next(last));
 }
 
-static inline bool
+ bool
 hotstore_is_empty(
     anti_buf_t *   buf)
 {
@@ -1065,7 +1065,7 @@ hotstore_is_empty(
     return (dict_empty(buf->page_anticache.hot_store));
 }
 
-static inline void
+ void
 coldstore_init(
     anti_buf_t *   buf)
 {
@@ -1076,14 +1076,14 @@ coldstore_init(
 
 }
 
-//static inline void
+// void
 //coldstore_clear(
 //        anti_buf_t *buf)
 //{
 //    panic(NOTIMPLEMENTED, to_string(coldstore_clear));   // TODO: Implement
 //}
 
-static inline page_t *
+ page_t *
 coldstore_fetch(
     anti_buf_t *   buf,
     page_id_t      id)
@@ -1094,7 +1094,7 @@ coldstore_fetch(
     return loaded_page;
 }
 
-//static inline void
+// void
 //coldstore_push(
 //        anti_buf_t *buf,
 //        page_t *page)
@@ -1102,7 +1102,7 @@ coldstore_fetch(
 //    panic(NOTIMPLEMENTED, to_string(coldstore_push));   // TODO: Implement
 //}
 
-static inline page_t *
+ page_t *
 page_create(
     anti_buf_t *   buf,
     page_id_t      id,
@@ -1162,7 +1162,7 @@ page_create(
     return page;
 }
 
-static inline size_t
+ size_t
 page_get_free_space(
     page_t *             page,
     free_space_get_strat strat)
@@ -1180,7 +1180,7 @@ page_get_free_space(
     }
 }
 
-static inline lane_handle_t *
+ lane_handle_t *
 lane_create(
     page_t *       page,
     block_pos      strat,
@@ -1203,7 +1203,7 @@ lane_create(
     return handle;
 }
 
-static inline bool
+ bool
 page_equals(
     page_t  *      lhs,
     page_t  *      rhs)
@@ -1211,7 +1211,7 @@ page_equals(
     return ((lhs != NULL && rhs != NULL) && (lhs->header.id == rhs->header.id));
 }
 
-static inline void
+ void
 page_dump(
     FILE *         out,
     anti_buf_t *   buf,
@@ -1378,7 +1378,7 @@ page_dump(
     printf("#\n");
 }
 
-static inline zone_t *
+ zone_t *
 zone_create(
     anti_buf_t *   buf,
     page_t *       lane_page,
@@ -1430,7 +1430,7 @@ zone_create(
     return retval;
 }
 
-static inline zone_t *
+ zone_t *
 zone_first(
     anti_buf_t *   buf,
     page_t *       page,
@@ -1443,7 +1443,7 @@ zone_first(
     return (ptr_is_null(&lane->first) ? NULL : ptr_cast_zone(buf, &lane->first));
 }
 
-static inline zone_t *
+ zone_t *
 zone_next(
     anti_buf_t *   buf,
     zone_t *       zone)
@@ -1459,7 +1459,7 @@ zone_next(
     }
 }
 
-static inline bool
+ bool
 zone_memcpy(
     zone_t *       zone,
     size_t         offset,
@@ -1474,7 +1474,7 @@ zone_memcpy(
     return true;
 }
 
-static inline void *
+ void *
 zone_get_data(
     zone_t *       zone)
 {
@@ -1482,7 +1482,7 @@ zone_get_data(
     return (zone + 1);
 }
 
-//static inline bool
+// bool
 //zone_rem(
 //        anti_buf_t *buf,
 //        page_t *page,
@@ -1594,7 +1594,7 @@ zone_get_data(
 //    return true;
 //}
 
-static inline size_t
+ size_t
 page_ext_header_sizeof(
     size_t         free_space_cap,
     size_t         lane_reg_cap)
@@ -1602,7 +1602,7 @@ page_ext_header_sizeof(
     return (free_space_cap * sizeof(range_t) + lane_reg_cap * sizeof(offset_t) + lane_reg_cap * sizeof(lane_id_t));
 }
 
-static inline size_t
+ size_t
 page_total_header_sizeof(
     size_t         free_space_cap,
     size_t         lane_reg_cap)
@@ -1610,7 +1610,7 @@ page_total_header_sizeof(
     return CORE_HDR_SIZE + page_ext_header_sizeof(free_space_cap, lane_reg_cap);
 }
 
-static inline void *
+ void *
 seek(
     const page_t * page,
     seek_target    target)
@@ -1632,14 +1632,14 @@ seek(
     }
 }
 
-static inline freespace_reg_t *
+ freespace_reg_t *
 freespace(
     const page_t * page)
 {
     return (freespace_reg_t *) seek(page, SEEK_FREESPACE_REGISTER);
 }
 
-static inline void
+ void
 lane_reg_init(
     page_t *       page,
     size_t         num_lanes)
@@ -1657,14 +1657,14 @@ lane_reg_init(
     }
 }
 
-static inline lane_reg_t *
+ lane_reg_t *
 lane_reg(
     const page_t * page)
 {
     return (lane_reg_t *) seek(page, SEEK_LANE_REGISTER);
 }
 
-static inline range_t *
+ range_t *
 freespace_at(
     const page_t * page,
     size_t         pos)
@@ -1674,7 +1674,7 @@ freespace_at(
     return seek(page, SEEK_FREESPACE_ENTRIES) + sizeof(range_t) * pos;
 }
 
-static inline size_t
+ size_t
 freespace_len(
     const page_t * page)
 {
@@ -1682,7 +1682,7 @@ freespace_len(
     return free_space_reg->list_len;
 }
 
-static inline bool
+ bool
 freespace_pop(
     range_t *      range,
     page_t *       page)
@@ -1698,7 +1698,7 @@ freespace_pop(
     } else return false;
 }
 
-static inline offset_t *
+ offset_t *
 lane_offsetof(
     const page_t * page,
     lane_id_t      id)
@@ -1709,7 +1709,7 @@ lane_offsetof(
     return seek(page, SEEK_LANE_INUSE) + id * sizeof(offset_t);
 }
 
-static inline lane_t *
+ lane_t *
 lane_by_id(
     const page_t * page,
     lane_id_t      id)
@@ -1721,7 +1721,7 @@ lane_by_id(
     return data;
 }
 
-static inline lane_id_t *
+ lane_id_t *
 lane_reg_entry_by_pos(
     const page_t * page,
     size_t         pos)
@@ -1732,7 +1732,7 @@ lane_reg_entry_by_pos(
             pos * sizeof(lane_id_t);
 }
 
-static inline bool
+ bool
 lane_reg_is_full(
     const page_t * page)
 {
@@ -1740,7 +1740,7 @@ lane_reg_is_full(
     return (lanes->free_list_len == 0);
 }
 
-static inline lane_id_t
+ lane_id_t
 lane_new(
     page_t *       page,
     block_pos      strat,
@@ -1767,7 +1767,7 @@ lane_new(
     return id;
 }
 
-static inline void
+ void
 lane_reg_link(
     page_t *       page,
     lane_id_t      id,
@@ -1779,7 +1779,7 @@ lane_reg_link(
     *(offset_t *)(seek(page, SEEK_LANE_INUSE) + id * sizeof(offset_t)) = lane_offset;
 }
 
-static inline range_t *
+ range_t *
 freespace_new(
     const page_t *   page)
 {
@@ -1793,7 +1793,7 @@ freespace_new(
     return entry;
 }
 
-static inline size_t
+ size_t
 freespace_find_first(
     const page_t * page,
     size_t         capacity)
@@ -1814,7 +1814,7 @@ return_position:
     return entry_id_cursor;
 }
 
-static inline size_t
+ size_t
 freespace_largest(
     const page_t * page)
 {
@@ -1831,7 +1831,7 @@ freespace_largest(
     return max_capacity;
 }
 
-static inline bool
+ bool
 freespace_bind(
     range_t *      range,
     page_t *       page,
@@ -1899,7 +1899,7 @@ freespace_bind(
     return success;
 }
 
-static inline range_t
+ range_t
 freespace_split(
     page_t *       page,
     size_t         pos,
@@ -1922,7 +1922,7 @@ freespace_split(
     return result;
 }
 
-static inline void
+ void
 freespace_rebuild(
     page_t *       page)
 {
@@ -1931,7 +1931,7 @@ freespace_rebuild(
     freespace_merge(page);
 }
 
-static inline void
+ void
 freespace_cleanup(
     page_t *       page)
 {
@@ -1952,7 +1952,7 @@ freespace_cleanup(
     }
 }
 
-static inline int
+ int
 freespace_comp_by_start(
     const void *   lhs,
     const void *   rhs)
@@ -1962,7 +1962,7 @@ freespace_comp_by_start(
     return (a == b ? 0 : (a < b) ? - 1 : 1);
 }
 
-static inline void
+ void
 freespace_merge(
     page_t *       page)
 {
@@ -1998,7 +1998,7 @@ freespace_merge(
     vec_free(stack);
 }
 
-static inline lane_id_t
+ lane_id_t
 lane_reg_scan(
     const page_t * page,
     lane_state     state)
@@ -2020,7 +2020,7 @@ lane_reg_scan(
     return NULL_LANE_ID;
 }
 
-static inline bool
+ bool
 ptr_is_null(
     const in_page_ptr *ptr)
 {
@@ -2028,7 +2028,7 @@ ptr_is_null(
     return (ptr->offset == NULL_OFFSET);
 }
 
-static inline bool
+ bool
 ptr_has_scope(
     const in_page_ptr *ptr,
     page_ptr_type      type)
@@ -2043,7 +2043,7 @@ ptr_has_scope(
     }
 }
 
-static inline void
+ void
 ptr_make(
     in_page_ptr *  ptr,
     page_t *       page,
@@ -2080,7 +2080,7 @@ ptr_make(
     }
 }
 
-static inline
+
 ptr_target ptr_typeof(
     const in_page_ptr *ptr)
 {
@@ -2100,7 +2100,7 @@ ptr_target ptr_typeof(
     }
 }
 
-static inline void *
+ void *
 ptr_deref(
     anti_buf_t *       buf,
     const in_page_ptr *ptr)
@@ -2114,7 +2114,7 @@ ptr_deref(
     return (page_base_ptr + ptr->offset);
 }
 
-static inline zone_t *
+ zone_t *
 ptr_cast_zone(
     anti_buf_t *       buf,
     const in_page_ptr *ptr)
@@ -2124,7 +2124,7 @@ ptr_cast_zone(
     return (zone_t *) data;
 }
 
-//static inline lane_t *
+// lane_t *
 //ptr_cast_frame(
 //    anti_buf_t *buffer_manager,
 //    const in_page_ptr *ptr)
@@ -2134,7 +2134,7 @@ ptr_cast_zone(
 //    return (lane_t *) data;
 //}
 
-//static inline lane_t *
+// lane_t *
 //lane_by_zone(
 //        anti_buf_t *manager,
 //        const zone_t *zone)
@@ -2147,7 +2147,7 @@ ptr_cast_zone(
 //    return ptr_cast_frame(manager, &zone->prev);
 //}
 
-static inline void
+ void
 write_unsafe(
     page_t *       page,
     offset_t       offset,
@@ -2163,7 +2163,7 @@ write_unsafe(
     memcpy(base + offset, data, size);
 }
 
-static inline void *
+ void *
 read_unsafe(
     const page_t * page,
     offset_t       offset)
@@ -2173,7 +2173,7 @@ read_unsafe(
     return (offset != NULL_OFFSET ? (void *) page + offset : NULL);
 }
 
-static inline bool
+ bool
 range_do_overlap(
     range_t *      lhs,
     range_t *      rhs)
@@ -2182,7 +2182,7 @@ range_do_overlap(
            (rhs->end >= lhs->begin && rhs->begin <= lhs->begin);
 }
 
-static inline void
+ void
 page_approx_freespace_inc(
     page_t *       page,
     size_t         size)
@@ -2191,7 +2191,7 @@ page_approx_freespace_inc(
     page->header.freespace += size;
 }
 
-static inline void
+ void
 page_approx_freespace_dec(
     page_t *       page,
     size_t         size)
@@ -2200,14 +2200,14 @@ page_approx_freespace_dec(
     page->header.freespace -= size;
 }
 
-static inline size_t
+ size_t
 page_approx_freespace(
     const page_t * page)
 {
     return page->header.freespace;
 }
 
-static inline bool
+ bool
 freespace_push(
     page_t *      page,
     offset_t      begin,
@@ -2225,7 +2225,7 @@ freespace_push(
     return (entry != NULL);
 }
 
-static inline void
+ void
 buf_init(
     anti_buf_t *   buf)
 {
@@ -2255,7 +2255,7 @@ buf_init(
     GS_REQUIRE_NONNULL(buf->page_anticache.hot_store);
 }
 
-static inline page_t *
+ page_t *
 generic_store_get(
     anti_buf_t *     buf,
     size_t           size,
@@ -2279,7 +2279,7 @@ generic_store_get(
     return NULL;
 }
 
-static inline page_t *
+ page_t *
 anticache_page_by_freesize(
     anti_buf_t *   buf,
     size_t         size,
@@ -2308,7 +2308,7 @@ anticache_page_by_freesize(
     return page;
 }
 
-static inline void
+ void
 anticache_pin(
     anti_buf_t *   buf,
     page_t *       page)
@@ -2316,7 +2316,7 @@ anticache_pin(
     warn(NOTIMPLEMENTED, to_string(anticache_pin));   // TODO: Implement
 }
 
-static inline void
+ void
 anticache_unpin(
     anti_buf_t *   buf,
     page_t *       page)
@@ -2324,7 +2324,7 @@ anticache_unpin(
     warn(NOTIMPLEMENTED, to_string(anticache_unpin));   // TODO: Implement
 }
 
-static inline lane_id_t
+ lane_id_t
 anticache_create_lane(
     anti_buf_t *   buf,
     page_t *       page,

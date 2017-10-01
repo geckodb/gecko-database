@@ -22,14 +22,14 @@
 #define REQUIRE_INSTANCEOF_THIS(x)                                                                                     \
     REQUIRE((x->tag == FPTT_CONSOLE_PRINTER), BADTAG);
 
-static inline void console_printer_print(struct frag_printer_t *self, FILE *file, frag_t *frag, size_t row_offset, size_t limit);
-static inline void console_printer_free(struct frag_printer_t *self);
+ void console_printer_print(struct frag_printer_t *self, FILE *file, frag_t *frag, size_t row_offset, size_t limit);
+ void console_printer_free(struct frag_printer_t *self);
 
-static inline void calc_field_print_lens(vec_t *field_print_lens, frag_t *frag, size_t num_attr);
+ void calc_field_print_lens(vec_t *field_print_lens, frag_t *frag, size_t num_attr);
 
-static inline void print_h_line(FILE *file, const frag_t *frag, size_t num_attr, schema_t *schema, vec_t *field_print_lens);
-static inline void print_frag_header(FILE *file, const frag_t *frag, vec_t *field_print_lens, size_t num_attr);
-static inline void print_frag_body(FILE *file, frag_t *frag, vec_t *field_print_lens, size_t num_attr, size_t row_offset, size_t limit);
+ void print_h_line(FILE *file, const frag_t *frag, size_t num_attr, schema_t *schema, vec_t *field_print_lens);
+ void print_frag_header(FILE *file, const frag_t *frag, vec_t *field_print_lens, size_t num_attr);
+ void print_frag_body(FILE *file, frag_t *frag, vec_t *field_print_lens, size_t num_attr, size_t row_offset, size_t limit);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -47,7 +47,7 @@ struct frag_printer_t *console_printer_new()
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-static inline void calc_field_print_lens(vec_t *field_print_lens, frag_t *frag, size_t num_attr)
+ void calc_field_print_lens(vec_t *field_print_lens, frag_t *frag, size_t num_attr)
 {
     assert (field_print_lens);
 
@@ -76,7 +76,7 @@ static inline void calc_field_print_lens(vec_t *field_print_lens, frag_t *frag, 
     }
 }
 
-static inline void console_printer_print(struct frag_printer_t *self, FILE *file, frag_t *frag, size_t row_offset, size_t limit)
+ void console_printer_print(struct frag_printer_t *self, FILE *file, frag_t *frag, size_t row_offset, size_t limit)
 {
     REQUIRE_INSTANCEOF_THIS(self);
     size_t num_attr = frag_num_of_attributes(frag);
@@ -91,12 +91,12 @@ static inline void console_printer_print(struct frag_printer_t *self, FILE *file
     vec_free(field_print_lens);
 }
 
-static inline void console_printer_free(struct frag_printer_t *self)
+ void console_printer_free(struct frag_printer_t *self)
 {
     REQUIRE_INSTANCEOF_THIS(self);
 }
 
-static inline void print_h_line(FILE *file, const frag_t *frag, size_t num_attr, schema_t *schema, vec_t *field_print_lens)
+ void print_h_line(FILE *file, const frag_t *frag, size_t num_attr, schema_t *schema, vec_t *field_print_lens)
 {
     for (size_t attr_idx = 0; attr_idx < num_attr; attr_idx++) {
         size_t   col_width = *(size_t *) vec_at(field_print_lens, attr_idx);
@@ -109,7 +109,7 @@ static inline void print_h_line(FILE *file, const frag_t *frag, size_t num_attr,
     printf("+\n");
 }
 
-static inline void print_frag_header(FILE *file, const frag_t *frag, vec_t *field_print_lens, size_t num_attr)
+ void print_frag_header(FILE *file, const frag_t *frag, vec_t *field_print_lens, size_t num_attr)
 {
     char format_buffer[2048];
     schema_t *schema   = frag_schema(frag);
@@ -127,7 +127,7 @@ static inline void print_frag_header(FILE *file, const frag_t *frag, vec_t *fiel
     print_h_line(file, frag, num_attr, schema, field_print_lens);
 }
 
-static inline void print_frag_body(FILE *file, frag_t *frag, vec_t *field_print_lens, size_t num_attr, size_t row_offset, size_t limit)
+ void print_frag_body(FILE *file, frag_t *frag, vec_t *field_print_lens, size_t num_attr, size_t row_offset, size_t limit)
 {
     assert (field_print_lens);
 

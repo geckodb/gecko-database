@@ -40,7 +40,7 @@ typedef struct mondrian_vm_exec_args_t {
 } mondrian_vm_exec_args_t;
 
 
-static inline int mondrian_start_vm(mvm_handle_t *out, mondrian_t *instance, const program_t *program, future_eval_policy run_policy);
+ int mondrian_start_vm(mvm_handle_t *out, mondrian_t *instance, const program_t *program, future_eval_policy run_policy);
 
 void *promise_mondrian_vm_exec(promise_result *return_value, const void *capture);
 
@@ -129,7 +129,7 @@ const db_config_t *mondrian_config(mondrian_t *instance)
 
 //----------------------------------------------------------------------------------------------------------------------
 
-static inline int mondrian_start_vm(mvm_handle_t *out, mondrian_t *instance, const program_t *program, future_eval_policy run_policy)
+ int mondrian_start_vm(mvm_handle_t *out, mondrian_t *instance, const program_t *program, future_eval_policy run_policy)
 {
     if (instance == NULL || program == NULL)
         return MONDRIAN_ERROR;

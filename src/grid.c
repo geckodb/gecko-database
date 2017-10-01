@@ -23,21 +23,21 @@
 #include <tuplet_field.h>
 #include <tuple_field.h>
 
-static inline void create_indexes(table_t *table, size_t approx_num_horizontal_partitions);
+ void create_indexes(table_t *table, size_t approx_num_horizontal_partitions);
 
-static inline void create_grid_ptr_store(table_t *table);
+ void create_grid_ptr_store(table_t *table);
 
-static inline void create_tuple_id_store(table_t *table);
+ void create_tuple_id_store(table_t *table);
 
-static inline grid_t *create_grid(table_t *table, const attr_id_t *attr, size_t nattr,
+ grid_t *create_grid(table_t *table, const attr_id_t *attr, size_t nattr,
                                   const tuple_id_interval_t *tuple_ids, size_t ntuple_ids, enum frag_impl_type_t type);
 
-static inline size_t get_required_capacity(const tuple_id_interval_t *tuple_ids, size_t ntuple_ids);
+ size_t get_required_capacity(const tuple_id_interval_t *tuple_ids, size_t ntuple_ids);
 
-static inline void indexes_insert(table_t *table, grid_t *grid, const attr_id_t *attr, size_t nattr,
+ void indexes_insert(table_t *table, grid_t *grid, const attr_id_t *attr, size_t nattr,
                                   const tuple_id_interval_t *tuples, size_t ntuples);
 
-static inline void register_grid(table_t *table, grid_t *grid);
+ void register_grid(table_t *table, grid_t *grid);
 
 table_t *table_new(const schema_t *schema, size_t approx_num_horizontal_partitions)
 {
@@ -52,7 +52,7 @@ table_t *table_new(const schema_t *schema, size_t approx_num_horizontal_partitio
     } else return NULL;
 }
 
-static inline bool free_grids(void *capture, void *begin, void *end)
+ bool free_grids(void *capture, void *begin, void *end)
 {
     for (grid_t **it = (grid_t **) begin; it < (grid_t **) end; it++) {
         grid_delete(*it);
@@ -384,24 +384,24 @@ void table_structure_print(FILE *file, const table_t *table, size_t row_offset, 
     schema_delete(write_schema);
 }
 
-static inline void create_indexes(table_t *table, size_t approx_num_horizontal_partitions)
+ void create_indexes(table_t *table, size_t approx_num_horizontal_partitions)
 {
     size_t num_schema_slots = 2 * table->schema->attr->num_elements;
     table->schema_cover = hash_vindex_new(sizeof(attr_id_t), num_schema_slots);
     table->tuple_cover  = lesearch_hindex_new(approx_num_horizontal_partitions, table->schema);
 }
 
-static inline void create_grid_ptr_store(table_t *table)
+ void create_grid_ptr_store(table_t *table)
 {
     table->grid_ptrs = vec_new(sizeof(grid_t *), 10);
 }
 
-static inline void create_tuple_id_store(table_t *table)
+ void create_tuple_id_store(table_t *table)
 {
     freelist_create(&table->tuple_id_freelist, sizeof(tuple_id_t), 100, tuple_id_init, tuple_id_inc);
 }
 
-static inline grid_t *create_grid(table_t *table, const attr_id_t *attr, size_t nattr,
+ grid_t *create_grid(table_t *table, const attr_id_t *attr, size_t nattr,
                                   const tuple_id_interval_t *tuple_ids, size_t ntuple_ids, enum frag_impl_type_t type)
 {
     grid_t *result = GS_REQUIRE_MALLOC(sizeof(grid_t));
@@ -437,7 +437,7 @@ static inline grid_t *create_grid(table_t *table, const attr_id_t *attr, size_t 
     return result;
 }
 
-static inline size_t get_required_capacity(const tuple_id_interval_t *tuple_ids, size_t ntuple_ids)
+ size_t get_required_capacity(const tuple_id_interval_t *tuple_ids, size_t ntuple_ids)
 {
     size_t capacity = 0;
     while (ntuple_ids--) {
@@ -447,7 +447,7 @@ static inline size_t get_required_capacity(const tuple_id_interval_t *tuple_ids,
     return capacity;
 }
 
-static inline void indexes_insert(table_t *table, grid_t *grid, const attr_id_t *attr, size_t nattr,
+ void indexes_insert(table_t *table, grid_t *grid, const attr_id_t *attr, size_t nattr,
                                   const tuple_id_interval_t *tuples, size_t ntuples)
 {
     while (nattr--) {
@@ -458,7 +458,7 @@ static inline void indexes_insert(table_t *table, grid_t *grid, const attr_id_t 
     }
 }
 
-static inline void register_grid(table_t *table, grid_t *grid)
+ void register_grid(table_t *table, grid_t *grid)
 {
     vec_pushback(table->grid_ptrs, 1, &grid);
     grid->grid_id = vec_length(table->grid_ptrs) - 1;

@@ -16,3 +16,10 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <interval.h>
+
+int interval_tuple_id_comp_by_lower_bound(const void *lhs, const void *rhs)
+{
+    const tuple_id_interval_t *a = lhs;
+    const tuple_id_interval_t *b = rhs;
+    return (a->begin < b->begin ? - 1 : (a->begin > b->begin ? + 1 : 0));
+}

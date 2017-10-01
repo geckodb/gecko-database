@@ -84,3 +84,12 @@ enum field_type tuplet_field_type(const tuplet_t *tuplet, attr_id_t id)
     assert(tuplet);
     return frag_field_type(tuplet->fragment, id);
 }
+
+const char *tuplet_format_str(enum tuplet_format format)
+{
+    switch (format) {
+        case TF_NSM: return "row";
+        case TF_DSM: return "column";
+        default: perror("Unknown tuple format"); abort();
+    }
+}

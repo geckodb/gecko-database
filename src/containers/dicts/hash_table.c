@@ -125,31 +125,31 @@ typedef struct {
 // H E L P E R   P R O T O T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-void this_clear(struct dict_t *self);
-bool this_empty(const struct dict_t *self);
-bool this_contains_key(const struct dict_t *self, const void *key);
-const struct vec_t *this_keyset(const struct dict_t *self);
-const void *this_get(const struct dict_t *self, const void *key);
-struct vec_t *this_gets(const struct dict_t *self, size_t num_keys, const void *keys);
-bool this_remove(struct dict_t *self, size_t num_keys, const void *keys);
-void this_put(struct dict_t *self, const void *key, const void *value);
-void this_puts(struct dict_t *self, size_t num_elements, const void *keys, const void *values);
-size_t this_num_elements(struct dict_t *self);
-void this_for_each(struct dict_t *self, void *capture, void (*consumer)(void *capture, const void *key, const void *value));
+static void this_clear(struct dict_t *self);
+static bool this_empty(const struct dict_t *self);
+static bool this_contains_key(const struct dict_t *self, const void *key);
+static const struct vec_t *this_keyset(const struct dict_t *self);
+static const void *this_get(const struct dict_t *self, const void *key);
+static struct vec_t *this_gets(const struct dict_t *self, size_t num_keys, const void *keys);
+static bool this_remove(struct dict_t *self, size_t num_keys, const void *keys);
+static void this_put(struct dict_t *self, const void *key, const void *value);
+static void this_puts(struct dict_t *self, size_t num_elements, const void *keys, const void *values);
+static size_t this_num_elements(struct dict_t *self);
+static void this_for_each(struct dict_t *self, void *capture, void (*consumer)(void *capture, const void *key, const void *value));
 
-static inline void init_slots(void *slots, size_t num_slots, size_t key_size, size_t elem_size,
+ void init_slots(void *slots, size_t num_slots, size_t key_size, size_t elem_size,
                               void *empty_indicator);
-static inline bool slot_is_empty(const dict_t *self, hash_table_extra_t *extra, size_t slot_id);
-static inline void slot_put(void *slots, size_t slot_id, size_t key_size, size_t elem_size, const void *key, const void *data);
-static inline void *slot_get_key(void *slots, size_t slot_id, size_t key_size, size_t elem_size);
-static inline void *slot_get_value(void *slots, size_t slot_id, size_t key_size, size_t elem_size);
-static inline void slot_remove(void *slots, size_t slot_id, size_t key_size, size_t elem_size, void *empty_indicator);
+ bool slot_is_empty(const dict_t *self, hash_table_extra_t *extra, size_t slot_id);
+ void slot_put(void *slots, size_t slot_id, size_t key_size, size_t elem_size, const void *key, const void *data);
+ void *slot_get_key(void *slots, size_t slot_id, size_t key_size, size_t elem_size);
+ void *slot_get_value(void *slots, size_t slot_id, size_t key_size, size_t elem_size);
+ void slot_remove(void *slots, size_t slot_id, size_t key_size, size_t elem_size, void *empty_indicator);
 
-static inline void rebuild(const dict_t *self, hash_table_extra_t *extra);
-static inline void swap(hash_table_extra_t *a, hash_table_extra_t *b);
+ void rebuild(const dict_t *self, hash_table_extra_t *extra);
+ void swap(hash_table_extra_t *a, hash_table_extra_t *b);
 
-static inline bool is_empty_key(const char *a);
-static inline bool key_comp(const char *a, const char *b);
+ bool is_empty_key(const char *a);
+ bool key_comp(const char *a, const char *b);
 
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -354,7 +354,7 @@ str_str_clean_up(
 // H E L P E R   I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-void this_clear(struct dict_t *self)
+static void this_clear(struct dict_t *self)
 {
     REQUIRE_INSTANCEOF_THIS(self);
     hash_table_extra_t *extra = (hash_table_extra_t *) self->extra;
@@ -362,26 +362,26 @@ void this_clear(struct dict_t *self)
     init_slots(extra->slots, extra->num_slots, self->key_size, self->elem_size, extra->empty_indicator);
 }
 
-bool this_empty(const struct dict_t *self)
+static bool this_empty(const struct dict_t *self)
 {
     REQUIRE_INSTANCEOF_THIS(self);
     return (((hash_table_extra_t *) self->extra)->num_inuse == 0);
 }
 
-bool this_contains_key(const struct dict_t *self, const void *key)
+static bool this_contains_key(const struct dict_t *self, const void *key)
 {
     REQUIRE_INSTANCEOF_THIS(self);
     return (this_get(self, key) != NULL);
 }
 
-const struct vec_t *this_keyset(const struct dict_t *self)
+static const struct vec_t *this_keyset(const struct dict_t *self)
 {
     REQUIRE_INSTANCEOF_THIS(self);
     hash_table_extra_t *extra = (hash_table_extra_t *) self->extra;
     return extra->keyset;
 }
 
-const void *this_get(const struct dict_t *self, const void *key)
+static const void *this_get(const struct dict_t *self, const void *key)
 {
     vec_t *value_ptrs = this_gets(self, 1, key);
     assert (value_ptrs->num_elements <= 1);
@@ -390,7 +390,7 @@ const void *this_get(const struct dict_t *self, const void *key)
     return result;
 }
 
-struct vec_t *this_gets(const struct dict_t *self, size_t num_keys, const void *keys)
+static struct vec_t *this_gets(const struct dict_t *self, size_t num_keys, const void *keys)
 {
     REQUIRE_INSTANCEOF_THIS(self);
     GS_REQUIRE_NONNULL(keys);
@@ -431,7 +431,7 @@ next_key:
     return result;
 }
 
-bool this_remove(struct dict_t *self, size_t num_keys, const void *keys)
+static bool this_remove(struct dict_t *self, size_t num_keys, const void *keys)
 {
     panic("The function '%s' is not properly implemented.", "this_remove"); // TODO: Mark removed elements as "deleted". Actually removing them causes issues with chained entries for linear probing
 
@@ -475,14 +475,14 @@ bool this_remove(struct dict_t *self, size_t num_keys, const void *keys)
     return removed_one_entry;
 }
 
-void this_put(struct dict_t *self, const void *key, const void *value)
+static void this_put(struct dict_t *self, const void *key, const void *value)
 {
     REQUIRE_INSTANCEOF_THIS(self);
     GS_REQUIRE_NONNULL(key && value);
     this_puts(self, 1, key, value);
 }
 
-void this_puts(struct dict_t *self, size_t num_elements, const void *keys, const void *values)
+static void this_puts(struct dict_t *self, size_t num_elements, const void *keys, const void *values)
 {
     REQUIRE_INSTANCEOF_THIS(self);
     GS_REQUIRE_NONNULL(keys && values);
@@ -542,13 +542,13 @@ void this_puts(struct dict_t *self, size_t num_elements, const void *keys, const
     }
 }
 
-size_t this_num_elements(struct dict_t *self)
+static size_t this_num_elements(struct dict_t *self)
 {
     REQUIRE_INSTANCEOF_THIS(self);
     return ((hash_table_extra_t *) self->extra)->num_inuse;
 }
 
-void this_for_each(struct dict_t *self, void *capture, void (*consumer)(void *capture, const void *key, const void *value))
+static void this_for_each(struct dict_t *self, void *capture, void (*consumer)(void *capture, const void *key, const void *value))
 {
     REQUIRE_INSTANCEOF_THIS(self);
     hash_table_extra_t * extra = (hash_table_extra_t *) self->extra;
@@ -566,7 +566,7 @@ void this_for_each(struct dict_t *self, void *capture, void (*consumer)(void *ca
     }
 }
 
-static inline void init_slots(void *slots, size_t num_slots, size_t key_size, size_t elem_size,
+ void init_slots(void *slots, size_t num_slots, size_t key_size, size_t elem_size,
                               void *empty_indicator)
 {
     assert (slots && num_slots > 0 && key_size > 0);
@@ -577,7 +577,7 @@ static inline void init_slots(void *slots, size_t num_slots, size_t key_size, si
     }
 }
 
-static inline bool slot_is_empty(const dict_t *self, hash_table_extra_t *extra, size_t slot_id)
+ bool slot_is_empty(const dict_t *self, hash_table_extra_t *extra, size_t slot_id)
 {
     assert (self && extra && slot_id < extra->num_slots);
     void *pos = SEEK_TO_SLOT(extra->slots, slot_id, self->key_size, self->elem_size);
@@ -585,7 +585,7 @@ static inline bool slot_is_empty(const dict_t *self, hash_table_extra_t *extra, 
     return empty;
 }
 
-static inline void slot_put(void *slots, size_t slot_id, size_t key_size, size_t elem_size, const void *key, const void *data)
+ void slot_put(void *slots, size_t slot_id, size_t key_size, size_t elem_size, const void *key, const void *data)
 {
     assert (slots && key && data && key_size > 0 && elem_size > 0);
     void *slot_data = SEEK_TO_SLOT(slots, slot_id, key_size, elem_size);
@@ -593,26 +593,26 @@ static inline void slot_put(void *slots, size_t slot_id, size_t key_size, size_t
     memcpy(slot_data + key_size, data, elem_size);
 }
 
-static inline void *slot_get_key(void *slots, size_t slot_id, size_t key_size, size_t elem_size)
+ void *slot_get_key(void *slots, size_t slot_id, size_t key_size, size_t elem_size)
 {
     assert (slots && key_size > 0 && elem_size > 0);
     return SEEK_TO_SLOT(slots, slot_id, key_size, elem_size);
 }
 
-static inline void *slot_get_value(void *slots, size_t slot_id, size_t key_size, size_t elem_size)
+ void *slot_get_value(void *slots, size_t slot_id, size_t key_size, size_t elem_size)
 {
     assert (slots && key_size > 0 && elem_size > 0);
     return SEEK_TO_SLOT(slots, slot_id, key_size, elem_size) + key_size;
 }
 
-static inline void slot_remove(void *slots, size_t slot_id, size_t key_size, size_t elem_size, void *empty_indicator)
+ void slot_remove(void *slots, size_t slot_id, size_t key_size, size_t elem_size, void *empty_indicator)
 {
     assert (slots && empty_indicator && elem_size > 0 && key_size > 0);
     size_t slot_len = (key_size + elem_size);
     memcpy(slots + (slot_id * slot_len), empty_indicator, key_size);
 }
 
-static inline void rebuild(const dict_t *self, hash_table_extra_t *extra)
+ void rebuild(const dict_t *self, hash_table_extra_t *extra)
 {
     assert (self && extra && extra->grow_factor > 1);
 
@@ -637,17 +637,17 @@ static inline void rebuild(const dict_t *self, hash_table_extra_t *extra)
     hash_table_delete(tmp);
 }
 
-static inline void swap(hash_table_extra_t *a, hash_table_extra_t *b)
+ void swap(hash_table_extra_t *a, hash_table_extra_t *b)
 {
     hash_table_extra_t tmp = SHALLOW_CPY(a);
     *a = SHALLOW_CPY(b);
     *b = SHALLOW_CPY(&tmp);
 }
 
-static inline bool is_empty_key(const char *a) {
+ bool is_empty_key(const char *a) {
     return (a == NULL || strlen(a) == 0);
 }
 
-static inline bool key_comp(const char *a, const char *b) {
+ bool key_comp(const char *a, const char *b) {
     return (strcmp(a, b) == 0);
 }

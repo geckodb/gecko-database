@@ -16,18 +16,19 @@ typedef struct gs_shell_t {
     apr_time_t           uptime;
 } gs_shell_t;
 
-static inline int shell_loop(void *args);
+ int shell_loop(void *args);
 
-static inline bool process_input(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input);
+ bool process_input(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input);
 
-static inline void process_command_help(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input);
-static inline void process_command_exit(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input);
-static inline void process_command_uptime(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input);
+ void process_command_help(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input);
+ void process_command_exit(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input);
+ void process_command_uptime(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input);
 
 GS_DECLARE(gs_status_t) gs_shell_create(gs_shell_t **shell, gs_dispatcher_t *dispatcher)
 {
     gs_shell_t *result = GS_REQUIRE_MALLOC(sizeof(gs_shell_t));
     result->dispatcher = dispatcher;
+    result->is_running = false;
     result->is_disposable = false;
     apr_pool_create(&result->pool, NULL);
     apr_uid_current(&result->user_id, &result->group_id, result->pool);
@@ -96,7 +97,7 @@ GS_DECLARE(gs_status_t) gs_shell_shutdown(gs_shell_t *shell)
     }
 }
 
-static inline int shell_loop(void *args)
+ int shell_loop(void *args)
 {
     assert (args);
 
@@ -123,7 +124,7 @@ static inline int shell_loop(void *args)
     return EXIT_SUCCESS;
 }
 
-static inline bool process_input(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input)
+ bool process_input(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input)
 {
     if (apr_strnatcasecmp(input, "help") == 0) {
         process_command_help(shell, in, out, input);
@@ -138,7 +139,7 @@ static inline bool process_input(gs_shell_t *shell, apr_file_t *in, apr_file_t *
     return true;
 }
 
-static inline void process_command_help(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input)
+ void process_command_help(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input)
 {
     GS_DEBUG("shell %p command 'help' entered", shell);
     apr_file_printf(out, "Available commands:\n");
@@ -148,13 +149,13 @@ static inline void process_command_help(gs_shell_t *shell, apr_file_t *in, apr_f
 
 }
 
-static inline void process_command_exit(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input)
+ void process_command_exit(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input)
 {
     GS_DEBUG("shell %p command 'exit' entered", shell);
     gs_dispatcher_publish(shell->dispatcher, gs_event_system_exit(shell->dispatcher, GS_OBJECT_TYPE_SHELL, shell));
 }
 
-static inline void process_command_uptime(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input)
+ void process_command_uptime(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input)
 {
     GS_DEBUG("shell %p command 'uptime' entered", shell);
     apr_time_exp_t result;

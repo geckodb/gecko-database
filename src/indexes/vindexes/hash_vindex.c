@@ -32,25 +32,25 @@
 // H E L P E R   P R O T O T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-static inline void this_add(struct vindex_t *self, const attr_id_t *key, const struct grid_t *grid);
-static inline void this_remove(struct vindex_t *self, const attr_id_t *key);
-static inline bool this_contains(const struct vindex_t *self, const attr_id_t *key);
-static inline void this_free(struct vindex_t *self);
-static inline void this_query(grid_cursor_t *result, const struct vindex_t *self, const attr_id_t *key_begin,
+static void this_add(struct vindex_t *self, const attr_id_t *key, const struct grid_t *grid);
+static void this_remove(struct vindex_t *self, const attr_id_t *key);
+static bool this_contains(const struct vindex_t *self, const attr_id_t *key);
+static void this_free(struct vindex_t *self);
+static void this_query(grid_cursor_t *result, const struct vindex_t *self, const attr_id_t *key_begin,
                               const attr_id_t *key_end);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E  I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-static inline bool attr_key_equals(const void *key_lhs, const void *key_rhs)
+ bool attr_key_equals(const void *key_lhs, const void *key_rhs)
 {
     attr_id_t lhs = *((attr_id_t *) key_lhs);
     attr_id_t rhs = *((attr_id_t *) key_rhs);
     return (lhs == rhs);
 }
 
-static inline void cleanup_vectors(void *key, void *value)
+ void cleanup_vectors(void *key, void *value)
 {
     vec_dispose((vec_t *) value);
 }
@@ -81,7 +81,7 @@ vindex_t *hash_vindex_new(size_t key_size, size_t num_init_slots)
 // H E L P E R   I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-static inline void this_add(struct vindex_t *self, const attr_id_t *key, const struct grid_t *grid)
+static void this_add(struct vindex_t *self, const attr_id_t *key, const struct grid_t *grid)
 {
     REQUIRE_INSTANCEOF_THIS(self);
     dict_t *dict = ((dict_t *)self->extra);
@@ -98,13 +98,13 @@ static inline void this_add(struct vindex_t *self, const attr_id_t *key, const s
     vec_pushback(vec, 1, &grid);
 }
 
-static inline void this_remove(struct vindex_t *self, const attr_id_t *key)
+static void this_remove(struct vindex_t *self, const attr_id_t *key)
 {
     REQUIRE_INSTANCEOF_THIS(self);
     panic(NOTIMPLEMENTED, to_string(this_remove)) // requires proper implementation of remove in hash table
 }
 
-static inline bool this_contains(const struct vindex_t *self, const attr_id_t *key)
+static bool this_contains(const struct vindex_t *self, const attr_id_t *key)
 {
     REQUIRE_INSTANCEOF_THIS(self);
     dict_t *dict = ((dict_t *)self->extra);
@@ -112,7 +112,7 @@ static inline bool this_contains(const struct vindex_t *self, const attr_id_t *k
     return dict_contains_key(dict, key);
 }
 
-void this_free(struct vindex_t *self)
+static void this_free(struct vindex_t *self)
 {
     REQUIRE_INSTANCEOF_THIS(self);
     dict_delete((dict_t *) self->extra);
@@ -120,7 +120,7 @@ void this_free(struct vindex_t *self)
 }
 
 
-static inline void this_query(grid_cursor_t *result, const struct vindex_t *self, const attr_id_t *key_begin,
+static void this_query(grid_cursor_t *result, const struct vindex_t *self, const attr_id_t *key_begin,
                               const attr_id_t *key_end)
 {
     GS_REQUIRE_NONNULL(result->extra);

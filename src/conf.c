@@ -25,7 +25,7 @@
 #define BADCWD          "Unable to get working directory (file name might exceed limit of %d)"
 #define NOCONFIG        "Configuration map for '%s' is not set. Did you call 'conf_load'?"
 
-static inline char
+ char
 path_separator()
 {
 #ifdef PLATFORM_WINDOWS
@@ -68,7 +68,7 @@ static char *replace(const char *in, const char *pattern, const char *by)
     return res;
 }
 
-static inline void
+ void
 get_home_dir(
     dict_t *    env)
 {
@@ -105,7 +105,7 @@ get_by_key(
     return (result != NULL ? *(char **) result : NULL);
 }
 
-static inline void
+ void
 register_path_dir(
     dict_t *    env,
     const char *key_name,

@@ -27,6 +27,7 @@
 #include <stdatomic.h>
 #include <inet/gs_request.h>
 #include <apr_hash.h>
+#include <apr_strings.h>
 
 typedef struct gs_server_t
 {
@@ -38,8 +39,8 @@ typedef struct gs_server_t
     socklen_t            socket_len;
     apr_hash_t          *routers;
     thrd_t               thread;
-    atomic_bool          is_running;
-    atomic_bool          is_disposable;
+    bool                 is_running;
+    bool                 is_disposable;
 } gs_server_t;
 
 typedef struct server_loop_args_t
@@ -57,7 +58,7 @@ str_clean_up(
     free (*key_string);
 }
 
-static inline int server_loop(void *args);
+int server_loop(void *args);
 
 GS_DECLARE(gs_status_t) gs_server_create(gs_server_t **out, unsigned short port, gs_dispatcher_t *dispatcher)
 {
@@ -65,8 +66,8 @@ GS_DECLARE(gs_status_t) gs_server_create(gs_server_t **out, unsigned short port,
 
     server->socket_len = sizeof(server->client_addr);
     server->dispatcher = dispatcher;
-    atomic_init(&server->is_disposable, false);
-    atomic_init(&server->is_running, false);
+    server->is_disposable = false;
+    server->is_running = false;
     apr_pool_create(&server->pool, NULL);
 
     int on = 1;
@@ -97,7 +98,7 @@ GS_DECLARE(gs_status_t) gs_server_create(gs_server_t **out, unsigned short port,
                                         sizeof(char *), sizeof(router_t), RESPONSE_DICT_CAPACITY,
                                         RESPONSE_DICT_CAPACITY, 1.7f, 0.75f,
                                         str_equals, str_clean_up, true);*/
-    apr_hash_make(server->pool);
+    server->routers = apr_hash_make(server->pool);
 
     printf("listening to port %d\n", (int) ntohs(server->server_addr.sin_port));
 
@@ -109,7 +110,8 @@ GS_DECLARE(gs_status_t) gs_server_router_add(gs_server_t *server, const char *re
 {
     GS_REQUIRE_NONNULL(server)
    // dict_put(server->routers, &resource, &router);
-    apr_hash_set(server->routers, &resource, sizeof(char *), router);
+    char *key = apr_pstrdup(server->pool, resource);
+    apr_hash_set(server->routers, key, APR_HASH_KEY_STRING, router);
     return GS_SUCCESS;
 }
 
@@ -118,16 +120,15 @@ GS_DECLARE(gs_status_t) gs_server_start(gs_server_t *server, router_t catch)
     GS_REQUIRE_NONNULL(server);
     GS_REQUIRE_NONNULL(catch);
 
-    if (!atomic_load(&server->is_running)) {
+    if (!server->is_running) {
         GS_DEBUG("server %p is starting", server);
-        atomic_store(&server->is_running, true);
+        server->is_running = true;
 
-        server_loop_args_t args = {
-            .server = server,
-            .catch = catch
-        };
+        server_loop_args_t *args = GS_REQUIRE_MALLOC(sizeof(server_loop_args_t));
+        args->server = server;
+        args->catch = catch;
 
-        thrd_create(&server->thread, server_loop, &args);
+        thrd_create(&server->thread, server_loop, args);
         return GS_SUCCESS;
     } else {
         warn("server %p was request to start but runs already", server);
@@ -140,7 +141,7 @@ GS_DECLARE(gs_status_t) gs_server_dispose(gs_server_t **server_ptr)
     GS_REQUIRE_NONNULL(server_ptr);
     GS_REQUIRE_NONNULL(*server_ptr);
     gs_server_t *server = *server_ptr;
-    if (atomic_load_explicit(&server->is_disposable, memory_order_seq_cst)) {
+    if (server->is_disposable) {
         apr_pool_destroy(server->pool);
      //   dict_clear(server->routers);
         GS_DEBUG("server %p disposed", server);
@@ -154,9 +155,9 @@ GS_DECLARE(gs_status_t) gs_server_dispose(gs_server_t **server_ptr)
 
 GS_DECLARE(gs_status_t) gs_server_shutdown(gs_server_t *server)
 {
-    if (atomic_load(&server->is_running)) {
+    if (server->is_running) {
         GS_DEBUG("server %p is shutting down", server);
-        atomic_store(&server->is_running, false);
+        server->is_running = false;
         return GS_SUCCESS;
     } else {
         GS_DEBUG("server %p is already shutting down", server);
@@ -183,7 +184,7 @@ GS_DECLARE(gs_status_t) gs_server_handle_events(const gs_event_t *event)
     }
 }
 
-static inline int server_loop(void *args)
+int server_loop(void *args)
 {
     GS_REQUIRE_NONNULL(args);
     server_loop_args_t *loop_args = (server_loop_args_t *) args;
@@ -193,12 +194,12 @@ static inline int server_loop(void *args)
     response_t response;
     fd_set set;
 
-    while (atomic_load(&loop_args->server->is_running)) {
+    while (loop_args->server->is_running) {
         FD_ZERO(&set);
         FD_SET(loop_args->server->server_desc, &set);
 
         struct timeval timeout = {
-            .tv_sec = 5
+            .tv_sec = 25
         };
 
         int select_result = select(loop_args->server->server_desc + 1, &set, NULL, NULL, &timeout);
@@ -216,7 +217,7 @@ static inline int server_loop(void *args)
             memset (buffer, 0, sizeof(buffer));
             struct pollfd pollfd = { .fd = client, .events = POLLIN };
             response_create(&response);
-            if (poll(&pollfd, 1, 1000)) {
+            if (poll(&pollfd, 1, 100000)) {
                 gs_request_t *request;
                 gs_request_create(&request, client);
 
@@ -228,7 +229,11 @@ static inline int server_loop(void *args)
                     const router_t *router;
                     char *resource;
                     gs_request_resource(&resource, request);
-                    if ((router = apr_hash_get(loop_args->server->routers, &resource, sizeof(char *))) != NULL) {
+                    GS_DEBUG("loop args %p", loop_args);
+                    GS_DEBUG("resource %s", resource);
+                    GS_DEBUG("server %p", loop_args->server);
+                    GS_DEBUG("routers %p", loop_args->server->routers);
+                    if ((router = apr_hash_get(loop_args->server->routers, resource, APR_HASH_KEY_STRING)) != NULL) {
                         GS_DEBUG("request delegated to router for resource '%s'", resource);
                         (*router)(loop_args->server->dispatcher, request, &response);
                     } else {
@@ -251,7 +256,7 @@ static inline int server_loop(void *args)
         close (client);
     }
     GS_DEBUG("server %p left main loop", loop_args->server);
-    atomic_store_explicit(&loop_args->server->is_disposable, true, memory_order_seq_cst);
+    loop_args->server->is_disposable = true;
 
     return EXIT_SUCCESS;
 }

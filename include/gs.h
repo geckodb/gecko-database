@@ -68,57 +68,6 @@ typedef uint64_t attr_id_t;
 
 typedef uint32_t tuplet_id_t;
 
-typedef uint32_t http_status_code_t;
-
-typedef enum content_type_t
-{
-    MEDIA_MULTI_PART_FORM_DATA
-} content_type_t;
-
-typedef enum method_t {
-    HTTP_GET, HTTP_POST, HTTP_PUT, HTTP_DELETE, HTTP_OTHERS
-} method_t;
-
-#define HTTP_STATUS_CODE_100_CONTINUE           100
-#define HTTP_STATUS_CODE_200_OK                 200
-#define HTTP_STATUS_CODE_500_INTERNAL_ERR       500
-#define HTTP_STATUS_CODE_400_BAD_REQUEST        400
-#define HTTP_STATUS_CODE_404_NOT_FOUND          404
-#define HTTP_STATUS_CODE_405_METHOD_NOT_ALLOWED 405
-#define HTTP_STATUS_CODE_408_REQUEST_TIMEOUT    408
-
-
-#define HTTP_GET_STRING    "GET"
-#define HTTP_PUT_STRING    "PUT"
-#define HTTP_POST_STRING   "POST"
-#define HTTP_DELETE_STRING "DELETE"
-
-
-static inline const char *codestr(http_status_code_t code)
-{
-    switch (code) {
-        case HTTP_STATUS_CODE_100_CONTINUE:           return "100 Continue";
-        case HTTP_STATUS_CODE_200_OK:                 return "200 OK";
-        case HTTP_STATUS_CODE_400_BAD_REQUEST:        return "400 Bad Request";
-        case HTTP_STATUS_CODE_408_REQUEST_TIMEOUT:    return "408 Request Timeout";
-        case HTTP_STATUS_CODE_404_NOT_FOUND:          return "404 Not Found";
-        case HTTP_STATUS_CODE_405_METHOD_NOT_ALLOWED: return "405 Method Not Allowed";
-        case HTTP_STATUS_CODE_500_INTERNAL_ERR:
-        default:                                      return "500 Internal Server Error";
-    }
-}
-
-static inline const char *methodstr(http_status_code_t code) {
-    switch (code) {
-        case HTTP_GET:    return HTTP_GET_STRING;
-        case HTTP_POST:   return HTTP_POST_STRING;
-        case HTTP_PUT:    return HTTP_PUT_STRING;
-        case HTTP_DELETE: return HTTP_DELETE_STRING;
-        default: return "(unknown)";
-    }
-}
-
-
 typedef uint8_t     u8;
 typedef uint16_t   u16;
 typedef uint32_t   u32;
@@ -184,15 +133,6 @@ typedef MD5_CTX checksum_context_t;
         REQUIRE_IMPL(instance->fun);                                                                                   \
         instance->fun(instance,__VA_ARGS__);                                                                           \
     })
-
-static inline const char *tuplet_format_str(enum tuplet_format format)
-{
-    switch (format) {
-        case TF_NSM: return "row";
-        case TF_DSM: return "column";
-        default: perror("Unknown tuple format"); abort();
-    }
-}
 
 #define GS_CONNECT(sig, slot)                                                                                          \
     error_if((gs_dispatcher_connect(dispatcher, sig, slot) != GS_SUCCESS), err_connect_failed);

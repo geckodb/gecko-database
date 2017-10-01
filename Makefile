@@ -730,6 +730,33 @@ src/gs_gridstore.c.s:
 	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/gs_gridstore.c.s
 .PHONY : src/gs_gridstore.c.s
 
+src/gs_http.o: src/gs_http.c.o
+
+.PHONY : src/gs_http.o
+
+# target to build an object file
+src/gs_http.c.o:
+	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/gs_http.c.o
+.PHONY : src/gs_http.c.o
+
+src/gs_http.i: src/gs_http.c.i
+
+.PHONY : src/gs_http.i
+
+# target to preprocess a source file
+src/gs_http.c.i:
+	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/gs_http.c.i
+.PHONY : src/gs_http.c.i
+
+src/gs_http.s: src/gs_http.c.s
+
+.PHONY : src/gs_http.s
+
+# target to generate assembly for a file
+src/gs_http.c.s:
+	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/gs_http.c.s
+.PHONY : src/gs_http.c.s
+
 src/gs_shell.o: src/gs_shell.c.o
 
 .PHONY : src/gs_shell.o
@@ -1589,6 +1616,9 @@ help:
 	@echo "... src/gs_gridstore.o"
 	@echo "... src/gs_gridstore.i"
 	@echo "... src/gs_gridstore.s"
+	@echo "... src/gs_http.o"
+	@echo "... src/gs_http.i"
+	@echo "... src/gs_http.s"
 	@echo "... src/gs_shell.o"
 	@echo "... src/gs_shell.i"
 	@echo "... src/gs_shell.s"

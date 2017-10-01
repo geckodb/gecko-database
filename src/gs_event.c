@@ -48,8 +48,8 @@ void *gs_event_get_data(const gs_event_t *event)
     return (event->data);
 }
 
-static inline void *blocking_event_wrap_data(volatile gs_spinlock_t *lock, gs_event_t *contained_event);
-static inline void blocking_event_unlock_and_dispose(gs_event_t *blocking_event);
+ void *blocking_event_wrap_data(volatile gs_spinlock_t *lock, gs_event_t *contained_event);
+ void blocking_event_unlock_and_dispose(gs_event_t *blocking_event);
 
 gs_status_t gs_event_get_subject(gs_object_type_tag_e *type_tag, void **ptr, const gs_event_t *event, gs_subject_kind_e subj)
 {
@@ -128,7 +128,7 @@ gs_event_t *gs_event_new_blocking(volatile gs_spinlock_t *lock, gs_event_t *cont
     return result;
 }
 
-static inline void *blocking_event_wrap_data(volatile gs_spinlock_t *lock, gs_event_t *contained_event)
+ void *blocking_event_wrap_data(volatile gs_spinlock_t *lock, gs_event_t *contained_event)
 {
     blocking_event_args_t *result = GS_REQUIRE_MALLOC(sizeof(blocking_event_args_t));
     result->lock = lock;
@@ -136,7 +136,7 @@ static inline void *blocking_event_wrap_data(volatile gs_spinlock_t *lock, gs_ev
     return result;
 }
 
-static inline void blocking_event_unlock_and_dispose(gs_event_t *blocking_event)
+ void blocking_event_unlock_and_dispose(gs_event_t *blocking_event)
 {
     assert (blocking_event->is_blocking);
     blocking_event_args_t *args = (blocking_event_args_t *) blocking_event->data;

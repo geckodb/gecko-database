@@ -235,24 +235,24 @@ typedef struct program_t
 
 //----------------------------------------------------------------------------------------------------------------------
 
-static inline int mondrian_vm_tick(mondrian_vm_t *vm);
-static inline int mondrian_vm_rollback(mondrian_vm_t *vm);
+ int mondrian_vm_tick(mondrian_vm_t *vm);
+ int mondrian_vm_rollback(mondrian_vm_t *vm);
 
-static inline lock_id_t mondrian_vm_ackn_lock(mondrian_vm_t *vm, shared_resource target, access_mode mode);
-static inline int mondrian_vm_release_lock(mondrian_vm_t *vm, lock_id_t lock_id);
+ lock_id_t mondrian_vm_ackn_lock(mondrian_vm_t *vm, shared_resource target, access_mode mode);
+ int mondrian_vm_release_lock(mondrian_vm_t *vm, lock_id_t lock_id);
 
-static inline void mondrian_vm_set_var(mondrian_vm_t *vm, u64 index, u64 *value);
-static inline int mondrian_vm_get_var(u64 *out, mondrian_vm_t *vm, u64 index);
-static inline int mondrian_vm_install_frag_local(frag_id_t *out, mondrian_vm_t *vm, frag_t *frag);
-static inline frag_t *mondrian_vm_get_frag_local(mondrian_vm_t *vm, frag_id_t id);
+ void mondrian_vm_set_var(mondrian_vm_t *vm, u64 index, u64 *value);
+ int mondrian_vm_get_var(u64 *out, mondrian_vm_t *vm, u64 index);
+ int mondrian_vm_install_frag_local(frag_id_t *out, mondrian_vm_t *vm, frag_t *frag);
+ frag_t *mondrian_vm_get_frag_local(mondrian_vm_t *vm, frag_id_t id);
 
 //----------------------------------------------------------------------------------------------------------------------
 
-static inline bool is_unique_fragment_name(mondrian_vm_t *vm, const char *name);
-static inline int drop_fragment_with_name(mondrian_vm_t *vm, const char *name);
-static inline void frag_handle_make(frag_handle_t *out, u64 scope, frag_id_t frag_id);
-static inline bool frag_handle_is_global(frag_handle_t *handle);
-static inline frag_id_t frag_handle_get_frag_id(frag_handle_t *handle);
+ bool is_unique_fragment_name(mondrian_vm_t *vm, const char *name);
+ int drop_fragment_with_name(mondrian_vm_t *vm, const char *name);
+ void frag_handle_make(frag_handle_t *out, u64 scope, frag_id_t frag_id);
+ bool frag_handle_is_global(frag_handle_t *handle);
+ frag_id_t frag_handle_get_frag_id(frag_handle_t *handle);
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -575,7 +575,7 @@ int program_free(program_t *program)
 
 //----------------------------------------------------------------------------------------------------------------------
 
-static inline int mondrian_vm_tick(mondrian_vm_t *vm)
+ int mondrian_vm_tick(mondrian_vm_t *vm)
 {
     assert (vm);
     assert (vm->operand_stack);
@@ -604,13 +604,13 @@ static inline int mondrian_vm_tick(mondrian_vm_t *vm)
     }
 }
 
-static inline int mondrian_vm_rollback(mondrian_vm_t *vm)
+ int mondrian_vm_rollback(mondrian_vm_t *vm)
 {
     // TODO
     return MONDRIAN_OK;
 }
 
-static inline lock_id_t mondrian_vm_ackn_lock(mondrian_vm_t *vm, shared_resource target, access_mode mode)
+ lock_id_t mondrian_vm_ackn_lock(mondrian_vm_t *vm, shared_resource target, access_mode mode)
 {
     lock_id_t lock_id = vm->locks->num_elements;
     shared_resource_release_state_t state = {
@@ -622,7 +622,7 @@ static inline lock_id_t mondrian_vm_ackn_lock(mondrian_vm_t *vm, shared_resource
     return lock_id;
 }
 
-static inline int mondrian_vm_release_lock(mondrian_vm_t *vm, lock_id_t lock_id)
+ int mondrian_vm_release_lock(mondrian_vm_t *vm, lock_id_t lock_id)
 {
     shared_resource_release_state_t *release_states = (shared_resource_release_state_t *)(vm->locks->data);
     if (lock_id >= vm->locks->num_elements) {
@@ -653,7 +653,7 @@ static inline int mondrian_vm_release_lock(mondrian_vm_t *vm, lock_id_t lock_id)
     }
 }
 
-static inline void mondrian_vm_set_var(mondrian_vm_t *vm, u64 index, u64 *value)
+ void mondrian_vm_set_var(mondrian_vm_t *vm, u64 index, u64 *value)
 {
     variable_entry_t entry = {
         .initialized = true,
@@ -668,7 +668,7 @@ static inline void mondrian_vm_set_var(mondrian_vm_t *vm, u64 index, u64 *value)
     vec_set(vm->variables, index, 1, &entry);
 }
 
-static inline int mondrian_vm_get_var(u64 *out, mondrian_vm_t *vm, u64 index)
+ int mondrian_vm_get_var(u64 *out, mondrian_vm_t *vm, u64 index)
 {
     if (vm == NULL || out == NULL) {
         return MONDRIAN_ERROR;
@@ -681,7 +681,7 @@ static inline int mondrian_vm_get_var(u64 *out, mondrian_vm_t *vm, u64 index)
     }
 }
 
-static inline int mondrian_vm_install_frag_local(frag_id_t *out, mondrian_vm_t *vm, frag_t *frag)
+ int mondrian_vm_install_frag_local(frag_id_t *out, mondrian_vm_t *vm, frag_t *frag)
 {
     local_fragment_t local = {
         .is_dropped = false,
@@ -692,7 +692,7 @@ static inline int mondrian_vm_install_frag_local(frag_id_t *out, mondrian_vm_t *
     return MONDRIAN_OK;
 }
 
-static inline frag_t *mondrian_vm_get_frag_local(mondrian_vm_t *vm, frag_id_t id)
+ frag_t *mondrian_vm_get_frag_local(mondrian_vm_t *vm, frag_id_t id)
 {
     const local_fragment_t *local = (const local_fragment_t *) vec_at(vm->fragments, id);
     return (local == NULL ? NULL : local->fragment);
@@ -700,7 +700,7 @@ static inline frag_t *mondrian_vm_get_frag_local(mondrian_vm_t *vm, frag_id_t id
 
 //----------------------------------------------------------------------------------------------------------------------
 
-static inline bool is_unique_fragment_name(mondrian_vm_t *vm, const char *name)
+ bool is_unique_fragment_name(mondrian_vm_t *vm, const char *name)
 {
     local_fragment_t *fragments = (local_fragment_t *) vm->fragments->data;
     for (size_t i = 0; i < vm->fragments->num_elements; i++) {
@@ -711,7 +711,7 @@ static inline bool is_unique_fragment_name(mondrian_vm_t *vm, const char *name)
     return true;
 }
 
-static inline int drop_fragment_with_name(mondrian_vm_t *vm, const char *name)
+ int drop_fragment_with_name(mondrian_vm_t *vm, const char *name)
 {
     local_fragment_t *fragments = (local_fragment_t *) vm->fragments->data;
     for (size_t i = 0; i < vm->fragments->num_elements; i++) {
@@ -727,18 +727,18 @@ static inline int drop_fragment_with_name(mondrian_vm_t *vm, const char *name)
     return MONDRIAN_NOSUCHELEM;
 }
 
-static inline void frag_handle_make(frag_handle_t *out, u64 scope, frag_id_t frag_id)
+ void frag_handle_make(frag_handle_t *out, u64 scope, frag_id_t frag_id)
 {
     out->is_global = (scope == FRAGMENT_SCOPE_GLOBAL);
     out->frag_id   = frag_id;
 }
 
-static inline bool frag_handle_is_global(frag_handle_t *handle)
+ bool frag_handle_is_global(frag_handle_t *handle)
 {
     return handle->is_global;
 }
 
-static inline frag_id_t frag_handle_get_frag_id(frag_handle_t *handle)
+ frag_id_t frag_handle_get_frag_id(frag_handle_t *handle)
 {
     return handle->frag_id;
 }

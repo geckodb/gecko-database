@@ -10,7 +10,7 @@ typedef struct gs_dispatcher_t
     dict_t         *handler_map;
 } gs_dispatcher_t;
 
-static inline vec_t *dispatcher_get_handler(gs_dispatcher_t *dispatcher, gs_signal_type_e signal);
+ vec_t *dispatcher_get_handler(gs_dispatcher_t *dispatcher, gs_signal_type_e signal);
 
 GS_DECLARE(gs_status_t) gs_dispatcher_create(gs_dispatcher_t **dispatcher)
 {
@@ -120,7 +120,7 @@ GS_DECLARE(gs_status_t) gs_dispatcher_waitfor(gs_dispatcher_t *dispatcher, gs_ev
     return GS_SUCCESS;
 }
 
-static inline vec_t *dispatcher_get_handler(gs_dispatcher_t *dispatcher, gs_signal_type_e signal)
+ vec_t *dispatcher_get_handler(gs_dispatcher_t *dispatcher, gs_signal_type_e signal)
 {
     return (vec_t *) dict_get(dispatcher->handler_map, &signal);
 }

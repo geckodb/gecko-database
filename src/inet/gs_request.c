@@ -21,7 +21,7 @@ typedef struct gs_request_t {
     gs_request_body_e body_type;
 } gs_request_t;
 
-static inline void parse_request(gs_request_t *request, int socket_desc);
+ void parse_request(gs_request_t *request, int socket_desc);
 
 GS_DECLARE(gs_status_t) gs_request_create(gs_request_t **request, int socket_desc)
 {
@@ -121,7 +121,7 @@ GS_DECLARE(gs_status_t) gs_request_is_valid(const gs_request_t *request)
     return (request->is_valid);
 }
 
-static inline void parse_request(gs_request_t *request, int socket_desc)
+ void parse_request(gs_request_t *request, int socket_desc)
 {
     char message_buffer[10240];
 

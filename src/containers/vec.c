@@ -23,16 +23,16 @@
 // H E L P E R   P R O T O T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-static inline bool check_create_args(size_t, vector_flags, float);
-static inline vec_t *alloc_vector();
-static inline vec_t *alloc_data(vec_t *, vector_flags, size_t, size_t);
-static inline void init_vector(vec_t *, vector_flags, size_t, size_t, float);
-static inline bool check_add_args(vec_t *, size_t, const void *);
-static inline bool check_auto_resize(vec_t *, size_t);
-static inline bool check_set_args(vec_t *, size_t, const void *);
-static inline bool outside_bounds_enabled(vec_t *, size_t, size_t);
-static inline bool realloc_vector(vec_t *, size_t);
-static inline bool advance(vec_t *, size_t, size_t);
+ bool check_create_args(size_t, vector_flags, float);
+ vec_t *alloc_vector();
+ vec_t *alloc_data(vec_t *, vector_flags, size_t, size_t);
+ void init_vector(vec_t *, vector_flags, size_t, size_t, float);
+ bool check_add_args(vec_t *, size_t, const void *);
+ bool check_auto_resize(vec_t *, size_t);
+ bool check_set_args(vec_t *, size_t, const void *);
+ bool outside_bounds_enabled(vec_t *, size_t, size_t);
+ bool realloc_vector(vec_t *, size_t);
+ bool advance(vec_t *, size_t, size_t);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E  I M P L E M E N T A T I O N
@@ -458,21 +458,21 @@ bool get_sizeof_strings(void *capture, void *begin, void *end)
     return true;
 };
 
-static inline bool check_create_args(size_t size, vector_flags flags, float grow_factor)
+ bool check_create_args(size_t size, vector_flags flags, float grow_factor)
 {
     bool valid_args = (size > 0) && (((flags & auto_resize) != auto_resize) || (grow_factor > 1));
     error_if(!valid_args, err_illegal_args);
     return valid_args;
 }
 
-static inline vec_t *alloc_vector()
+ vec_t *alloc_vector()
 {
     vec_t *result = GS_REQUIRE_MALLOC (sizeof(vec_t));
     error_if((result == NULL), err_bad_malloc);
     return result;
 }
 
-static inline vec_t *alloc_data(vec_t *vec, vector_flags flags, size_t capacity, size_t size)
+ vec_t *alloc_data(vec_t *vec, vector_flags flags, size_t capacity, size_t size)
 {
     if (__builtin_expect((vec != NULL) && (vec->data = ((flags & zero_memory) == zero_memory) ?
                                                        calloc(capacity, size) :
@@ -483,7 +483,7 @@ static inline vec_t *alloc_data(vec_t *vec, vector_flags flags, size_t capacity,
     } else return vec;
 }
 
-static inline void init_vector(vec_t *vec, vector_flags flags, size_t capacity, size_t size, float factor)
+ void init_vector(vec_t *vec, vector_flags flags, size_t capacity, size_t size, float factor)
 {
     if (__builtin_expect(vec != NULL, true)) {
         vec->flags = flags;
@@ -495,14 +495,14 @@ static inline void init_vector(vec_t *vec, vector_flags flags, size_t capacity, 
     }
 }
 
-static inline bool check_add_args(vec_t *vec, size_t num_elements, const void *data)
+ bool check_add_args(vec_t *vec, size_t num_elements, const void *data)
 {
     bool result = ((vec != NULL) && (num_elements > 0) && (data != NULL));
     error_if(!result, err_illegal_args);
     return result;
 }
 
-static inline bool check_auto_resize(vec_t *vec, size_t num_elements)
+ bool check_auto_resize(vec_t *vec, size_t num_elements)
 {
     bool result = ((vec->sizeof_element + num_elements < vec->element_capacity) ||
                    (vec->flags & auto_resize) == auto_resize);
@@ -510,14 +510,14 @@ static inline bool check_auto_resize(vec_t *vec, size_t num_elements)
     return result;
 }
 
-static inline bool check_set_args(vec_t *vec, size_t num_elements, const void *data)
+ bool check_set_args(vec_t *vec, size_t num_elements, const void *data)
 {
     bool result = (vec != NULL && num_elements > 0 && data != NULL);
     error_if(!result, err_illegal_args);
     return result;
 }
 
-static inline bool outside_bounds_enabled(vec_t *vec, size_t idx, size_t num_elements)
+ bool outside_bounds_enabled(vec_t *vec, size_t idx, size_t num_elements)
 {
     bool result = (vec != NULL &&
                    ((idx + num_elements < vec->num_elements) || ((vec->flags & auto_resize) == auto_resize)));
@@ -525,7 +525,7 @@ static inline bool outside_bounds_enabled(vec_t *vec, size_t idx, size_t num_ele
     return result;
 }
 
-static inline bool realloc_vector(vec_t *vec, size_t new_num_elements)
+ bool realloc_vector(vec_t *vec, size_t new_num_elements)
 {
     if (new_num_elements >= vec->element_capacity) {
         while (new_num_elements >= vec->element_capacity)
@@ -544,7 +544,7 @@ static inline bool realloc_vector(vec_t *vec, size_t new_num_elements)
     } else return true;
 }
 
-static inline bool advance(vec_t *vec, size_t idx, size_t num_elements)
+ bool advance(vec_t *vec, size_t idx, size_t num_elements)
 {
     if ((idx + num_elements) < vec->num_elements) {
         return true;

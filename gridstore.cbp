@@ -171,6 +171,9 @@
 		<Unit filename="/Users/marcus/git/basement/include/gs_gridstore.h">
 			<Option target="gridstore"/>
 		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_http.h">
+			<Option target="gridstore"/>
+		</Unit>
 		<Unit filename="/Users/marcus/git/basement/include/gs_shell.h">
 			<Option target="gridstore"/>
 		</Unit>
@@ -331,6 +334,9 @@
 			<Option target="gridstore"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/basement/src/gs_gridstore.c">
+			<Option target="gridstore"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/gs_http.c">
 			<Option target="gridstore"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/basement/src/gs_shell.c">

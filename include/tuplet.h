@@ -108,3 +108,5 @@ size_t tuplet_size_by_schema(const schema_t *schema);
 enum field_type tuplet_field_type(const tuplet_t *tuplet, attr_id_t id);
 
 size_t tuplet_printlen(const attr_t *attr, const void *field_data);
+
+const char *tuplet_format_str(enum tuplet_format format);

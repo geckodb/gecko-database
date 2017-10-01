@@ -40,19 +40,19 @@ typedef struct entry_t {
 // H E L P E R   P R O T O T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-static inline void this_add(struct hindex_t *self, const tuple_id_interval_t *key, const struct grid_t *grid);
-static inline void this_remove_interval(struct hindex_t *self, const tuple_id_interval_t *key);
-static inline void this_remove_intersec(struct hindex_t *self, tuple_id_t tid);
-static inline bool this_contains(const struct hindex_t *self, tuple_id_t tid);
-static inline void this_delete(struct hindex_t *self);
-static inline void this_query(grid_cursor_t *result, const struct hindex_t *self, const tuple_id_t *tid_begin,
+ void this_add(struct hindex_t *self, const tuple_id_interval_t *key, const struct grid_t *grid);
+ void this_remove_interval(struct hindex_t *self, const tuple_id_interval_t *key);
+ void this_remove_intersec(struct hindex_t *self, tuple_id_t tid);
+ bool this_contains(const struct hindex_t *self, tuple_id_t tid);
+ void this_delete(struct hindex_t *self);
+ void this_query(grid_cursor_t *result, const struct hindex_t *self, const tuple_id_t *tid_begin,
                               const tuple_id_t *tid_end);
-static inline tuple_id_t this_minbegin(struct hindex_t *self);
-static inline tuple_id_t this_maxend(struct hindex_t *self);
-static inline tuple_id_t bounds(struct hindex_t *self, bool begin);
+ tuple_id_t this_minbegin(struct hindex_t *self);
+ tuple_id_t this_maxend(struct hindex_t *self);
+ tuple_id_t bounds(struct hindex_t *self, bool begin);
 
-static inline entry_t *find_interval(vec_t *haystack, const tuple_id_interval_t *needle);
-static inline void find_all_by_point(vec_t *result, vec_t *haystack, const tuple_id_t needle);
+ entry_t *find_interval(vec_t *haystack, const tuple_id_interval_t *needle);
+ void find_all_by_point(vec_t *result, vec_t *haystack, const tuple_id_t needle);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E  I M P L E M E N T A T I O N
@@ -86,7 +86,7 @@ hindex_t *lesearch_hindex_new(size_t approx_num_horizontal_partitions, const sch
 // H E L P E R   I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-static inline entry_t *find_interval(vec_t *haystack, const tuple_id_interval_t *needle)
+ entry_t *find_interval(vec_t *haystack, const tuple_id_interval_t *needle)
 {
     entry_t *it = (entry_t *) haystack->data;
     size_t num_elements = haystack->num_elements;
@@ -98,7 +98,7 @@ static inline entry_t *find_interval(vec_t *haystack, const tuple_id_interval_t 
     return NULL;
 }
 
-static inline void find_all_by_point(vec_t *result, vec_t *haystack, const tuple_id_t needle)
+ void find_all_by_point(vec_t *result, vec_t *haystack, const tuple_id_t needle)
 {
     const entry_t *it = (const entry_t *) haystack->data;
     size_t num_elements = haystack->num_elements;
@@ -110,7 +110,7 @@ static inline void find_all_by_point(vec_t *result, vec_t *haystack, const tuple
     }
 }
 
-static inline void this_add(struct hindex_t *self, const tuple_id_interval_t *key, const struct grid_t *grid)
+ void this_add(struct hindex_t *self, const tuple_id_interval_t *key, const struct grid_t *grid)
 {
     REQUIRE_INSTANCEOF_THIS(self);
     GS_REQUIRE_NONNULL(key);
@@ -130,7 +130,7 @@ static inline void this_add(struct hindex_t *self, const tuple_id_interval_t *ke
     }
 }
 
-static inline void this_query(grid_cursor_t *result, const struct hindex_t *self, const tuple_id_t *tid_begin,
+ void this_query(grid_cursor_t *result, const struct hindex_t *self, const tuple_id_t *tid_begin,
                               const tuple_id_t *tid_end)
 {
     REQUIRE_INSTANCEOF_THIS(self);
@@ -143,17 +143,17 @@ static inline void this_query(grid_cursor_t *result, const struct hindex_t *self
     }
 }
 
-static inline void this_remove_interval(struct hindex_t *self, const tuple_id_interval_t *key)
+ void this_remove_interval(struct hindex_t *self, const tuple_id_interval_t *key)
 {
     panic(NOTIMPLEMENTED, to_string(this_remove_interval))
 }
 
-static inline void this_remove_intersec(struct hindex_t *self, tuple_id_t tid)
+ void this_remove_intersec(struct hindex_t *self, tuple_id_t tid)
 {
     panic(NOTIMPLEMENTED, to_string(this_remove_intersec))
 }
 
-static inline bool this_contains(const struct hindex_t *self, tuple_id_t tid)
+ bool this_contains(const struct hindex_t *self, tuple_id_t tid)
 {
     REQUIRE_INSTANCEOF_THIS(self);
     // TODO:...
@@ -161,7 +161,7 @@ static inline bool this_contains(const struct hindex_t *self, tuple_id_t tid)
     return false;
 }
 
-static inline bool free_entires(void *capture, void *begin, void *end)
+ bool free_entires(void *capture, void *begin, void *end)
 {
     for (entry_t *it = (entry_t *) begin; it < (entry_t *) end; it++) {
         vec_free(it->grids);
@@ -169,14 +169,14 @@ static inline bool free_entires(void *capture, void *begin, void *end)
     return true;
 }
 
-static inline void this_delete(struct hindex_t *self)
+ void this_delete(struct hindex_t *self)
 {
     REQUIRE_INSTANCEOF_THIS(self);
     vec_foreach(self->extra, NULL, free_entires);
     vec_free(self->extra);
 }
 
-static inline tuple_id_t bounds(struct hindex_t *self, bool begin)
+ tuple_id_t bounds(struct hindex_t *self, bool begin)
 {
     REQUIRE_INSTANCEOF_THIS(self);
     tuple_id_t tuple = begin ? INT_MAX : INT_MIN;
@@ -186,12 +186,12 @@ static inline tuple_id_t bounds(struct hindex_t *self, bool begin)
     return tuple;
 }
 
-static inline tuple_id_t this_minbegin(struct hindex_t *self)
+ tuple_id_t this_minbegin(struct hindex_t *self)
 {
     return bounds(self, true);
 }
 
-static inline tuple_id_t this_maxend(struct hindex_t *self)
+ tuple_id_t this_maxend(struct hindex_t *self)
 {
     return bounds(self, false);
 }
