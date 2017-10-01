@@ -8,6 +8,7 @@
 #include <apr_queue.h>
 
 #define MESSAGE_QUEUE_SIZE_MAX 100
+#define DISPATCHER_NUM_ROUTERS  50
 
 __BEGIN_DECLS
 

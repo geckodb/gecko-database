@@ -19,6 +19,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <gs.h>
+#include <apr_pools.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 // C O N F I G
@@ -48,6 +49,7 @@ typedef struct vec_t {
     float grow_factor;
     void *data;
     bool is_sorted;
+    apr_pool_t *pool;
 } vec_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -81,7 +83,6 @@ bool vec_add_all_unsafe(vec_t *dest, const vec_t *src);
 void vec_add_unsafe(vec_t *vec, size_t num_elements, const void *data);
 bool vec_comp(const vec_t *lhs, const vec_t *rhs, comp_t comp);
 bool vec_foreach(vec_t *vec, void *capture, bool (*func)(void *capture, void *begin, void *end));
-void vec_dedup(vec_t *vec);
 void vec_swap(vec_t *lhs, vec_t *rhs);
 size_t vec_count(vec_t *vec, void *capture, bool (*pred)(void *capture, void *it));
 bool vec_contains(vec_t *vec, void *needle);

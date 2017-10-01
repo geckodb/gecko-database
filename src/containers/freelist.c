@@ -33,11 +33,24 @@ void freelist_create(freelist_t *list, size_t elem_size, size_t capacity, init_t
     init(list->next_element);
 }
 
+void freelist_create2(freelist_t **list, size_t elem_size, size_t capacity, init_t init, inc_t inc)
+{
+    freelist_t *result = GS_REQUIRE_MALLOC(sizeof(freelist_t));
+    freelist_create(result, elem_size, capacity, init, inc);
+    *list = result;
+}
+
 void freelist_dispose(freelist_t *list)
 {
     GS_REQUIRE_NONNULL(list);
     vec_free(list->free_elem);
     free(list->next_element);
+}
+
+void freelist_free(freelist_t *list)
+{
+    freelist_dispose(list);
+    free(list);
 }
 
 void freelist_bind(void *out, const freelist_t *list, size_t num_elem)

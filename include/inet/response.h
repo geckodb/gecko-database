@@ -19,6 +19,7 @@
 
 #include <gs.h>
 #include <gs_http.h>
+#include <apr_hash.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 // C O N S T A N T S
@@ -40,8 +41,9 @@
 
 typedef struct response_t {
     http_status_code_t code;
-    dict_t *fields;
+    apr_hash_t *fields;
     char *body;
+    apr_pool_t *pool;
 } response_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -58,5 +60,4 @@ void response_content_type_set(response_t *response, const char *content_type);
 const char *response_content_type_get(response_t *response);
 const char *response_body_get(response_t *response);
 void response_end(response_t *response, http_status_code_t code);
-const struct vec_t *response_fields(response_t *response);
-const char *response_format_fields(const dict_t *fields);
+const char *response_format_fields(const response_t *response);

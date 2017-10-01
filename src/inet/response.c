@@ -16,17 +16,15 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <inet/response.h>
-#include <containers/dicts/hash_table.h>
+#include <apr_strings.h>
 
 void response_create(response_t *response)
 {
     GS_REQUIRE_NONNULL(response);
     response->code = HTTP_STATUS_CODE_500_INTERNAL_ERR;
     response->body = NULL;
-    response->fields = hash_table_new_ex(&(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen},
-                                         sizeof(char *), sizeof(char *), RESPONSE_DICT_CAPACITY,
-                                         RESPONSE_DICT_CAPACITY, 1.7f, 0.75f,
-                                         str_equals, str_str_clean_up, true);
+    apr_pool_create(&response->pool, NULL);
+    response->fields = apr_hash_make(response->pool);
 }
 
 char *response_pack(response_t *response)
@@ -34,7 +32,7 @@ char *response_pack(response_t *response)
     GS_REQUIRE_NONNULL(response);
     const char *pack = "HTTP/1.1 %s\r\n%s\r\n%s";
     const char *code = codestr(response->code);
-    const char *mime = response_format_fields(response->fields);
+    const char *mime = response_format_fields(response);
     const char *body = response_body_get(response);
     char *buffer = GS_REQUIRE_MALLOC(strlen(pack) + 1 + strlen(mime) + 1 + strlen(body) + 1);
     sprintf(buffer, pack, code, mime, body);
@@ -45,9 +43,9 @@ void response_field_set(response_t *response, const char *field, const char *val
 {
     GS_REQUIRE_NONNULL(response);
     GS_REQUIRE_NONNULL(response->fields);
-    const char *imp_key = strdup(field);
-    const char *imp_val = strdup(value);
-    dict_put(response->fields, &imp_key, &imp_val);
+    char *imp_key = apr_pstrdup(response->pool, field);
+    char *imp_val = apr_pstrdup(response->pool, value);
+    apr_hash_set(response->fields, imp_key, APR_HASH_KEY_STRING, imp_val);
 }
 
 const char *response_field_get(response_t *response, const char *field)
@@ -55,7 +53,7 @@ const char *response_field_get(response_t *response, const char *field)
     GS_REQUIRE_NONNULL(response);
     GS_REQUIRE_NONNULL(field);
     GS_REQUIRE_NONNULL(response->fields);
-    const void *result = dict_get(response->fields, field);
+    const void *result = apr_hash_get(response->fields, field, APR_HASH_KEY_STRING);
     return (result != NULL ? *(char **) result : "");
 }
 
@@ -95,6 +93,7 @@ void response_dispose(response_t *response)
     GS_REQUIRE_NONNULL(response);
     GS_REQUIRE_NONNULL(response->fields);
     if (response->body != NULL) {
+        apr_pool_destroy(response->pool);
         free (response->body);
     }
    // dict_delete(response->fields);
@@ -106,22 +105,15 @@ void response_end(response_t *response, http_status_code_t code)
     response->code = code;
 }
 
-const struct vec_t *response_fields(response_t *response)
+const char *response_format_fields(const response_t *response)
 {
     GS_REQUIRE_NONNULL(response);
-    return dict_keyset(response->fields);
-}
 
-const char *response_format_fields(const dict_t *fields)
-{
-    GS_REQUIRE_NONNULL(fields);
-
-    const struct vec_t *keys = dict_keyset(fields);
     size_t length_fields = 0;
-    size_t num_elements = vec_length(keys);
-    for (size_t i = 0; i < num_elements; i++) {
-        const char *field_name = *(const char **) vec_at(keys, i);
-        const char *value = *(const char **) dict_get(fields, &field_name);
+
+    for (apr_hash_index_t *it = apr_hash_first(response->pool, response->fields); it; it = apr_hash_next(it)) {
+        const char *field_name, *value;
+        apr_hash_this(it, (const void **) &field_name, NULL, (void **) &value);
         const char *value_str = (value != NULL ? value : "");
         length_fields += strlen(field_name) + 2 + strlen(value_str) + 2;    // "str: " + "value_str\r\n";
     }
@@ -129,10 +121,11 @@ const char *response_format_fields(const dict_t *fields)
 
     char *formatted_str = GS_REQUIRE_MALLOC(length_fields);
     size_t offset = 0;
-    for (size_t i = 0; i < num_elements; i++) {
-        const char *field_name = *(const char **) vec_at(keys, i);
-        const char *value = *(const char **) dict_get(fields, &field_name);
+    for (apr_hash_index_t *it = apr_hash_first(response->pool, response->fields); it; it = apr_hash_next(it)) {
+        const char *field_name, *value;
+        apr_hash_this(it, (const void **) &field_name, NULL, (void **) &value);
         const char *value_str = (value != NULL ? value : "");
+
         strcpy(formatted_str + offset, field_name);
         offset += strlen(field_name);
         strcpy(formatted_str + offset, ": ");

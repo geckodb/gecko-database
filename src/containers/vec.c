@@ -17,7 +17,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <containers/vec.h>
-#include <containers/dicts/hash_table.h>
+#include <apr_hash.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 // H E L P E R   P R O T O T Y P E S
@@ -57,11 +57,15 @@ vec_t *vec_new_ex(size_t element_size, size_t capacity, vector_flags flags, floa
 bool vec_resize(vec_t *vec, size_t num_elements)
 {
     GS_REQUIRE_NONNULL(vec)
-    REQUIRE_NONZERO(num_elements)
-    if (advance(vec, 0, num_elements)) {
+    if (num_elements < vec->num_elements) {
         vec->num_elements = num_elements;
         return true;
-    } else return false;
+    } else {
+        if (advance(vec, 0, num_elements)) {
+            vec->num_elements = num_elements;
+            return true;
+        } else return false;
+    }
 }
 
 bool vec_reserve(vec_t *vec, size_t num_elements)
@@ -111,6 +115,7 @@ void vec_dispose(struct vec_t *vec)
     vec->data = NULL;
     vec->element_capacity = 0;
     vec->num_elements = 0;
+    apr_pool_destroy(vec->pool);
 }
 
 void vec_free_ex(vec_t *vec, void *capture, bool (*func)(void *capture, void *begin, void *end))
@@ -271,18 +276,6 @@ bool vec_foreach(vec_t *vec, void *capture, bool (*func)(void *capture, void *be
     return func(capture, vec->data, vec->data + vec->num_elements * vec->sizeof_element);
 }
 
-void vec_dedup(vec_t *vec)
-{
-    dict_t *dict = hash_table_new_jenkins(vec->sizeof_element, sizeof(bool), vec->num_elements, 2.0f, 0.75f);
-    void *end = vec_end(vec);
-    bool dummy;
-    for (void *it = vec_begin(vec); it < end; dict_put(dict, it++, &dummy));
-    vec_t *dedups = (vec_t *) dict_keyset(dict);
-    vec_swap(vec, dedups);
-    dict_delete(dict);
-    vec_free(dedups);
-}
-
 void vec_cpy_shallow(vec_t *dst, vec_t *src)
 {
     dst->sizeof_element = src->sizeof_element;
@@ -372,28 +365,32 @@ void *vec_bsearch(vec_t *vec, const void *needle, comp_t sort_comp, comp_t find_
     GS_REQUIRE_NONNULL(sort_comp);
     GS_REQUIRE_NONNULL(find_comp);
 
-    vec_sort(vec, sort_comp);
+    if (vec->num_elements == 0) {
+        return vec_end(vec);
+    } else {
+        vec_sort(vec, sort_comp);
 
-    size_t lower = 0;
-    size_t upper = vec->num_elements - 1;
-    size_t mid;
+        size_t lower = 0;
+        size_t upper = vec->num_elements - 1;
+        size_t mid;
 
-    while(lower <= upper) {
-        mid = (lower + upper) / 2;
-        void *element = vec->data + mid * vec->sizeof_element;
-        int comp = find_comp(needle, element);
-        if(comp == 0) {
-            return element;
-        } else {
-            if(comp < 0) {
-                upper = mid - 1;
+        while(lower <= upper) {
+            mid = (lower + upper) / 2;
+            void *element = vec->data + mid * vec->sizeof_element;
+            int comp = find_comp(needle, element);
+            if(comp == 0) {
+                return element;
             } else {
-                lower = mid + 1;
+                if(comp < 0) {
+                    upper = mid - 1;
+                } else {
+                    lower = mid + 1;
+                }
             }
         }
-    }
 
-    return vec_end(vec);
+        return vec_end(vec);
+    }
 }
 
 bool vec_comp(const vec_t *lhs, const vec_t *rhs, comp_t comp)
@@ -492,6 +489,7 @@ bool get_sizeof_strings(void *capture, void *begin, void *end)
         vec->grow_factor = factor;
         vec->num_elements = 0;
         vec->is_sorted = true;
+        apr_pool_create(&vec->pool, NULL);
     }
 }
 

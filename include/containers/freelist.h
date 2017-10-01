@@ -18,6 +18,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <gs.h>
+#include "vec.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 // D A T A T Y P E S
@@ -37,7 +38,9 @@ typedef struct freelist_t {
 // ---------------------------------------------------------------------------------------------------------------------
 
 void freelist_create(freelist_t *list, size_t elem_size, size_t capacity, init_t init, inc_t inc);
+void freelist_create2(freelist_t **list, size_t elem_size, size_t capacity, init_t init, inc_t inc);
 void freelist_dispose(freelist_t *list);
+void freelist_free(freelist_t *list);
 void freelist_bind(void *out, const freelist_t *list, size_t num_elem);
 const void *freelist_peek_new(const freelist_t *list);
 void freelist_pushback(freelist_t *list, size_t num_elem, void *elem);

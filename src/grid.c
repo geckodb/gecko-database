@@ -18,12 +18,12 @@
 #include <grid.h>
 #include <indexes/vindexes/hash_vindex.h>
 #include <indexes/hindexes/lsearch_hindex.h>
-#include <containers/dicts/hash_table.h>
 #include <schema.h>
 #include <tuplet_field.h>
 #include <tuple_field.h>
+#include <apr_strings.h>
 
- void create_indexes(table_t *table, size_t approx_num_horizontal_partitions);
+void create_indexes(table_t *table, size_t approx_num_horizontal_partitions);
 
  void create_grid_ptr_store(table_t *table);
 
@@ -76,7 +76,7 @@ void table_delete(table_t *table)
 void grid_delete(grid_t *grid)
 {
     frag_delete(grid->frag);
-    dict_delete(grid->schema_map_indicies);
+    apr_pool_destroy(grid->pool);
     vec_free(grid->tuple_ids);
 }
 
@@ -130,23 +130,29 @@ grid_cursor_t *table_find(const table_t *table, const attr_id_t *attr_ids, size_
 
     /* Hash-join intersection */
     panic_if(grid_cursor_is_empty(smaller), "No grid found. Does the table field cover for %p contain gaps?", table);
-    dict_t* hash_table = hash_table_new_jenkins(sizeof(grid_t *), sizeof(bool),
-                                                10 * grid_cursor_numelem(smaller), 1.7f, 0.95f);
+
+    apr_pool_t *pool;
+    apr_pool_create(&pool, NULL);
+    bool *dummy = GS_REQUIRE_MALLOC(sizeof(dummy));
+    *dummy = true;
+
+    apr_hash_t* hash_table = apr_hash_make(pool);
+    //sizeof(grid_t *), sizeof(bool), 10 * grid_cursor_numelem(smaller), 1.7f, 0.95f);
 
     /* Build */
     for (const grid_t *grid = grid_cursor_next(smaller); grid != NULL; grid = grid_cursor_next(NULL)) {
-        bool b;
-        dict_put(hash_table, &grid, &b);
+        grid_t *grid_cp = apr_pmemdup(pool, grid, sizeof(grid_t));
+        apr_hash_set(hash_table, grid_cp, sizeof(grid_t), dummy);
     }
 
     /* Probe */
     for (const grid_t *grid = grid_cursor_next(larger); grid != NULL; grid = grid_cursor_next(NULL)) {
-        if (dict_contains_key(hash_table, &grid)) {
+        if (apr_hash_get(hash_table, &grid, sizeof(grid_t))) {
             grid_cursor_pushback(result, &grid);
         }
     }
 
-    dict_delete(hash_table);
+    apr_pool_destroy(pool);
     vindex_close(v_result);
     hindex_close(h_result);
 
@@ -186,7 +192,7 @@ table_t *table_melt(enum frag_impl_type_t type, const table_t *src_table, const 
 const attr_id_t *table_attr_id_to_frag_attr_id(const grid_t *grid, attr_id_t table_attr_id)
 {
     GS_REQUIRE_NONNULL(grid);
-    const attr_id_t *frag_attr_id = dict_get(grid->schema_map_indicies, &table_attr_id);
+    const attr_id_t *frag_attr_id = apr_hash_get(grid->schema_map_indicies, &table_attr_id, sizeof(attr_id_t));
     return frag_attr_id;
 }
 
@@ -410,13 +416,12 @@ void table_structure_print(FILE *file, const table_t *table, size_t row_offset, 
     assert (grid_schema);
     size_t tuplet_capacity = get_required_capacity(tuple_ids, ntuple_ids);
 
+    apr_pool_create(&result->pool, NULL);
+
     *result = (grid_t) {
         .context = table,
         .frag = frag_new(grid_schema, tuplet_capacity, type),
-        .schema_map_indicies = hash_table_new(
-                &(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen}, sizeof(attr_id_t), sizeof(attr_id_t),
-                nattr + 1, 1.7f, 1.0f
-        ),
+        .schema_map_indicies = apr_hash_make(result->pool),
         .tuple_ids = vec_new(sizeof(tuple_id_interval_t), ntuple_ids),
         .last_interval_cache = NULL
             // TODO: add mutex init here
@@ -429,7 +434,9 @@ void table_structure_print(FILE *file, const table_t *table, size_t row_offset, 
     vec_pushback(result->tuple_ids, ntuple_ids, tuple_ids);
 
     for (size_t i = 0; i < nattr; i++) {
-        dict_put(result->schema_map_indicies, attr + i, &i);
+        attr_id_t *key = apr_pmemdup(result->pool, (attr + i), sizeof(attr_id_t));
+        size_t *val = apr_pmemdup(result->pool, &i, sizeof(size_t));
+        apr_hash_set(result->schema_map_indicies, key, sizeof(attr_id_t), val);
     }
 
     schema_delete(grid_schema);

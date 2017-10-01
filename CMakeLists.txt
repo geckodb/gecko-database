@@ -37,9 +37,6 @@ set(SOURCE_FILES
         include/async.h
         include/attr.h
         include/c11threads.h
-        include/conf.h
-        include/containers/dict.h
-        include/containers/dicts/hash_table.h
         include/containers/list.h
         include/containers/vec.h
         include/frags/frag_host_vm.h
@@ -49,15 +46,12 @@ set(SOURCE_FILES
         include/hash.h
         include/msg.h
         include/pred.h
-        include/pref.h
         include/require.h
         include/schema.h
         include/gs.h
-        include/storage/memory.h
         include/tableimg.h
         include/tuplet.h
         include/operators/scan.h
-        include/mondrian.h
         include/frag_printer.h
         include/frag_printers/console_printer.h
         include/unsafe.h
@@ -68,14 +62,9 @@ set(SOURCE_FILES
         include/debug.h
         include/global.h
         include/inet/response.h
-        include/mvm.h
-        include/progpool.h
 
         src/async.c
         src/attr.c
-        src/conf.c
-        src/containers/dict.c
-        src/containers/dicts/hash_table.c
         src/containers/list.c
         src/containers/vec.c
         src/frags/frag_host_vm.c
@@ -84,12 +73,9 @@ set(SOURCE_FILES
         src/frag.c
         src/hash.c
         src/pred.c
-        src/pref.c
         src/schema.c
-        src/storage/memory.c
         src/tuplet.c
         src/operators/scan.c
-        src/mondrian.c
         src/frag_printer.c
         src/frag_printers/console_printer.c
         src/unsafe.c
@@ -99,8 +85,6 @@ set(SOURCE_FILES
         src/inet/gs_server.c
         src/global.c
         src/inet/response.c
-        src/mvm.c
-        src/progpool.c
         src/grid.c
         include/grid.h
         src/interval.c
@@ -136,7 +120,7 @@ set(SOURCE_FILES
         include/gs_gridstore.h
         include/info.h
         include/gs_shell.h src/gs_shell.c include/inet/gs_request.h src/inet/gs_request.c
-        include/routers/api/1.0/nodes.h include/gs_spinlock.h src/gs_spinlock.c src/routers/api/1.0/nodes.c include/gs_http.h src/gs_http.c)
+        include/routers/api/1.0/nodes.h include/gs_spinlock.h src/gs_spinlock.c src/routers/api/1.0/nodes.c include/gs_http.h src/gs_http.c include/containers/gs_hash.h src/containers/gs_hash.c)
 
 
 add_executable(

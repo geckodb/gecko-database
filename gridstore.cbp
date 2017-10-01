@@ -108,16 +108,10 @@
 		<Unit filename="/Users/marcus/git/basement/include/c11threads.h">
 			<Option target="gridstore"/>
 		</Unit>
-		<Unit filename="/Users/marcus/git/basement/include/conf.h">
-			<Option target="gridstore"/>
-		</Unit>
-		<Unit filename="/Users/marcus/git/basement/include/containers/dict.h">
-			<Option target="gridstore"/>
-		</Unit>
-		<Unit filename="/Users/marcus/git/basement/include/containers/dicts/hash_table.h">
-			<Option target="gridstore"/>
-		</Unit>
 		<Unit filename="/Users/marcus/git/basement/include/containers/freelist.h">
+			<Option target="gridstore"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/containers/gs_hash.h">
 			<Option target="gridstore"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/basement/include/containers/hashset.h">
@@ -210,25 +204,13 @@
 		<Unit filename="/Users/marcus/git/basement/include/interval.h">
 			<Option target="gridstore"/>
 		</Unit>
-		<Unit filename="/Users/marcus/git/basement/include/mondrian.h">
-			<Option target="gridstore"/>
-		</Unit>
 		<Unit filename="/Users/marcus/git/basement/include/msg.h">
-			<Option target="gridstore"/>
-		</Unit>
-		<Unit filename="/Users/marcus/git/basement/include/mvm.h">
 			<Option target="gridstore"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/basement/include/operators/scan.h">
 			<Option target="gridstore"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/basement/include/pred.h">
-			<Option target="gridstore"/>
-		</Unit>
-		<Unit filename="/Users/marcus/git/basement/include/pref.h">
-			<Option target="gridstore"/>
-		</Unit>
-		<Unit filename="/Users/marcus/git/basement/include/progpool.h">
 			<Option target="gridstore"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/basement/include/require.h">
@@ -241,9 +223,6 @@
 			<Option target="gridstore"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/basement/include/schema.h">
-			<Option target="gridstore"/>
-		</Unit>
-		<Unit filename="/Users/marcus/git/basement/include/storage/memory.h">
 			<Option target="gridstore"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/basement/include/tableimg.h">
@@ -279,16 +258,10 @@
 		<Unit filename="/Users/marcus/git/basement/src/attr.c">
 			<Option target="gridstore"/>
 		</Unit>
-		<Unit filename="/Users/marcus/git/basement/src/conf.c">
-			<Option target="gridstore"/>
-		</Unit>
-		<Unit filename="/Users/marcus/git/basement/src/containers/dict.c">
-			<Option target="gridstore"/>
-		</Unit>
-		<Unit filename="/Users/marcus/git/basement/src/containers/dicts/hash_table.c">
-			<Option target="gridstore"/>
-		</Unit>
 		<Unit filename="/Users/marcus/git/basement/src/containers/freelist.c">
+			<Option target="gridstore"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/containers/gs_hash.c">
 			<Option target="gridstore"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/basement/src/containers/hashset.c">
@@ -372,31 +345,16 @@
 		<Unit filename="/Users/marcus/git/basement/src/interval.c">
 			<Option target="gridstore"/>
 		</Unit>
-		<Unit filename="/Users/marcus/git/basement/src/mondrian.c">
-			<Option target="gridstore"/>
-		</Unit>
-		<Unit filename="/Users/marcus/git/basement/src/mvm.c">
-			<Option target="gridstore"/>
-		</Unit>
 		<Unit filename="/Users/marcus/git/basement/src/operators/scan.c">
 			<Option target="gridstore"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/basement/src/pred.c">
 			<Option target="gridstore"/>
 		</Unit>
-		<Unit filename="/Users/marcus/git/basement/src/pref.c">
-			<Option target="gridstore"/>
-		</Unit>
-		<Unit filename="/Users/marcus/git/basement/src/progpool.c">
-			<Option target="gridstore"/>
-		</Unit>
 		<Unit filename="/Users/marcus/git/basement/src/routers/api/1.0/nodes.c">
 			<Option target="gridstore"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/basement/src/schema.c">
-			<Option target="gridstore"/>
-		</Unit>
-		<Unit filename="/Users/marcus/git/basement/src/storage/memory.c">
 			<Option target="gridstore"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/basement/src/timer.c">

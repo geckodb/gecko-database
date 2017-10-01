@@ -10,9 +10,9 @@ typedef struct gs_shell_t {
     thrd_t               thread;
     bool                 is_running;
     bool                 is_disposable;
-    apr_uid_t            user_id;
-    apr_gid_t            group_id;
-    char                *user_name;
+    //apr_uid_t            user_id;
+    //apr_gid_t            group_id;
+    //char                *user_name;
     apr_time_t           uptime;
 } gs_shell_t;
 
@@ -31,8 +31,8 @@ GS_DECLARE(gs_status_t) gs_shell_create(gs_shell_t **shell, gs_dispatcher_t *dis
     result->is_running = false;
     result->is_disposable = false;
     apr_pool_create(&result->pool, NULL);
-    apr_uid_current(&result->user_id, &result->group_id, result->pool);
-    apr_uid_name_get(&result->user_name, result->user_id, result->pool);
+  //  apr_uid_current(&result->user_id, &result->group_id, result->pool);
+  //  apr_uid_name_get(&result->user_name, result->user_id, result->pool);
     result->uptime = apr_time_now();
     *shell = result;
     return GS_SUCCESS;
@@ -113,7 +113,7 @@ GS_DECLARE(gs_status_t) gs_shell_shutdown(gs_shell_t *shell)
     apr_file_printf(out, "Type 'help' for hints on usage of this shell.\n\n");
     while (shell->is_running) {
         if (accept_input) {
-            apr_file_printf(out, "%s@gs> ", shell->user_name);
+            apr_file_printf(out, "gs> ");
             apr_file_gets(buffer, STDIN_BUFFER_SIZE, in);
             accept_input = process_input(shell, in, out, buffer);
             apr_file_flush(out);

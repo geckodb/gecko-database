@@ -101,16 +101,16 @@ void trace_print(FILE *file);
 
 #define GS_DEBUG(msg, args...)                                                                                         \
     {                                                                                                                  \
-        fprintf(stderr, "# DEBUG: ");                                                                                  \
-        fprintf(stderr, msg, args);                                                                                    \
-        fprintf(stderr, "\n");                                                                                         \
+       /* fprintf(stderr, "# DEBUG: ");        */                                                                          \
+     /*   fprintf(stderr, msg, args);              */                                                                      \
+       /* fprintf(stderr, "\n");                     */                                                                    \
     }
 
 #define GS_DEBUG2(msg)                                                                                                 \
     {                                                                                                                  \
-        fprintf(stderr, "# DEBUG: ");                                                                                  \
-        fprintf(stderr, msg);                                                                                          \
-        fprintf(stderr, "\n");                                                                                         \
+     /*   fprintf(stderr, "# DEBUG: ");     */                                                                             \
+     /*   fprintf(stderr, msg);               */                                                                           \
+      /*  fprintf(stderr, "\n");                */                                                                         \
     }
 
 #define panic_if(expr, msg, args...)                                                                                   \

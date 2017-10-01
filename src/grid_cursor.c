@@ -16,7 +16,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <grid_cursor.h>
-#include <containers/dicts/hash_table.h>
+#include <containers/vec.h>
 
 grid_cursor_t *grid_cursor_new(size_t cursor)
 {
@@ -36,16 +36,6 @@ void grid_cursor_delete(grid_cursor_t *cursor)
 void grid_cursor_pushback(grid_cursor_t *cursor, const void *data)
 {
     vec_pushback((cursor->extra), 1, data);
-}
-
-void grid_cursor_append(grid_cursor_t *dst, grid_cursor_t *src)
-{
-    vec_add_all(dst->extra, src->extra);
-}
-
-void grid_cursor_dedup(grid_cursor_t *cursor)
-{
-    vec_dedup(cursor->extra);
 }
 
 struct grid_t *grid_cursor_next(grid_cursor_t *cursor)

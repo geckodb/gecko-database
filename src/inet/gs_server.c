@@ -16,12 +16,10 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <inet/gs_server.h>
-#include <conf.h>
 #include <debug.h>
 #include <inet/response.h>
 #include <sys/socket.h>
 #include <poll.h>
-#include <containers/dicts/hash_table.h>
 #include <apr_pools.h>
 #include <c11threads.h>
 #include <stdatomic.h>

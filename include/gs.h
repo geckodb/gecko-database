@@ -44,7 +44,6 @@
 
 #include <openssl/md5.h>
 
-#include <conf.h>
 #include <global.h>
 #include <msg.h>
 #include <error.h>
@@ -67,6 +66,8 @@
 typedef uint64_t attr_id_t;
 
 typedef uint32_t tuplet_id_t;
+
+typedef int (*gs_comp_func_t)(const void *lhs, const void *rhs);
 
 typedef uint8_t     u8;
 typedef uint16_t   u16;

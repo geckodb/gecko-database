@@ -1,16 +1,21 @@
 #include <gs_dispatcher.h>
-#include <containers/dicts/hash_table.h>
 #include <gs_spinlock.h>
+#include <apr_hash.h>
+#include <containers/vec.h>
+#include <apr_strings.h>
+#include <containers/gs_hash.h>
 
 typedef struct gs_dispatcher_t
 {
     bool            accept_new;
     apr_queue_t    *queue;
     apr_pool_t     *mem_pool;
-    dict_t         *handler_map;
+    gs_hash_t      *handler_map;
 } gs_dispatcher_t;
 
  vec_t *dispatcher_get_handler(gs_dispatcher_t *dispatcher, gs_signal_type_e signal);
+
+static inline int singnal_comp(const void *lhs, const void *rhs);
 
 GS_DECLARE(gs_status_t) gs_dispatcher_create(gs_dispatcher_t **dispatcher)
 {
@@ -18,7 +23,9 @@ GS_DECLARE(gs_status_t) gs_dispatcher_create(gs_dispatcher_t **dispatcher)
     result->accept_new = true;
     apr_pool_create(&result->mem_pool, NULL);
     apr_queue_create(&result->queue, MESSAGE_QUEUE_SIZE_MAX, result->mem_pool);
-    result->handler_map = hash_table_new_defaults(sizeof(gs_signal_type_e), sizeof(vec_t));
+
+    gs_hash_create(&result->handler_map, DISPATCHER_NUM_ROUTERS, singnal_comp);
+
     *dispatcher = result;
     return GS_SUCCESS;
 }
@@ -29,7 +36,7 @@ GS_DECLARE(gs_status_t) gs_dispatcher_dispose(gs_dispatcher_t **dispatcher_ptr)
     GS_REQUIRE_NONNULL(*dispatcher_ptr)
     gs_dispatcher_t *dispatcher = *dispatcher_ptr;
     apr_pool_destroy(dispatcher->mem_pool);
-    dict_clear(dispatcher->handler_map);
+    gs_hash_dispose(dispatcher->handler_map);
     GS_DEBUG("dispatcher %p disposed", dispatcher);
     free(dispatcher);
     *dispatcher_ptr = NULL;
@@ -83,12 +90,17 @@ GS_DECLARE(gs_status_t) gs_dispatcher_connect(gs_dispatcher_t *dispatcher, gs_si
 {
     GS_REQUIRE_NONNULL(dispatcher)
     GS_REQUIRE_NONNULL(handler)
-    if (!dict_contains_key(dispatcher->handler_map, &signal)) {
+
+    //sizeof(gs_signal_type_e), sizeof(vec_t)
+
+    if (gs_hash_get(dispatcher->handler_map, &signal, sizeof(gs_signal_type_e)) == NULL) {
         vec_t *vec = vec_new(sizeof(gs_event_handler_t), 10);
-        dict_put(dispatcher->handler_map, &signal, vec);
-        free (vec);
+        gs_signal_type_e *signal_cpy = GS_REQUIRE_MALLOC(sizeof(gs_signal_type_e));
+        *signal_cpy = signal;
+        gs_hash_set(dispatcher->handler_map, signal_cpy, sizeof(gs_signal_type_e), vec, singnal_comp);
     }
-    vec_t *handlers = (vec_t *) dict_get(dispatcher->handler_map, &signal);
+    vec_t *handlers = (vec_t *) gs_hash_get(dispatcher->handler_map, &signal, sizeof(gs_signal_type_e));
+    assert (handlers);
     vec_pushback(handlers, 1, &handler);
     return GS_SUCCESS;
 }
@@ -122,5 +134,12 @@ GS_DECLARE(gs_status_t) gs_dispatcher_waitfor(gs_dispatcher_t *dispatcher, gs_ev
 
  vec_t *dispatcher_get_handler(gs_dispatcher_t *dispatcher, gs_signal_type_e signal)
 {
-    return (vec_t *) dict_get(dispatcher->handler_map, &signal);
+    return (vec_t *) gs_hash_get(dispatcher->handler_map, &signal, sizeof(gs_signal_type_e));
+}
+
+static inline int singnal_comp(const void *a, const void *b)
+{
+    gs_signal_type_e lhs = *(gs_signal_type_e *) a;
+    gs_signal_type_e rhs = *(gs_signal_type_e *) b;
+    return lhs < rhs ? -1 : (lhs > rhs ? +1 : 0);
 }

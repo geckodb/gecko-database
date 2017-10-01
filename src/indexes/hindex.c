@@ -20,7 +20,7 @@
 #include <schema.h>
 #include <grid.h>
 #include <tuplet_field.h>
-#include <containers/dicts/hash_table.h>
+#include <apr_strings.h>
 
 typedef struct print_tuple_t
 {
@@ -108,25 +108,30 @@ void hindex_print(FILE *file, const hindex_t *index)
     tuplet_t tuplet;
 
     /* dedup entries by hand */
-    dict_t *dict = hash_table_new_jenkins(sizeof(print_tuple_t),
-                                          sizeof(bool), 1.5f * grid_cursor_numelem(cursor), 1.7f, 0.75f);
+    apr_pool_t *pool;
+    apr_pool_create(&pool, NULL);
+
+    apr_hash_t *hash = apr_hash_make(pool);
+    bool *dummy = GS_REQUIRE_MALLOC(sizeof(bool));
+    *dummy = true;
 
     for (struct grid_t *grid = grid_cursor_next(cursor); grid != NULL; grid = grid_cursor_next(NULL)) {
        size_t interval_idx = 0;
-       const tuple_id_interval_t *interval = vec_at(grid->tuple_ids, interval_idx); bool dummy;
+       const tuple_id_interval_t *interval = vec_at(grid->tuple_ids, interval_idx);
        print_tuple_t t = { .grid = grid->grid_id, .begin = interval->begin, .end = interval->end };
-       if (!dict_contains_key(dict, &t)) {
+       if (apr_hash_get(hash, &t, sizeof(print_tuple_t)) == NULL) {
            frag_insert(&tuplet, frag, 1);
            tuplet_field_open(&field, &tuplet);
            tuplet_field_write(&field, &interval->begin, true);
            tuplet_field_write(&field, &interval->end, true);
            tuplet_field_write(&field, &grid->grid_id, true);
-           dict_put(dict, &t, &dummy);
+           print_tuple_t *t_imp = apr_pmemdup(pool, &t, sizeof(print_tuple_t));
+           apr_hash_set(hash, t_imp, sizeof(print_tuple_t), dummy);
        }
     }
 
     free(ids);
-    dict_delete(dict);
+    apr_pool_destroy(pool);
     frag_print(file, frag, 0, INT_MAX);
     grid_cursor_delete(cursor);
     frag_delete(frag);

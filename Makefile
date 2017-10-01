@@ -217,87 +217,6 @@ src/attr.c.s:
 	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/attr.c.s
 .PHONY : src/attr.c.s
 
-src/conf.o: src/conf.c.o
-
-.PHONY : src/conf.o
-
-# target to build an object file
-src/conf.c.o:
-	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/conf.c.o
-.PHONY : src/conf.c.o
-
-src/conf.i: src/conf.c.i
-
-.PHONY : src/conf.i
-
-# target to preprocess a source file
-src/conf.c.i:
-	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/conf.c.i
-.PHONY : src/conf.c.i
-
-src/conf.s: src/conf.c.s
-
-.PHONY : src/conf.s
-
-# target to generate assembly for a file
-src/conf.c.s:
-	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/conf.c.s
-.PHONY : src/conf.c.s
-
-src/containers/dict.o: src/containers/dict.c.o
-
-.PHONY : src/containers/dict.o
-
-# target to build an object file
-src/containers/dict.c.o:
-	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/containers/dict.c.o
-.PHONY : src/containers/dict.c.o
-
-src/containers/dict.i: src/containers/dict.c.i
-
-.PHONY : src/containers/dict.i
-
-# target to preprocess a source file
-src/containers/dict.c.i:
-	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/containers/dict.c.i
-.PHONY : src/containers/dict.c.i
-
-src/containers/dict.s: src/containers/dict.c.s
-
-.PHONY : src/containers/dict.s
-
-# target to generate assembly for a file
-src/containers/dict.c.s:
-	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/containers/dict.c.s
-.PHONY : src/containers/dict.c.s
-
-src/containers/dicts/hash_table.o: src/containers/dicts/hash_table.c.o
-
-.PHONY : src/containers/dicts/hash_table.o
-
-# target to build an object file
-src/containers/dicts/hash_table.c.o:
-	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/containers/dicts/hash_table.c.o
-.PHONY : src/containers/dicts/hash_table.c.o
-
-src/containers/dicts/hash_table.i: src/containers/dicts/hash_table.c.i
-
-.PHONY : src/containers/dicts/hash_table.i
-
-# target to preprocess a source file
-src/containers/dicts/hash_table.c.i:
-	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/containers/dicts/hash_table.c.i
-.PHONY : src/containers/dicts/hash_table.c.i
-
-src/containers/dicts/hash_table.s: src/containers/dicts/hash_table.c.s
-
-.PHONY : src/containers/dicts/hash_table.s
-
-# target to generate assembly for a file
-src/containers/dicts/hash_table.c.s:
-	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/containers/dicts/hash_table.c.s
-.PHONY : src/containers/dicts/hash_table.c.s
-
 src/containers/freelist.o: src/containers/freelist.c.o
 
 .PHONY : src/containers/freelist.o
@@ -324,6 +243,33 @@ src/containers/freelist.s: src/containers/freelist.c.s
 src/containers/freelist.c.s:
 	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/containers/freelist.c.s
 .PHONY : src/containers/freelist.c.s
+
+src/containers/gs_hash.o: src/containers/gs_hash.c.o
+
+.PHONY : src/containers/gs_hash.o
+
+# target to build an object file
+src/containers/gs_hash.c.o:
+	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/containers/gs_hash.c.o
+.PHONY : src/containers/gs_hash.c.o
+
+src/containers/gs_hash.i: src/containers/gs_hash.c.i
+
+.PHONY : src/containers/gs_hash.i
+
+# target to preprocess a source file
+src/containers/gs_hash.c.i:
+	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/containers/gs_hash.c.i
+.PHONY : src/containers/gs_hash.c.i
+
+src/containers/gs_hash.s: src/containers/gs_hash.c.s
+
+.PHONY : src/containers/gs_hash.s
+
+# target to generate assembly for a file
+src/containers/gs_hash.c.s:
+	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/containers/gs_hash.c.s
+.PHONY : src/containers/gs_hash.c.s
 
 src/containers/hashset.o: src/containers/hashset.c.o
 
@@ -1054,60 +1000,6 @@ src/interval.c.s:
 	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/interval.c.s
 .PHONY : src/interval.c.s
 
-src/mondrian.o: src/mondrian.c.o
-
-.PHONY : src/mondrian.o
-
-# target to build an object file
-src/mondrian.c.o:
-	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/mondrian.c.o
-.PHONY : src/mondrian.c.o
-
-src/mondrian.i: src/mondrian.c.i
-
-.PHONY : src/mondrian.i
-
-# target to preprocess a source file
-src/mondrian.c.i:
-	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/mondrian.c.i
-.PHONY : src/mondrian.c.i
-
-src/mondrian.s: src/mondrian.c.s
-
-.PHONY : src/mondrian.s
-
-# target to generate assembly for a file
-src/mondrian.c.s:
-	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/mondrian.c.s
-.PHONY : src/mondrian.c.s
-
-src/mvm.o: src/mvm.c.o
-
-.PHONY : src/mvm.o
-
-# target to build an object file
-src/mvm.c.o:
-	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/mvm.c.o
-.PHONY : src/mvm.c.o
-
-src/mvm.i: src/mvm.c.i
-
-.PHONY : src/mvm.i
-
-# target to preprocess a source file
-src/mvm.c.i:
-	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/mvm.c.i
-.PHONY : src/mvm.c.i
-
-src/mvm.s: src/mvm.c.s
-
-.PHONY : src/mvm.s
-
-# target to generate assembly for a file
-src/mvm.c.s:
-	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/mvm.c.s
-.PHONY : src/mvm.c.s
-
 src/operators/scan.o: src/operators/scan.c.o
 
 .PHONY : src/operators/scan.o
@@ -1162,60 +1054,6 @@ src/pred.c.s:
 	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/pred.c.s
 .PHONY : src/pred.c.s
 
-src/pref.o: src/pref.c.o
-
-.PHONY : src/pref.o
-
-# target to build an object file
-src/pref.c.o:
-	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/pref.c.o
-.PHONY : src/pref.c.o
-
-src/pref.i: src/pref.c.i
-
-.PHONY : src/pref.i
-
-# target to preprocess a source file
-src/pref.c.i:
-	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/pref.c.i
-.PHONY : src/pref.c.i
-
-src/pref.s: src/pref.c.s
-
-.PHONY : src/pref.s
-
-# target to generate assembly for a file
-src/pref.c.s:
-	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/pref.c.s
-.PHONY : src/pref.c.s
-
-src/progpool.o: src/progpool.c.o
-
-.PHONY : src/progpool.o
-
-# target to build an object file
-src/progpool.c.o:
-	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/progpool.c.o
-.PHONY : src/progpool.c.o
-
-src/progpool.i: src/progpool.c.i
-
-.PHONY : src/progpool.i
-
-# target to preprocess a source file
-src/progpool.c.i:
-	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/progpool.c.i
-.PHONY : src/progpool.c.i
-
-src/progpool.s: src/progpool.c.s
-
-.PHONY : src/progpool.s
-
-# target to generate assembly for a file
-src/progpool.c.s:
-	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/progpool.c.s
-.PHONY : src/progpool.c.s
-
 src/routers/api/1.0/nodes.o: src/routers/api/1.0/nodes.c.o
 
 .PHONY : src/routers/api/1.0/nodes.o
@@ -1269,33 +1107,6 @@ src/schema.s: src/schema.c.s
 src/schema.c.s:
 	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/schema.c.s
 .PHONY : src/schema.c.s
-
-src/storage/memory.o: src/storage/memory.c.o
-
-.PHONY : src/storage/memory.o
-
-# target to build an object file
-src/storage/memory.c.o:
-	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/storage/memory.c.o
-.PHONY : src/storage/memory.c.o
-
-src/storage/memory.i: src/storage/memory.c.i
-
-.PHONY : src/storage/memory.i
-
-# target to preprocess a source file
-src/storage/memory.c.i:
-	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/storage/memory.c.i
-.PHONY : src/storage/memory.c.i
-
-src/storage/memory.s: src/storage/memory.c.s
-
-.PHONY : src/storage/memory.s
-
-# target to generate assembly for a file
-src/storage/memory.c.s:
-	$(MAKE) -f CMakeFiles/gridstore.dir/build.make CMakeFiles/gridstore.dir/src/storage/memory.c.s
-.PHONY : src/storage/memory.c.s
 
 src/timer.o: src/timer.c.o
 
@@ -1559,18 +1370,12 @@ help:
 	@echo "... src/attr.o"
 	@echo "... src/attr.i"
 	@echo "... src/attr.s"
-	@echo "... src/conf.o"
-	@echo "... src/conf.i"
-	@echo "... src/conf.s"
-	@echo "... src/containers/dict.o"
-	@echo "... src/containers/dict.i"
-	@echo "... src/containers/dict.s"
-	@echo "... src/containers/dicts/hash_table.o"
-	@echo "... src/containers/dicts/hash_table.i"
-	@echo "... src/containers/dicts/hash_table.s"
 	@echo "... src/containers/freelist.o"
 	@echo "... src/containers/freelist.i"
 	@echo "... src/containers/freelist.s"
+	@echo "... src/containers/gs_hash.o"
+	@echo "... src/containers/gs_hash.i"
+	@echo "... src/containers/gs_hash.s"
 	@echo "... src/containers/hashset.o"
 	@echo "... src/containers/hashset.i"
 	@echo "... src/containers/hashset.s"
@@ -1652,33 +1457,18 @@ help:
 	@echo "... src/interval.o"
 	@echo "... src/interval.i"
 	@echo "... src/interval.s"
-	@echo "... src/mondrian.o"
-	@echo "... src/mondrian.i"
-	@echo "... src/mondrian.s"
-	@echo "... src/mvm.o"
-	@echo "... src/mvm.i"
-	@echo "... src/mvm.s"
 	@echo "... src/operators/scan.o"
 	@echo "... src/operators/scan.i"
 	@echo "... src/operators/scan.s"
 	@echo "... src/pred.o"
 	@echo "... src/pred.i"
 	@echo "... src/pred.s"
-	@echo "... src/pref.o"
-	@echo "... src/pref.i"
-	@echo "... src/pref.s"
-	@echo "... src/progpool.o"
-	@echo "... src/progpool.i"
-	@echo "... src/progpool.s"
 	@echo "... src/routers/api/1.0/nodes.o"
 	@echo "... src/routers/api/1.0/nodes.i"
 	@echo "... src/routers/api/1.0/nodes.s"
 	@echo "... src/schema.o"
 	@echo "... src/schema.i"
 	@echo "... src/schema.s"
-	@echo "... src/storage/memory.o"
-	@echo "... src/storage/memory.i"
-	@echo "... src/storage/memory.s"
 	@echo "... src/timer.o"
 	@echo "... src/timer.i"
 	@echo "... src/timer.s"
