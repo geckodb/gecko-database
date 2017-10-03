@@ -1,0 +1,11 @@
+/home/pegasus/Downloads/clion-2017.2.3/bin/cmake/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/pegasus/clion/gridstore
+-- Found APR headers: /usr/include/apr-1.0
+-- Found APR library: /usr/lib/x86_64-linux-gnu/libapr-1.so
+-- Found APRUTIL headers: /usr/include/apr-1.0
+-- Found APRUTIL library: /usr/lib/x86_64-linux-gnu/libaprutil-1.so
+OPENSSL_INCLUDE_DIR: /usr/include
+OPENSSL_LIBRARIES: /usr/lib/x86_64-linux-gnu/libssl.so;/usr/lib/x86_64-linux-gnu/libcrypto.so
+OPENSSL_ROOT_DIR: 
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/pegasus/clion/gridstore/cmake-build-debug

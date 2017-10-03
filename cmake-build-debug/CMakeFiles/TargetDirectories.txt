@@ -1,0 +1,4 @@
+/home/pegasus/clion/gridstore/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/pegasus/clion/gridstore/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/pegasus/clion/gridstore/cmake-build-debug/CMakeFiles/doc.dir
+/home/pegasus/clion/gridstore/cmake-build-debug/CMakeFiles/gridstore.dir

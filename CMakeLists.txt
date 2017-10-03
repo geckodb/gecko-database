@@ -1,11 +1,15 @@
+# this will make sure that one is using the clang compiler
+set(CMAKE_CXX_COMPILER  "/usr/bin/clang++")
+set(CMAKE_C_COMPILER    "/usr/bin/clang")
 cmake_minimum_required(VERSION 3.5)
+
 project(gridstore)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
 include_directories("include"
-                    "third-party"
-                    ${APR_INCLUDE_DIR})
+        "third-party"
+        ${APR_INCLUDE_DIR})
 include_directories("/usr/local/include/")
 
 find_package(APR REQUIRED)
@@ -23,7 +27,8 @@ include_directories(${CURSES_INCLUDE_DIR})
 find_package(Doxygen)
 option(BUILD_DOCUMENTATION "API documentation requires Doxygen" ${DOXYGEN_FOUND})
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -std=c11 -Wall -Werror")
+# add two aditional flags to call posix functions and to use the bsd library
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -std=c11 -Wall -Werror -D_XOPEN_SOURCE=700 -D_BSD_SOURCE")
 
 set(CMAKE_BINARY_DIR
         ${CMAKE_SOURCE_DIR}/bin)
@@ -138,14 +143,13 @@ add_executable(
         gridstore
         gridstore.c
         ${SOURCE_FILES})
-
+# link with math library and bsd
+# removed standalone apgr, not needed in linux
 target_link_libraries(
-        gridstore
+        gridstore m bsd
         ${APR_LIBRARIES}
         ${APRUTIL_LIBRARIES}
-        /usr/local/opt/argp-standalone/lib
-        /usr/local/opt/argp-standalone/lib/libargp.a
-        ${OPENSSL_LIBRARIES})
+        ${OPENSSL_LIBRARIES} pthread)
 
 if(DOXYGEN_FOUND)
     #configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)

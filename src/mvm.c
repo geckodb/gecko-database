@@ -21,7 +21,7 @@
 #include <schema.h>
 #include <frag.h>
 #include <tuplet_field.h>
-
+#include <inttypes.h>
 #ifndef OPERAND_STACK_CAPACITY
 #define OPERAND_STACK_CAPACITY  1024
 #endif
@@ -73,18 +73,18 @@
 
 #define CHECKFOR_CONTAINER(container)                                                                                  \
     CHECKFOR(container != CONTAINER_PROGPOOL, MVM_EC_BADCONTAINER,                                                     \
-             "container id in line '%d' in '%s': %lld",                                                                \
+             "container id in line '%d' in '%s': %"PRIu64,                                                                \
              (vm->pc - 1), program_name(vm->program), container)
 
 #define CHECKFOR_SCOPE(scope)                                                                                          \
     CHECKFOR(scope != FRAGMENT_SCOPE_GLOBAL && scope != FRAGMENT_SCOPE_LOCAL, MVM_EC_BADSCOPE,                         \
-             "bad scope in line '%d' in '%s': %lld",                                                                   \
+             "bad scope in line '%d' in '%s': %"PRIu64,                                                                   \
              (vm->pc - 1), program_name(vm->program), scope)
 
 
 #define CHECKFOR_ELEMENT(container, element)                                                                           \
     CHECKFOR((container == CONTAINER_PROGPOOL && element != ACCESS_GLOBAL), MVM_EC_BADELEMENT,                         \
-             "unknown element id in line '%d' in '%s': %lld",                                                          \
+             "unknown element id in line '%d' in '%s': %"PRIu64,                                                          \
              (vm->pc - 1), program_name(vm->program), element)
 
 #define CHECKFOR_UNIQUE_LOCAL_FRAGMENT_NAME(frag_name)                                                                 \
@@ -96,25 +96,25 @@
     CHECKFOR((frag_id >= vm->fragments->num_elements ||                                                                \
              ((local_fragment_t *)vec_at(vm->fragments, frag_id))->is_dropped),                                        \
              MVM_EC_NOFRAGMENT,                                                                                        \
-             "instruction at line '%d' in '%s' failed: no such fragment in local space: %lld",                         \
+             "instruction at line '%d' in '%s' failed: no such fragment in local space: %"PRIu64,                         \
              (vm->pc - 1), program_name(vm->program), frag_id)
 
 #define CHECKFOR_TYPE(type)                                                                                            \
     CHECKFOR((type != FT_BOOL && type != FT_INT8 && type != FT_INT16 && type != FT_INT32 && type != FT_INT64 &&        \
               type != FT_UINT8 && type != FT_UINT16 && type != FT_UINT32 && type != FT_UINT64 &&                       \
               type != FT_FLOAT32 && type != FT_FLOAT64 && type != FT_CHAR ) , MVM_EC_UNKNOWNATTRTYPE,                  \
-             "instruction at line '%d' in '%s' failed: unknown attribute data type '%lld'",                            \
+             "instruction at line '%d' in '%s' failed: unknown attribute data type %"PRIu64,                            \
              (vm->pc - 1), program_name(vm->program), type)
 
 #define CHECKFOR_REP(rep)                                                                                              \
     CHECKFOR(rep <= 0, MVM_EC_BADFIELDLEN,                                                                             \
-             "instruction at line '%d' in '%s' failed: bad field length '%lld'",                                       \
+             "instruction at line '%d' in '%s' failed: bad field length %"PRIu64,                                       \
              (vm->pc - 1), program_name(vm->program), rep)
 
 #define CHECKFOR_FRAGMENTTYPE(fragment_type)                                                                           \
     CHECKFOR((fragment_type != FRAGMENT_HOST_PLAIN_COLUMN_STORE && fragment_type != FRAGMENT_HOST_PLAIN_ROW_STORE),    \
              MVM_EC_BADFRAGMENTTYPE,                                                                                   \
-             "instruction at line '%d' in '%s' failed: bad fragment type '%lld'",                                      \
+             "instruction at line '%d' in '%s' failed: bad fragment type %"PRIu64,                                      \
              (vm->pc - 1), program_name(vm->program), fragment_type)
 
 #define CHECKFOR_NOTZERO(value)                                                                                        \
@@ -142,7 +142,7 @@
               IS_FLAG_SET(flags, FLAG_AUTOINC) && !(IS_FLAG_SET(flags, FLAG_NULLABLE) ||                               \
                                                    IS_FLAG_SET(flags, FLAG_FOREIGN))))),                               \
              MVM_EC_BADCOLUMNFLAGS,                                                                                    \
-             "instruction at line '%d' in '%s' failed: bad column flag combination '%lld'",                            \
+             "instruction at line '%d' in '%s' failed: bad column flag combination %"PRIu64,                            \
              (vm->pc - 1), program_name(vm->program), flags)
 
 
@@ -186,8 +186,8 @@ typedef struct variable_entry_t {
 } variable_entry_t;
 
 static variable_entry_t EMPTY_ENTRY = {
-    .initialized = false,
-    .value = 0
+        .initialized = false,
+        .value = 0
 };
 
 typedef struct local_fragment_t {
@@ -363,20 +363,20 @@ int mondrian_vm_create(mondrian_vm_t **out, mondrian_t *db)
         return MONDRIAN_ERROR;
     } else {
         **out = (mondrian_vm_t) {
-            .pc = 0,
-            .rollback = false,
-            .return_value = 0,
-            .temp_name_counter = 0,
-            .operand_stack = vec_new(sizeof(operand_t), OPERAND_STACK_CAPACITY),
-            .locks = vec_new(sizeof(shared_resource_release_state_t), 5),
-            .latches = vec_new(sizeof(shared_resource_release_state_t), 5),
-            .variables = vec_new(sizeof(variable_entry_t), 10),
-            .temp_names = vec_new(sizeof(char *), 10),
-            .fragments = vec_new(sizeof(local_fragment_t), 10),
-            .program = NULL,
-            .db = db,
-            .error_code = MVM_EC_NOERR,
-            .error_details = NULL
+                .pc = 0,
+                .rollback = false,
+                .return_value = 0,
+                .temp_name_counter = 0,
+                .operand_stack = vec_new(sizeof(operand_t), OPERAND_STACK_CAPACITY),
+                .locks = vec_new(sizeof(shared_resource_release_state_t), 5),
+                .latches = vec_new(sizeof(shared_resource_release_state_t), 5),
+                .variables = vec_new(sizeof(variable_entry_t), 10),
+                .temp_names = vec_new(sizeof(char *), 10),
+                .fragments = vec_new(sizeof(local_fragment_t), 10),
+                .program = NULL,
+                .db = db,
+                .error_code = MVM_EC_NOERR,
+                .error_details = NULL
         };
 
         if ((*out)->variables) {
@@ -385,7 +385,7 @@ int mondrian_vm_create(mondrian_vm_t **out, mondrian_t *db)
 
         return ((*out)->operand_stack != NULL && (*out)->locks != NULL && (*out)->latches != NULL &&
                 (*out)->variables != NULL && (*out)->temp_names != NULL) ?
-                MONDRIAN_OK : MONDRIAN_ERROR;
+               MONDRIAN_OK : MONDRIAN_ERROR;
     }
 }
 
@@ -462,11 +462,11 @@ int mondrian_vm_free(mondrian_vm_t *vm)
                     switch (release_states[id].mode) {
                         case MODE_EXCLUSIVE:
                             // TODO
-                            panic("not implemented %s", "AM_EXCLUSIVE");
+                        panic("not implemented %s", "AM_EXCLUSIVE");
                             break;
                         case MODE_SHARED:
                             // TODO
-                            panic("not implemented %s", "AM_SHARED");
+                        panic("not implemented %s", "AM_SHARED");
                             break;
                         default: panic("Unknown access mode: %d", release_states[id].mode);
                     }
@@ -501,13 +501,13 @@ int program_new(program_t **out, const char *prog_name, const char *prog_author,
 
     *out = REQUIRE_MALLOC(sizeof(program_t));
     **out = (program_t) {
-        .instructions = vec_new(sizeof(instruction_t), 10),
-        .magic_word   = MVM_MAGIC_WORD,
-        .mvm_version_major = MVM_MAJOR_VERSION,
-        .mvm_version_minor = MVM_MINOR_VERSION,
-        .prog_name = strdup(prog_name),
-        .prog_author = strdup(prog_author),
-        .prog_comments = strdup(prog_comment)
+            .instructions = vec_new(sizeof(instruction_t), 10),
+            .magic_word   = MVM_MAGIC_WORD,
+            .mvm_version_major = MVM_MAJOR_VERSION,
+            .mvm_version_minor = MVM_MINOR_VERSION,
+            .prog_name = strdup(prog_name),
+            .prog_author = strdup(prog_author),
+            .prog_comments = strdup(prog_comment)
     };
     return ((*out)->instructions != NULL ? MONDRIAN_OK : MONDRIAN_ERROR);
 }
@@ -534,10 +534,10 @@ int program_print(FILE *out, const program_t *program)
     for (size_t i = 0; i < num_instructions; i++) {
         instruction_t inst = data[i];
         panic_if((inst.opcode >= ARRAY_LEN_OF(mvm_opcode_register)), "internal error: opcode 0x%02x exceeds register.",
-                  inst.opcode);
+                 inst.opcode);
         const char *mnemonic = mvm_opcode_register[inst.opcode].mnemonic;
         if (mvm_opcode_register[inst.opcode].operand_used) {
-            printf("%-4ld 0x%02x\t%-15s0x%016llx\n",
+            printf("%-4ld 0x%02x\t%-15s0x%"PRIu64"\n",
                    (i * sizeof(instruction_t)), inst.opcode, mnemonic, inst.operand);
         } else {
             printf("%-4ld 0x%02x\t%-15s\n",
@@ -589,7 +589,7 @@ static inline int mondrian_vm_tick(mondrian_vm_t *vm)
                       (vm->pc - 1) * sizeof(instruction_t), mvm_opcode_register[inst->opcode].mnemonic,
                       prog_name, vm->program, vm->error_details);
             panic_if((mondrian_vm_rollback(vm) != MONDRIAN_OK),
-                      "*** FATAL *** rollback failed for mvm job '%s' (%p)", prog_name, vm->program);
+                     "*** FATAL *** rollback failed for mvm job '%s' (%p)", prog_name, vm->program);
             vm->return_value = EXIT_CODE_ABORT_BY_SYSTEM;
             return MONDRIAN_ERROR;
         } else {
@@ -614,9 +614,9 @@ static inline lock_id_t mondrian_vm_ackn_lock(mondrian_vm_t *vm, shared_resource
 {
     lock_id_t lock_id = vm->locks->num_elements;
     shared_resource_release_state_t state = {
-        .mode = mode,
-        .resource = target,
-        .is_released = false
+            .mode = mode,
+            .resource = target,
+            .is_released = false
     };
     vec_pushback(vm->locks, 1, &state);
     return lock_id;
@@ -656,8 +656,8 @@ static inline int mondrian_vm_release_lock(mondrian_vm_t *vm, lock_id_t lock_id)
 static inline void mondrian_vm_set_var(mondrian_vm_t *vm, u64 index, u64 *value)
 {
     variable_entry_t entry = {
-        .initialized = true,
-        .value = *value
+            .initialized = true,
+            .value = *value
     };
     size_t vec_elem = vm->variables->num_elements;
     if (vec_elem + 1 >= vm->variables->element_capacity) {
@@ -684,8 +684,8 @@ static inline int mondrian_vm_get_var(u64 *out, mondrian_vm_t *vm, u64 index)
 static inline int mondrian_vm_install_frag_local(frag_id_t *out, mondrian_vm_t *vm, frag_t *frag)
 {
     local_fragment_t local = {
-        .is_dropped = false,
-        .fragment = frag
+            .is_dropped = false,
+            .fragment = frag
     };
     *out = vm->fragments->num_elements;
     vec_pushback(vm->fragments, 1, &local);
@@ -870,9 +870,9 @@ static int exec_fcreate(mondrian_vm_t *vm, u64 force)
             OPERAND_STACK_PUSH(schema);
             return MONDRIAN_OK;
         case FRAGMENT_SCOPE_GLOBAL:
-            panic("Not implemented! %s", "FRAGMENT_SCOPE_GLOBAL");
+        panic("Not implemented! %s", "FRAGMENT_SCOPE_GLOBAL");
             return MONDRIAN_ERROR;
-        default: panic("Unknown scope %llu", scope);
+        default: panic("Unknown scope %"PRIu64, scope);
     }
     return MONDRIAN_ERROR;
 }
@@ -933,7 +933,7 @@ static int exec_finstall(mondrian_vm_t *vm, u64 _)
             impl_type = FIT_HOST_DSM_VM;
             break;
         default:
-            panic("Unknown fragment type '%lld'", frag_type);
+        panic("Unknown fragment type %"PRIu64, frag_type);
     }
 
     frag_id_t frag_id;
@@ -941,13 +941,13 @@ static int exec_finstall(mondrian_vm_t *vm, u64 _)
 
     switch (scope) {
         case FRAGMENT_SCOPE_GLOBAL:
-            panic("Not implemented: '%s'", "FRAGMENT_SCOPE_GLOBAL");
+        panic("Not implemented: '%s'", "FRAGMENT_SCOPE_GLOBAL");
             break;
         case FRAGMENT_SCOPE_LOCAL:
             mondrian_vm_install_frag_local(&frag_id, vm, frag);
             break;
         default:
-            panic("Unknown scope: %lld", scope);
+        panic("Unknown scope: %"PRIu64, scope);
     }
 
     frag_handle_t handle;
@@ -1069,10 +1069,10 @@ static int exec_acq_lock(mondrian_vm_t *vm, u64 container)
                     progpool_lock_exclusive(mondrian_get_progpool(vm->db));
                     break;
                 case MODE_SHARED:
-                    panic("Not implemented '%s'", "MODE_SHARED");
+                panic("Not implemented '%s'", "MODE_SHARED");
                     break;
                 default:
-                    panic("Unknown lock mode in vm %p", vm);
+                panic("Unknown lock mode in vm %p", vm);
             }
             lock_id = mondrian_vm_ackn_lock(vm, SR_PROGPOOL, mode);
             break;
