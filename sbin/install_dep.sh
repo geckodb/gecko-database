@@ -112,38 +112,38 @@ if [ $ans == "Y" ]
                                                 		if [[ ! " ${packages_installed[@]} " =~ " ${value} " ]]; 
 								then
 								echo "installing clang"
-								echo $password | sudo -S apt-get install clang    			
+								echo $password | sudo -S apt-get -y install clang    			
 								fi
                                                 		value="openssl"
                                                 		if [[ ! " ${packages_installed[@]} " =~ " ${value} " ]]; 
 								then
 									echo "installing the openssl library"
-									echo $password | sudo -S install openssl
-									echo $password | sudo -S apt-get install libssl-dev
+									echo $password | sudo -S apt-get -y install openssl
+									echo $password | sudo -S apt-get -y  install libssl-dev
 								fi
                                                 		value="apr"
                                                 		if [[ ! " ${packages_installed[@]} " =~ " ${value} " ]];
 								then
 								echo "installing the Apache Portable Runtime(APR) library"
-								echo $password | sudo -S apt-get install apache2-dev libapr1-dev libaprutil1-dev
+								echo $password | sudo -S apt-get -y install apache2-dev libapr1-dev libaprutil1-dev
 								fi
                                                 		value="bsd"
                                                 		if [[ ! " ${packages_installed[@]} " =~ " ${value} " ]];
 								then
 									echo "installing the freebsd library"
-									echo $password | sudo -S apt-get install libbsd-dev
+									echo $password | sudo -S apt-get -y  install libbsd-dev
 								fi
                                                 		value="libncurses5"  
                                                 		if [[ ! " ${packages_installed[@]} " =~ " ${value} " ]]; 
 								then
 								       echo "installing curses"
-								       echo $password | sudo -S apt-get install libncurses5-dev libncursesw5-dev
+								       echo $password | sudo -S apt-get -y install libncurses5-dev libncursesw5-dev
 								fi
                                                 		value="doxygen"
                                                 			if [[ ! " ${packages_installed[@]} " =~ " ${value} " ]] 
 								then
 									echo "installing doxygen"
-									echo $password | sudo -S apt-get install doxygen
+									echo $password | sudo -S apt-get -y  install doxygen
 								fi
 								echo -e "\nchecking the versions of the libraries"
 								echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
