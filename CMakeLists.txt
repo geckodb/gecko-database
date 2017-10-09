@@ -1,39 +1,66 @@
-cmake_minimum_required(VERSION 3.5)
 project(gridstore)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
+set(
+        # this will make sure that one is using the clang compiler
+        CMAKE_CXX_COMPILER        "/usr/bin/clang++"
+        CMAKE_C_COMPILER          "/usr/bin/clang"
 
-include_directories("include"
-                    "third-party"
-                    ${APR_INCLUDE_DIR})
-include_directories("/usr/local/include/")
+        CMAKE_BINARY_DIR          ${CMAKE_SOURCE_DIR}/bin
+        EXECUTABLE_OUTPUT_PATH    ${CMAKE_BINARY_DIR}
+)
 
-find_package(APR REQUIRED)
+set(
+        # include third-party cmake files
+        CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/"
+)
+
+set(
+        CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -std=c11 -Wall -Werror"
+)
+
+cmake_minimum_required(
+        VERSION 3.5
+)
+
+include(
+        "${CMAKE_SOURCE_DIR}/cmake/FindOS.cmake"
+        "${CMAKE_SOURCE_DIR}/cmake/FindAPR.cmake"
+)
+
+find_package(APR     REQUIRED)
 find_package(OpenSSL REQUIRED)
+find_package(Curses  REQUIRED)
+find_package(Doxygen REQUIRED)
 
-include_directories(${OPENSSL_INCLUDE_DIR})
+include_directories(
+        "/usr/local/include/"
+        "include"
+        "third-party"
+        ${APR_INCLUDE_DIR}
+        ${OPENSSL_INCLUDE_DIR}
+        ${CURSES_INCLUDE_DIR}
+)
 
 message("OPENSSL_INCLUDE_DIR: ${OPENSSL_INCLUDE_DIR}")
 message("OPENSSL_LIBRARIES: ${OPENSSL_LIBRARIES}")
 message("OPENSSL_ROOT_DIR: ${OPENSSL_ROOT_DIR}")
 
-find_package(Curses REQUIRED)
-include_directories(${CURSES_INCLUDE_DIR})
+option(
+        BUILD_DOCUMENTATION "API documentation requires Doxygen" ${DOXYGEN_FOUND}
+)
 
-find_package(Doxygen)
-option(BUILD_DOCUMENTATION "API documentation requires Doxygen" ${DOXYGEN_FOUND})
+file(
+        MAKE_DIRECTORY ${CMAKE_BINARY_DIR}
+)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -std=c11 -Wall -Werror")
+file(
+        GLOB SOURCE_FILES
+        "*.h"
+        "*.c"
+)
 
-set(CMAKE_BINARY_DIR
-        ${CMAKE_SOURCE_DIR}/bin)
-
-set(EXECUTABLE_OUTPUT_PATH
-        ${CMAKE_BINARY_DIR})
-
-file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR})
-
-set(SOURCE_FILES
+set(
+        SOURCE_FILES
         include/async.h
         include/attr.h
         include/c11threads.h
@@ -62,6 +89,30 @@ set(SOURCE_FILES
         include/debug.h
         include/global.h
         include/inet/response.h
+        include/grid.h
+        include/interval.h
+        include/tuple_field.h
+        include/indexes/vindex.h
+        include/indexes/vindexes/hash_vindex.h
+        include/containers/freelist.h
+        include/tuple_cursor.h
+        include/indexes/hindex.h
+        include/indexes/hindexes/lsearch_hindex.h
+        include/grid_cursor.h
+        include/containers/hashset.h
+        include/routers/api/types/create/router.h
+        include/utils.h
+        include/gs_dispatcher.h
+        include/gs_event.h
+        include/gs_gridstore.h
+        include/info.h
+        include/gs_shell.h
+        include/inet/gs_request.h
+        include/routers/api/1.0/nodes.h
+        include/gs_spinlock.h
+        include/gs_http.h
+        include/containers/gs_hash.h
+        include/platform.h
 
         src/async.c
         src/attr.c
@@ -86,61 +137,93 @@ set(SOURCE_FILES
         src/global.c
         src/inet/response.c
         src/grid.c
-        include/grid.h
         src/interval.c
-        include/interval.h
         src/tuple_field.c
-        include/tuple_field.h
         src/indexes/vindex.c
-        include/indexes/vindex.h
-        include/indexes/vindexes/hash_vindex.h
         src/indexes/vindexes/hash_vindex.c
-        include/containers/freelist.h
         src/containers/freelist.c
-        include/tuple_cursor.h
         src/tuple_cursor.c
-        include/indexes/hindex.h
         src/indexes/hindex.c
-        include/indexes/hindexes/lsearch_hindex.h
         src/indexes/hindexes/lsearch_hindex.c
         src/grid_cursor.c
-        include/grid_cursor.h
         src/containers/hashset.c
-        include/containers/hashset.h
-        include/routers/api/types/create/router.h
-        third-party/json-parser/json.c
-        third-party/json-parser/json.h
-        include/utils.h
         src/utils.c
         src/gs_dispatcher.c
-        include/gs_dispatcher.h
         src/gs_event.c
-        include/gs_event.h
         src/gs_gridstore.c
-        include/gs_gridstore.h
-        include/info.h
-        include/gs_shell.h src/gs_shell.c include/inet/gs_request.h src/inet/gs_request.c
-        include/routers/api/1.0/nodes.h include/gs_spinlock.h src/gs_spinlock.c src/routers/api/1.0/nodes.c include/gs_http.h src/gs_http.c include/containers/gs_hash.h src/containers/gs_hash.c)
+        src/gs_shell.c
+        src/inet/gs_request.c
+        src/gs_spinlock.c
+        src/routers/api/1.0/nodes.c
+        src/gs_http.c
+        src/containers/gs_hash.c
 
+        third-party/json-parser/json.h
+        third-party/json-parser/json.c
+)
+
+IF (PROJECT_OS_LINUX)
+
+ELSEIF (PROJECT_OS_OSX)
+
+ENDIF (PROJECT_OS_LINUX)
 
 add_executable(
         gridstore
         gridstore.c
-        ${SOURCE_FILES})
+        ${SOURCE_FILES}
+)
 
-target_link_libraries(
-        gridstore
-        ${APR_LIBRARIES}
-        ${APRUTIL_LIBRARIES}
-        /usr/local/opt/argp-standalone/lib
-        /usr/local/opt/argp-standalone/lib/libargp.a
-        ${OPENSSL_LIBRARIES})
+
+IF (PROJECT_OS_LINUX)
+        MESSAGE (STATUS "Operating system is Linux")
+
+        set (
+                # add platform-specific code
+                SOURCE_FILES ${SOURCE_FILES} include/platforms/linux/platform.h
+        )
+
+        set(
+                # add two aditional flags to call posix functions and to use the bsd library
+                CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_XOPEN_SOURCE=700 -D_BSD_SOURCE"
+        )
+
+        target_link_libraries(
+                gridstore
+                bsd
+                ${APR_LIBRARIES}
+                ${APRUTIL_LIBRARIES}
+                ${OPENSSL_LIBRARIES}
+                pthread
+        )
+
+ELSEIF (PROJECT_OS_OSX)
+        MESSAGE (STATUS "Operating system is Apple MacOS X")
+
+        set (
+                # add platform-specific code
+                SOURCE_FILES   ${SOURCE_FILES} include/platforms/macos/platform.h
+        )
+
+        target_link_libraries(
+                gridstore
+                ${APR_LIBRARIES}
+                ${APRUTIL_LIBRARIES}
+                /usr/local/opt/argp-standalone/lib
+                /usr/local/opt/argp-standalone/lib/libargp.a
+                ${OPENSSL_LIBRARIES}
+                pthread
+        )
+
+ENDIF (PROJECT_OS_LINUX)
+
 
 if(DOXYGEN_FOUND)
-    #configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
-    add_custom_target(doc
+        #configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+        add_custom_target(
+            doc
             ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
             COMMENT "Generating API documentation with Doxygen" VERBATIM
-            )
+        )
 endif(DOXYGEN_FOUND)

@@ -1,6 +1,0 @@
-database/init routers/init.js
-users/insert  routers/insert.js
-users/update  routers/update.js
-users/delete  routers/delete.js
-actions/scan  routers/scan.js
-actions/read  routers/read.js

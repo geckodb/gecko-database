@@ -1,0 +1,15 @@
+/Applications/CLion.app/Contents/bin/cmake/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /Users/marcus/git/basement
+-- Operating system is Apple MacOS X
+-- Got System Processor x86_64
+-- Found APR headers: /usr/include/apr-1
+-- Found APR library: /usr/lib/libapr-1.dylib
+-- Found APRUTIL headers: /usr/include/apr-1
+-- Found APRUTIL library: /usr/lib/libaprutil-1.dylib
+OPENSSL_INCLUDE_DIR: /usr/local/include
+OPENSSL_LIBRARIES: /usr/lib/libssl.dylib;/usr/lib/libcrypto.dylib
+OPENSSL_ROOT_DIR: 
+-- Operating system is Apple MacOS X
+-- Configuring done
+WARNING: Target "gridstore" requests linking to directory "/usr/local/opt/argp-standalone/lib".  Targets may link only to libraries.  CMake is dropping the item.
+-- Generating done
+-- Build files have been written to: /Users/marcus/git/basement/cmake-build-debug

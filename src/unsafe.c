@@ -18,7 +18,7 @@
 #include <unsafe.h>
 #include <frag.h>
 #include <grid.h>
-
+#include <inttypes.h>
 size_t unsafe_field_println(enum field_type type, const void *data)
 {
     char *buffer = unsafe_field_str(type, data);
@@ -45,28 +45,28 @@ char *unsafe_field_str(enum field_type type, const void *data)
             strcpy (buffer, *((bool *) data) == true? "true" : "false");
             break;
         case FT_INT8:
-            sprintf(buffer, "%d", *(INT8 *) data);
+            sprintf(buffer, "%"PRId32, *(INT8 *) data);
             break;
         case FT_INT16:
-            sprintf(buffer, "%d", *(INT16 *) data);
+            sprintf(buffer, "%"PRId32, *(INT16 *) data);
             break;
         case FT_INT32:
-            sprintf(buffer, "%d", *(INT32 *) data);
+            sprintf(buffer, "%"PRId32, *(INT32 *) data);
             break;
         case FT_INT64:
-            sprintf(buffer, "%lld", *(INT64 *) data);
+            sprintf(buffer,"%"PRIu64, *(INT64 *) data);
             break;
         case FT_UINT8:
-            sprintf(buffer, "%u", *(UINT8 *) data);
+            sprintf(buffer, "%"PRIu32, *(UINT8 *) data);
             break;
         case FT_UINT16:
-            sprintf(buffer, "%u", *(UINT16 *) data);
+            sprintf(buffer, "%"PRIu32, *(UINT16 *) data);
             break;
         case FT_UINT32:
-            sprintf(buffer, "%u", *(UINT32 *) data);
+            sprintf(buffer, "%"PRIu32, *(UINT32 *) data);
             break;
         case FT_UINT64:
-            sprintf(buffer, "%llu", *(UINT64 *) data);
+            sprintf(buffer, "%"PRIu64, *(UINT64 *) data);
             break;
         case FT_FLOAT32:
             sprintf(buffer, "%f", *(FLOAT32 *) data);
@@ -80,20 +80,20 @@ char *unsafe_field_str(enum field_type type, const void *data)
             }
             strcpy(buffer, data);
             break;
-        /* internal */
+            /* internal */
         case FT_STRPTR: {
             char *output = (strlen((STRPTR) data) + 1) > INIT_BUFFER_LEN ? clip(data, INIT_BUFFER_LEN) : strdup(data);
             sprintf(buffer, "%s", output);
             free(output);
         } break;
         case FT_ATTRID:
-            sprintf(buffer, "%llu", *(ATTRID *) data);
+            sprintf(buffer, "%"PRIu64, *(ATTRID *) data);
             break;
         case FT_GRIDID:
             sprintf(buffer, "%zu", *(GRIDID *) data);
             break;
         case FT_TUPLEID:
-            sprintf(buffer, "%u", *(TUPLEID *) data);
+            sprintf(buffer, "%"PRIu32, *(TUPLEID *) data);
             break;
         case FT_FRAGTYPE:
             sprintf(buffer, "%s", frag_str(*(FRAGTYPE *) data));
