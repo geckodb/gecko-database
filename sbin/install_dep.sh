@@ -1,6 +1,6 @@
 #!/bin/bash
 clear
-echo -e "\n\nThis in the dependency installation script of GridStore. Written by Mahmoud Mohsen 2017 (mahmoud.mohsen@ovgu.de)\n
+echo -e "\n\nThis is the dependency installation script of GridStore. Written by Mahmoud Mohsen 2017 (mahmoud.mohsen@ovgu.de)\n
 When proceeding, required dependencies (e.g., libraries) to configure and make GridStore will be installed in your system. \n"
 
 read -p "Do you want to proceed [Y/n]?" ans
