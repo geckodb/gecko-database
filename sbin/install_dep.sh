@@ -5,13 +5,13 @@ When proceeding, required dependencies (e.g., libraries) to configure and make G
 
 read -p "Do you want to proceed [Y/n]?" ans
 
-if [ $ans == "Y" ]
+if [ $ans == "Y" -o $ans == "y" ]
 	then
 	    if [ "$OSTYPE" == "linux-gnu" ] 
 	    then
-				echo "operating system detected is linux"	    
+				echo "operating system detected is Linux"
 				sleep 1
-                        	echo "check if the linux distro is Ubuntu"
+                        	echo "check if the Linux distro is Ubuntu"
                         	if [ $(grep DISTRIB_ID /etc/*-release | awk -F '=' '{print $2}') == "Ubuntu" ] 
 				then
 						echo "Ubuntu detected"
@@ -186,14 +186,14 @@ if [ $ans == "Y" ]
 
                                                 fi
 						else 
-							echo "Your linux distribution is not supported.....exiting"
+							echo "Your Linux distribution is not supported.....exiting"
                                         		sleep 2
 							exit
 	 fi
-    elif [ "$OSTYPE" == "darwin"* ]
-    then
-        echo " OS code goes here " 
-    fi
-
+     elif [ "$(uname)" == "Darwin" ]
+     then
+         echo "MacOS dependencies cannot be installed since we missed to provide the logic for that branch."
+         echo "Please contact <pinnecke@ovgu.de> if you have any trouble."
+     fi
 fi	
 
