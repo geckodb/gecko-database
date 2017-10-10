@@ -29,7 +29,7 @@ if [ $ans == "Y" -o $ans == "y" ]
 							packages_to_be_upgraded+=("clang")			        
 						fi
 
-                                                if [ -z "$(openssl version -v)" ]
+                        if [ -z "$(openssl version -v)" ]
                                                 then
 							packages_to_be_installed+=("openssl")	
 					        elif [ -z "$(apt-get -s upgrade | grep openssl)"]
@@ -64,6 +64,17 @@ if [ $ans == "Y" -o $ans == "y" ]
 
 					        fi
 
+                                                if [  -z "$(dpkg -l 'libssl-dev')" ]
+                                                then
+							packages_to_be_installed+=("libssl-dev")	
+   
+					        elif [ -z "$(apt-get -s upgrade | grep libssl-dev)" ]
+								then
+						   		   packages_installed+=("libssl-dev")
+                                                else
+							 packages_to_be_upgraded+=("libssl-dev")			        
+                                                fi
+
                                                 if [  -z "$(dpkg -l 'libncurses5')" ]
                                                 then
 							packages_to_be_installed+=("libncurses5")	
@@ -97,7 +108,7 @@ if [ $ans == "Y" -o $ans == "y" ]
 						sleep 5
                                                 echo ""
                                                 echo ""
-                                                if [ ${#packages_installed[@]} == 6 ]
+                                                if [ ${#packages_installed[@]} == 7 ]
                                                 then
                                                 echo "you have the needed packages already installed .... Exiting the script"
                                                 sleep 3
@@ -119,6 +130,11 @@ if [ $ans == "Y" -o $ans == "y" ]
 								then
 									echo "installing the openssl library"
 									echo $password | sudo -S apt-get -y install openssl
+								fi
+                                                		value="libssl-dev"
+                                                		if [[ ! " ${packages_installed[@]} " =~ " ${value} " ]]; 
+								then
+									echo "installing the openssl dev library"
 									echo $password | sudo -S apt-get -y  install libssl-dev
 								fi
                                                 		value="apr"
