@@ -19,22 +19,23 @@ if [ $ans == "Y" -o $ans == "y" ]
                                                 packages_to_be_installed=()
                                                 packages_installed=()
                                                 packages_to_be_upgraded=()
-						if [ -z "$(clang --version)" ]
+						
+                                                if [ -z "$(clang --version)" ]
                                                 then
 							packages_to_be_installed+=("clang")
 					        elif [ -z "$(apt-get -s upgrade | grep clang)" ]
 					        then
-						   		   packages_installed+=("clang")
+						        packages_installed+=("clang")
                                                 else
 							packages_to_be_upgraded+=("clang")			        
 						fi
 
-                        if [ -z "$(openssl version -v)" ]
+                                                if [ -z "$(openssl version -v)" ]
                                                 then
 							packages_to_be_installed+=("openssl")	
 					        elif [ -z "$(apt-get -s upgrade | grep openssl)"]
 						then
-						   	   packages_installed+=("openssl")
+						   	packages_installed+=("openssl")
                                                 else	
 							packages_to_be_upgraded+=("openssl")			        
                                                 
@@ -45,7 +46,7 @@ if [ $ans == "Y" -o $ans == "y" ]
 							packages_to_be_installed+=("apr")	
 					        elif [ -z "$(apt-get -s upgrade | grep libapr1-dev)" ]
 						then
-						   		   packages_installed+=("apr")
+						        packages_installed+=("apr")
                                                 else
 							packages_to_be_upgraded+=("apr")			        
 
@@ -57,10 +58,10 @@ if [ $ans == "Y" -o $ans == "y" ]
                                                
 					        elif [ -z "$(apt-get -s upgrade | grep libbsd-dev)" ]
 						then
-						   		   packages_installed+=("bsd")
+						        packages_installed+=("bsd")
  
 						else
-								packages_to_be_upgraded+=("bsd")			        
+						        packages_to_be_upgraded+=("bsd")			        
 
 					        fi
 
@@ -69,10 +70,10 @@ if [ $ans == "Y" -o $ans == "y" ]
 							packages_to_be_installed+=("libssl-dev")	
    
 					        elif [ -z "$(apt-get -s upgrade | grep libssl-dev)" ]
-								then
-						   		   packages_installed+=("libssl-dev")
+						then
+						        packages_installed+=("libssl-dev")
                                                 else
-							 packages_to_be_upgraded+=("libssl-dev")			        
+							packages_to_be_upgraded+=("libssl-dev")			        
                                                 fi
 
                                                 if [  -z "$(dpkg -l 'libncurses5')" ]
@@ -80,8 +81,8 @@ if [ $ans == "Y" -o $ans == "y" ]
 							packages_to_be_installed+=("libncurses5")	
    
 					        elif [ -z "$(apt-get -s upgrade | grep libncurses5)" ]
-								then
-						   		   packages_installed+=("libncurses5")
+						then
+						         packages_installed+=("libncurses5")
                                                 else
 							 packages_to_be_upgraded+=("libncurses5")			        
                                                 fi
@@ -92,7 +93,7 @@ if [ $ans == "Y" -o $ans == "y" ]
   
 					        elif [ -z "$(apt-get -s upgrade | grep doxygen)" ]
 						then
-						   		   packages_installed+=("doxygen")
+						        packages_installed+=("doxygen")
                                                 else
 							packages_to_be_upgraded+=("doxygen")			        
  
