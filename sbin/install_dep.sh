@@ -76,15 +76,15 @@ if [ $ans == "Y" -o $ans == "y" ]
 							packages_to_be_upgraded+=("libssl-dev")			        
                                                 fi
 
-                                                if [  -z "$(dpkg -l 'libncurses5')" ]
+                                                if [  -z "$(dpkg -l 'libncurses5-dev')" ]
                                                 then
-							packages_to_be_installed+=("libncurses5")	
+							packages_to_be_installed+=("libncurses5-dev")	
    
-					        elif [ -z "$(apt-get -s upgrade | grep libncurses5)" ]
+					        elif [ -z "$(apt-get -s upgrade | grep libncurses5-dev)" ]
 						then
-						         packages_installed+=("libncurses5")
+						         packages_installed+=("libncurses5-dev")
                                                 else
-							 packages_to_be_upgraded+=("libncurses5")			        
+							 packages_to_be_upgraded+=("libncurses5-dev")			        
                                                 fi
 
                                                 if [ -z "$(doxygen --version)" ]
@@ -109,7 +109,7 @@ if [ $ans == "Y" -o $ans == "y" ]
 						sleep 5
                                                 echo ""
                                                 echo ""
-                                                if [ ${#packages_installed[@]} == 7 ]
+                                                if [ ${#packages_installed[@]} == 8 ]
                                                 then
                                                 echo "you have the needed packages already installed .... Exiting the script"
                                                 sleep 3
@@ -150,10 +150,10 @@ if [ $ans == "Y" -o $ans == "y" ]
 									echo "installing the freebsd library"
 									echo $password | sudo -S apt-get -y  install libbsd-dev
 								fi
-                                                		value="libncurses5"  
+                                                		value="libncurses5-dev"  
                                                 		if [[ ! " ${packages_installed[@]} " =~ " ${value} " ]]; 
 								then
-								       echo "installing curses"
+								       echo "installing libncurses5-dev"
 								       echo $password | sudo -S apt-get -y install libncurses5-dev libncursesw5-dev
 								fi
                                                 		value="doxygen"

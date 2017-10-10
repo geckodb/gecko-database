@@ -1,4 +1,4 @@
-#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
 
 #IncludeRegexScan: ^.*$
 
@@ -386,7 +386,7 @@ field_type.h
 gs.h
 -
 
-/Users/marcus/git/basement/gridstore.c
+/home/ubuntu/CLionProjects/gridstore/gridstore.c
 gs.h
 -
 argp.h
@@ -406,7 +406,7 @@ inet/gs_server.h
 routers/api/1.0/nodes.h
 -
 
-/Users/marcus/git/basement/src/async.c
+/home/ubuntu/CLionProjects/gridstore/src/async.c
 async.h
 -
 require.h
@@ -418,7 +418,7 @@ c11threads.h
 assert.h
 -
 
-/Users/marcus/git/basement/src/attr.c
+/home/ubuntu/CLionProjects/gridstore/src/attr.c
 attr.h
 -
 containers/vec.h
@@ -430,41 +430,43 @@ frag.h
 schema.h
 -
 
-/Users/marcus/git/basement/src/containers/freelist.c
+/home/ubuntu/CLionProjects/gridstore/src/containers/freelist.c
 containers/freelist.h
 -
 
-/Users/marcus/git/basement/src/containers/gs_hash.c
+/home/ubuntu/CLionProjects/gridstore/src/containers/gs_hash.c
 containers/gs_hash.h
 -
 containers/freelist.h
 -
 
-/Users/marcus/git/basement/src/containers/hashset.c
+/home/ubuntu/CLionProjects/gridstore/src/containers/hashset.c
 containers/hashset.h
 -
 
-/Users/marcus/git/basement/src/containers/list.c
+/home/ubuntu/CLionProjects/gridstore/src/containers/list.c
 containers/list.h
 -
 
-/Users/marcus/git/basement/src/containers/vec.c
+/home/ubuntu/CLionProjects/gridstore/src/containers/vec.c
 containers/vec.h
 -
 apr_hash.h
 -
+bsd/stdlib.h
+-
 
-/Users/marcus/git/basement/src/error.c
+/home/ubuntu/CLionProjects/gridstore/src/error.c
 error.h
 -
 
-/Users/marcus/git/basement/src/field_type.c
+/home/ubuntu/CLionProjects/gridstore/src/field_type.c
 field_type.h
 -
 grid.h
 -
 
-/Users/marcus/git/basement/src/frag.c
+/home/ubuntu/CLionProjects/gridstore/src/frag.c
 frag.h
 -
 frags/frag_host_vm.h
@@ -474,11 +476,11 @@ frag_printer.h
 schema.h
 -
 
-/Users/marcus/git/basement/src/frag_printer.c
+/home/ubuntu/CLionProjects/gridstore/src/frag_printer.c
 frag_printer.h
 -
 
-/Users/marcus/git/basement/src/frag_printers/console_printer.c
+/home/ubuntu/CLionProjects/gridstore/src/frag_printers/console_printer.c
 unsafe.h
 -
 tuplet_field.h
@@ -486,7 +488,7 @@ tuplet_field.h
 attr.h
 -
 
-/Users/marcus/git/basement/src/frags/frag_host_vm.c
+/home/ubuntu/CLionProjects/gridstore/src/frags/frag_host_vm.c
 frags/frag_host_vm.h
 -
 operators/scan.h
@@ -500,11 +502,11 @@ containers/vec.h
 attr.h
 -
 
-/Users/marcus/git/basement/src/global.c
+/home/ubuntu/CLionProjects/gridstore/src/global.c
 global.h
 -
 
-/Users/marcus/git/basement/src/grid.c
+/home/ubuntu/CLionProjects/gridstore/src/grid.c
 grid.h
 -
 indexes/vindexes/hash_vindex.h
@@ -520,13 +522,13 @@ tuple_field.h
 apr_strings.h
 -
 
-/Users/marcus/git/basement/src/grid_cursor.c
+/home/ubuntu/CLionProjects/gridstore/src/grid_cursor.c
 grid_cursor.h
 -
 containers/vec.h
 -
 
-/Users/marcus/git/basement/src/gs_dispatcher.c
+/home/ubuntu/CLionProjects/gridstore/src/gs_dispatcher.c
 gs_dispatcher.h
 -
 gs_spinlock.h
@@ -540,23 +542,23 @@ apr_strings.h
 containers/gs_hash.h
 -
 
-/Users/marcus/git/basement/src/gs_event.c
+/home/ubuntu/CLionProjects/gridstore/src/gs_event.c
 gs_event.h
 -
 gs_spinlock.h
 -
 
-/Users/marcus/git/basement/src/gs_gridstore.c
+/home/ubuntu/CLionProjects/gridstore/src/gs_gridstore.c
 gs_gridstore.h
 -
 gs_dispatcher.h
 -
 
-/Users/marcus/git/basement/src/gs_http.c
+/home/ubuntu/CLionProjects/gridstore/src/gs_http.c
 gs_http.h
 -
 
-/Users/marcus/git/basement/src/gs_shell.c
+/home/ubuntu/CLionProjects/gridstore/src/gs_shell.c
 gs_shell.h
 -
 c11threads.h
@@ -568,17 +570,17 @@ apr_strings.h
 gs_dispatcher.h
 -
 
-/Users/marcus/git/basement/src/gs_spinlock.c
+/home/ubuntu/CLionProjects/gridstore/src/gs_spinlock.c
 gs_spinlock.h
 -
 stdatomic.h
 -
 
-/Users/marcus/git/basement/src/hash.c
+/home/ubuntu/CLionProjects/gridstore/src/hash.c
 hash.h
 -
 
-/Users/marcus/git/basement/src/indexes/hindex.c
+/home/ubuntu/CLionProjects/gridstore/src/indexes/hindex.c
 indexes/hindex.h
 -
 grid_cursor.h
@@ -592,11 +594,11 @@ tuplet_field.h
 apr_strings.h
 -
 
-/Users/marcus/git/basement/src/indexes/hindexes/lsearch_hindex.c
+/home/ubuntu/CLionProjects/gridstore/src/indexes/hindexes/lsearch_hindex.c
 indexes/hindexes/lsearch_hindex.h
 -
 
-/Users/marcus/git/basement/src/indexes/vindex.c
+/home/ubuntu/CLionProjects/gridstore/src/indexes/vindex.c
 indexes/vindex.h
 -
 grid.h
@@ -604,13 +606,13 @@ grid.h
 tuplet_field.h
 -
 
-/Users/marcus/git/basement/src/indexes/vindexes/hash_vindex.c
+/home/ubuntu/CLionProjects/gridstore/src/indexes/vindexes/hash_vindex.c
 indexes/vindexes/hash_vindex.h
 -
 apr_strings.h
 -
 
-/Users/marcus/git/basement/src/inet/gs_request.c
+/home/ubuntu/CLionProjects/gridstore/src/inet/gs_request.c
 inet/gs_request.h
 -
 inet/response.h
@@ -620,7 +622,7 @@ apr_strings.h
 apr_tables.h
 -
 
-/Users/marcus/git/basement/src/inet/gs_server.c
+/home/ubuntu/CLionProjects/gridstore/src/inet/gs_server.c
 inet/gs_server.h
 -
 debug.h
@@ -644,29 +646,29 @@ apr_hash.h
 apr_strings.h
 -
 
-/Users/marcus/git/basement/src/inet/response.c
+/home/ubuntu/CLionProjects/gridstore/src/inet/response.c
 inet/response.h
 -
 apr_strings.h
 -
 
-/Users/marcus/git/basement/src/interval.c
+/home/ubuntu/CLionProjects/gridstore/src/interval.c
 interval.h
 -
 
-/Users/marcus/git/basement/src/operators/scan.c
+/home/ubuntu/CLionProjects/gridstore/src/operators/scan.c
 operators/scan.h
 -
 
-/Users/marcus/git/basement/src/pred.c
+/home/ubuntu/CLionProjects/gridstore/src/pred.c
 pred.h
 -
 
-/Users/marcus/git/basement/src/routers/api/1.0/nodes.c
+/home/ubuntu/CLionProjects/gridstore/src/routers/api/1.0/nodes.c
 routers/api/1.0/nodes.h
 -
 
-/Users/marcus/git/basement/src/schema.c
+/home/ubuntu/CLionProjects/gridstore/src/schema.c
 schema.h
 -
 attr.h
@@ -676,21 +678,21 @@ tuplet_field.h
 debug.h
 -
 
-/Users/marcus/git/basement/src/timer.c
+/home/ubuntu/CLionProjects/gridstore/src/timer.c
 timer.h
 -
 
-/Users/marcus/git/basement/src/tuple.c
+/home/ubuntu/CLionProjects/gridstore/src/tuple.c
 tuple.h
 -
 grid.h
 -
 
-/Users/marcus/git/basement/src/tuple_cursor.c
+/home/ubuntu/CLionProjects/gridstore/src/tuple_cursor.c
 tuple_cursor.h
 -
 
-/Users/marcus/git/basement/src/tuple_field.c
+/home/ubuntu/CLionProjects/gridstore/src/tuple_field.c
 tuple_field.h
 -
 grid.h
@@ -698,7 +700,7 @@ grid.h
 schema.h
 -
 
-/Users/marcus/git/basement/src/tuplet.c
+/home/ubuntu/CLionProjects/gridstore/src/tuplet.c
 tuplet.h
 -
 tuplet_field.h
@@ -706,7 +708,7 @@ tuplet_field.h
 schema.h
 -
 
-/Users/marcus/git/basement/src/tuplet_field.c
+/home/ubuntu/CLionProjects/gridstore/src/tuplet_field.c
 tuplet_field.h
 -
 schema.h
@@ -714,7 +716,7 @@ schema.h
 unsafe.h
 -
 
-/Users/marcus/git/basement/src/unsafe.c
+/home/ubuntu/CLionProjects/gridstore/src/unsafe.c
 unsafe.h
 -
 frag.h
@@ -724,13 +726,13 @@ grid.h
 inttypes.h
 -
 
-/Users/marcus/git/basement/src/utils.c
+/home/ubuntu/CLionProjects/gridstore/src/utils.c
 utils.h
 -
 
-/Users/marcus/git/basement/third-party/json-parser/json.c
+/home/ubuntu/CLionProjects/gridstore/third-party/json-parser/json.c
 json.h
-/Users/marcus/git/basement/third-party/json-parser/json.h
+/home/ubuntu/CLionProjects/gridstore/third-party/json-parser/json.h
 stdio.h
 -
 utils.h
@@ -740,7 +742,7 @@ ctype.h
 math.h
 -
 
-/Users/marcus/git/basement/third-party/json-parser/json.h
+/home/ubuntu/CLionProjects/gridstore/third-party/json-parser/json.h
 inttypes.h
 -
 stdlib.h
@@ -748,9 +750,7 @@ stdlib.h
 string.h
 -
 
-/usr/include/apr-1/apr.h
-Availability.h
--
+/usr/include/apr-1.0/apr.h
 windows.h
 -
 winsock2.h
@@ -776,139 +776,139 @@ limits.h
 sys/syslimits.h
 -
 
-/usr/include/apr-1/apr_allocator.h
+/usr/include/apr-1.0/apr_allocator.h
 apr.h
-/usr/include/apr-1/apr.h
+/usr/include/apr-1.0/apr.h
 apr_errno.h
-/usr/include/apr-1/apr_errno.h
+/usr/include/apr-1.0/apr_errno.h
 apr_want.h
-/usr/include/apr-1/apr_want.h
+/usr/include/apr-1.0/apr_want.h
 apr_pools.h
-/usr/include/apr-1/apr_pools.h
+/usr/include/apr-1.0/apr_pools.h
 apr_thread_mutex.h
-/usr/include/apr-1/apr_thread_mutex.h
+/usr/include/apr-1.0/apr_thread_mutex.h
 
-/usr/include/apr-1/apr_errno.h
+/usr/include/apr-1.0/apr_errno.h
 apr.h
-/usr/include/apr-1/apr.h
+/usr/include/apr-1.0/apr.h
 errno.h
 -
 
-/usr/include/apr-1/apr_file_info.h
+/usr/include/apr-1.0/apr_file_info.h
 apr.h
-/usr/include/apr-1/apr.h
+/usr/include/apr-1.0/apr.h
 apr_user.h
-/usr/include/apr-1/apr_user.h
+/usr/include/apr-1.0/apr_user.h
 apr_pools.h
-/usr/include/apr-1/apr_pools.h
+/usr/include/apr-1.0/apr_pools.h
 apr_tables.h
-/usr/include/apr-1/apr_tables.h
+/usr/include/apr-1.0/apr_tables.h
 apr_time.h
-/usr/include/apr-1/apr_time.h
+/usr/include/apr-1.0/apr_time.h
 apr_errno.h
-/usr/include/apr-1/apr_errno.h
+/usr/include/apr-1.0/apr_errno.h
 sys/uio.h
 -
 
-/usr/include/apr-1/apr_file_io.h
+/usr/include/apr-1.0/apr_file_io.h
 apr.h
-/usr/include/apr-1/apr.h
+/usr/include/apr-1.0/apr.h
 apr_pools.h
-/usr/include/apr-1/apr_pools.h
+/usr/include/apr-1.0/apr_pools.h
 apr_time.h
-/usr/include/apr-1/apr_time.h
+/usr/include/apr-1.0/apr_time.h
 apr_errno.h
-/usr/include/apr-1/apr_errno.h
+/usr/include/apr-1.0/apr_errno.h
 apr_file_info.h
-/usr/include/apr-1/apr_file_info.h
+/usr/include/apr-1.0/apr_file_info.h
 apr_inherit.h
-/usr/include/apr-1/apr_inherit.h
+/usr/include/apr-1.0/apr_inherit.h
 apr_want.h
-/usr/include/apr-1/apr_want.h
+/usr/include/apr-1.0/apr_want.h
 
-/usr/include/apr-1/apr_general.h
+/usr/include/apr-1.0/apr_general.h
 apr.h
-/usr/include/apr-1/apr.h
+/usr/include/apr-1.0/apr.h
 apr_pools.h
-/usr/include/apr-1/apr_pools.h
+/usr/include/apr-1.0/apr_pools.h
 apr_errno.h
-/usr/include/apr-1/apr_errno.h
+/usr/include/apr-1.0/apr_errno.h
 signal.h
 -
 
-/usr/include/apr-1/apr_hash.h
+/usr/include/apr-1.0/apr_hash.h
 apr_pools.h
-/usr/include/apr-1/apr_pools.h
+/usr/include/apr-1.0/apr_pools.h
 
-/usr/include/apr-1/apr_inherit.h
+/usr/include/apr-1.0/apr_inherit.h
 
-/usr/include/apr-1/apr_pools.h
+/usr/include/apr-1.0/apr_pools.h
 apr.h
-/usr/include/apr-1/apr.h
+/usr/include/apr-1.0/apr.h
 apr_errno.h
-/usr/include/apr-1/apr_errno.h
+/usr/include/apr-1.0/apr_errno.h
 apr_general.h
-/usr/include/apr-1/apr_general.h
+/usr/include/apr-1.0/apr_general.h
 apr_want.h
-/usr/include/apr-1/apr_want.h
+/usr/include/apr-1.0/apr_want.h
 apr_allocator.h
-/usr/include/apr-1/apr_allocator.h
+/usr/include/apr-1.0/apr_allocator.h
 
-/usr/include/apr-1/apr_queue.h
+/usr/include/apr-1.0/apr_queue.h
 apu.h
-/usr/include/apr-1/apu.h
+/usr/include/apr-1.0/apu.h
 apr_errno.h
-/usr/include/apr-1/apr_errno.h
+/usr/include/apr-1.0/apr_errno.h
 apr_pools.h
-/usr/include/apr-1/apr_pools.h
+/usr/include/apr-1.0/apr_pools.h
 
-/usr/include/apr-1/apr_strings.h
+/usr/include/apr-1.0/apr_strings.h
 apr.h
-/usr/include/apr-1/apr.h
+/usr/include/apr-1.0/apr.h
 apr_errno.h
-/usr/include/apr-1/apr_errno.h
+/usr/include/apr-1.0/apr_errno.h
 apr_pools.h
-/usr/include/apr-1/apr_pools.h
+/usr/include/apr-1.0/apr_pools.h
 apr_want.h
-/usr/include/apr-1/apr_want.h
+/usr/include/apr-1.0/apr_want.h
 stdarg.h
 -
 
-/usr/include/apr-1/apr_tables.h
+/usr/include/apr-1.0/apr_tables.h
 apr.h
-/usr/include/apr-1/apr.h
+/usr/include/apr-1.0/apr.h
 apr_pools.h
-/usr/include/apr-1/apr_pools.h
+/usr/include/apr-1.0/apr_pools.h
 stdarg.h
 -
 
-/usr/include/apr-1/apr_thread_mutex.h
+/usr/include/apr-1.0/apr_thread_mutex.h
 apr.h
-/usr/include/apr-1/apr.h
+/usr/include/apr-1.0/apr.h
 apr_errno.h
-/usr/include/apr-1/apr_errno.h
+/usr/include/apr-1.0/apr_errno.h
 apr_pools.h
-/usr/include/apr-1/apr_pools.h
+/usr/include/apr-1.0/apr_pools.h
 
-/usr/include/apr-1/apr_time.h
+/usr/include/apr-1.0/apr_time.h
 apr.h
-/usr/include/apr-1/apr.h
+/usr/include/apr-1.0/apr.h
 apr_pools.h
-/usr/include/apr-1/apr_pools.h
+/usr/include/apr-1.0/apr_pools.h
 apr_errno.h
-/usr/include/apr-1/apr_errno.h
+/usr/include/apr-1.0/apr_errno.h
 
-/usr/include/apr-1/apr_user.h
+/usr/include/apr-1.0/apr_user.h
 apr.h
-/usr/include/apr-1/apr.h
+/usr/include/apr-1.0/apr.h
 apr_errno.h
-/usr/include/apr-1/apr_errno.h
+/usr/include/apr-1.0/apr_errno.h
 apr_pools.h
-/usr/include/apr-1/apr_pools.h
+/usr/include/apr-1.0/apr_pools.h
 
-/usr/include/apr-1/apr_want.h
+/usr/include/apr-1.0/apr_want.h
 apr.h
-/usr/include/apr-1/apr.h
+/usr/include/apr-1.0/apr.h
 string.h
 -
 strings.h
@@ -924,27 +924,5 @@ netinet/in.h
 arpa/inet.h
 -
 
-/usr/include/apr-1/apu.h
-
-/usr/local/include/argp.h
-stdio.h
--
-ctype.h
--
-errno.h
--
-
-/usr/local/include/openssl/e_os2.h
-openssl/opensslconf.h
--
-sys/socket.h
--
-
-/usr/local/include/openssl/md5.h
-openssl/e_os2.h
--
-stddef.h
--
-
-/usr/local/include/openssl/opensslconf.h
+/usr/include/apr-1.0/apu.h
 

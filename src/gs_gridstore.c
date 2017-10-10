@@ -33,7 +33,7 @@ GS_DECLARE(gs_status_t) gs_gridstore_handle_events(const gs_event_t *event)
 
     switch (signal) {
         case GS_SIG_SHUTDOWN:
-            printf("Gid store should shutdown, yeah\n");
+            printf("Grid store should shutdown, yeah\n");
             return GS_CATCHED;
         case GS_SIG_TEST:
             printf("Hey, yeah\n");

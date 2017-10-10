@@ -1,9 +1,10 @@
+# this will make sure that one is using the clang compiler
+set(CMAKE_CXX_COMPILER  "/usr/bin/clang++")
+set(CMAKE_C_COMPILER "/usr/bin/clang")
+
 project(gridstore)
 
 set(
-        # this will make sure that one is using the clang compiler
-        CMAKE_CXX_COMPILER        "/usr/bin/clang++"
-        CMAKE_C_COMPILER          "/usr/bin/clang"
 
         CMAKE_BINARY_DIR          ${CMAKE_SOURCE_DIR}/bin
         EXECUTABLE_OUTPUT_PATH    ${CMAKE_BINARY_DIR}
@@ -191,6 +192,7 @@ IF (PROJECT_OS_LINUX)
         target_link_libraries(
                 gridstore
                 bsd
+                m
                 ${APR_LIBRARIES}
                 ${APRUTIL_LIBRARIES}
                 ${OPENSSL_LIBRARIES}

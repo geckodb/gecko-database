@@ -1,4 +1,4 @@
-/Users/marcus/git/basement/cmake-build-debug/CMakeFiles/edit_cache.dir
-/Users/marcus/git/basement/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/Users/marcus/git/basement/cmake-build-debug/CMakeFiles/doc.dir
-/Users/marcus/git/basement/cmake-build-debug/CMakeFiles/gridstore.dir
+/home/ubuntu/CLionProjects/gridstore/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/ubuntu/CLionProjects/gridstore/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/ubuntu/CLionProjects/gridstore/cmake-build-debug/CMakeFiles/doc.dir
+/home/ubuntu/CLionProjects/gridstore/cmake-build-debug/CMakeFiles/gridstore.dir
