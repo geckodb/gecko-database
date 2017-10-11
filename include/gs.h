@@ -44,6 +44,7 @@
 
 #include <openssl/md5.h>
 
+#include <platform.h>
 #include <global.h>
 #include <msg.h>
 #include <error.h>
