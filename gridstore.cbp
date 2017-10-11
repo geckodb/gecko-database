@@ -4,7 +4,7 @@
 	<Project>
 		<Option title="gridstore"/>
 		<Option makefile_is_custom="1"/>
-		<Option compiler="gcc"/>
+		<Option compiler="clang"/>
 		<Option virtualFolders="CMake Files\;CMake Files\cmake\;"/>
 		<Build>
 			<Target title="all">
@@ -48,18 +48,19 @@
 				</MakeCommands>
 			</Target>
 			<Target title="gridstore">
-				<Option output="/Users/marcus/git/basement/bin/gridstore" prefix_auto="0" extension_auto="0"/>
-				<Option working_dir="/Users/marcus/git/basement/bin"/>
+				<Option output="/Users/marcus/git/basement/gridstore" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/marcus/git/basement"/>
 				<Option object_output="./"/>
 				<Option type="1"/>
-				<Option compiler="gcc"/>
+				<Option compiler="clang"/>
 				<Compiler>
+					<Add directory="/usr/local/include"/>
 					<Add directory="/Users/marcus/git/basement/include"/>
 					<Add directory="/Users/marcus/git/basement/third-party"/>
 					<Add directory="/usr/include/apr-1"/>
-					<Add directory="/usr/local/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/usr/include"/>
 					<Add directory="/System/Library/Frameworks"/>
 					<Add directory="/Library/Frameworks"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"/>
@@ -72,18 +73,19 @@
 				</MakeCommands>
 			</Target>
 			<Target title="gridstore/fast">
-				<Option output="/Users/marcus/git/basement/bin/gridstore" prefix_auto="0" extension_auto="0"/>
-				<Option working_dir="/Users/marcus/git/basement/bin"/>
+				<Option output="/Users/marcus/git/basement/gridstore" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/marcus/git/basement"/>
 				<Option object_output="./"/>
 				<Option type="1"/>
-				<Option compiler="gcc"/>
+				<Option compiler="clang"/>
 				<Compiler>
+					<Add directory="/usr/local/include"/>
 					<Add directory="/Users/marcus/git/basement/include"/>
 					<Add directory="/Users/marcus/git/basement/third-party"/>
 					<Add directory="/usr/include/apr-1"/>
-					<Add directory="/usr/local/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/7.3.0/include"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"/>
+					<Add directory="/usr/include"/>
 					<Add directory="/System/Library/Frameworks"/>
 					<Add directory="/Library/Frameworks"/>
 					<Add directory="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"/>
@@ -208,6 +210,9 @@
 			<Option target="gridstore"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/basement/include/operators/scan.h">
+			<Option target="gridstore"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/platform.h">
 			<Option target="gridstore"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/basement/include/pred.h">
@@ -389,6 +394,9 @@
 		</Unit>
 		<Unit filename="/Users/marcus/git/basement/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/cmake/FindOS.cmake">
+			<Option virtualFolder="CMake Files\cmake\"/>
 		</Unit>
 		<Unit filename="/Users/marcus/git/basement/cmake/FindAPR.cmake">
 			<Option virtualFolder="CMake Files\cmake\"/>

@@ -8,16 +8,21 @@ set(
 
         CMAKE_BINARY_DIR          ${CMAKE_SOURCE_DIR}/bin
         EXECUTABLE_OUTPUT_PATH    ${CMAKE_BINARY_DIR}
+        CMAKE_TEMP_OUTPUT_DIR     ${CMAKE_BINARY_DIR}/cmake
 )
 
 set(
         # include third-party cmake files
         CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/"
+
+        RUNTIME_OUTPUT_DIRECTORY $CMAKE_TEMP_OUTPUT_DIR
 )
 
 set(
         CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -std=c11 -Wall -Werror"
 )
+
+file(MAKE_DIRECTORY $CMAKE_TEMP_OUTPUT_DIR)
 
 cmake_minimum_required(
         VERSION 3.5
