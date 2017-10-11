@@ -58,3 +58,16 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# CMake files 
+cmake_install.cmake
+CMakeFiles
+CMakeCache.txt
+cmake-build-debug
+
+# The makefile is created by make
+Makefile
+
+# Clion-specif files
+.idea
+gridstore.cbp

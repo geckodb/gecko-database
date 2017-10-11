@@ -4,25 +4,18 @@ set(CMAKE_C_COMPILER "/usr/bin/clang")
 
 project(gridstore)
 
-set(
+set(CMAKE_BINARY_DIR          ${CMAKE_SOURCE_DIR}/bin)
+set(EXECUTABLE_OUTPUT_PATH    ${CMAKE_SOURCE_DIR}/bin)
+set(CMAKE_TEMP_OUTPUT_DIR     ${CMAKE_SOURCE_DIR}/cmake)
 
-        CMAKE_BINARY_DIR          ${CMAKE_SOURCE_DIR}/bin
-        EXECUTABLE_OUTPUT_PATH    ${CMAKE_BINARY_DIR}
-        CMAKE_TEMP_OUTPUT_DIR     ${CMAKE_BINARY_DIR}/cmake
-)
+message("exectuables are written to: ${EXECUTABLE_OUTPUT_PATH}")
 
-set(
-        # include third-party cmake files
-        CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/"
+# include third-party cmake files
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
-        RUNTIME_OUTPUT_DIRECTORY $CMAKE_TEMP_OUTPUT_DIR
-)
+set(RUNTIME_OUTPUT_DIRECTORY ${CMAKE_TEMP_OUTPUT_DIR})
 
-set(
-        CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -std=c11 -Wall -Werror"
-)
-
-file(MAKE_DIRECTORY $CMAKE_TEMP_OUTPUT_DIR)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -std=c11 -Wall -Werror")
 
 cmake_minimum_required(
         VERSION 3.5
