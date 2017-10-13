@@ -48,7 +48,7 @@ GS_DECLARE(gs_status_t) gs_hash_create(gs_hash_t **hash, size_t num_buckets, gs_
 GS_DECLARE(gs_status_t) gs_hash_create_ex(gs_hash_t **hash, size_t num_buckets, hash_code_fn_t hash_func, gs_comp_func_t key_comp)
 {
     gs_hash_t *result   = GS_REQUIRE_MALLOC(sizeof(gs_hash_t));
-    result->buckets     = GS_REQUIRE_MALLOC(sizeof(hash_bucket_t));
+    result->buckets     = GS_REQUIRE_MALLOC(num_buckets * sizeof(hash_bucket_t));
     result->hash_func   = hash_func;
     result->num_buckets = num_buckets;
     setup_hash_buckets(result->buckets, result->num_buckets, key_comp);
