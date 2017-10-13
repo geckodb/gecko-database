@@ -34,7 +34,7 @@ char *response_pack(response_t *response)
     const char *code = codestr(response->code);
     const char *mime = response_format_fields(response);
     const char *body = response_body_get(response);
-    char *buffer = GS_REQUIRE_MALLOC(strlen(pack) + 1 + strlen(mime) + 1 + strlen(body) + 1);
+    char *buffer = GS_REQUIRE_MALLOC(strlen(pack) + 1 + strlen(code) + 1 + strlen(mime) + 1 + strlen(body) + 1);
     sprintf(buffer, pack, code, mime, body);
     return buffer;
 }
