@@ -66,6 +66,7 @@ void response_body_set(response_t *response, const char *body)
     } else {
         response->body = GS_REQUIRE_MALLOC(strlen(body) + 1);
         strcpy(response->body, body);
+        response_field_set(response, "Content-Length", apr_ltoa(response->pool, strlen(body)));
     }
 }
 

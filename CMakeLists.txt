@@ -88,7 +88,6 @@ set(SOURCE_FILES
     include/indexes/hindexes/lsearch_hindex.h
     include/grid_cursor.h
     include/containers/hashset.h
-    include/routers/api/types/create/router.h
     include/utils.h
     include/gs_dispatcher.h
     include/gs_event.h

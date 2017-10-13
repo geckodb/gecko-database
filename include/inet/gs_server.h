@@ -80,4 +80,12 @@ GS_DECLARE(gs_status_t) gs_server_pool_handle_events(const gs_event_t *event);
 
 GS_DECLARE(gs_status_t) gs_server_pool_shutdown(gs_server_pool_t *pool);
 
+GS_DECLARE(unsigned short) gs_server_pool_get_gateway_port(gs_server_pool_t *pool);
+
+GS_DECLARE(size_t) gs_server_pool_get_num_of_servers(gs_server_pool_t *pool);
+
+GS_DECLARE(gs_status_t) gs_server_pool_cpy_port_list(unsigned short *dst, const gs_server_pool_t *pool);
+
+unsigned short gs_server_pool_next_port(gs_server_pool_t *pool);
+
 __END_DECLS

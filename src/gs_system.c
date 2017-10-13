@@ -12,7 +12,7 @@ typedef struct gs_system_t
     gs_gridstore_t    *gridstore;
     gs_dispatcher_t   *dispatcher;
     gs_shell_t        *shell;
-    gs_server_pool_t   *server_pool;
+    gs_server_pool_t  *server_pool;
 } gs_system_t;
 
 void setup_core(gs_system_t *system);
@@ -70,6 +70,26 @@ gs_status_t gs_system_cleanup(gs_system_t *system)
     apr_terminate();
     free (system);
     return GS_SUCCESS;
+}
+
+gs_gridstore_t *gs_system_get_gridstore(const gs_system_t *system)
+{
+    return (system != NULL ? system->gridstore : NULL);
+}
+
+gs_dispatcher_t *gs_system_get_dispatcher(const gs_system_t *system)
+{
+    return (system != NULL ? system->dispatcher : NULL);
+}
+
+gs_shell_t *gs_system_get_shell(const gs_system_t *system)
+{
+    return (system != NULL ? system->shell : NULL);
+}
+
+gs_server_pool_t *gs_system_get_server_pool(const gs_system_t *system)
+{
+    return (system != NULL ? system->server_pool : NULL);
 }
 
 void setup_core(gs_system_t *system)

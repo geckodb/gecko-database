@@ -46,6 +46,7 @@ typedef struct gs_server_pool_t
 {
     gs_server_t         *gateway;
     vec_t               *servers;
+    size_t               next_port_idx;
 } gs_server_pool_t;
 
 typedef struct server_loop_args_t
@@ -296,6 +297,7 @@ GS_DECLARE(gs_status_t) gs_server_pool_create(gs_server_pool_t **server_set, gs_
         gs_server_create(it, 0, dispatcher);
         GS_DEBUG("created server listening to port: %d", gs_server_port(*it));
     }
+    result->next_port_idx = 0;
 
     gs_server_create(&result->gateway, gateway_port, dispatcher);
     gs_server_router_add(result->gateway, gateway_resource, router);
@@ -395,4 +397,32 @@ GS_DECLARE(gs_status_t) gs_server_pool_shutdown(gs_server_pool_t *pool)
     }
 
     return GS_SUCCESS;
+}
+
+GS_DECLARE(unsigned short) gs_server_pool_get_gateway_port(gs_server_pool_t *pool)
+{
+    return (pool != NULL ? ntohs(pool->gateway->server_addr.sin_port) : 0);
+}
+
+GS_DECLARE(size_t) gs_server_pool_get_num_of_servers(gs_server_pool_t *pool)
+{
+    return (pool != NULL ? vec_length(pool->servers) : 0);
+}
+
+GS_DECLARE(gs_status_t) gs_server_pool_cpy_port_list(unsigned short *dst, const gs_server_pool_t *pool)
+{
+    GS_REQUIRE_NONNULL(dst);
+    GS_REQUIRE_NONNULL(pool);
+
+    for (gs_server_t **it = vec_begin(pool->servers); it != vec_end(pool->servers); it++, dst++) {
+        *dst = gs_server_port(*it);
+    }
+
+    return GS_SUCCESS;
+}
+
+unsigned short gs_server_pool_next_port(gs_server_pool_t *pool)
+{
+    gs_server_t **server = (vec_at(pool->servers, (pool->next_port_idx++ % vec_length(pool->servers)))); /* round robin */
+    return gs_server_port(*server);
 }
