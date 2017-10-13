@@ -48,6 +48,13 @@ typedef struct server_loop_args_t
     router_t              catch;
 } server_loop_args_t;
 
+typedef struct server_handle_connection_args_t
+{
+    int client;
+    server_loop_args_t *loop_args;
+
+} server_handle_connection_args_t;
+
 void
 str_clean_up(
         void *key,
@@ -58,6 +65,7 @@ str_clean_up(
 }
 
 int server_loop(void *args);
+int server_handle_connection(void *args);
 
 GS_DECLARE(gs_status_t) gs_server_create(gs_server_t **out, unsigned short port, gs_dispatcher_t *dispatcher)
 {
@@ -189,8 +197,6 @@ int server_loop(void *args)
     server_loop_args_t *loop_args = (server_loop_args_t *) args;
 
     int client;
-    char buffer[131072];
-    response_t response;
     fd_set set;
 
     while (loop_args->server->is_running) {
@@ -213,49 +219,70 @@ int server_loop(void *args)
             close (client);
             continue;
         } else {
-            memset (buffer, 0, sizeof(buffer));
-            struct pollfd pollfd = { .fd = client, .events = POLLIN };
-            response_create(&response);
-            if (poll(&pollfd, 1, 100000)) {
-                gs_request_t *request;
-                gs_request_create(&request, client);
 
-                if (!gs_request_is_valid(request)) {
-                    GS_DEBUG2("request rejected");
-                    response_content_type_set(&response, MIME_CONTENT_TYPE_TEXT_PLAIN);
-                    response_end(&response, HTTP_STATUS_CODE_400_BAD_REQUEST);
-                } else {
-                    router_t router;
-                    char *resource;
-                    gs_request_resource(&resource, request);
-                    GS_DEBUG("loop args %p", loop_args);
-                    GS_DEBUG("resource %s", resource);
-                    GS_DEBUG("server %p", loop_args->server);
-                    GS_DEBUG("routers %p", loop_args->server->routers);
-                    if ((router = (router_t) gs_hash_get(loop_args->server->routers, resource, sizeof(char *))) != NULL) {
-                        GS_DEBUG("request delegated to router for resource '%s'", resource);
-                        router(loop_args->server->dispatcher, request, &response);
-                    } else {
-                        GS_DEBUG("no router installed for resource '%s'; delegate to default router", resource);
-                        loop_args->catch(loop_args->server->dispatcher, request, &response);
-                    }
-                }
+            thrd_t thrd;
+            server_handle_connection_args_t *args = GS_REQUIRE_MALLOC(sizeof(server_handle_connection_args_t));
+            args->loop_args = loop_args;
+            args->client = client;
+            thrd_create(&thrd, server_handle_connection, args);
 
-                gs_request_dispose(&request);
-            } else {
-                response_end(&response, HTTP_STATUS_CODE_408_REQUEST_TIMEOUT);
-            }
-            char *response_text = response_pack(&response);
-            GS_DEBUG("RESPONSE TEXT: %s\n", response_text);
-            write(client, response_text, strlen(response_text));
-            free(response_text);
-            response_dispose(&response);
-            close(client);
+
         }
-        close (client);
+        //close (client);
     }
     GS_DEBUG("server %p left main loop", loop_args->server);
     loop_args->server->is_disposable = true;
+
+    return EXIT_SUCCESS;
+}
+
+int server_handle_connection(void *args)
+{
+    server_handle_connection_args_t *server_handle_connection_args = (server_handle_connection_args_t *) args;
+
+    response_t response;
+    char buffer[131072];
+    int client = server_handle_connection_args->client;
+    server_loop_args_t *loop_args = server_handle_connection_args->loop_args;
+
+    memset (buffer, 0, sizeof(buffer));
+    struct pollfd pollfd = { .fd = client, .events = POLLIN };
+    response_create(&response);
+    if (poll(&pollfd, 1, 100000)) {
+        gs_request_t *request;
+        gs_request_create(&request, client);
+
+        if (!gs_request_is_valid(request)) {
+            GS_DEBUG2("request rejected");
+            response_content_type_set(&response, MIME_CONTENT_TYPE_TEXT_PLAIN);
+            response_end(&response, HTTP_STATUS_CODE_400_BAD_REQUEST);
+        } else {
+            router_t router;
+            char *resource;
+            gs_request_resource(&resource, request);
+            GS_DEBUG("loop args %p", loop_args);
+            GS_DEBUG("resource %s", resource);
+            GS_DEBUG("server %p", loop_args->server);
+            GS_DEBUG("routers %p", loop_args->server->routers);
+            if ((router = (router_t) gs_hash_get(loop_args->server->routers, resource, sizeof(char *))) != NULL) {
+                GS_DEBUG("request delegated to router for resource '%s'", resource);
+                router(loop_args->server->dispatcher, request, &response);
+            } else {
+                GS_DEBUG("no router installed for resource '%s'; delegate to default router", resource);
+                loop_args->catch(loop_args->server->dispatcher, request, &response);
+            }
+        }
+
+        gs_request_dispose(&request);
+    } else {
+        response_end(&response, HTTP_STATUS_CODE_408_REQUEST_TIMEOUT);
+    }
+    char *response_text = response_pack(&response);
+    GS_DEBUG("RESPONSE TEXT: %s\n", response_text);
+    write(client, response_text, strlen(response_text));
+    free(response_text);
+    response_dispose(&response);
+    close(client);
 
     return EXIT_SUCCESS;
 }
