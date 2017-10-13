@@ -137,7 +137,7 @@ typedef MD5_CTX checksum_context_t;
     })
 
 #define GS_CONNECT(sig, slot)                                                                                          \
-    error_if((gs_dispatcher_connect(dispatcher, sig, slot) != GS_SUCCESS), err_connect_failed);
+    error_if((gs_dispatcher_connect(system->dispatcher, sig, slot) != GS_SUCCESS), err_connect_failed);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N L I N E   F U N C T I O N S

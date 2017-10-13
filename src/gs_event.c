@@ -1,7 +1,9 @@
 #include <gs_event.h>
 #include <gs_spinlock.h>
+#include <gs_system.h>
 
 typedef struct gs_event_t {
+    gs_system_t            *system;
     gs_signal_type_e        signal;
     gs_object_type_tag_e    sender_tag;
     gs_object_type_tag_e    receiver_tag;
@@ -12,10 +14,13 @@ typedef struct gs_event_t {
     void (*dispose)(gs_event_t *self);
 } gs_event_t;
 
-gs_event_t *gs_event_new(gs_signal_type_e s, gs_object_type_tag_e sdr_t, void *sdr, gs_object_type_tag_e rcvr_t,
-                         void *rcvr, void *data, gs_event_dispose d)
+gs_event_t *gs_event_new(gs_system_t *system, gs_signal_type_e s, gs_object_type_tag_e sdr_t, void *sdr,
+                         gs_object_type_tag_e rcvr_t, void *rcvr, void *data, gs_event_dispose d)
 {
+    GS_REQUIRE_NONNULL(system);
+
     gs_event_t *event = GS_REQUIRE_MALLOC(sizeof(gs_event_t));
+    event->system = system;
     event->signal = s;
     event->sender_tag = sdr_t;
     event->sender = sdr;
@@ -64,47 +69,70 @@ gs_status_t gs_event_get_subject(gs_object_type_tag_e *type_tag, void **ptr, con
     } else return GS_ILLEGALARG;
 }
 
-gs_event_t *gs_event_dispatcher_shutdown(gs_dispatcher_t *dispatcher)
+gs_status_t gs_event_get_system(gs_system_t **system, const gs_event_t *event)
 {
-    return gs_event_new(GS_SIG_SHUTDOWN, GS_OBJECT_TYPE_NONE, NULL, GS_OBJECT_TYPE_DISPATCHER, dispatcher, NULL, NULL);
+    GS_REQUIRE_NONNULL(system);
+    GS_REQUIRE_NONNULL(event);
+    *system = event->system;
+    return GS_SUCCESS;
 }
 
-gs_event_t *gs_event_shell_shutdown(gs_dispatcher_t *dispatcher, gs_shell_t *shell)
+gs_event_t *gs_event_dispatcher_shutdown(gs_system_t *system, gs_dispatcher_t *dispatcher)
 {
-    return gs_event_new(GS_SIG_SHUTDOWN, GS_OBJECT_TYPE_NONE, NULL, GS_OBJECT_TYPE_SHELL, shell, NULL, NULL);
+    GS_REQUIRE_NONNULL(system);
+    return gs_event_new(system, GS_SIG_SHUTDOWN, GS_OBJECT_TYPE_NONE, NULL, GS_OBJECT_TYPE_DISPATCHER, dispatcher,
+                        NULL, NULL);
 }
 
-gs_event_t *gs_event_server_pool_shutdown(gs_dispatcher_t *dispatcher, gs_server_pool_t *pool)
+gs_event_t *gs_event_shell_shutdown(gs_system_t *system, gs_dispatcher_t *dispatcher, gs_shell_t *shell)
 {
-    return gs_event_new(GS_SIG_SHUTDOWN, GS_OBJECT_TYPE_NONE, NULL, GS_OBJECT_TYPE_SERVER_POOL, pool, NULL, NULL);
+    GS_REQUIRE_NONNULL(system);
+    return gs_event_new(system, GS_SIG_SHUTDOWN, GS_OBJECT_TYPE_NONE, NULL, GS_OBJECT_TYPE_SHELL, shell,
+                        NULL, NULL);
 }
 
-gs_event_t *gs_event_gridstore_shutdown(gs_dispatcher_t *dispatcher, gs_gridstore_t *gridstore)
+gs_event_t *gs_event_server_pool_shutdown(gs_system_t *system, gs_dispatcher_t *dispatcher, gs_server_pool_t *pool)
 {
-    return gs_event_new(GS_SIG_SHUTDOWN, GS_OBJECT_TYPE_NONE, NULL, GS_OBJECT_TYPE_GRIDSTORE, gridstore, NULL, NULL);
+    GS_REQUIRE_NONNULL(system);
+    return gs_event_new(system, GS_SIG_SHUTDOWN, GS_OBJECT_TYPE_NONE, NULL, GS_OBJECT_TYPE_SERVER_POOL, pool,
+                        NULL, NULL);
 }
 
-gs_event_t *gs_event_system_exit(gs_dispatcher_t *dispatcher, gs_object_type_tag_e sender_tag, void *sender)
+gs_event_t *gs_event_gridstore_shutdown(gs_system_t *system, gs_dispatcher_t *dispatcher, gs_gridstore_t *gridstore)
+{
+    GS_REQUIRE_NONNULL(system);
+    return gs_event_new(system, GS_SIG_SHUTDOWN, GS_OBJECT_TYPE_NONE, NULL, GS_OBJECT_TYPE_GRIDSTORE, gridstore,
+                        NULL, NULL);
+}
+
+gs_event_t *gs_event_system_exit(gs_system_t *system, gs_dispatcher_t *dispatcher, gs_object_type_tag_e sender_tag, void *sender)
 {
     GS_REQUIRE_NONNULL(sender);
-    return gs_event_new(GS_SIG_SYSEXIT, sender_tag, sender, GS_OBJECT_TYPE_SYSTEM, NULL, NULL, NULL);
+    return gs_event_new(system, GS_SIG_SYSEXIT, sender_tag, sender, GS_OBJECT_TYPE_SYSTEM, NULL,
+                        NULL, NULL);
 }
 
-gs_event_t *gs_event_heartbeat_new(gs_dispatcher_t *dispatcher)
+gs_event_t *gs_event_heartbeat_new(gs_system_t *system, gs_dispatcher_t *dispatcher)
 {
-    return gs_event_new(GS_SIG_HEARTBEAT, GS_OBJECT_TYPE_NONE, NULL, GS_OBJECT_TYPE_DISPATCHER, dispatcher, NULL, NULL);
+    GS_REQUIRE_NONNULL(system);
+    return gs_event_new(system, GS_SIG_HEARTBEAT, GS_OBJECT_TYPE_NONE, NULL, GS_OBJECT_TYPE_DISPATCHER, dispatcher,
+                        NULL, NULL);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 
-gs_event_t *gs_event_gridstore_test(gs_gridstore_t *gridstore)
+gs_event_t *gs_event_gridstore_test(gs_system_t *system, gs_gridstore_t *gridstore)
 {
-    return gs_event_new(GS_SIG_TEST, GS_OBJECT_TYPE_NONE, NULL, GS_OBJECT_TYPE_GRIDSTORE, gridstore, NULL, NULL);
+    GS_REQUIRE_NONNULL(system);
+    return gs_event_new(system, GS_SIG_TEST, GS_OBJECT_TYPE_NONE, NULL, GS_OBJECT_TYPE_GRIDSTORE, gridstore,
+                        NULL, NULL);
 }
 
-gs_event_t *gs_event_gridstore_invoke()
+gs_event_t *gs_event_gridstore_invoke(gs_system_t *system)
 {
-    return gs_event_new(GS_SIG_INVOKE, GS_OBJECT_TYPE_NONE, NULL, GS_OBJECT_TYPE_GRIDSTORE, NULL, NULL, NULL);
+    GS_REQUIRE_NONNULL(system);
+    return gs_event_new(system, GS_SIG_INVOKE, GS_OBJECT_TYPE_NONE, NULL, GS_OBJECT_TYPE_GRIDSTORE, NULL,
+                        NULL, NULL);
 }
 
 
@@ -114,9 +142,11 @@ typedef struct blocking_event_args_t
     gs_event_t *contained_event;
 } blocking_event_args_t;
 
-gs_event_t *gs_event_new_blocking(volatile gs_spinlock_t *lock, gs_event_t *contained_event)
+gs_event_t *gs_event_new_blocking(gs_system_t *system, volatile gs_spinlock_t *lock, gs_event_t *contained_event)
 {
-    gs_event_t *result = gs_event_new(contained_event->signal,
+    GS_REQUIRE_NONNULL(system);
+    gs_event_t *result = gs_event_new(system,
+                                      contained_event->signal,
                                       contained_event->sender_tag,
                                       contained_event->sender,
                                       contained_event->receiver_tag,

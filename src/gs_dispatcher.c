@@ -77,11 +77,11 @@ GS_DECLARE(gs_status_t) gs_dispatcher_start(gs_dispatcher_t *dispatcher)
     return GS_SUCCESS;
 }
 
-GS_DECLARE(gs_status_t) gs_dispatcher_shutdown(gs_dispatcher_t *dispatcher)
+GS_DECLARE(gs_status_t) gs_dispatcher_shutdown(gs_dispatcher_t *dispatcher, gs_system_t *system)
 {
     GS_REQUIRE_NONNULL(dispatcher)
     GS_DEBUG("initialize shutdown for dispatcher %p", dispatcher);
-    gs_dispatcher_publish(dispatcher, gs_event_heartbeat_new(dispatcher));
+    gs_dispatcher_publish(dispatcher, gs_event_heartbeat_new(system, dispatcher));
     dispatcher->accept_new = false;
     return GS_SUCCESS;
 }
@@ -120,11 +120,11 @@ GS_DECLARE(gs_status_t) gs_dispatcher_publish(gs_dispatcher_t *dispatcher, gs_ev
     }
 }
 
-GS_DECLARE(gs_status_t) gs_dispatcher_waitfor(gs_dispatcher_t *dispatcher, gs_event_t *event)
+GS_DECLARE(gs_status_t) gs_dispatcher_waitfor(gs_dispatcher_t *dispatcher, gs_event_t *event, gs_system_t *system)
 {
     volatile gs_spinlock_t *lock;
     gs_spinlock_create(&lock);
-    gs_dispatcher_publish(dispatcher, gs_event_new_blocking(lock, event));
+    gs_dispatcher_publish(dispatcher, gs_event_new_blocking(system, lock, event));
     GS_DEBUG2("thread is being locked...");
     gs_spinlock_lock(lock);
     GS_DEBUG2("thread was unlocked...");

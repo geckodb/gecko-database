@@ -67,7 +67,7 @@ GS_DECLARE(gs_status_t) gs_server_dispose(gs_server_t *server);
 GS_DECLARE(gs_status_t) gs_server_shutdown(gs_server_t *server);
 
 GS_DECLARE(gs_status_t) gs_server_pool_create(gs_server_pool_t **server_set, gs_dispatcher_t *dispatcher,
-                                              size_t gateway_port, const char *gateway_resource, router_t router,
+                                              unsigned short gateway_port, const char *gateway_resource, router_t router,
                                               size_t num_servers);
 
 GS_DECLARE(gs_status_t) gs_server_pool_dispose(gs_server_pool_t *pool);

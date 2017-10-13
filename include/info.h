@@ -1,5 +1,7 @@
 #pragma once
 
+#include <argp.h>
+
 const char *argp_program_version     = "v1.0.0";
 const char *argp_program_bug_address = "<pinnecke@ovgu.de>";
 

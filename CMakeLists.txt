@@ -158,7 +158,7 @@ IF (PROJECT_OS_LINUX)
     set (SOURCE_FILES ${SOURCE_FILES} include/platforms/linux/platform.h)
 ELSEIF (PROJECT_OS_OSX)
     MESSAGE (STATUS "Operating system is Apple MacOS X")
-    set (SOURCE_FILES   ${SOURCE_FILES} include/platforms/macos/platform.h)
+    set (SOURCE_FILES   ${SOURCE_FILES} include/platforms/macos/platform.h include/gs_system.h src/gs_system.c)
 ENDIF (PROJECT_OS_LINUX)
 
 add_executable(

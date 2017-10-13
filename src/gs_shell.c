@@ -17,12 +17,17 @@ typedef struct gs_shell_t {
     apr_time_t           uptime;
 } gs_shell_t;
 
+typedef struct gs_shell_loop_args_t {
+    gs_system_t         *system;
+    gs_shell_t          *shell;
+} gs_shell_loop_args_t;
+
  int shell_loop(void *args);
 
- bool process_input(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input);
+ bool process_input(gs_system_t *system, gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input);
 
  void process_command_help(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input);
- void process_command_exit(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input);
+ void process_command_exit(gs_system_t *system, gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input);
  void process_command_uptime(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input);
 
 GS_DECLARE(gs_status_t) gs_shell_create(gs_shell_t **shell, gs_dispatcher_t *dispatcher)
@@ -40,13 +45,18 @@ GS_DECLARE(gs_status_t) gs_shell_create(gs_shell_t **shell, gs_dispatcher_t *dis
     return GS_SUCCESS;
 }
 
-GS_DECLARE(gs_status_t) gs_shell_start(gs_shell_t *shell)
+GS_DECLARE(gs_status_t) gs_shell_start(gs_shell_t *shell, gs_system_t *system)
 {
     GS_REQUIRE_NONNULL(shell);
     if (!atomic_load(&shell->is_running)) {
         GS_DEBUG("shell %p is starting", shell);
         atomic_store(&shell->is_running, true);
-        thrd_create(&shell->thread, shell_loop, shell);
+
+        gs_shell_loop_args_t *args = GS_REQUIRE_MALLOC(sizeof(gs_shell_loop_args_t));
+        args->shell = shell;
+        args->system = system;
+
+        thrd_create(&shell->thread, shell_loop, args);
         return GS_SUCCESS;
     } else {
         warn("shell %p was request to start but runs already", shell);
@@ -99,11 +109,14 @@ GS_DECLARE(gs_status_t) gs_shell_shutdown(gs_shell_t *shell)
     }
 }
 
- int shell_loop(void *args)
+ int shell_loop(void *vargs)
 {
-    assert (args);
+    assert (vargs);
 
-    gs_shell_t   *shell = (gs_shell_t *) args;
+    gs_shell_loop_args_t *args = (gs_shell_loop_args_t *) vargs;
+
+    gs_shell_t   *shell = args->shell;
+    gs_system_t  *system = args->system;
     apr_file_t   *in, *out;
     char          buffer[STDIN_BUFFER_SIZE];
     bool          accept_input = true;
@@ -117,21 +130,23 @@ GS_DECLARE(gs_status_t) gs_shell_shutdown(gs_shell_t *shell)
         if (accept_input) {
             apr_file_printf(out, "gs> ");
             apr_file_gets(buffer, STDIN_BUFFER_SIZE, in);
-            accept_input = process_input(shell, in, out, buffer);
+            accept_input = process_input(system, shell, in, out, buffer);
             apr_file_flush(out);
         }
     }
     GS_DEBUG("shell %p left main loop", shell);
     atomic_store(&shell->is_disposable, true);
+
+    free (args);
     return EXIT_SUCCESS;
 }
 
- bool process_input(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input)
+ bool process_input(gs_system_t *system, gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input)
 {
     if (apr_strnatcasecmp(input, "help") == 0) {
         process_command_help(shell, in, out, input);
     } else if (apr_strnatcasecmp(input, "exit") == 0) {
-        process_command_exit(shell, in, out, input);
+        process_command_exit(system, shell, in, out, input);
         return false;
     } else if (apr_strnatcasecmp(input, "uptime") == 0) {
         process_command_uptime(shell, in, out, input);
@@ -151,10 +166,11 @@ GS_DECLARE(gs_status_t) gs_shell_shutdown(gs_shell_t *shell)
 
 }
 
- void process_command_exit(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input)
+ void process_command_exit(gs_system_t *system, gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input)
 {
     GS_DEBUG("shell %p command 'exit' entered", shell);
-    gs_dispatcher_publish(shell->dispatcher, gs_event_system_exit(shell->dispatcher, GS_OBJECT_TYPE_SHELL, shell));
+    gs_dispatcher_publish(shell->dispatcher, gs_event_system_exit(system, shell->dispatcher,
+                                                                  GS_OBJECT_TYPE_SHELL, shell));
 }
 
  void process_command_uptime(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input)

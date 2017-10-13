@@ -282,7 +282,7 @@ int server_handle_connection(void *args)
 }
 
 GS_DECLARE(gs_status_t) gs_server_pool_create(gs_server_pool_t **server_set, gs_dispatcher_t *dispatcher,
-                                              size_t gateway_port, const char *gateway_resource, router_t router,
+                                              unsigned short gateway_port, const char *gateway_resource, router_t router,
                                               size_t num_servers)
 {
     GS_REQUIRE_NONNULL(dispatcher);
