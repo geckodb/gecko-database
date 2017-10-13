@@ -97,6 +97,7 @@ set(SOURCE_FILES
     include/gs_shell.h
     include/inet/gs_request.h
     include/routers/api/1.0/nodes.h
+    include/routers/api/1.0/root.h
     include/gs_spinlock.h
     include/gs_http.h
     include/containers/gs_hash.h
@@ -143,6 +144,7 @@ set(SOURCE_FILES
     src/inet/gs_request.c
     src/gs_spinlock.c
     src/routers/api/1.0/nodes.c
+    src/routers/api/1.0/root.c
     src/gs_http.c
     src/containers/gs_hash.c
 

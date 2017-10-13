@@ -24,13 +24,16 @@
 #include <routers/catch.h>
 #include <inet/gs_server.h>
 #include <routers/api/1.0/nodes.h>
+#include <routers/api/1.0/root.h>
 
 // curl -i -G -d "key=val" -d "abs=[1,2,3,4]" http://localhost:36895/api/test
+
+#define NUM_SERVERS 10
 
 gs_gridstore_t    *gridstore;
 gs_dispatcher_t   *dispatcher;
 gs_shell_t        *shell;
-gs_server_t       *server;
+gs_server_pool_t   *server_pool;
 
  void setup_config(int argc, char **argv);
  void setup_core();
@@ -82,19 +85,28 @@ int main(int argc, char* argv[])
 
  void setup_server()
 {
-    gs_server_create(&server, startup_config.port, dispatcher);
+    const char *gat = "/api/1.0/";
+
+    gs_server_pool_create(&server_pool, dispatcher,
+                          startup_config.port,
+                          gat,
+                          router_api_1_0_root,
+                          NUM_SERVERS);
+
 //    const char *x = "/api/types/create";
     const char *y = "/api/1.0/nodes";
-   // gs_server_router_add(server, x, router_api_types_create);
-    gs_server_router_add(server, y, router_api_1_0_nodes);
-    gs_server_start(server, router_catch);
+   // gs_server_router_add(gateway, x, router_api_types_create);
+    gs_server_pool_router_add(server_pool, y, router_api_1_0_nodes);
+    gs_server_pool_start(server_pool, router_catch);
+
+
 }
 
  void stop_system()
 {
     GS_DEBUG2("stopping system modules");
     gs_dispatcher_publish(dispatcher, gs_event_shell_shutdown(dispatcher, shell));
-    gs_dispatcher_publish(dispatcher, gs_event_server_shutdown(dispatcher, server));
+    gs_dispatcher_publish(dispatcher, gs_event_server_pool_shutdown(dispatcher, server_pool));
     gs_dispatcher_publish(dispatcher, gs_event_gridstore_shutdown(dispatcher, gridstore));
     gs_dispatcher_publish(dispatcher, gs_event_dispatcher_shutdown(dispatcher));
 
@@ -102,8 +114,8 @@ int main(int argc, char* argv[])
 
  void cleanup()
 {
-    GS_DEBUG("dispose server %p", server);
-    while (gs_server_dispose(&server) != GS_SUCCESS)
+    GS_DEBUG("dispose server pool %p", server_pool);
+    while (gs_server_pool_dispose(server_pool) != GS_SUCCESS)
         ;
 
    // GS_DEBUG("dispose gridstore %p", gridstore);
@@ -151,7 +163,7 @@ int main(int argc, char* argv[])
 
     GS_CONNECT(GS_SIG_SHUTDOWN, gs_gridstore_handle_events);
 
-    GS_CONNECT(GS_SIG_SHUTDOWN, gs_server_handle_events);
+    GS_CONNECT(GS_SIG_SHUTDOWN, gs_server_pool_handle_events);
 
     GS_CONNECT(GS_SIG_TEST,     gs_gridstore_handle_events);
     GS_CONNECT(GS_SIG_INVOKE,   gs_gridstore_handle_events);

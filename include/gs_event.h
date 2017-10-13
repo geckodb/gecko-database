@@ -6,7 +6,7 @@
 #include "gs_spinlock.h"
 
 typedef struct gs_dispatcher_t gs_dispatcher_t; /* forwarding */
-typedef struct gs_server_t gs_server_t; /* forwarding */
+typedef struct gs_server_pool_t gs_server_pool_t; /* forwarding */
 
 typedef enum gs_signal_type_e {
     GS_SIG_HEARTBEAT,
@@ -22,7 +22,7 @@ typedef enum gs_object_type_tag_e {
     GS_OBJECT_TYPE_GRIDSTORE,
     GS_OBJECT_TYPE_DISPATCHER,
     GS_OBJECT_TYPE_SHELL,
-    GS_OBJECT_TYPE_SERVER,
+    GS_OBJECT_TYPE_SERVER_POOL,
     GS_OBJECT_TYPE_EVENT_WRAPPER,
 } gs_object_type_tag_e;
 
@@ -89,7 +89,7 @@ gs_event_t *gs_event_dispatcher_shutdown(gs_dispatcher_t *dispatcher);
 
 gs_event_t *gs_event_shell_shutdown(gs_dispatcher_t *dispatcher, gs_shell_t *shell);
 
-gs_event_t *gs_event_server_shutdown(gs_dispatcher_t *dispatcher, gs_server_t *server);
+gs_event_t *gs_event_server_pool_shutdown(gs_dispatcher_t *dispatcher, gs_server_pool_t *server);
 
 gs_event_t *gs_event_gridstore_shutdown(gs_dispatcher_t *dispatcher, gs_gridstore_t *gridstore);
 

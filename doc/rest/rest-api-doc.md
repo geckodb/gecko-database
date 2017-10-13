@@ -4,7 +4,7 @@
 
 
 
-REST API requests are sent to the URL `${GRID_STORE_URL}`. This URL is where the internal http-server of GridStore is accessible. When running on a developer machine, the http-server is listening on `${GRID_STORE_URL}=
+REST API requests are sent to the URL `${GRID_STORE_URL}`. This URL is where the internal http-gateway of GridStore is accessible. When running on a developer machine, the http-gateway is listening on `${GRID_STORE_URL}=
 http://localhost:36895`.
 
 [TOC]

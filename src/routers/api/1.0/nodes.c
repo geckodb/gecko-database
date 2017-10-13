@@ -7,7 +7,7 @@ void router_api_1_0_nodes(gs_dispatcher_t *dispatcher, const gs_request_t *reque
     } else {
 
 
-        gs_dispatcher_waitfor(dispatcher, gs_event_gridstore_invoke());
+       // gs_dispatcher_waitfor(dispatcher, gs_event_gridstore_invoke());
 
 
         response_content_type_set(response, "text/html");//MIME_CONTENT_TYPE_TEXT_PLAIN);

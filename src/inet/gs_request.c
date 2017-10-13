@@ -261,8 +261,7 @@ GS_DECLARE(gs_status_t) gs_request_is_valid(const gs_request_t *request)
                 }
             } break;
         default:
-            request->is_valid = false;
-            warn("Unknown body type for request: '%s'", request->original);
+            warn("Unknown or empty body type for request: '%s'", request->original);
             break;
     }
 }
