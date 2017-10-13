@@ -51,6 +51,7 @@ typedef struct gs_server_pool_t
 typedef struct server_loop_args_t
 {
     gs_server_t         *server;
+    gs_system_t         *system;
     router_t             catch;
 } server_loop_args_t;
 
@@ -132,7 +133,7 @@ GS_DECLARE(gs_status_t) gs_server_router_add(gs_server_t *server, const char *re
     return GS_SUCCESS;
 }
 
-GS_DECLARE(gs_status_t) gs_server_start(gs_server_t *server, router_t catch)
+GS_DECLARE(gs_status_t) gs_server_start(gs_server_t *server, gs_system_t *system, router_t catch)
 {
     GS_REQUIRE_NONNULL(server);
     GS_REQUIRE_NONNULL(catch);
@@ -144,6 +145,7 @@ GS_DECLARE(gs_status_t) gs_server_start(gs_server_t *server, router_t catch)
         server_loop_args_t *args = GS_REQUIRE_MALLOC(sizeof(server_loop_args_t));
         args->server = server;
         args->catch = catch;
+        args->system = system;
 
         thrd_create(&server->thread, server_loop, args);
         return GS_SUCCESS;
@@ -260,10 +262,10 @@ int server_handle_connection(void *args)
             GS_DEBUG("routers %p", loop_args->server->routers);
             if ((router = (router_t) gs_hash_get(loop_args->server->routers, resource, sizeof(char *))) != NULL) {
                 GS_DEBUG("request delegated to router for resource '%s'", resource);
-                router(loop_args->server->dispatcher, request, &response);
+                router(loop_args->system, request, &response);
             } else {
                 GS_DEBUG("no router installed for resource '%s'; delegate to default router", resource);
-                loop_args->catch(loop_args->server->dispatcher, request, &response);
+                loop_args->catch(loop_args->system, request, &response);
             }
         }
 
@@ -338,7 +340,7 @@ GS_DECLARE(gs_status_t) gs_server_pool_router_add(gs_server_pool_t *pool, const 
     return GS_SUCCESS;
 }
 
-GS_DECLARE(gs_status_t) gs_server_pool_start(gs_server_pool_t *pool, router_t catch)
+GS_DECLARE(gs_status_t) gs_server_pool_start(gs_server_pool_t *pool, gs_system_t *system, router_t catch)
 {
     GS_REQUIRE_NONNULL(pool);
     GS_REQUIRE_NONNULL(catch);
@@ -347,12 +349,12 @@ GS_DECLARE(gs_status_t) gs_server_pool_start(gs_server_pool_t *pool, router_t ca
 
     for (gs_server_t **it = vec_begin(pool->servers); it != vec_end(pool->servers); it++) {
         GS_DEBUG("start server %p", *it);
-        if ((status = gs_server_start(*it, catch)) != GS_SUCCESS)
+        if ((status = gs_server_start(*it, system, catch)) != GS_SUCCESS)
             return status;
     }
 
     GS_DEBUG("start gateway %p", pool->gateway);
-    if ((status = gs_server_start(pool->gateway, catch)) != GS_SUCCESS)
+    if ((status = gs_server_start(pool->gateway, system, catch)) != GS_SUCCESS)
         return status;
 
     return GS_SUCCESS;

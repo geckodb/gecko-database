@@ -102,7 +102,7 @@ void setup_server(gs_system_t *system, unsigned short gateway_port)
     const char *y = "/api/1.0/nodes";
     // gs_server_router_add(gateway, x, router_api_types_create);
     gs_server_pool_router_add(system->server_pool, y, router_api_1_0_nodes);
-    gs_server_pool_start(system->server_pool, router_catch);
+    gs_server_pool_start(system->server_pool, system, router_catch);
 
 
 }

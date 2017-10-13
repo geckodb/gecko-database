@@ -102,6 +102,7 @@ set(SOURCE_FILES
     include/gs_http.h
     include/containers/gs_hash.h
     include/platform.h
+    include/routers/catch.h
 
     src/async.c
     src/attr.c

@@ -1,7 +1,7 @@
 #include <routers/api/1.0/root.h>
 #include <apr_strings.h>
 
-void router_api_1_0_root(gs_dispatcher_t *dispatcher, const gs_request_t *request, response_t *response)
+void router_api_1_0_root(gs_system_t *system, const gs_request_t *request, response_t *response)
 {
     if (!gs_request_is_method(request, GS_GET)) {
         response_end(response, HTTP_STATUS_CODE_405_METHOD_NOT_ALLOWED);
