@@ -198,7 +198,7 @@ int server_loop(void *args)
         FD_SET(loop_args->server->server_desc, &set);
 
         struct timeval timeout = {
-            .tv_sec = 25
+            .tv_sec = SERVER_SELECT_TIMEOUT
         };
 
         int select_result = select(loop_args->server->server_desc + 1, &set, NULL, NULL, &timeout);
