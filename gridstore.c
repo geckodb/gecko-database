@@ -84,9 +84,9 @@ int main(int argc, char* argv[])
 {
     gs_server_create(&server, startup_config.port, dispatcher);
 //    const char *x = "/api/types/create";
-  //  const char *y = "/api/1.0/nodes";
+    const char *y = "/api/1.0/nodes";
    // gs_server_router_add(server, x, router_api_types_create);
-  //  gs_server_router_add(server, y, router_api_1_0_nodes);
+    gs_server_router_add(server, y, router_api_1_0_nodes);
     gs_server_start(server, router_catch);
 }
 

@@ -26,6 +26,7 @@
 #include <inet/gs_request.h>
 #include <apr_hash.h>
 #include <apr_strings.h>
+#include <containers/gs_hash.h>
 
 typedef struct gs_server_t
 {
@@ -35,7 +36,7 @@ typedef struct gs_server_t
     struct sockaddr_in   client_addr;
     int                  server_desc;
     socklen_t            socket_len;
-    apr_hash_t          *routers;
+    gs_hash_t           *routers;
     thrd_t               thread;
     bool                 is_running;
     bool                 is_disposable;
@@ -96,7 +97,7 @@ GS_DECLARE(gs_status_t) gs_server_create(gs_server_t **out, unsigned short port,
                                         sizeof(char *), sizeof(router_t), RESPONSE_DICT_CAPACITY,
                                         RESPONSE_DICT_CAPACITY, 1.7f, 0.75f,
                                         str_equals, str_clean_up, true);*/
-    server->routers = apr_hash_make(server->pool);
+    gs_hash_create(&server->routers, 10, GS_STRING_COMP);
 
     printf("listening to port %d\n", (int) ntohs(server->server_addr.sin_port));
 
@@ -109,7 +110,7 @@ GS_DECLARE(gs_status_t) gs_server_router_add(gs_server_t *server, const char *re
     GS_REQUIRE_NONNULL(server)
    // dict_put(server->routers, &resource, &router);
     char *key = apr_pstrdup(server->pool, resource);
-    apr_hash_set(server->routers, key, APR_HASH_KEY_STRING, router);
+    gs_hash_set(server->routers, key, sizeof(char *), router, GS_STRING_COMP);
     return GS_SUCCESS;
 }
 
@@ -224,16 +225,16 @@ int server_loop(void *args)
                     response_content_type_set(&response, MIME_CONTENT_TYPE_TEXT_PLAIN);
                     response_end(&response, HTTP_STATUS_CODE_400_BAD_REQUEST);
                 } else {
-                    const router_t *router;
+                    router_t router;
                     char *resource;
                     gs_request_resource(&resource, request);
                     GS_DEBUG("loop args %p", loop_args);
                     GS_DEBUG("resource %s", resource);
                     GS_DEBUG("server %p", loop_args->server);
                     GS_DEBUG("routers %p", loop_args->server->routers);
-                    if ((router = apr_hash_get(loop_args->server->routers, resource, APR_HASH_KEY_STRING)) != NULL) {
+                    if ((router = (router_t) gs_hash_get(loop_args->server->routers, resource, sizeof(char *))) != NULL) {
                         GS_DEBUG("request delegated to router for resource '%s'", resource);
-                        (*router)(loop_args->server->dispatcher, request, &response);
+                        router(loop_args->server->dispatcher, request, &response);
                     } else {
                         GS_DEBUG("no router installed for resource '%s'; delegate to default router", resource);
                         loop_args->catch(loop_args->server->dispatcher, request, &response);
