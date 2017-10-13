@@ -3,13 +3,14 @@
 #include <apr_file_io.h>
 #include <apr_strings.h>
 #include <gs_dispatcher.h>
+#include <stdatomic.h>
 
 typedef struct gs_shell_t {
     gs_dispatcher_t     *dispatcher;
     apr_pool_t          *pool;
     thrd_t               thread;
-    bool                 is_running;
-    bool                 is_disposable;
+    atomic_bool          is_running;
+    atomic_bool          is_disposable;
     //apr_uid_t            user_id;
     //apr_gid_t            group_id;
     //char                *user_name;
@@ -28,8 +29,9 @@ GS_DECLARE(gs_status_t) gs_shell_create(gs_shell_t **shell, gs_dispatcher_t *dis
 {
     gs_shell_t *result = GS_REQUIRE_MALLOC(sizeof(gs_shell_t));
     result->dispatcher = dispatcher;
-    result->is_running = false;
-    result->is_disposable = false;
+
+    result->is_running = ATOMIC_VAR_INIT(false);
+    result->is_disposable = ATOMIC_VAR_INIT(false);
     apr_pool_create(&result->pool, NULL);
   //  apr_uid_current(&result->user_id, &result->group_id, result->pool);
   //  apr_uid_name_get(&result->user_name, result->user_id, result->pool);
@@ -41,9 +43,9 @@ GS_DECLARE(gs_status_t) gs_shell_create(gs_shell_t **shell, gs_dispatcher_t *dis
 GS_DECLARE(gs_status_t) gs_shell_start(gs_shell_t *shell)
 {
     GS_REQUIRE_NONNULL(shell);
-    if (!shell->is_running) {
+    if (!atomic_load(&shell->is_running)) {
         GS_DEBUG("shell %p is starting", shell);
-        shell->is_running = true;
+        atomic_store(&shell->is_running, true);
         thrd_create(&shell->thread, shell_loop, shell);
         return GS_SUCCESS;
     } else {
@@ -87,9 +89,9 @@ GS_DECLARE(gs_status_t) gs_shell_handle_events(const gs_event_t *event)
 
 GS_DECLARE(gs_status_t) gs_shell_shutdown(gs_shell_t *shell)
 {
-    if (shell->is_running) {
+    if (atomic_load(&shell->is_running)) {
         GS_DEBUG("shell %p is shutting down", shell);
-        shell->is_running = false;
+        atomic_store(&shell->is_running, false);
         return GS_SUCCESS;
     } else {
         GS_DEBUG("shell %p is already shutting down", shell);
@@ -111,7 +113,7 @@ GS_DECLARE(gs_status_t) gs_shell_shutdown(gs_shell_t *shell)
 
     GS_DEBUG("shell %p enters main loop", shell);
     apr_file_printf(out, "Type 'help' for hints on usage of this shell.\n\n");
-    while (shell->is_running) {
+    while (atomic_load(&shell->is_running)) {
         if (accept_input) {
             apr_file_printf(out, "gs> ");
             apr_file_gets(buffer, STDIN_BUFFER_SIZE, in);
@@ -120,7 +122,7 @@ GS_DECLARE(gs_status_t) gs_shell_shutdown(gs_shell_t *shell)
         }
     }
     GS_DEBUG("shell %p left main loop", shell);
-    shell->is_disposable = true;
+    atomic_store(&shell->is_disposable, true);
     return EXIT_SUCCESS;
 }
 

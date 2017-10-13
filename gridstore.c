@@ -102,9 +102,9 @@ int main(int argc, char* argv[])
 
  void cleanup()
 {
-    //GS_DEBUG("dispose server %p", server);
-   // while (gs_server_dispose(&server) != GS_SUCCESS)
-   //     ;
+    GS_DEBUG("dispose server %p", server);
+    while (gs_server_dispose(&server) != GS_SUCCESS)
+        ;
 
    // GS_DEBUG("dispose gridstore %p", gridstore);
    // while (gs_gridstore_dispose(gridstore) != GS_SUCCESS);
