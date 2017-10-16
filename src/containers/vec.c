@@ -368,6 +368,8 @@ void *vec_bsearch(vec_t *vec, const void *needle, comp_t sort_comp, comp_t find_
 
     if (vec->num_elements == 0) {
         return vec_end(vec);
+    } else if (vec->num_elements == 1) {
+        return (find_comp(needle, vec_at(vec, 0)) == 0 ? vec_begin(vec) : vec_end(vec));
     } else {
         vec_sort(vec, sort_comp);
 
