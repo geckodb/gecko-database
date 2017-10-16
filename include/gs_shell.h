@@ -16,7 +16,7 @@ typedef struct gs_shell_t gs_shell_t;
 
 #define STDIN_BUFFER_SIZE 1024
 
-GS_DECLARE(gs_status_t) gs_shell_create(gs_shell_t **shell, gs_dispatcher_t *dispatcher);
+GS_DECLARE(gs_status_t) gs_shell_create(gs_shell_t **shell, gs_system_t *system);
 
 GS_DECLARE(gs_status_t) gs_shell_start(gs_shell_t *shell, gs_system_t *system);
 

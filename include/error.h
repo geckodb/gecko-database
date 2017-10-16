@@ -61,6 +61,8 @@ typedef enum {
 #define GS_TRYAGAIN         5
 #define GS_TRUE             true
 #define GS_FALSE            false
+#define GS_REJECTED         6
+#define GS_NOTFOUND         7
 
 typedef int gs_status_t;
 
@@ -94,23 +96,23 @@ void trace_print(FILE *file);
 
 #define warn(msg, args...)                                                                                             \
     {                                                                                                                  \
-        begin_write("WARNING");                                                                                        \
-        fprintf(stderr, msg, args);                                                                                    \
-        end_write();                                                                                                   \
+        /*begin_write("WARNING");       */                                                                                 \
+        /*fprintf(stderr, msg, args); */                                                                                   \
+        /*end_write();*/                                                                                                   \
     }
 
 #define GS_DEBUG(msg, args...)                                                                                         \
     {                                                                                                                  \
-        fprintf(stderr, "# DEBUG: ");                                                                                  \
-        fprintf(stderr, msg, args);                                                                                    \
-        fprintf(stderr, "\n");                                                                                         \
+        /*fprintf(stderr, "# DEBUG: ");       */                                                                           \
+        /*fprintf(stderr, msg, args);         */                                                                           \
+        /*fprintf(stderr, "\n");                */                                                                         \
     }
 
 #define GS_DEBUG2(msg)                                                                                                 \
     {                                                                                                                  \
-        fprintf(stderr, "# DEBUG: ");                                                                                  \
-        fprintf(stderr, msg);                                                                                          \
-        fprintf(stderr, "\n");                                                                                         \
+       /* fprintf(stderr, "# DEBUG: ");             */                                                                     \
+      /*  fprintf(stderr, msg);                       */                                                                   \
+      /*  fprintf(stderr, "\n");                        */                                                                 \
     }
 
 #define panic_if(expr, msg, args...)                                                                                   \

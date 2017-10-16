@@ -2,7 +2,7 @@
 
 #include <gs.h>
 
-#define NUM_SERVERS 10
+#define NUM_SERVERS 400
 
 typedef struct gs_gridstore_t gs_gridstore_t; /* forwarded */
 typedef struct gs_dispatcher_t gs_dispatcher_t; /* forwarded */

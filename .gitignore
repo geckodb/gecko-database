@@ -71,3 +71,4 @@ Makefile
 # Clion-specif files
 .idea
 gridstore.cbp
+*.class

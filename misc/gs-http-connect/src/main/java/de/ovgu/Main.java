@@ -12,7 +12,7 @@ import java.net.URL;
 
 public class Main {
 
-    static final int NUM_SERVER_SOCKETS = 1000;
+    static final int NUM_SERVER_SOCKETS = 200;
     static final int MAX_SAMPLE = 5;
 
     public static void main(String[] args) {

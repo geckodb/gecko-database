@@ -4,9 +4,10 @@
 #include <apr_strings.h>
 #include <gs_dispatcher.h>
 #include <stdatomic.h>
+#include <inet/gs_server.h>
 
 typedef struct gs_shell_t {
-    gs_dispatcher_t     *dispatcher;
+    gs_system_t         *system;
     apr_pool_t          *pool;
     thrd_t               thread;
     atomic_bool          is_running;
@@ -29,11 +30,12 @@ typedef struct gs_shell_loop_args_t {
  void process_command_help(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input);
  void process_command_exit(gs_system_t *system, gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input);
  void process_command_uptime(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input);
+void process_command_port_info(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input);
 
-GS_DECLARE(gs_status_t) gs_shell_create(gs_shell_t **shell, gs_dispatcher_t *dispatcher)
+GS_DECLARE(gs_status_t) gs_shell_create(gs_shell_t **shell, gs_system_t *system)
 {
     gs_shell_t *result = GS_REQUIRE_MALLOC(sizeof(gs_shell_t));
-    result->dispatcher = dispatcher;
+    result->system = system;
 
     result->is_running = ATOMIC_VAR_INIT(false);
     result->is_disposable = ATOMIC_VAR_INIT(false);
@@ -150,6 +152,8 @@ GS_DECLARE(gs_status_t) gs_shell_shutdown(gs_shell_t *shell)
         return false;
     } else if (apr_strnatcasecmp(input, "uptime") == 0) {
         process_command_uptime(shell, in, out, input);
+    } else if (apr_strnatcasecmp(input, "port info") == 0) {
+        process_command_port_info(shell, in, out, input);
     } else {
         apr_file_printf(out, "no such command: %s", input);
     }
@@ -160,17 +164,19 @@ GS_DECLARE(gs_status_t) gs_shell_shutdown(gs_shell_t *shell)
 {
     GS_DEBUG("shell %p command 'help' entered", shell);
     apr_file_printf(out, "Available commands:\n");
-    apr_file_printf(out, "  help    Shows this help message\n");
-    apr_file_printf(out, "  uptime  Shows how long the system is running\n");
-    apr_file_printf(out, "  exit    Shutdowns the system, and exit the shell\n");
+    apr_file_printf(out, "  help        Shows this help message\n");
+    apr_file_printf(out, "  uptime      Shows how long the system is running\n");
+    apr_file_printf(out, "  port info   Lists socket configuration of this service\n");
+    apr_file_printf(out, "  exit        Shutdowns the system, and exit the shell\n");
 
 }
 
  void process_command_exit(gs_system_t *system, gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input)
 {
     GS_DEBUG("shell %p command 'exit' entered", shell);
-    gs_dispatcher_publish(shell->dispatcher, gs_event_system_exit(system, shell->dispatcher,
-                                                                  GS_OBJECT_TYPE_SHELL, shell));
+    gs_dispatcher_publish(gs_system_get_dispatcher(shell->system),
+                          gs_event_system_exit(system, gs_system_get_dispatcher(shell->system),
+                                              GS_OBJECT_TYPE_SHELL, shell));
 }
 
  void process_command_uptime(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input)
@@ -179,4 +185,11 @@ GS_DECLARE(gs_status_t) gs_shell_shutdown(gs_shell_t *shell)
     apr_time_exp_t result;
     apr_time_exp_gmt(&result, apr_time_now() - shell->uptime);
     printf("%dh, %dmin, %dsec\n", result.tm_hour, result.tm_min, result.tm_sec);
+}
+
+void process_command_port_info(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input)
+{
+    GS_DEBUG("shell %p command 'port info' entered", shell);
+    gs_server_pool_t *pool = gs_system_get_server_pool(shell->system);
+    gs_server_pool_print(stdout, pool);
 }

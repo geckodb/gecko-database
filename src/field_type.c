@@ -17,6 +17,7 @@
 
 #include <field_type.h>
 #include <grid.h>
+#include <gs_reltype.h>
 
 size_t field_type_sizeof(enum field_type type)
 {
@@ -60,6 +61,8 @@ size_t field_type_sizeof(enum field_type type)
             return sizeof(SIZE);
         case FT_TFORMAT:
             return sizeof(TFORMAT);
+        case FT_RELTYPE:
+            return sizeof(RELTYPE);
         default:
             perror ("Unknown type");
             abort();
@@ -108,6 +111,8 @@ const char *field_type_str(enum field_type type)
             return "size";
         case FT_TFORMAT:
             return "tuple format";
+        case FT_RELTYPE:
+            return "relation type";
         default:
             perror ("Unknown type");
             abort();

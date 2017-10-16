@@ -6,6 +6,7 @@
 #include <routers/api/1.0/root.h>
 #include <routers/api/1.0/nodes.h>
 #include <routers/catch.h>
+#include <routers/api/1.0/collections.h>
 
 typedef struct gs_system_t
 {
@@ -105,23 +106,20 @@ void setup_event_loop(gs_system_t *system)
 
 void setup_shell(gs_system_t *system)
 {
-    gs_shell_create(&system->shell, system->dispatcher);
+    gs_shell_create(&system->shell, system);
 }
 
 void setup_server(gs_system_t *system, unsigned short gateway_port)
 {
-    const char *gat = "/api/1.0/";
-
     gs_server_pool_create(&system->server_pool, system->dispatcher,
                           gateway_port,
-                          gat,
+                          "/api/1.0/",
                           router_api_1_0_root,
                           NUM_SERVERS);
 
-//    const char *x = "/api/types/create";
-    const char *y = "/api/1.0/nodes";
-    // gs_server_router_add(gateway, x, router_api_types_create);
-    gs_server_pool_router_add(system->server_pool, y, router_api_1_0_nodes);
+    gs_server_pool_router_add(system->server_pool, "/api/1.0/nodes", router_api_1_0_nodes);
+    gs_server_pool_router_add(system->server_pool, "/api/1.0/collections", router_api_1_0_collections);
+
     gs_server_pool_start(system->server_pool, system, router_catch);
 
 

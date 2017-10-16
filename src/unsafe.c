@@ -19,6 +19,8 @@
 #include <frag.h>
 #include <grid.h>
 #include <inttypes.h>
+#include <gs_reltype.h>
+
 size_t unsafe_field_println(enum field_type type, const void *data)
 {
     char *buffer = unsafe_field_str(type, data);
@@ -104,6 +106,8 @@ char *unsafe_field_str(enum field_type type, const void *data)
         case FT_TFORMAT:
             sprintf(buffer, "%s", tuplet_format_str(*(TFORMAT *) data));
             break;
+        case FT_RELTYPE:
+            sprintf(buffer, "%s", gs_reltype_str(*(RELTYPE *) data));
         default:
             perror("Unknown type");
             abort();

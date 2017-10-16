@@ -194,9 +194,7 @@ void *vec_peek(const vec_t *vec)
 void *vec_begin(const vec_t *vec)
 {
     if (vec) {
-        REQUIRE_NONZERO(vec->num_elements)
-        void *result = vec_at(vec, 0);
-        return result;
+        return (vec->num_elements > 0 ? vec_at(vec, 0) : vec_end(vec));
     } else return NULL;
 }
 

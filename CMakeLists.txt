@@ -15,7 +15,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
 set(RUNTIME_OUTPUT_DIRECTORY ${CMAKE_TEMP_OUTPUT_DIR})
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -std=c11 -Wall -Werror")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -std=c11 -Wall -Werror")
 
 cmake_minimum_required(
     VERSION 3.5
@@ -102,6 +102,7 @@ set(SOURCE_FILES
     include/containers/gs_hash.h
     include/platform.h
     include/routers/catch.h
+    include/routers/api/1.0/collections.h
 
     src/async.c
     src/attr.c
@@ -147,6 +148,16 @@ set(SOURCE_FILES
     src/routers/api/1.0/root.c
     src/gs_http.c
     src/containers/gs_hash.c
+    src/routers/api/1.0/collections.c;
+
+    include/gs_system.h
+    src/gs_system.c
+    include/gs_collection.h
+    src/gs_collection.c
+    include/gs_reltype.h
+    src/gs_reltype.c
+    include/gs_collections.h
+    src/gs_collections.c
 
     third-party/json-parser/json.h
     third-party/json-parser/json.c
@@ -158,7 +169,10 @@ IF (PROJECT_OS_LINUX)
     set (SOURCE_FILES ${SOURCE_FILES} include/platforms/linux/platform.h)
 ELSEIF (PROJECT_OS_OSX)
     MESSAGE (STATUS "Operating system is Apple MacOS X")
-    set (SOURCE_FILES   ${SOURCE_FILES} include/platforms/macos/platform.h include/gs_system.h src/gs_system.c)
+    set (SOURCE_FILES   ${SOURCE_FILES}
+            include/platforms/macos/platform.h
+            include/platforms/macos/third-party/fmemopen/fmemopen.h
+            src/platforms/macos/third-party/fmemopen/fmemopen.c)
 ENDIF (PROJECT_OS_LINUX)
 
 add_executable(

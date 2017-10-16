@@ -62,6 +62,8 @@ GS_DECLARE(gs_status_t) gs_server_start(gs_server_t *server, gs_system_t *system
 
 GS_DECLARE(unsigned short) gs_server_port(const gs_server_t *server);
 
+GS_DECLARE(u64) gs_server_num_requests(const gs_server_t *server);
+
 GS_DECLARE(gs_status_t) gs_server_dispose(gs_server_t *server);
 
 GS_DECLARE(gs_status_t) gs_server_shutdown(gs_server_t *server);
@@ -87,5 +89,7 @@ GS_DECLARE(size_t) gs_server_pool_get_num_of_servers(gs_server_pool_t *pool);
 GS_DECLARE(gs_status_t) gs_server_pool_cpy_port_list(unsigned short *dst, const gs_server_pool_t *pool);
 
 unsigned short gs_server_pool_next_port(gs_server_pool_t *pool);
+
+GS_DECLARE(void) gs_server_pool_print(FILE *file, gs_server_pool_t *pool);
 
 __END_DECLS

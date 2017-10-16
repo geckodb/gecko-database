@@ -1,24 +1,27 @@
 #include <gs_gridstore.h>
 #include <gs_dispatcher.h>
+#include <grid.h>
+#include <gs_collections.h>
 
 typedef struct gs_gridstore_t {
-
+    gs_collections_t *collections;
 } gs_gridstore_t;
 
 GS_DECLARE(gs_status_t) gs_gridstore_create(gs_gridstore_t **gridstore)
 {
     gs_gridstore_t *result = GS_REQUIRE_MALLOC(sizeof(gs_gridstore_t));
+
+    gs_collections_create(&result->collections);
+
     *gridstore = result;
     return GS_SUCCESS;
 }
 
-GS_DECLARE(gs_status_t) gs_gridstore_dispose(gs_gridstore_t **gridstore)
+GS_DECLARE(gs_status_t) gs_gridstore_dispose(gs_gridstore_t *gridstore)
 {
     GS_REQUIRE_NONNULL(gridstore)
-    GS_REQUIRE_NONNULL(*gridstore)
-    gs_gridstore_t *obj = *gridstore;
-    free(obj);
-    *gridstore = NULL;
+    gs_collections_dispose(gridstore->collections);
+    free(gridstore);
     GS_DEBUG("gridstore %p was disposed", gridstore);
     return GS_SUCCESS;
 }
@@ -28,7 +31,7 @@ GS_DECLARE(gs_status_t) gs_gridstore_handle_events(const gs_event_t *event)
     GS_REQUIRE_NONNULL(event);
     GS_EVENT_FILTER_BY_RECEIVER_TAG(GS_OBJECT_TYPE_GRIDSTORE);
 
-    gs_gridstore_t   *self   = GS_EVENT_GET_RECEIVER(gs_gridstore_t);
+    //gs_gridstore_t   *self   = GS_EVENT_GET_RECEIVER(gs_gridstore_t);
     gs_signal_type_e  signal = GS_EVENT_GET_SIGNAL();
 
     switch (signal) {
@@ -50,4 +53,10 @@ GS_DECLARE(gs_status_t) gs_gridstore_handle_events(const gs_event_t *event)
         warn("gridstore %p received event for signal %d that is not handled", self, signal);
             return GS_SKIPPED;
     }
+}
+
+GS_DECLARE(gs_collections_t *) gs_gridstore_get_collections(const gs_gridstore_t *gridstore)
+{
+    GS_REQUIRE_NONNULL(gridstore);
+    return (gridstore->collections);
 }

@@ -68,6 +68,10 @@ typedef uint64_t attr_id_t;
 
 typedef uint32_t tuplet_id_t;
 
+typedef uint64_t collection_id_t;
+
+#define COLLECTION_ID_NULL UINT64_MAX
+
 typedef int (*gs_comp_func_t)(const void *lhs, const void *rhs);
 
 typedef uint8_t     u8;
@@ -210,4 +214,7 @@ static inline int gs_comp_func_str(const void *lhs, const void *rhs)
 #endif
 #ifndef TFORMAT
 #define TFORMAT   enum tuplet_format
+#endif
+#ifndef RELTYPE
+#define RELTYPE   gs_reltype_e
 #endif

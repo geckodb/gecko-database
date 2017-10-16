@@ -27,6 +27,10 @@
 #include <apr_hash.h>
 #include <apr_strings.h>
 #include <containers/gs_hash.h>
+#include <schema.h>
+#include <attr.h>
+#include <frag.h>
+#include <tuplet_field.h>
 
 typedef struct gs_server_t
 {
@@ -40,6 +44,7 @@ typedef struct gs_server_t
     thrd_t               thread;
     bool                 is_running;
     bool                 is_disposable;
+    size_t               num_requests;
 } gs_server_t;
 
 typedef struct gs_server_pool_t
@@ -83,6 +88,7 @@ GS_DECLARE(gs_status_t) gs_server_create(gs_server_t **out, unsigned short port,
     server->dispatcher = dispatcher;
     server->is_disposable = false;
     server->is_running = false;
+    server->num_requests = 0;
     apr_pool_create(&server->pool, NULL);
 
     int on = 1;
@@ -162,6 +168,12 @@ GS_DECLARE(unsigned short) gs_server_port(const gs_server_t *server)
     return ntohs(server->server_addr.sin_port);
 }
 
+GS_DECLARE(u64) gs_server_num_requests(const gs_server_t *server)
+{
+    GS_REQUIRE_NONNULL(server);
+    return (server->num_requests);
+}
+
 GS_DECLARE(gs_status_t) gs_server_dispose(gs_server_t *server)
 {
     GS_REQUIRE_NONNULL(server);
@@ -216,6 +228,8 @@ int server_loop(void *args)
             close (client);
             continue;
         } else {
+
+            loop_args->server->num_requests++;
 
             thrd_t thrd;
             server_handle_connection_args_t *args = GS_REQUIRE_MALLOC(sizeof(server_handle_connection_args_t));
@@ -426,3 +440,41 @@ unsigned short gs_server_pool_next_port(gs_server_pool_t *pool)
     gs_server_t **server = (vec_at(pool->servers, (pool->next_port_idx++ % vec_length(pool->servers)))); /* round robin */
     return gs_server_port(*server);
 }
+
+GS_DECLARE(void) gs_server_pool_print(FILE *file, gs_server_pool_t *pool)
+{
+    schema_t *print_schema = schema_new("ad hoc info");
+    attr_create_uint64("id", print_schema);
+    attr_create_string("type", 100, print_schema);
+    attr_create_uint16("port", print_schema);
+    attr_create_uint64("num_requests", print_schema);
+    size_t num_servers = vec_length(pool->servers) + 1;
+    frag_t *frag = frag_new(print_schema, num_servers, FIT_HOST_NSM_VM);
+
+    tuplet_t tuplet;
+    frag_insert(&tuplet, frag, num_servers);
+
+    u64 id = 0;
+    do {
+        gs_server_t *cursor = (id == 0 ? pool->gateway : *(gs_server_t **) vec_at(pool->servers, (id - 1)));
+        const char *type = (id == 0 ? "Gateway" : "Router");
+        u16 port = gs_server_port(cursor);
+        u64 num_requests = gs_server_num_requests(cursor);
+
+        tuplet_field_t field;
+        tuplet_field_open(&field, &tuplet);
+        tuplet_field_write(&field, &id, true);
+        tuplet_field_write(&field, &type, true);
+        tuplet_field_write(&field, &port, true);
+        tuplet_field_write(&field, &num_requests, false);
+
+        id++;
+
+    } while (tuplet_next(&tuplet));
+
+    frag_print(file, frag, 0, INT_MAX);
+
+    frag_delete(frag);
+    schema_delete(print_schema);
+}
+
