@@ -31,71 +31,71 @@
 // D A T A   T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-typedef int (*comp_t)(const void *lhs, const void *rhs);
+typedef int (*gs_comp_t)(const void *lhs, const void *rhs);
 
 typedef enum {
     CCP_IGNORECACHE,
     CCP_USECACHE
-} cache_consideration_policy;
+} gs_cache_consideration_policy_e;
 
 typedef enum {
     zero_memory = 1 << 0,
     auto_resize = 1 << 1,
-} vector_flags;
+} gs_vector_flags_e;
 
-typedef struct vec_t {
+typedef struct gs_vec_t {
     size_t sizeof_element, num_elements, element_capacity;
-    vector_flags flags;
+    gs_vector_flags_e flags;
     float grow_factor;
     void *data;
     bool is_sorted;
     apr_pool_t *pool;
-} vec_t;
+} gs_vec_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-vec_t *vec_new(size_t element_size, size_t capacity);
-vec_t *vec_new_ex(size_t element_size, size_t capacity, vector_flags flags, float grow_factor);
-void vec_free(struct vec_t *vec);
-void vec_dispose(struct vec_t *vec);
-bool vec_resize(vec_t *vec, size_t num_elements);
-bool vec_reserve(vec_t *vec, size_t num_elements);
-size_t vec_length(const vec_t *vec);
-void vec_memset(vec_t *vec, size_t pos_start, size_t num_elements, const void *data);
-vec_t *vec_cpy_deep(vec_t *proto);
-void vec_cpy_shallow(vec_t *dst, vec_t *src);
-void vec_free_ex(vec_t *vec, void *capture, bool (*func)(void *capture, void *begin, void *end));
-void *vec_data(vec_t *vec);
-void *vec_at(const vec_t *vec, size_t pos);
-void *vec_peek(const vec_t *vec);
-void *vec_begin(const vec_t *vec);
-void *vec_end(const vec_t *vec);
-bool vec_issorted(vec_t *vec, cache_consideration_policy policy, comp_t comp);
-bool vec_updatesort(vec_t *vec, comp_t comp);
-void *vec_pop_unsafe(vec_t *vec);
-void *vec_peek_unsafe(vec_t *vec);
-bool vec_set(vec_t *vec, size_t idx, size_t num_elements, const void *data);
-bool vec_pushback(vec_t *vec, size_t num_elements, const void *data);
-bool vec_add_all(vec_t *dest, const vec_t *src);
-bool vec_add_all_unsafe(vec_t *dest, const vec_t *src);
-void vec_add_unsafe(vec_t *vec, size_t num_elements, const void *data);
-bool vec_comp(const vec_t *lhs, const vec_t *rhs, comp_t comp);
-bool vec_foreach(vec_t *vec, void *capture, bool (*func)(void *capture, void *begin, void *end));
-void vec_swap(vec_t *lhs, vec_t *rhs);
-size_t vec_count(vec_t *vec, void *capture, bool (*pred)(void *capture, void *it));
-bool vec_contains(vec_t *vec, void *needle);
-size_t vec_memused(vec_t *vec);
-size_t vec_memused__str(vec_t *vec);
-size_t vec_sizeof(const vec_t *vec);
-void vec_sort(vec_t *vec, comp_t comp);
-void *vec_bsearch(vec_t *vec, const void *needle, comp_t sort_comp, comp_t find_comp);
+gs_vec_t *gs_vec_new(size_t element_size, size_t capacity);
+gs_vec_t *gs_vec_new_ex(size_t element_size, size_t capacity, gs_vector_flags_e flags, float grow_factor);
+void gs_vec_free(struct gs_vec_t *vec);
+void gs_vec_dispose(struct gs_vec_t *vec);
+bool gs_vec_resize(gs_vec_t *vec, size_t num_elements);
+bool gs_vec_reserve(gs_vec_t *vec, size_t num_elements);
+size_t gs_vec_length(const gs_vec_t *vec);
+void gs_vec_memset(gs_vec_t *vec, size_t pos_start, size_t num_elements, const void *data);
+gs_vec_t *gs_vec_cpy_deep(gs_vec_t *proto);
+void gs_vec_cpy_shallow(gs_vec_t *dst, gs_vec_t *src);
+void gs_vec_free_ex(gs_vec_t *vec, void *capture, bool (*func)(void *capture, void *begin, void *end));
+void *gs_vec_data(gs_vec_t *vec);
+void *gs_vec_at(const gs_vec_t *vec, size_t pos);
+void *gs_vec_peek(const gs_vec_t *vec);
+void *gs_vec_begin(const gs_vec_t *vec);
+void *gs_vec_end(const gs_vec_t *vec);
+bool gs_vec_issorted(gs_vec_t *vec, gs_cache_consideration_policy_e policy, gs_comp_t comp);
+bool gs_vec_updatesort(gs_vec_t *vec, gs_comp_t comp);
+void *gs_vec_pop_unsafe(gs_vec_t *vec);
+void *gs_vec_peek_unsafe(gs_vec_t *vec);
+bool gs_vec_set(gs_vec_t *vec, size_t idx, size_t num_elements, const void *data);
+bool gs_vec_pushback(gs_vec_t *vec, size_t num_elements, const void *data);
+bool gs_vec_add_all(gs_vec_t *dest, const gs_vec_t *src);
+bool gs_vec_add_all_unsafe(gs_vec_t *dest, const gs_vec_t *src);
+void gs_vec_add_unsafe(gs_vec_t *vec, size_t num_elements, const void *data);
+bool gs_vec_comp(const gs_vec_t *lhs, const gs_vec_t *rhs, gs_comp_t comp);
+bool gs_vec_foreach(gs_vec_t *vec, void *capture, bool (*func)(void *capture, void *begin, void *end));
+void gs_vec_swap(gs_vec_t *lhs, gs_vec_t *rhs);
+size_t gs_vec_count(gs_vec_t *vec, void *capture, bool (*pred)(void *capture, void *it));
+bool gs_vec_contains(gs_vec_t *vec, void *needle);
+size_t gs_vec_memused(gs_vec_t *vec);
+size_t gs_vec_memused__str(gs_vec_t *vec);
+size_t gs_vec_sizeof(const gs_vec_t *vec);
+void gs_vec_sort(gs_vec_t *vec, gs_comp_t comp);
+void *gs_vec_bsearch(gs_vec_t *vec, const void *needle, gs_comp_t sort_comp, gs_comp_t find_comp);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // C O N V E N I E N C E  F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-void vec_free__str(vec_t *vec);
-bool free_strings(void *capture, void *begin, void *end);
-bool get_sizeof_strings(void *capture, void *begin, void *end);
+void gs_vec_free__str(gs_vec_t *vec);
+bool gs_free_strings(void *capture, void *begin, void *end);
+bool gs_get_sizeof_strings(void *capture, void *begin, void *end);

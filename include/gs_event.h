@@ -79,11 +79,7 @@ void *gs_event_get_data(const gs_event_t *event);
 
 gs_status_t gs_event_get_subject(gs_object_type_tag_e *type_tag, void **ptr, const gs_event_t *event, gs_subject_kind_e subj);
 
-
-
-
 gs_event_t *gs_event_system_exit(gs_dispatcher_t *dispatcher, gs_object_type_tag_e sender_tag, void *sender);
-
 
 gs_event_t *gs_event_dispatcher_shutdown(gs_dispatcher_t *dispatcher);
 

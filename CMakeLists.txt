@@ -51,7 +51,7 @@ file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR})
 set(SOURCE_FILES
     include/gs_async.h
     include/gs_attr.h
-    include/gs_c11threads.h
+        include/c11threads.h
     include/containers/gs_list.h
     include/containers/gs_vec.h
     include/frags/gs_frag_host_vm.h

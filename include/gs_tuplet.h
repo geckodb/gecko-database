@@ -25,26 +25,26 @@
 // F O R W A R D   D E C L A R A T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-struct schema_t;
+struct gs_schema_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // D A T A   T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-typedef struct tuplet_t {
-    struct frag_t *fragment; /*<! fragment in which this tuplet exists */
-    tuplet_id_t tuplet_id; /*<! number of this tuplet inside the fragment */
+typedef struct gs_tuplet_t {
+    struct gs_frag_t *fragment; /*<! fragment in which this tuplet exists */
+    gs_tuplet_id_t tuplet_id; /*<! number of this tuplet inside the fragment */
     void *attr_base; /*<! pointer in fragment where first attribute of this tuplet is located */
 
     /* operations */
-    bool (*_next)(struct tuplet_t *self); /* seeks to the next tuplet inside this fragment */
-    void (*_open)(struct tuplet_field_t *dst, struct tuplet_t *self); /*<! access the attr_value_ptr data of this tuplet */
-    void (*_update)(struct tuplet_t *self, const void *data); /*<! updates all fields of this tuplet and moves to next */
-    void (*_set_null)(struct tuplet_t *self); /*<! updates all fields of this tuplet to NULL, and moves to next */
-    void (*_delete)(struct tuplet_t *self); /* request to delete this tuplet from fragment */
-    bool (*_is_null)(struct tuplet_t *self); /*<! checks whether this tuplet is NULL entirely */
+    bool (*_next)(struct gs_tuplet_t *self); /* seeks to the next tuplet inside this fragment */
+    void (*_open)(struct gs_tuplet_field_t *dst, struct gs_tuplet_t *self); /*<! access the attr_value_ptr data of this tuplet */
+    void (*_update)(struct gs_tuplet_t *self, const void *data); /*<! updates all fields of this tuplet and moves to next */
+    void (*_set_null)(struct gs_tuplet_t *self); /*<! updates all fields of this tuplet to NULL, and moves to next */
+    void (*_delete)(struct gs_tuplet_t *self); /* request to delete this tuplet from fragment */
+    bool (*_is_null)(struct gs_tuplet_t *self); /*<! checks whether this tuplet is NULL entirely */
 
-} tuplet_t;
+} gs_tuplet_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   D E C L A R A T I O N
@@ -64,7 +64,7 @@ typedef struct tuplet_t {
  *        [in] tuplet_id the tuplet id. Must be valid.
  * @return A pointer to the first tuplet in <i>frag</i>, or <b>NULL</b> if the fragment does not contains any tuplets.
  * */
-void tuplet_open(tuplet_t *dst, struct frag_t *frag, tuplet_id_t tuplet_id);
+void gs_tuplet_open(gs_tuplet_t *dst, struct gs_frag_t *frag, gs_tuplet_id_t tuplet_id);
 
 /*!
  * @brief Moves the input tuplet cursor to its successor inside its fragment.
@@ -82,7 +82,7 @@ void tuplet_open(tuplet_t *dst, struct frag_t *frag, tuplet_id_t tuplet_id);
  * @return <b>true</b> is the tuplet cursor was moved to its successor and the end of the fragment was not reached,
  * or <b>false</b> otherwise.
  */
-bool tuplet_next(tuplet_t *tuplet);
+bool gs_tuplet_next(gs_tuplet_t *tuplet);
 
 /*!
  * @brief Resets the tuplet pointer to the begin of the first tuplet in its fragment.
@@ -93,20 +93,20 @@ bool tuplet_next(tuplet_t *tuplet);
  * @param tuplet A valid tuplet inside a fragment (mus be non-null)
  * @return The first tuplet in the fragment of the input tuplet.
  */
-void tuplet_rewind(tuplet_t *tuplet);
+void gs_tuplet_rewind(gs_tuplet_t *tuplet);
 
-void tuplet_set_null(tuplet_t *tuplet);
+void gs_tuplet_set_null(gs_tuplet_t *tuplet);
 
-bool tuplet_is_null(tuplet_t *tuplet);
+bool gs_tuplet_is_null(gs_tuplet_t *tuplet);
 
-size_t tuplet_size(tuplet_t *tuplet);
+size_t gs_tuplet_size(gs_tuplet_t *tuplet);
 
-void *tuplet_update(void *dst, schema_t *frag, attr_id_t attr_id, void *src);
+void *gs_tuplet_update(void *dst, gs_schema_t *frag, gs_attr_id_t attr_id, void *src);
 
-size_t tuplet_size_by_schema(const schema_t *schema);
+size_t gs_tuplet_size_by_schema(const gs_schema_t *schema);
 
-enum field_type tuplet_field_type(const tuplet_t *tuplet, attr_id_t id);
+enum gs_field_type_e gs_tuplet_field_type(const gs_tuplet_t *tuplet, gs_attr_id_t id);
 
-size_t tuplet_printlen(const attr_t *attr, const void *field_data);
+size_t gs_tuplet_printlen(const gs_attr_t *attr, const void *field_data);
 
-const char *tuplet_format_str(enum tuplet_format format);
+const char *gs_tuplet_format_str(enum gs_tuplet_format_e format);

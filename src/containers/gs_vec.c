@@ -24,29 +24,29 @@
 // H E L P E R   P R O T O T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
- bool check_create_args(size_t, vector_flags, float);
- vec_t *alloc_vector();
- vec_t *alloc_data(vec_t *, vector_flags, size_t, size_t);
- void init_vector(vec_t *, vector_flags, size_t, size_t, float);
- bool check_add_args(vec_t *, size_t, const void *);
- bool check_auto_resize(vec_t *, size_t);
- bool check_set_args(vec_t *, size_t, const void *);
- bool outside_bounds_enabled(vec_t *, size_t, size_t);
- bool realloc_vector(vec_t *, size_t);
- bool advance(vec_t *, size_t, size_t);
+ bool check_create_args(size_t, gs_vector_flags_e, float);
+ gs_vec_t *alloc_vector();
+ gs_vec_t *alloc_data(gs_vec_t *, gs_vector_flags_e, size_t, size_t);
+ void init_vector(gs_vec_t *, gs_vector_flags_e, size_t, size_t, float);
+ bool check_add_args(gs_vec_t *, size_t, const void *);
+ bool check_auto_resize(gs_vec_t *, size_t);
+ bool check_set_args(gs_vec_t *, size_t, const void *);
+ bool outside_bounds_enabled(gs_vec_t *, size_t, size_t);
+ bool realloc_vector(gs_vec_t *, size_t);
+ bool advance(gs_vec_t *, size_t, size_t);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E  I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-vec_t *vec_new(size_t element_size, size_t capacity)
+gs_vec_t *gs_vec_new(size_t element_size, size_t capacity)
 {
-    return vec_new_ex(element_size, capacity, auto_resize, GROW_FACTOR);
+    return gs_vec_new_ex(element_size, capacity, auto_resize, GROW_FACTOR);
 }
 
-vec_t *vec_new_ex(size_t element_size, size_t capacity, vector_flags flags, float grow_factor)
+gs_vec_t *gs_vec_new_ex(size_t element_size, size_t capacity, gs_vector_flags_e flags, float grow_factor)
 {
-    vec_t *result = NULL;
+    gs_vec_t *result = NULL;
     if (check_create_args(element_size, flags, grow_factor)) {
         result = alloc_vector();
         init_vector(result, flags, capacity, element_size, grow_factor);
@@ -55,7 +55,7 @@ vec_t *vec_new_ex(size_t element_size, size_t capacity, vector_flags flags, floa
     return result;
 }
 
-bool vec_resize(vec_t *vec, size_t num_elements)
+bool gs_vec_resize(gs_vec_t *vec, size_t num_elements)
 {
     GS_REQUIRE_NONNULL(vec)
     if (num_elements < vec->num_elements) {
@@ -69,48 +69,48 @@ bool vec_resize(vec_t *vec, size_t num_elements)
     }
 }
 
-bool vec_reserve(vec_t *vec, size_t num_elements)
+bool gs_vec_reserve(gs_vec_t *vec, size_t num_elements)
 {
     return advance(vec, 0, num_elements - 1);
 }
 
-size_t vec_length(const vec_t *vec)
+size_t gs_vec_length(const gs_vec_t *vec)
 {
     GS_REQUIRE_NONNULL(vec);
     return (vec->num_elements);
 }
 
-void vec_memset(vec_t *vec, size_t pos_start, size_t num_elements, const void *data)
+void gs_vec_memset(gs_vec_t *vec, size_t pos_start, size_t num_elements, const void *data)
 {
     GS_REQUIRE_NONNULL(vec);
     REQUIRE((num_elements > 0), "illegal argument");
     REQUIRE((pos_start + num_elements <= vec->element_capacity), "out of bounds");
     for (size_t i = pos_start; i < pos_start + num_elements; i++) {
-        vec_set(vec, i, 1, data);
+        gs_vec_set(vec, i, 1, data);
     }
     vec->is_sorted = false;
 }
 
-vec_t *vec_cpy_deep(vec_t *proto)
+gs_vec_t *gs_vec_cpy_deep(gs_vec_t *proto)
 {
-    vec_t *result = NULL;
+    gs_vec_t *result = NULL;
     GS_REQUIRE_NONNULL(proto)
     GS_REQUIRE_NONNULL(proto->data)
-    if ((result = vec_new_ex(proto->sizeof_element, proto->element_capacity, proto->flags, proto->grow_factor))) {
-        vec_set(result, 0, proto->num_elements, proto->data);
+    if ((result = gs_vec_new_ex(proto->sizeof_element, proto->element_capacity, proto->flags, proto->grow_factor))) {
+        gs_vec_set(result, 0, proto->num_elements, proto->data);
     }
     return result;
 }
 
-void vec_free(struct vec_t *vec)
+void gs_vec_free(struct gs_vec_t *vec)
 {
     GS_REQUIRE_NONNULL(vec)
     GS_REQUIRE_NONNULL(vec->data)
-    vec_dispose(vec);
+    gs_vec_dispose(vec);
     free (vec);
 }
 
-void vec_dispose(struct vec_t *vec)
+void gs_vec_dispose(struct gs_vec_t *vec)
 {
     free (vec->data);
     vec->data = NULL;
@@ -119,14 +119,14 @@ void vec_dispose(struct vec_t *vec)
     apr_pool_destroy(vec->pool);
 }
 
-void vec_free_ex(vec_t *vec, void *capture, bool (*func)(void *capture, void *begin, void *end))
+void gs_vec_free_ex(gs_vec_t *vec, void *capture, bool (*func)(void *capture, void *begin, void *end))
 {
-    if (vec_foreach(vec, capture, func)) {
-        vec_free(vec);
+    if (gs_vec_foreach(vec, capture, func)) {
+        gs_vec_free(vec);
     }
 }
 
-bool vec_pushback(vec_t *vec, size_t num_elements, const void *data)
+bool gs_vec_pushback(gs_vec_t *vec, size_t num_elements, const void *data)
 {
     if (check_add_args(vec, num_elements, data) && check_auto_resize(vec, num_elements)) {
         size_t new_num_elements = vec->num_elements + num_elements;
@@ -140,27 +140,27 @@ bool vec_pushback(vec_t *vec, size_t num_elements, const void *data)
     } else return false;
 }
 
-bool vec_add_all(vec_t *dest, const vec_t *src)
+bool gs_vec_add_all(gs_vec_t *dest, const gs_vec_t *src)
 {
     if (dest == NULL || src == NULL || dest->sizeof_element != src->sizeof_element) {
         return false;
     } else {
-        vec_reserve(dest, dest->num_elements + src->num_elements);
-        return vec_add_all_unsafe(dest, src);
+        gs_vec_reserve(dest, dest->num_elements + src->num_elements);
+        return gs_vec_add_all_unsafe(dest, src);
     }
 }
 
-bool vec_add_all_unsafe(vec_t *dest, const vec_t *src)
+bool gs_vec_add_all_unsafe(gs_vec_t *dest, const gs_vec_t *src)
 {
     if (dest == NULL || src == NULL || dest->sizeof_element != src->sizeof_element) {
         return false;
     } else {
-        vec_add_unsafe(dest, src->num_elements, src->data);
+        gs_vec_add_unsafe(dest, src->num_elements, src->data);
         return true;
     }
 }
 
-void vec_add_unsafe(vec_t *vec, size_t num_elements, const void *data)
+void gs_vec_add_unsafe(gs_vec_t *vec, size_t num_elements, const void *data)
 {
     size_t new_num_elements = vec->num_elements + num_elements;
     void *base = vec->data + vec->num_elements * vec->sizeof_element;
@@ -169,13 +169,13 @@ void vec_add_unsafe(vec_t *vec, size_t num_elements, const void *data)
     vec->is_sorted = false;
 }
 
-void *vec_data(vec_t *vec)
+void *gs_vec_data(gs_vec_t *vec)
 {
     GS_REQUIRE_NONNULL(vec)
     return vec->data;
 }
 
-void *vec_at(const vec_t *vec, size_t pos)
+void *gs_vec_at(const gs_vec_t *vec, size_t pos)
 {
     GS_REQUIRE_NONNULL(vec)
     REQUIRE_LESSTHAN(pos, vec->num_elements)
@@ -183,38 +183,38 @@ void *vec_at(const vec_t *vec, size_t pos)
     return result;
 }
 
-void *vec_peek(const vec_t *vec)
+void *gs_vec_peek(const gs_vec_t *vec)
 {
     GS_REQUIRE_NONNULL(vec)
     REQUIRE_NONZERO(vec->num_elements)
-    void *result = vec_at(vec, vec->num_elements - 1);
+    void *result = gs_vec_at(vec, vec->num_elements - 1);
     return result;
 }
 
-void *vec_begin(const vec_t *vec)
+void *gs_vec_begin(const gs_vec_t *vec)
 {
     if (vec) {
         REQUIRE_NONZERO(vec->num_elements)
-        void *result = vec_at(vec, 0);
+        void *result = gs_vec_at(vec, 0);
         return result;
     } else return NULL;
 }
 
-void *vec_end(const vec_t *vec)
+void *gs_vec_end(const gs_vec_t *vec)
 {
     GS_REQUIRE_NONNULL(vec)
     void *result = (vec->data + vec->num_elements * vec->sizeof_element);
     return result;
 }
 
-bool vec_issorted(vec_t *vec, cache_consideration_policy policy, comp_t comp)
+bool gs_vec_issorted(gs_vec_t *vec, gs_cache_consideration_policy_e policy, gs_comp_t comp)
 {
     GS_REQUIRE_NONNULL(vec);
     REQUIRE((policy != CCP_IGNORECACHE || (comp != NULL)), "Null pointer to required function pointer");
-    return (policy == CCP_USECACHE) ? vec->is_sorted : vec_updatesort(vec, comp);
+    return (policy == CCP_USECACHE) ? vec->is_sorted : gs_vec_updatesort(vec, comp);
 }
 
-bool vec_updatesort(vec_t *vec, comp_t comp)
+bool gs_vec_updatesort(gs_vec_t *vec, gs_comp_t comp)
 {
     GS_REQUIRE_NONNULL(vec);
     GS_REQUIRE_NONNULL(comp);
@@ -231,17 +231,17 @@ bool vec_updatesort(vec_t *vec, comp_t comp)
     return vec->is_sorted;
 }
 
-void *vec_pop_unsafe(vec_t *vec)
+void *gs_vec_pop_unsafe(gs_vec_t *vec)
 {
     return (vec->data + (vec->num_elements-- - 1) * vec->sizeof_element);
 }
 
-void *vec_peek_unsafe(vec_t *vec)
+void *gs_vec_peek_unsafe(gs_vec_t *vec)
 {
     return (vec->data + (vec->num_elements - 1) * vec->sizeof_element);
 }
 
-bool vec_set(vec_t *vec, size_t idx, size_t num_elements, const void *data)
+bool gs_vec_set(gs_vec_t *vec, size_t idx, size_t num_elements, const void *data)
 {
     GS_REQUIRE_NONNULL(vec)
     if (check_set_args(vec, num_elements, data)) {
@@ -252,24 +252,24 @@ bool vec_set(vec_t *vec, size_t idx, size_t num_elements, const void *data)
             vec->num_elements = max(vec->num_elements, last_idx);
             return true;
         } else if (advance(vec, idx, num_elements))
-            return vec_set(vec, idx, num_elements, data);
+            return gs_vec_set(vec, idx, num_elements, data);
     }
     return false;
 }
 
-size_t vector_get_num_elements(vec_t *vec)
+size_t vector_get_num_elements(gs_vec_t *vec)
 {
     GS_REQUIRE_NONNULL(vec)
     return vec->num_elements;
 }
 
-size_t vector_get_elements_size(vec_t *vec)
+size_t vector_get_elements_size(gs_vec_t *vec)
 {
     GS_REQUIRE_NONNULL(vec)
     return vec->sizeof_element;
 }
 
-bool vec_foreach(vec_t *vec, void *capture, bool (*func)(void *capture, void *begin, void *end))
+bool gs_vec_foreach(gs_vec_t *vec, void *capture, bool (*func)(void *capture, void *begin, void *end))
 {
     GS_REQUIRE_NONNULL(vec)
     GS_REQUIRE_NONNULL(func)
@@ -277,7 +277,7 @@ bool vec_foreach(vec_t *vec, void *capture, bool (*func)(void *capture, void *be
     return func(capture, vec->data, vec->data + vec->num_elements * vec->sizeof_element);
 }
 
-void vec_cpy_shallow(vec_t *dst, vec_t *src)
+void gs_vec_cpy_shallow(gs_vec_t *dst, gs_vec_t *src)
 {
     dst->sizeof_element = src->sizeof_element;
     dst->num_elements = src->num_elements;
@@ -288,15 +288,15 @@ void vec_cpy_shallow(vec_t *dst, vec_t *src)
     dst->is_sorted = src->is_sorted;
 }
 
-void vec_swap(vec_t *lhs, vec_t *rhs)
+void gs_vec_swap(gs_vec_t *lhs, gs_vec_t *rhs)
 {
-    vec_t tmp;
-    vec_cpy_shallow(&tmp, lhs);
-    vec_cpy_shallow(lhs, rhs);
-    vec_cpy_shallow(rhs, &tmp);
+    gs_vec_t tmp;
+    gs_vec_cpy_shallow(&tmp, lhs);
+    gs_vec_cpy_shallow(lhs, rhs);
+    gs_vec_cpy_shallow(rhs, &tmp);
 }
 
-size_t vec_count(vec_t *vec, void *capture, bool (*pred)(void *capture, void *it))
+size_t vec_count(gs_vec_t *vec, void *capture, bool (*pred)(void *capture, void *it))
 {
     GS_REQUIRE_NONNULL(vec)
     GS_REQUIRE_NONNULL(pred)
@@ -308,7 +308,7 @@ size_t vec_count(vec_t *vec, void *capture, bool (*pred)(void *capture, void *it
     return count;
 }
 
-bool vec_contains(vec_t *vec, void *needle)
+bool vec_contains(gs_vec_t *vec, void *needle)
 {
     GS_REQUIRE_NONNULL(vec)
     GS_REQUIRE_NONNULL(needle)
@@ -330,25 +330,25 @@ bool vec_contains(vec_t *vec, void *needle)
     return false;
 }
 
-size_t vec_memused(vec_t *vec)
+size_t vec_memused(gs_vec_t *vec)
 {
     return (vec->element_capacity * vec->sizeof_element);
 }
 
-size_t vec_memused__str(vec_t *vec)
+size_t vec_memused__str(gs_vec_t *vec)
 {
     size_t memused = vec_memused(vec);
     size_t total_str_size = 0;
-    vec_foreach(vec, &total_str_size, get_sizeof_strings);
+    gs_vec_foreach(vec, &total_str_size, gs_get_sizeof_strings);
     return (memused + total_str_size);
 }
 
-size_t vec_sizeof(const vec_t *vec)
+size_t vec_sizeof(const gs_vec_t *vec)
 {
     return (vec == NULL ? 0 : vec->element_capacity * vec->sizeof_element);
 }
 
-void vec_sort(vec_t *vec, comp_t comp)
+void vec_sort(gs_vec_t *vec, gs_comp_t comp)
 {
     GS_REQUIRE_NONNULL(vec);
     GS_REQUIRE_NONNULL(comp);
@@ -359,7 +359,7 @@ void vec_sort(vec_t *vec, comp_t comp)
     }
 }
 
-void *vec_bsearch(vec_t *vec, const void *needle, comp_t sort_comp, comp_t find_comp)
+void *gs_vec_bsearch(gs_vec_t *vec, const void *needle, gs_comp_t sort_comp, gs_comp_t find_comp)
 {
     GS_REQUIRE_NONNULL(vec);
     GS_REQUIRE_NONNULL(needle);
@@ -367,7 +367,7 @@ void *vec_bsearch(vec_t *vec, const void *needle, comp_t sort_comp, comp_t find_
     GS_REQUIRE_NONNULL(find_comp);
 
     if (vec->num_elements == 0) {
-        return vec_end(vec);
+        return gs_vec_end(vec);
     } else {
         vec_sort(vec, sort_comp);
 
@@ -390,11 +390,11 @@ void *vec_bsearch(vec_t *vec, const void *needle, comp_t sort_comp, comp_t find_
             }
         }
 
-        return vec_end(vec);
+        return gs_vec_end(vec);
     }
 }
 
-bool vec_comp(const vec_t *lhs, const vec_t *rhs, comp_t comp)
+bool gs_vec_comp(const gs_vec_t *lhs, const gs_vec_t *rhs, gs_comp_t comp)
 {
     GS_REQUIRE_NONNULL(lhs)
     GS_REQUIRE_NONNULL(rhs)
@@ -420,10 +420,10 @@ break_inner_loop:
 }
 
 
-void vec_free__str(vec_t *vec)
+void gs_vec_free__str(gs_vec_t *vec)
 {
-    if (vec_foreach(vec, NULL, free_strings)) {
-        vec_free(vec);
+    if (gs_vec_foreach(vec, NULL, gs_free_strings)) {
+        gs_vec_free(vec);
     }
 }
 
@@ -431,7 +431,7 @@ void vec_free__str(vec_t *vec)
 // H E L P E R  I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool free_strings(void *capture, void *begin, void *end)
+bool gs_free_strings(void *capture, void *begin, void *end)
 {
     GS_REQUIRE_NONNULL(begin)
     GS_REQUIRE_NONNULL(end)
@@ -442,7 +442,7 @@ bool free_strings(void *capture, void *begin, void *end)
     return true;
 };
 
-bool get_sizeof_strings(void *capture, void *begin, void *end)
+bool gs_get_sizeof_strings(void *capture, void *begin, void *end)
 {
     GS_REQUIRE_NONNULL(begin)
     GS_REQUIRE_NONNULL(end)
@@ -456,32 +456,32 @@ bool get_sizeof_strings(void *capture, void *begin, void *end)
     return true;
 };
 
- bool check_create_args(size_t size, vector_flags flags, float grow_factor)
+ bool check_create_args(size_t size, gs_vector_flags_e flags, float grow_factor)
 {
     bool valid_args = (size > 0) && (((flags & auto_resize) != auto_resize) || (grow_factor > 1));
-    error_if(!valid_args, err_illegal_args);
+    gs_error_if(!valid_args, err_illegal_args);
     return valid_args;
 }
 
- vec_t *alloc_vector()
+ gs_vec_t *alloc_vector()
 {
-    vec_t *result = GS_REQUIRE_MALLOC (sizeof(vec_t));
-    error_if((result == NULL), err_bad_malloc);
+    gs_vec_t *result = GS_REQUIRE_MALLOC (sizeof(gs_vec_t));
+    gs_error_if((result == NULL), err_bad_malloc);
     return result;
 }
 
- vec_t *alloc_data(vec_t *vec, vector_flags flags, size_t capacity, size_t size)
+ gs_vec_t *alloc_data(gs_vec_t *vec, gs_vector_flags_e flags, size_t capacity, size_t size)
 {
     if (__builtin_expect((vec != NULL) && (vec->data = ((flags & zero_memory) == zero_memory) ?
                                                        calloc(capacity, size) :
                                                        GS_REQUIRE_MALLOC(capacity * size)) == NULL, false)) {
-        error(err_bad_malloc);
+        gs_gc_error(err_bad_malloc);
         free(vec);
         return NULL;
     } else return vec;
 }
 
- void init_vector(vec_t *vec, vector_flags flags, size_t capacity, size_t size, float factor)
+ void init_vector(gs_vec_t *vec, gs_vector_flags_e flags, size_t capacity, size_t size, float factor)
 {
     if (__builtin_expect(vec != NULL, true)) {
         vec->flags = flags;
@@ -494,44 +494,44 @@ bool get_sizeof_strings(void *capture, void *begin, void *end)
     }
 }
 
- bool check_add_args(vec_t *vec, size_t num_elements, const void *data)
+ bool check_add_args(gs_vec_t *vec, size_t num_elements, const void *data)
 {
     bool result = ((vec != NULL) && (num_elements > 0) && (data != NULL));
-    error_if(!result, err_illegal_args);
+    gs_error_if(!result, err_illegal_args);
     return result;
 }
 
- bool check_auto_resize(vec_t *vec, size_t num_elements)
+ bool check_auto_resize(gs_vec_t *vec, size_t num_elements)
 {
     bool result = ((vec->sizeof_element + num_elements < vec->element_capacity) ||
                    (vec->flags & auto_resize) == auto_resize);
-    error_if(!result, err_illegal_opp);
+    gs_error_if(!result, err_illegal_opp);
     return result;
 }
 
- bool check_set_args(vec_t *vec, size_t num_elements, const void *data)
+ bool check_set_args(gs_vec_t *vec, size_t num_elements, const void *data)
 {
     bool result = (vec != NULL && num_elements > 0 && data != NULL);
-    error_if(!result, err_illegal_args);
+    gs_error_if(!result, err_illegal_args);
     return result;
 }
 
- bool outside_bounds_enabled(vec_t *vec, size_t idx, size_t num_elements)
+ bool outside_bounds_enabled(gs_vec_t *vec, size_t idx, size_t num_elements)
 {
     bool result = (vec != NULL &&
                    ((idx + num_elements < vec->num_elements) || ((vec->flags & auto_resize) == auto_resize)));
-    error_if(!result, err_illegal_args);
+    gs_error_if(!result, err_illegal_args);
     return result;
 }
 
- bool realloc_vector(vec_t *vec, size_t new_num_elements)
+ bool realloc_vector(gs_vec_t *vec, size_t new_num_elements)
 {
     if (new_num_elements >= vec->element_capacity) {
         while (new_num_elements >= vec->element_capacity)
             vec->element_capacity = ceil(vec->element_capacity * vec->grow_factor);
 
         if ((vec->data = realloc(vec->data, vec->element_capacity * vec->sizeof_element)) == NULL) {
-            error(err_bad_realloc);
+            gs_gc_error(err_bad_realloc);
             return false;
         } else {
             if ((vec->flags & zero_memory) == zero_memory) {
@@ -543,7 +543,7 @@ bool get_sizeof_strings(void *capture, void *begin, void *end)
     } else return true;
 }
 
- bool advance(vec_t *vec, size_t idx, size_t num_elements)
+ bool advance(gs_vec_t *vec, size_t idx, size_t num_elements)
 {
     if ((idx + num_elements) < vec->num_elements) {
         return true;

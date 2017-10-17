@@ -22,21 +22,21 @@
 #include <gs_schema.h>
 
 #define DEFINE_ATTRIBUTE_CREATE(type_name,internal_type)                                                               \
-attr_id_t attr_create_##type_name(const char *name, schema_t *schema) {                                                \
-    return attr_create(name, internal_type, 1, schema);                                                                \
+gs_attr_id_t attr_create_##type_name(const char *name, gs_schema_t *schema) {                                                \
+    return gs_attr_create(name, internal_type, 1, schema);                                                                \
 }
 
 #define DEFINE_ATTRIBUTE_ARRAY_CREATE(type_name,internal_type)                                                         \
-attr_id_t attr_create_##type_name(const char *name, size_t length, schema_t *schema) {                                 \
-    return attr_create(name, internal_type, length, schema);                                                           \
+gs_attr_id_t attr_create_##type_name(const char *name, size_t length, gs_schema_t *schema) {                                 \
+    return gs_attr_create(name, internal_type, length, schema);                                                           \
 }
 
-attr_id_t _attr_create(const char *name, enum field_type data_type, size_t data_type_rep, ATTR_FLAGS attr_flags, schema_t *schema)
+gs_attr_id_t _attr_create(const char *name, enum gs_field_type_e data_type, size_t data_type_rep, GS_ATTR_FLAGS_t attr_flags, gs_schema_t *schema)
 {
     panic_if((name == NULL || schema == NULL || strlen(name) + 1 > ATTR_NAME_MAXLEN), BADARG,
              "null pointer or attribute name limit exceeded");
 
-    attr_t attr = {
+    gs_attr_t attr = {
             .id     = schema->attr->num_elements,
             .type     = data_type,
             .type_rep = data_type_rep,
@@ -46,49 +46,49 @@ attr_id_t _attr_create(const char *name, enum field_type data_type, size_t data_
 
     strcpy(attr.name, name);
     memset(attr.checksum, 0, MD5_DIGEST_LENGTH);
-    vec_pushback(schema->attr, 1, &attr);
+    gs_vec_pushback(schema->attr, 1, &attr);
     return attr.id;
 }
 
-const char *attr_name(const struct attr_t *attr)
+const char *gs_attr_name(const struct gs_attr_t *attr)
 {
     assert (attr);
     return attr->name;
 }
 
-size_t attr_str_max_len(attr_t *attr)
+size_t gs_attr_str_max_len(gs_attr_t *attr)
 {
     assert (attr);
     return attr->str_format_mlen;
 }
 
-enum field_type attr_type(const attr_t *attr)
+enum gs_field_type_e gs_attr_type(const gs_attr_t *attr)
 {
     assert (attr);
     return attr->type;
 }
 
-const attr_t *attr_cpy(const attr_t *template, schema_t *new_owner)
+const gs_attr_t *gs_attr_cpy(const gs_attr_t *template, gs_schema_t *new_owner)
 {
     assert (template);
     assert(new_owner);
-    attr_id_t id = _attr_create(template->name, template->type, template->type_rep, template->flags, new_owner);
-    return schema_attr_by_id(new_owner, id);
+    gs_attr_id_t id = _attr_create(template->name, template->type, template->type_rep, template->flags, new_owner);
+    return gs_schema_attr_by_id(new_owner, id);
 }
 
-size_t attr_total_size(const struct attr_t *attr)
+size_t gs_attr_total_size(const struct gs_attr_t *attr)
 {
-    return attr->type_rep * field_type_sizeof(attr->type);
+    return attr->type_rep * gs_field_type_sizeof(attr->type);
 }
 
-attr_id_t attr_create(const char *name, enum field_type data_type, size_t data_type_rep, schema_t *schema)
+gs_attr_id_t gs_attr_create(const char *name, enum gs_field_type_e data_type, size_t data_type_rep, gs_schema_t *schema)
 {
     return _attr_create(name, data_type, data_type_rep,
-                        (ATTR_FLAGS) { .autoinc = 0, .foreign = 0, .nullable = 0, .primary = 0, .unique = 0 },
+                        (GS_ATTR_FLAGS_t) { .autoinc = 0, .foreign = 0, .nullable = 0, .primary = 0, .unique = 0 },
                         schema);
 }
 
-bool attr_isstring(const attr_t *attr)
+bool gs_attr_isstring(const gs_attr_t *attr)
 {
     return (attr == NULL ? false : (attr->type == FT_CHAR));
 }

@@ -24,23 +24,23 @@
 // D A T A T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-typedef void (*init_t)(void *element);
-typedef void (*inc_t)(void *element);
+typedef void (*gs_init_t)(void *element);
+typedef void (*gs_inc_t)(void *element);
 
-typedef struct freelist_t {
-    inc_t inc;
+typedef struct gs_freelist_t {
+    gs_inc_t inc;
     void *next_element;
-    vec_t *free_elem;
-} freelist_t;
+    gs_vec_t *free_elem;
+} gs_freelist_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-void freelist_create(freelist_t *list, size_t elem_size, size_t capacity, init_t init, inc_t inc);
-void freelist_create2(freelist_t **list, size_t elem_size, size_t capacity, init_t init, inc_t inc);
-void freelist_dispose(freelist_t *list);
-void freelist_free(freelist_t *list);
-void freelist_bind(void *out, const freelist_t *list, size_t num_elem);
-const void *freelist_peek_new(const freelist_t *list);
-void freelist_pushback(freelist_t *list, size_t num_elem, void *elem);
+void gs_freelist_create(gs_freelist_t *list, size_t elem_size, size_t capacity, gs_init_t init, gs_inc_t inc);
+void gs_freelist_create2(gs_freelist_t **list, size_t elem_size, size_t capacity, gs_init_t init, gs_inc_t inc);
+void gs_freelist_dispose(gs_freelist_t *list);
+void gs_freelist_free(gs_freelist_t *list);
+void gs_freelist_bind(void *out, const gs_freelist_t *list, size_t num_elem);
+const void *gs_freelist_peek_new(const gs_freelist_t *list);
+void gs_freelist_pushback(gs_freelist_t *list, size_t num_elem, void *elem);

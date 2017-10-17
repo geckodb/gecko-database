@@ -17,7 +17,7 @@
 
 #include <operators/gs_scan.h>
 
-struct frag_t *scan_mediator(struct frag_t *self, const pred_tree_t *pred, size_t batch_size, size_t nthreads)
+struct gs_frag_t *gs_scan_mediator(struct gs_frag_t *self, const gs_pred_tree_t *pred, size_t batch_size, size_t nthreads)
 {
     panic(NOTIMPLEMENTED, "this")
 }

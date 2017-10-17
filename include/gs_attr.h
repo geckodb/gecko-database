@@ -26,36 +26,36 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #define DECLARE_ATTRIBUTE_CREATE(type_name,internal_type)                                                              \
-attr_id_t attr_create_##type_name(const char *name, schema_t *schema);
+gs_attr_id_t attr_create_##type_name(const char *name, gs_schema_t *schema);
 
 #define DECLARE_ATTRIBUTE_ARRAY_CREATE(type_name,internal_type)                                                        \
-attr_id_t attr_create_##type_name(const char *name, size_t length, schema_t *schema);
+gs_attr_id_t attr_create_##type_name(const char *name, size_t length, gs_schema_t *schema);
 
 // ---------------------------------------------------------------------------------------------------------------------
-// T Y P E S
+// D A T A T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-typedef struct attr_t {
+typedef struct gs_attr_t {
     size_t id;
     char name[ATTR_NAME_MAXLEN];
-    enum field_type type;
+    enum gs_field_type_e type;
     size_t type_rep;
-    ATTR_FLAGS flags;
+    GS_ATTR_FLAGS_t flags;
     size_t str_format_mlen;
     unsigned char checksum[MD5_DIGEST_LENGTH];
-} attr_t;
+} gs_attr_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   D E C L A R A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-attr_id_t attr_create(const char *name, enum field_type data_type, size_t data_type_rep, schema_t *schema);
-const char *attr_name(const struct attr_t *attr);
-bool attr_isstring(const attr_t *attr);
-size_t attr_str_max_len(attr_t *attr);
-enum field_type attr_type(const attr_t *attr);
-const attr_t *attr_cpy(const attr_t *template, schema_t *new_owner);
-size_t attr_total_size(const struct attr_t *attr);
+gs_attr_id_t gs_attr_create(const char *name, enum gs_field_type_e data_type, size_t data_type_rep, gs_schema_t *schema);
+const char *gs_attr_name(const struct gs_attr_t *attr);
+bool gs_attr_isstring(const gs_attr_t *attr);
+size_t gs_attr_str_max_len(gs_attr_t *attr);
+enum gs_field_type_e gs_attr_type(const gs_attr_t *attr);
+const gs_attr_t *gs_attr_cpy(const gs_attr_t *template, gs_schema_t *new_owner);
+size_t gs_attr_total_size(const struct gs_attr_t *attr);
 
 DECLARE_ATTRIBUTE_CREATE(bool, FT_BOOL)
 DECLARE_ATTRIBUTE_CREATE(int8, FT_INT8)

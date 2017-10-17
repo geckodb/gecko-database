@@ -38,12 +38,12 @@ typedef struct hash_vindex_extra_t {
 // H E L P E R   P R O T O T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-static void this_add(struct vindex_t *self, const attr_id_t *key, const struct grid_t *grid);
-static void this_remove(struct vindex_t *self, const attr_id_t *key);
-static bool this_contains(const struct vindex_t *self, const attr_id_t *key);
-static void this_free(struct vindex_t *self);
-static void this_query(grid_cursor_t *result, const struct vindex_t *self, const attr_id_t *key_begin,
-                              const attr_id_t *key_end);
+static void this_add(struct gs_vindex_t *self, const gs_attr_id_t *key, const struct gs_grid_t *grid);
+static void this_remove(struct gs_vindex_t *self, const gs_attr_id_t *key);
+static bool this_contains(const struct gs_vindex_t *self, const gs_attr_id_t *key);
+static void this_free(struct gs_vindex_t *self);
+static void this_query(gs_grid_cursor_t *result, const struct gs_vindex_t *self, const gs_attr_id_t *key_begin,
+                              const gs_attr_id_t *key_end);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E  I M P L E M E N T A T I O N
@@ -51,20 +51,20 @@ static void this_query(grid_cursor_t *result, const struct vindex_t *self, const
 
  bool attr_key_equals(const void *key_lhs, const void *key_rhs)
 {
-    attr_id_t lhs = *((attr_id_t *) key_lhs);
-    attr_id_t rhs = *((attr_id_t *) key_rhs);
+    gs_attr_id_t lhs = *((gs_attr_id_t *) key_lhs);
+    gs_attr_id_t rhs = *((gs_attr_id_t *) key_rhs);
     return (lhs == rhs);
 }
 
  void cleanup_vectors(void *key, void *value)
 {
-    vec_dispose((vec_t *) value);
+    gs_vec_dispose((gs_vec_t *) value);
 }
 
-vindex_t *hash_vindex_new(size_t key_size, size_t num_init_slots)   // TODO: remove key_size; it's attr_id_t always!
+gs_vindex_t *hash_vindex_new(size_t key_size, size_t num_init_slots)   // TODO: remove key_size; it's gs_attr_id_t always!
 {
-    vindex_t *result = GS_REQUIRE_MALLOC(sizeof(vindex_t));
-    *result = (vindex_t) {
+    gs_vindex_t *result = GS_REQUIRE_MALLOC(sizeof(gs_vindex_t));
+    *result = (gs_vindex_t) {
         ._add = this_add,
         ._contains = this_contains,
         ._free = this_free,
@@ -73,7 +73,7 @@ vindex_t *hash_vindex_new(size_t key_size, size_t num_init_slots)   // TODO: rem
         .tag = GI_VINDEX_HASH
     };
 
-    hashset_create(&result->keys, key_size, num_init_slots);
+    gs_hashset_create(&result->keys, key_size, num_init_slots);
 
     hash_vindex_extra_t *extra = GS_REQUIRE_MALLOC(sizeof(hash_vindex_extra_t));
     apr_pool_create(&extra->pool, NULL);
@@ -90,54 +90,54 @@ vindex_t *hash_vindex_new(size_t key_size, size_t num_init_slots)   // TODO: rem
 // H E L P E R   I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-static void this_add(struct vindex_t *self, const attr_id_t *key, const struct grid_t *grid)
+static void this_add(struct gs_vindex_t *self, const gs_attr_id_t *key, const struct gs_grid_t *grid)
 {
     REQUIRE_INSTANCEOF_THIS(self);
     hash_vindex_extra_t *extra = ((hash_vindex_extra_t *)self->extra);
     if (!apr_hash_get(extra->hash, key, extra->key_size)) {
-        vec_t *vec = vec_new(sizeof(struct grid_t *), 10);
-        attr_id_t *key_imp = apr_pmemdup(extra->pool, key, sizeof(attr_id_t));
-        apr_hash_set(extra->hash, key_imp, sizeof(attr_id_t), vec);
+        gs_vec_t *vec = gs_vec_new(sizeof(struct gs_grid_t *), 10);
+        gs_attr_id_t *key_imp = apr_pmemdup(extra->pool, key, sizeof(gs_attr_id_t));
+        apr_hash_set(extra->hash, key_imp, sizeof(gs_attr_id_t), vec);
     }
-    vec_t *vec = (vec_t *) apr_hash_get(extra->hash, key, sizeof(attr_id_t));
+    gs_vec_t *vec = (gs_vec_t *) apr_hash_get(extra->hash, key, sizeof(gs_attr_id_t));
     GS_REQUIRE_NONNULL(vec);
-    vec_pushback(vec, 1, &grid);
+    gs_vec_pushback(vec, 1, &grid);
 }
 
-static void this_remove(struct vindex_t *self, const attr_id_t *key)
+static void this_remove(struct gs_vindex_t *self, const gs_attr_id_t *key)
 {
     REQUIRE_INSTANCEOF_THIS(self);
     panic(NOTIMPLEMENTED, to_string(this_remove)) // requires proper implementation of remove in hash table
 }
 
-static bool this_contains(const struct vindex_t *self, const attr_id_t *key)
+static bool this_contains(const struct gs_vindex_t *self, const gs_attr_id_t *key)
 {
     REQUIRE_INSTANCEOF_THIS(self);
     hash_vindex_extra_t *extra = ((hash_vindex_extra_t *)self->extra);
     GS_REQUIRE_NONNULL(extra);
     GS_REQUIRE_NONNULL(extra->hash);
-    return (apr_hash_get(extra->hash, key, sizeof(attr_id_t)) != NULL);
+    return (apr_hash_get(extra->hash, key, sizeof(gs_attr_id_t)) != NULL);
 }
 
-static void this_free(struct vindex_t *self)
+static void this_free(struct gs_vindex_t *self)
 {
     REQUIRE_INSTANCEOF_THIS(self);
     hash_vindex_extra_t *extra = ((hash_vindex_extra_t *)self->extra);
     apr_pool_destroy(extra->pool);
-    hashset_dispose(&self->keys);
+    gs_hashset_dispose(&self->keys);
     free (extra);
 }
 
 
-static void this_query(grid_cursor_t *result, const struct vindex_t *self, const attr_id_t *key_begin,
-                              const attr_id_t *key_end)
+static void this_query(gs_grid_cursor_t *result, const struct gs_vindex_t *self, const gs_attr_id_t *key_begin,
+                              const gs_attr_id_t *key_end)
 {
     GS_REQUIRE_NONNULL(result->extra);
-    for (const attr_id_t *key = key_begin; key != key_end; key++) {
+    for (const gs_attr_id_t *key = key_begin; key != key_end; key++) {
         if (this_contains(self, key)) {
             hash_vindex_extra_t *extra = ((hash_vindex_extra_t *)self->extra);
-            const struct vec_t *vec = apr_hash_get(extra->hash, key, sizeof(attr_id_t));
-            vec_add_all(result->extra, vec);
+            const struct gs_vec_t *vec = apr_hash_get(extra->hash, key, sizeof(gs_attr_id_t));
+            gs_vec_add_all(result->extra, vec);
         }
     }
 }

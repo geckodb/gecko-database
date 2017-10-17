@@ -26,7 +26,7 @@
 // F O R W A R D   D E C L A R A T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-struct grid_t;
+struct gs_grid_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // D A T A   T Y P E S
@@ -34,43 +34,43 @@ struct grid_t;
 
 typedef enum {
     HT_LINEAR_SEARCH
-} hindex_tag;
+} gs_hindex_tag_e;
 
-typedef struct hindex_result_t {
-    hindex_tag tag;
+typedef struct gs_hindex_result_t {
+    gs_hindex_tag_e tag;
     void *extra;
-} xxx_index_result_cursor_t;
+} gs_xxx_index_result_cursor_t;
 
-typedef struct hindex_t {
-    hindex_tag tag;
-    tuple_id_interval_t bounds;
+typedef struct gs_hindex_t {
+    gs_hindex_tag_e tag;
+    gs_tuple_id_interval_t bounds;
 
-    void (*_add)(struct hindex_t *self, const tuple_id_interval_t *key, const struct grid_t *grid);
-    void (*_remove_interval)(struct hindex_t *self, const tuple_id_interval_t *key);
-    void (*_remove_intersec)(struct hindex_t *self, tuple_id_t tid);
-    bool (*_contains)(const struct hindex_t *self, tuple_id_t tid);
-    void (*_query)(grid_cursor_t *result, const struct hindex_t *self, const tuple_id_t *tid_begin,
-                   const tuple_id_t *tid_end);
-    void (*_delete)(struct hindex_t *self);
-    tuple_id_t (*_minbegin)(struct hindex_t *self);
-    tuple_id_t (*_maxend)(struct hindex_t *self);
+    void (*_add)(struct gs_hindex_t *self, const gs_tuple_id_interval_t *key, const struct gs_grid_t *grid);
+    void (*_remove_interval)(struct gs_hindex_t *self, const gs_tuple_id_interval_t *key);
+    void (*_remove_intersec)(struct gs_hindex_t *self, gs_tuple_id_t tid);
+    bool (*_contains)(const struct gs_hindex_t *self, gs_tuple_id_t tid);
+    void (*_query)(gs_grid_cursor_t *result, const struct gs_hindex_t *self, const gs_tuple_id_t *tid_begin,
+                   const gs_tuple_id_t *tid_end);
+    void (*_delete)(struct gs_hindex_t *self);
+    gs_tuple_id_t (*_minbegin)(struct gs_hindex_t *self);
+    gs_tuple_id_t (*_maxend)(struct gs_hindex_t *self);
 
-    const schema_t *table_schema; /*<! Required to calculate an approx. result set size for queries */
+    const gs_schema_t *table_schema; /*<! Required to calculate an approx. result set size for queries */
     void *extra;
-} hindex_t;
+} gs_hindex_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-void hindex_delete(struct hindex_t *index);
-void hindex_add(struct hindex_t *index, const tuple_id_interval_t *key, const struct grid_t *grid);
-void hindex_remove(struct hindex_t *index, const tuple_id_interval_t *key);
-void hindex_remove_having(struct hindex_t *index, tuple_id_t tid);
-bool hindex_contains(const struct hindex_t *index, tuple_id_t tid);
-grid_cursor_t *hindex_query(const struct hindex_t *index, const tuple_id_t *tid_begin,
-                            const tuple_id_t *tid_end);
-const struct grid_t *hindex_read(grid_cursor_t *result_set);
-void hindex_close(grid_cursor_t *result_set);
-void hindex_bounds(tuple_id_interval_t *bounds, const hindex_t *index);
-void hindex_print(FILE *file, const hindex_t *index);
+void gs_hindex_delete(struct gs_hindex_t *index);
+void gs_hindex_add(struct gs_hindex_t *index, const gs_tuple_id_interval_t *key, const struct gs_grid_t *grid);
+void gs_hindex_remove(struct gs_hindex_t *index, const gs_tuple_id_interval_t *key);
+void gs_hindex_remove_having(struct gs_hindex_t *index, gs_tuple_id_t tid);
+bool gs_hindex_contains(const struct gs_hindex_t *index, gs_tuple_id_t tid);
+gs_grid_cursor_t *gs_hindex_query(const struct gs_hindex_t *index, const gs_tuple_id_t *tid_begin,
+                                  const gs_tuple_id_t *tid_end);
+const struct gs_grid_t *gs_hindex_read(gs_grid_cursor_t *result_set);
+void gs_hindex_close(gs_grid_cursor_t *result_set);
+void gs_hindex_bounds(gs_tuple_id_interval_t *bounds, const gs_hindex_t *index);
+void gs_hindex_print(FILE *file, const gs_hindex_t *index);

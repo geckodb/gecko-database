@@ -22,38 +22,38 @@
 // I N T E R F A C E  I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-void freelist_create(freelist_t *list, size_t elem_size, size_t capacity, init_t init, inc_t inc)
+void gs_freelist_create(gs_freelist_t *list, size_t elem_size, size_t capacity, gs_init_t init, gs_inc_t inc)
 {
     GS_REQUIRE_NONNULL(list);
     GS_REQUIRE_NONNULL(inc);
     REQUIRE((elem_size > 0), BADINT);
-    list->free_elem = vec_new(elem_size, capacity);
+    list->free_elem = gs_vec_new(elem_size, capacity);
     list->next_element = GS_REQUIRE_MALLOC(elem_size);
     list->inc = inc;
     init(list->next_element);
 }
 
-void freelist_create2(freelist_t **list, size_t elem_size, size_t capacity, init_t init, inc_t inc)
+void gs_freelist_create2(gs_freelist_t **list, size_t elem_size, size_t capacity, gs_init_t init, gs_inc_t inc)
 {
-    freelist_t *result = GS_REQUIRE_MALLOC(sizeof(freelist_t));
-    freelist_create(result, elem_size, capacity, init, inc);
+    gs_freelist_t *result = GS_REQUIRE_MALLOC(sizeof(gs_freelist_t));
+    gs_freelist_create(result, elem_size, capacity, init, inc);
     *list = result;
 }
 
-void freelist_dispose(freelist_t *list)
+void gs_freelist_dispose(gs_freelist_t *list)
 {
     GS_REQUIRE_NONNULL(list);
-    vec_free(list->free_elem);
+    gs_vec_free(list->free_elem);
     free(list->next_element);
 }
 
-void freelist_free(freelist_t *list)
+void gs_freelist_free(gs_freelist_t *list)
 {
-    freelist_dispose(list);
+    gs_freelist_dispose(list);
     free(list);
 }
 
-void freelist_bind(void *out, const freelist_t *list, size_t num_elem)
+void gs_freelist_bind(void *out, const gs_freelist_t *list, size_t num_elem)
 {
     GS_REQUIRE_NONNULL(out);
     GS_REQUIRE_NONNULL(list);
@@ -63,7 +63,7 @@ void freelist_bind(void *out, const freelist_t *list, size_t num_elem)
         const void *data;
 
         if (list->free_elem->num_elements > 0) {
-            data = vec_pop_unsafe(list->free_elem);
+            data = gs_vec_pop_unsafe(list->free_elem);
             memcpy(out, data, sizeof_element);
         } else {
             data = list->next_element;
@@ -75,16 +75,16 @@ void freelist_bind(void *out, const freelist_t *list, size_t num_elem)
     }
 }
 
-const void *freelist_peek_new(const freelist_t *list)
+const void *gs_freelist_peek_new(const gs_freelist_t *list)
 {
     GS_REQUIRE_NONNULL(list);
     return list->next_element;
 }
 
-void freelist_pushback(freelist_t *list, size_t num_elem, void *elem)
+void gs_freelist_pushback(gs_freelist_t *list, size_t num_elem, void *elem)
 {
     GS_REQUIRE_NONNULL(list);
     GS_REQUIRE_NONNULL(elem);
     REQUIRE((num_elem > 0), BADINT);
-    vec_pushback(list->free_elem, num_elem, elem);
+    gs_vec_pushback(list->free_elem, num_elem, elem);
 }

@@ -19,9 +19,9 @@
 #include <gs_frag.h>
 #include <gs_grid.h>
 #include <inttypes.h>
-size_t unsafe_field_println(enum field_type type, const void *data)
+size_t gs_unsafe_field_println(enum gs_field_type_e type, const void *data)
 {
-    char *buffer = unsafe_field_str(type, data);
+    char *buffer = gs_unsafe_field_str(type, data);
     size_t print_len = strlen(buffer);
     free (buffer);
     return print_len;
@@ -36,7 +36,7 @@ char *clip(const char *str, size_t max_len)
     return out;
 }
 
-char *unsafe_field_str(enum field_type type, const void *data)
+char *gs_unsafe_field_str(enum gs_field_type_e type, const void *data)
 {
     const size_t INIT_BUFFER_LEN = 2048;
     char *buffer = GS_REQUIRE_MALLOC(INIT_BUFFER_LEN);
@@ -102,7 +102,7 @@ char *unsafe_field_str(enum field_type type, const void *data)
             sprintf(buffer, "%zu", *(SIZE *) data);
             break;
         case FT_TFORMAT:
-            sprintf(buffer, "%s", tuplet_format_str(*(TFORMAT *) data));
+            sprintf(buffer, "%s", gs_tuplet_format_str(*(TFORMAT *) data));
             break;
         default:
             perror("Unknown type");

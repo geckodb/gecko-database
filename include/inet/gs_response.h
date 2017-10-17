@@ -22,7 +22,7 @@
 #include <apr_hash.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
-// C O N S T A N T S
+// C O N F I G
 // ---------------------------------------------------------------------------------------------------------------------
 
 #define MIME_CONTENT_TYPE                   "Content-Type"
@@ -39,25 +39,25 @@
 // D A T A   T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-typedef struct response_t {
-    http_status_code_t code;
+typedef struct gs_response_t {
+    gs_http_status_code_t code;
     apr_hash_t *fields;
     char *body;
     apr_pool_t *pool;
-} response_t;
+} gs_response_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-void response_create(response_t *response);
-void response_dispose(response_t *response);
-char *response_pack(response_t *response);
-void response_field_set(response_t *response, const char *field, const char *value);
-const char *response_field_get(response_t *response, const char *field);
-void response_body_set(response_t *response, const char *body);
-void response_content_type_set(response_t *response, const char *content_type);
-const char *response_content_type_get(response_t *response);
-const char *response_body_get(response_t *response);
-void response_end(response_t *response, http_status_code_t code);
-const char *response_format_fields(const response_t *response);
+void gs_response_create(gs_response_t *response);
+void gs_response_dispose(gs_response_t *response);
+char *gs_response_pack(gs_response_t *response);
+void gs_response_field_set(gs_response_t *response, const char *field, const char *value);
+const char *gs_response_field_get(gs_response_t *response, const char *field);
+void gs_response_body_set(gs_response_t *response, const char *body);
+void gs_response_content_type_set(gs_response_t *response, const char *content_type);
+const char *gs_response_content_type_get(gs_response_t *response);
+const char *gs_response_body_get(gs_response_t *response);
+void gs_response_end(gs_response_t *response, gs_http_status_code_t code);
+const char *gs_response_format_fields(const gs_response_t *response);

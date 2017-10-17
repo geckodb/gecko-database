@@ -29,13 +29,13 @@
 // D A T A   T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-typedef size_t grid_id_t;
+typedef size_t gs_grid_id_t;
 
-typedef struct grid_t {
+typedef struct gs_grid_t {
     apr_pool_t *pool;
-    struct table_t *context; /*<! The grid table in which this grid exists. */
-    grid_id_t grid_id; /*<! The id of this grid in context of the grid table. */
-    frag_t *frag; /*<! The physical data fragment including the applied physical schema of this grid. */
+    struct gs_table_t *context; /*<! The grid table in which this grid exists. */
+    gs_grid_id_t grid_id; /*<! The id of this grid in context of the grid table. */
+    gs_frag_t *frag; /*<! The physical data fragment including the applied physical schema of this grid. */
     apr_hash_t *schema_map_indicies; /*<! An (inverted) index that allows direct access from a table schema attribute to
                                       the associated grid schema attribute via indices mapping. This index returns the
                                       position j in the grid schema attribute list given a position i in the table
@@ -44,7 +44,7 @@ typedef struct grid_t {
                                       iterating through all i that are mapped into the grid yields all associated j.
                                       Note, the order of attributes might change between the table schema and the grid
                                       schema. */
-    vec_t /* of tuple_id_interval_t */ *tuple_ids; /*<! A list of right-open intervals that describe which tuples in the table
+    gs_vec_t /* of gs_tuple_id_interval_t */ *tuple_ids; /*<! A list of right-open intervals that describe which tuples in the table
                                          are covered in this grid. Intervals [a, b), [c,d ),... in this list are assumed
                                          to be ordered ascending by their lower bound, e.g., a, c for a < c. Further,
                                          the intervals do not overlap. This information is required to translate from
@@ -55,7 +55,7 @@ typedef struct grid_t {
                                          tuplet identifiers per grid is strictly monotonically continuous increasing
                                          (i.e., 0, 1, 2, 3, ...). These information are needed to map a tuple
                                          identifier (e.g., 100) to a tuplet identifier (e.g. 2), and vice versa. */
-    tuple_id_interval_t *last_interval_cache; /*<! A nullable pointer into 'tuple_ids' data that is the last accessed interval.
+    gs_tuple_id_interval_t *last_interval_cache; /*<! A nullable pointer into 'tuple_ids' data that is the last accessed interval.
                                          it's used to speedup translation between tuplet and tuple identifier. Caching
                                          the last access avoids searching the interval when a tuplet is request in the
                                          same interval as before. In case the pointer is null, no entry is in the cache.
@@ -65,7 +65,7 @@ typedef struct grid_t {
                                          algorithm that is implemented in the manager of this cache. */
 
     pthread_mutex_t mutex; // TODO: locking a single grid
-} grid_t;
+} gs_grid_t;
 
 typedef enum {
     AT_SEQUENTIAL,  /*<! A call for translation between tuplet and tuple identifier forward iterates through the
@@ -79,24 +79,24 @@ typedef enum {
                          access type, intervals between succeeding calls for translation are likely to change. Hence,
                          if the tuple is not in the last (cached) interval, the entire list of intervals must be
                          searched. Random access is typical for index scans. */
-} access_type;
+} gs_access_type_e;
 
-typedef struct grids_by_attr_index_elem_t {
-    attr_id_t attr_id;
-    vec_t *grid_ptrs;
-} grids_by_attr_index_elem_t;
+typedef struct gs_grids_by_attr_index_elem_t {
+    gs_attr_id_t attr_id;
+    gs_vec_t *grid_ptrs;
+} gs_grids_by_attr_index_elem_t;
 
-typedef struct table_t {
-    schema_t *schema; /*<! The schema assigned to this table. Note that this schema is 'logical', i.e., grids
+typedef struct gs_table_t {
+    gs_schema_t *schema; /*<! The schema assigned to this table. Note that this schema is 'logical', i.e., grids
                            have their own schema that might be a subset of this schema with another order on the
                            attributes. The table's schema is used to give a logical structure to a caller. */
-    vec_t *grid_ptrs;  /*<! A vector of pointers to elements of type grid_t. Each grid contained in this table is
+    gs_vec_t *grid_ptrs;  /*<! A vector of pointers to elements of type gs_grid_t. Each grid contained in this table is
                            referenced here, and will be freed from here once the table will be disposed. */
-    vindex_t *schema_cover; /*<! An index that maps attribute ids from this tables schema to a list of pointers
+    gs_vindex_t *schema_cover; /*<! An index that maps attribute ids from this tables schema to a list of pointers
                              to grids that cover at least this attribute in their 'physical' schemata. */
-    hindex_t *tuple_cover; /*<! An index that maps ranges of tuple ids to a list of pointers to grids that
+    gs_hindex_t *tuple_cover; /*<! An index that maps ranges of tuple ids to a list of pointers to grids that
                              contribute to at least one of the tuples in the range. */
-    freelist_t tuple_id_freelist; /*<! Tuple identifiers that can be re-used. A tuple identifier will be added to this
+    gs_freelist_t tuple_id_freelist; /*<! Tuple identifiers that can be re-used. A tuple identifier will be added to this
                                       list after the physical tuple associated with the identifier was removed from
                                       the grid table. A strictly auto-increasing number that provides a new tuple
                                       identifier that never was used before is also stored here. */
@@ -105,64 +105,65 @@ typedef struct table_t {
                             With other words, each tuple identifier in the right open interval [0, num_tuples) is
                             accessible. However, it's neither guaranteed that a tuple associated with an identifier in
                             this interval is not marked as 'deleted' nor that the tuple data is initialized. */
-} table_t;
+} gs_table_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E  D E C L A R A T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-table_t *table_new(const schema_t *schema, size_t approx_num_horizontal_partitions);
-void table_delete(table_t *table);
-const char *table_name(const table_t *table);
-grid_id_t table_add(table_t *table, const attr_id_t *attr_ids_covered, size_t nattr_ids_covered,
-                    const tuple_id_interval_t *tuple_ids_covered, size_t ntuple_ids_covered, enum frag_impl_type_t type);
-const freelist_t *table_freelist(const struct table_t *table);
-grid_cursor_t *table_find(const table_t *table, const attr_id_t *attr_ids, size_t nattr_ids,
-                          const tuple_id_t *tuple_ids, size_t ntuple_ids);
-table_t *table_melt(enum frag_impl_type_t type, const table_t *src_table, const tuple_id_t *tuple_ids,
-                    size_t ntuple_ids, const attr_id_t *attr_ids, size_t nattr_ids);
-const attr_t *table_attr_by_id(const table_t *table, attr_id_t id);
-const char *table_attr_name_by_id(const table_t *table, attr_id_t id);
-size_t table_num_of_attributes(const table_t *table);
-size_t table_num_of_tuples(const table_t *table);
-size_t table_num_of_grids(const table_t *table);
-const attr_id_t *table_attr_id_to_frag_attr_id(const grid_t *grid, attr_id_t table_attr_id);
-vec_t *table_grids_by_attr(const table_t *table, const attr_id_t *attr_ids, size_t nattr_ids);
-vec_t *table_grids_by_tuples(const table_t *table, const tuple_id_t *tuple_ids, size_t ntuple_ids);
-bool table_is_valide(table_t *table);
+gs_table_t *gs_table_new(const gs_schema_t *schema, size_t approx_num_horizontal_partitions);
+void gs_table_delete(gs_table_t *table);
+const char *gs_table_name(const gs_table_t *table);
+gs_grid_id_t gs_table_add(gs_table_t *table, const gs_attr_id_t *attr_ids_covered, size_t nattr_ids_covered,
+                          const gs_tuple_id_interval_t *tuple_ids_covered, size_t ntuple_ids_covered,
+                          enum frag_impl_type_t type);
+const gs_freelist_t *gs_table_freelist(const struct gs_table_t *table);
+gs_grid_cursor_t *gs_table_find(const gs_table_t *table, const gs_attr_id_t *attr_ids, size_t nattr_ids,
+                                const gs_tuple_id_t *tuple_ids, size_t ntuple_ids);
+gs_table_t *gs_table_melt(enum frag_impl_type_t type, const gs_table_t *src_table, const gs_tuple_id_t *tuple_ids,
+                          size_t ntuple_ids, const gs_attr_id_t *attr_ids, size_t nattr_ids);
+const gs_attr_t *gs_table_attr_by_id(const gs_table_t *table, gs_attr_id_t id);
+const char *gs_table_attr_name_by_id(const gs_table_t *table, gs_attr_id_t id);
+size_t gs_table_num_of_attributes(const gs_table_t *table);
+size_t gs_table_num_of_tuples(const gs_table_t *table);
+size_t gs_table_num_of_grids(const gs_table_t *table);
+const gs_attr_id_t *gs_table_attr_id_to_frag_attr_id(const gs_grid_t *grid, gs_attr_id_t table_attr_id);
+gs_vec_t *gs_table_grids_by_attr(const gs_table_t *table, const gs_attr_id_t *attr_ids, size_t nattr_ids);
+gs_vec_t *gs_table_grids_by_tuples(const gs_table_t *table, const gs_tuple_id_t *tuple_ids, size_t ntuple_ids);
+bool gs_table_is_valide(gs_table_t *table);
 
-void grid_delete(grid_t *grid);
-const grid_t *grid_by_id(const table_t *table, grid_id_t id);
-size_t grid_num_of_attributes(const grid_t *grid);
-void grid_insert(tuple_cursor_t *resultset, table_t *table, size_t ntuplets);
-void grid_print(FILE *file, const table_t *table, grid_id_t grid_id, size_t row_offset, size_t limit);
-void table_grid_list_print(FILE *file, const table_t *table, size_t row_offset, size_t limit);
-void table_print(FILE *file, const table_t *table, size_t row_offset, size_t limit);
-void table_structure_print(FILE *file, const table_t *table, size_t row_offset, size_t limit);
+void gs_grid_delete(gs_grid_t *grid);
+const gs_grid_t *gs_grid_by_id(const gs_table_t *table, gs_grid_id_t id);
+size_t gs_grid_num_of_attributes(const gs_grid_t *grid);
+void gs_grid_insert(gs_tuple_cursor_t *resultset, gs_table_t *table, size_t ntuplets);
+void gs_grid_print(FILE *file, const gs_table_t *table, gs_grid_id_t grid_id, size_t row_offset, size_t limit);
+void gs_table_grid_list_print(FILE *file, const gs_table_t *table, size_t row_offset, size_t limit);
+void gs_table_print(FILE *file, const gs_table_t *table, size_t row_offset, size_t limit);
+void gs_table_structure_print(FILE *file, const gs_table_t *table, size_t row_offset, size_t limit);
 
-static inline int interval_tuple_id_comp_by_element(const void *needle, const void *element)
+static inline int gs_interval_tuple_id_comp_by_element(const void *needle, const void *element)
 {
-    tuple_id_t tuple_id = *(const tuple_id_t *) needle;
-    const tuple_id_interval_t *interval = element;
+    gs_tuple_id_t tuple_id = *(const gs_tuple_id_t *) needle;
+    const gs_tuple_id_interval_t *interval = element;
     return (INTERVAL_CONTAINS(interval, tuple_id) ? 0 : (tuple_id < interval->begin ? - 1 : + 1));
 }
 
-static inline tuplet_id_t global_to_local(grid_t *grid, tuple_id_t tuple_id, access_type type)
+static inline gs_tuplet_id_t gs_global_to_local(gs_grid_t *grid, gs_tuple_id_t tuple_id, gs_access_type_e type)
 {
     // TODO: apply a bunch of strategy alternatives here. For instance, one can buffer the distances for a given
     // Cursor and all its processors. Then the translation does not require to scan the entire interval list in order
     // to provide the tuplet id. Also, one can run binary search and linear search probably multi-threaded...
 
     // The tuplet identifier that is mapped in this grid to the given 'tuplet_id'
-    tuplet_id_t result = 0;
+    gs_tuplet_id_t result = 0;
 
     // Determine where to start in the interval list. The last position was cached, so start_system here if possible
-    tuple_id_interval_t *cursor = (grid->last_interval_cache != NULL ? grid->last_interval_cache : grid->tuple_ids->data);
+    gs_tuple_id_interval_t *cursor = (grid->last_interval_cache != NULL ? grid->last_interval_cache : grid->tuple_ids->data);
 
     // Determine the end of the interval list. If cursor reaches this end, the tuple is not mapped into this grid.
-    // Clearly, if this case happens, there is an interval error since a request to this function requires
+    // Clearly, if this case happens, there is an interval gs_gc_error since a request to this function requires
     // a valid coverage of the given 'tuple_id' in this grid
-    const tuple_id_interval_t *end = vec_end(grid->tuple_ids);
+    const gs_tuple_id_interval_t *end = gs_vec_end(grid->tuple_ids);
 
     if (!INTERVAL_CONTAINS(cursor, tuple_id)) {
         switch (type) {
@@ -174,8 +175,9 @@ static inline tuplet_id_t global_to_local(grid_t *grid, tuple_id_t tuple_id, acc
             case AT_RANDOM:
                 // Assert that interval list is sorted. If sort state is not cached,
                 // re-evaluate the state and check again
-                assert (vec_issorted(grid->tuple_ids, CCP_USECACHE, NULL) ||
-                                vec_issorted(grid->tuple_ids, CCP_IGNORECACHE, interval_tuple_id_comp_by_lower_bound));
+                assert (gs_vec_issorted(grid->tuple_ids, CCP_USECACHE, NULL) ||
+                                gs_vec_issorted(grid->tuple_ids, CCP_IGNORECACHE,
+                                                gs_interval_tuple_id_comp_by_lower_bound));
 
                 // TODO: apply evolutionary algorithm here to find choice of alternatives once alternatives exists
                 // Alternatives besides bsearch might be linear search w/o multi-threading from cache or start_system/end, ...
@@ -184,18 +186,18 @@ static inline tuplet_id_t global_to_local(grid_t *grid, tuple_id_t tuple_id, acc
                 // intervals contained in the list: intervals do not overlap and the needle can be used to state whether
                 // a lower or higher interval must be considered during search if the needle is not contained in the
                 // current interval.
-                cursor = vec_bsearch(grid->tuple_ids, &tuple_id,
-                                     interval_tuple_id_comp_by_lower_bound, interval_tuple_id_comp_by_element);
+                cursor = gs_vec_bsearch(grid->tuple_ids, &tuple_id,
+                                        gs_interval_tuple_id_comp_by_lower_bound, gs_interval_tuple_id_comp_by_element);
                 break;
             default: panic(BADBRANCH, grid);
         }
     }
 
-    panic_if((cursor == end), "Internal error: mapping of tuple '%u' is not resolvable", tuple_id);
+    panic_if((cursor == end), "Internal gs_gc_error: mapping of tuple '%u' is not resolvable", tuple_id);
 
     // TODO: Cache this!
     // calculate the number of tuplets that fall into preceding intervals
-    for (const tuple_id_interval_t *it = vec_begin(grid->tuple_ids); it < end; it++) {
+    for (const gs_tuple_id_interval_t *it = gs_vec_begin(grid->tuple_ids); it < end; it++) {
         result += (tuple_id >= it->begin) ? INTERVAL_SPAN(it) : 0;
     }
     // calculate the exact identifier for the given tuple in the 'cursor' interval
@@ -207,14 +209,14 @@ static inline tuplet_id_t global_to_local(grid_t *grid, tuple_id_t tuple_id, acc
     return result;
 }
 
-static inline tuple_id_t local_to_global(grid_t *grid, tuplet_id_t tuplet_id)
+static inline gs_tuple_id_t gs_local_to_global(gs_grid_t *grid, gs_tuplet_id_t tuplet_id)
 {
     assert (tuplet_id < grid->frag->ntuplets);
 
     // TODO: Cache this!
-    tuple_id_t num_tuple_covereed = 0;
+    gs_tuple_id_t num_tuple_covereed = 0;
 
-    const tuple_id_interval_t *it = vec_begin(grid->tuple_ids);
+    const gs_tuple_id_interval_t *it = gs_vec_begin(grid->tuple_ids);
     // since tuples in the interval list maps bidirectional to tuplets, it holds with all other assumptions on the
     // interval list and the construction of the mapping: in the order-preserving union of all intervals,
     // the i-th tuple is mapped to the tuplet is i.

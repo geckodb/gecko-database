@@ -18,49 +18,49 @@
 #include <gs_grid_cursor.h>
 #include <containers/gs_vec.h>
 
-grid_cursor_t *grid_cursor_new(size_t cursor)
+gs_grid_cursor_t *gs_grid_cursor_new(size_t cursor)
 {
-    grid_cursor_t *result = GS_REQUIRE_MALLOC(sizeof(grid_cursor_t));
-    *result = (grid_cursor_t) {
-            .extra = vec_new(sizeof(struct grid_t *), cursor)
+    gs_grid_cursor_t *result = GS_REQUIRE_MALLOC(sizeof(gs_grid_cursor_t));
+    *result = (gs_grid_cursor_t) {
+            .extra = gs_vec_new(sizeof(struct gs_grid_t *), cursor)
     };
     return result;
 }
 
-void grid_cursor_delete(grid_cursor_t *cursor)
+void gs_grid_cursor_delete(gs_grid_cursor_t *cursor)
 {
-    vec_free(cursor->extra);
+    gs_vec_free(cursor->extra);
     free (cursor);
 }
 
-void grid_cursor_pushback(grid_cursor_t *cursor, const void *data)
+void gs_grid_cursor_pushback(gs_grid_cursor_t *cursor, const void *data)
 {
-    vec_pushback((cursor->extra), 1, data);
+    gs_vec_pushback((cursor->extra), 1, data);
 }
 
-struct grid_t *grid_cursor_next(grid_cursor_t *cursor)
+struct gs_grid_t *gs_grid_cursor_next(gs_grid_cursor_t *cursor)
 {
-    static grid_cursor_t *dest;
+    static gs_grid_cursor_t *dest;
     static size_t elem_idx;
     if (cursor != NULL) {
         dest = cursor;
         elem_idx = 0;
     }
 
-    vec_t *vec = (vec_t * ) dest->extra;
+    gs_vec_t *vec = (gs_vec_t * ) dest->extra;
     if (elem_idx < vec->num_elements) {
-        return *(struct grid_t **) vec_at(vec, elem_idx++);
+        return *(struct gs_grid_t **) gs_vec_at(vec, elem_idx++);
     } else return NULL;
 }
 
-size_t grid_cursor_numelem(const grid_cursor_t *cursor)
+size_t gs_grid_cursor_numelem(const gs_grid_cursor_t *cursor)
 {
     GS_REQUIRE_NONNULL(cursor);
-    return ((vec_t * ) cursor->extra)->num_elements;
+    return ((gs_vec_t * ) cursor->extra)->num_elements;
 }
 
-bool grid_cursor_is_empty(const grid_cursor_t *cursor)
+bool gs_grid_cursor_is_empty(const gs_grid_cursor_t *cursor)
 {
     GS_REQUIRE_NONNULL(cursor)
-    return (vec_length(cursor->extra) == 0);
+    return (gs_vec_length(cursor->extra) == 0);
 }

@@ -22,7 +22,7 @@
 // I D E N T I T Y   H A S H
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t hash_code_identity_size_t(const void *_, size_t key_size, const void *key)
+size_t gs_hash_code_identity_size_t(const void *_, size_t key_size, const void *key)
 {
     assert (key_size == sizeof(size_t) && (key != NULL));
     return *((size_t *)key);
@@ -36,10 +36,10 @@ size_t hash_code_identity_size_t(const void *_, size_t key_size, const void *key
 // P E R F E C T   H A S H
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t hash_code_perfect_size_t(const void *capture, size_t key_size, const void *key)
+size_t gs_hash_code_perfect_size_t(const void *capture, size_t key_size, const void *key)
 {
     panic("Not implemented '%s'. Use 'capture' argument to capture information regarding the construction of keys.",
-          "hash_code_perfect_size_t");
+          "gs_hash_code_perfect_size_t");
     return 0;
 }
 
@@ -47,7 +47,7 @@ size_t hash_code_perfect_size_t(const void *capture, size_t key_size, const void
 // A D D I T I V E   H A S H
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t hash_code_additive(const void *_, size_t key_size, const void *key)
+size_t gs_hash_code_additive(const void *_, size_t key_size, const void *key)
 {
     assert ((key != NULL) && (key_size > 0));
 
@@ -62,7 +62,7 @@ size_t hash_code_additive(const void *_, size_t key_size, const void *key)
 // X O R   H A S H
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t hash_code_xor(const void *_, size_t key_size, const void *key)
+size_t gs_hash_code_xor(const void *_, size_t key_size, const void *key)
 {
     assert ((key != NULL) && (key_size > 0));
 
@@ -77,7 +77,7 @@ size_t hash_code_xor(const void *_, size_t key_size, const void *key)
 // R O T A T I O N   H A S H
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t hash_code_rot(const void *_, size_t key_size, const void *key)
+size_t gs_hash_code_rot(const void *_, size_t key_size, const void *key)
 {
     assert ((key != NULL) && (key_size > 0));
 
@@ -92,7 +92,7 @@ size_t hash_code_rot(const void *_, size_t key_size, const void *key)
 // B E R N S T E I N   H A S H
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t hash_code_bernstein(const void *_, size_t key_size, const void *key)
+size_t gs_hash_code_bernstein(const void *_, size_t key_size, const void *key)
 {
     assert ((key != NULL) && (key_size > 0));
 
@@ -107,7 +107,7 @@ size_t hash_code_bernstein(const void *_, size_t key_size, const void *key)
 // M O D I F I E D   B E R N S T E I N   H A S H
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t hash_code_bernstein2(const void *_, size_t key_size, const void *key)
+size_t gs_hash_code_bernstein2(const void *_, size_t key_size, const void *key)
 {
     assert ((key != NULL) && (key_size > 0));
 
@@ -122,7 +122,7 @@ size_t hash_code_bernstein2(const void *_, size_t key_size, const void *key)
 // S H I F T - A D D - X O R   H A S H
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t hash_code_sax(const void *_, size_t key_size, const void *key)
+size_t gs_hash_code_sax(const void *_, size_t key_size, const void *key)
 {
     assert ((key != NULL) && (key_size > 0));
 
@@ -137,7 +137,7 @@ size_t hash_code_sax(const void *_, size_t key_size, const void *key)
 // F N V   H A S H
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t hash_code_fnv(const void *_, size_t key_size, const void *key)
+size_t gs_hash_code_fnv(const void *_, size_t key_size, const void *key)
 {
     assert ((key != NULL) && (key_size > 0));
 
@@ -152,7 +152,7 @@ size_t hash_code_fnv(const void *_, size_t key_size, const void *key)
 // O N E - A T - A - T I M E   H A S H
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t hash_code_oat(const void *_, size_t key_size, const void *key)
+size_t gs_hash_code_oat(const void *_, size_t key_size, const void *key)
 {
     assert ((key != NULL) && (key_size > 0));
 
@@ -183,7 +183,7 @@ void init_rand_num()
         RAND_NUM[i] = rand();
 }
 
-size_t hash_code_jsw(const void *_, size_t key_size, const void *key)
+size_t gs_hash_code_jsw(const void *_, size_t key_size, const void *key)
 {
     assert ((key != NULL) && (key_size > 0));
 
@@ -198,7 +198,7 @@ size_t hash_code_jsw(const void *_, size_t key_size, const void *key)
 // E L F   H A S H
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t hash_code_elf(const void *_, size_t key_size, const void *key)
+size_t gs_hash_code_elf(const void *_, size_t key_size, const void *key)
 {
     assert ((key != NULL) && (key_size > 0));
 
@@ -230,12 +230,12 @@ size_t hash_code_elf(const void *_, size_t key_size, const void *key)
     c -= a; c -= b; c ^= (b >> 15); \
 }
 
-size_t hash_code_jen(const void *capture, size_t key_size, const void *key)
+size_t gs_hash_code_jen(const void *capture, size_t key_size, const void *key)
 {
     assert ((key != NULL) && (key_size > 0));
 
     unsigned a, b;
-    unsigned c = (capture != NULL ? ((hash_code_jen_args_t *) capture)->initval : 0);
+    unsigned c = (capture != NULL ? ((gs_hash_code_jen_args_t *) capture)->initval : 0);
     unsigned char *k = (unsigned char *) key;
 
     a = b = 0x9e3779b9;

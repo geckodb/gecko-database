@@ -24,18 +24,18 @@
 // D A T A   T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-typedef struct _list list_t;
+typedef struct _list gs_list_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-list_t *list_new(size_t element_size);
-void list_delete(list_t *list);
-bool list_is_empty(const list_t *list);
-void list_clear(list_t *list);
-bool list_push(list_t *list, const void *data);
-const void *list_begin(const list_t *list);
-const void *list_next(const void *data);
-void list_remove(const void *data);
-size_t list_length(const list_t *list);
+gs_list_t *gs_list_new(size_t element_size);
+void gs_list_delete(gs_list_t *list);
+bool gs_list_is_empty(const gs_list_t *list);
+void gs_list_clear(gs_list_t *list);
+bool gs_list_push(gs_list_t *list, const void *data);
+const void *gs_list_begin(const gs_list_t *list);
+const void *gs_list_next(const void *data);
+void gs_list_remove(const void *data);
+size_t gs_list_length(const gs_list_t *list);

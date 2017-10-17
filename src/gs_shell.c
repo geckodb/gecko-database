@@ -1,5 +1,5 @@
 #include <gs_shell.h>
-#include <gs_c11threads.h>
+#include <c11threads.h>
 #include <apr_file_io.h>
 #include <apr_strings.h>
 #include <gs_dispatcher.h>
@@ -106,8 +106,8 @@ GS_DECLARE(gs_status_t) gs_shell_shutdown(gs_shell_t *shell)
     char          buffer[STDIN_BUFFER_SIZE];
     bool          accept_input = true;
 
-    error_if((apr_file_open_stdin(&in, shell->pool) != APR_SUCCESS), err_no_stdin);
-    error_if((apr_file_open_stdout(&out, shell->pool) != APR_SUCCESS), err_no_stdout);
+    gs_error_if((apr_file_open_stdin(&in, shell->pool) != APR_SUCCESS), err_no_stdin);
+    gs_error_if((apr_file_open_stdout(&out, shell->pool) != APR_SUCCESS), err_no_stdout);
 
     GS_DEBUG("shell %p enters main loop", shell);
     apr_file_printf(out, "Type 'help' for hints on usage of this shell.\n\n");

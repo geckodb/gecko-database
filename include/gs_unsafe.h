@@ -24,5 +24,5 @@
 // I N T E R F A C E   D E C L A R A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t unsafe_field_println(enum field_type type, const void *data);
-char *unsafe_field_str(enum field_type type, const void *data);
+size_t gs_unsafe_field_println(enum gs_field_type_e type, const void *data);
+char *gs_unsafe_field_str(enum gs_field_type_e type, const void *data);

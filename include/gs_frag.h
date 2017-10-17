@@ -29,11 +29,11 @@
 // F O R W A R D I N G
 // ---------------------------------------------------------------------------------------------------------------------
 
-enum frag_printer_type_tag;
-struct tuplet_t;
+enum gs_frag_printer_type_tag_e;
+struct gs_tuplet_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
-// T Y P E S
+// D A T A T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
 enum frag_impl_type_t {
@@ -41,34 +41,34 @@ enum frag_impl_type_t {
     FIT_HOST_DSM_VM
 };
 
-typedef struct frag_t {
-    schema_t *schema; /*!< schema of this fragment */
+typedef struct gs_frag_t {
+    gs_schema_t *schema; /*!< schema of this fragment */
     void *tuplet_data; /*!< data inside this fragment; the record format (e.g., NSM/DSM) is implementation-specific */
     size_t ntuplets; /*!< number of tuplets stored in this fragment */
     size_t ncapacity; /*!< number of tuplets that can be stored in this fragment, before a resize-opp is required */
     size_t tuplet_size; /*!< size in byte of a single tuplet */
-    enum tuplet_format format; /*!< the tuplet format that defined whether NSM or DSM is used*/
+    enum gs_tuplet_format_e format; /*!< the tuplet format that defined whether NSM or DSM is used*/
     enum frag_impl_type_t impl_type; /*!< the implementation type of the data fragment*/
 
     /* operations */
-    struct frag_t *(*_scan)(struct frag_t *self, const pred_tree_t *pred, size_t batch_size, size_t nthreads);
-    void (*_dispose)(struct frag_t *self);
+    struct gs_frag_t *(*_scan)(struct gs_frag_t *self, const gs_pred_tree_t *pred, size_t batch_size, size_t nthreads);
+    void (*_dispose)(struct gs_frag_t *self);
 
     /*!< factory function to create impl-specific tuplet */
-    void (*_open)(struct tuplet_t *dst, struct frag_t *self, tuplet_id_t tuplet_id);
+    void (*_open)(struct gs_tuplet_t *dst, struct gs_frag_t *self, gs_tuplet_id_t tuplet_id);
 
     /*!< inserts a number of (uninitialized) ntuplets into this fragment and returns a tuplet pointer to the first
      * tuplets of these newly added tuplets. */
-    void (*_insert)(struct tuplet_t *dst, struct frag_t *self, size_t ntuplets);
-} frag_t;
+    void (*_insert)(struct gs_tuplet_t *dst, struct gs_frag_t *self, size_t ntuplets);
+} gs_frag_t;
 
 
 static struct frag_type_pool_t {
     enum frag_impl_type_t binding;
-    frag_t *(*_create)(schema_t *schema, size_t tuplet_capacity);
+    gs_frag_t *(*_create)(gs_schema_t *schema, size_t tuplet_capacity);
 } frag_type_pool[] = {
-    { FIT_HOST_NSM_VM, frag_host_vm_nsm_new },
-    { FIT_HOST_DSM_VM, frag_host_vm_dsm_new },
+    { FIT_HOST_NSM_VM, gs_frag_host_vm_nsm_new },
+    { FIT_HOST_DSM_VM, gs_frag_host_vm_dsm_new },
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -77,27 +77,27 @@ static struct frag_type_pool_t {
 
 __BEGIN_DECLS
 
-frag_t *frag_new(schema_t *schema, size_t tuplet_capacity, enum frag_impl_type_t type);
-void frag_delete(frag_t *frag);
+gs_frag_t *frag_new(gs_schema_t *schema, size_t tuplet_capacity, enum frag_impl_type_t type);
+void frag_delete(gs_frag_t *frag);
 
-void frag_insert(struct tuplet_t *out, frag_t *frag, size_t ntuplets);
-void frag_print(FILE *file, frag_t *frag, size_t row_offset, size_t limit);
-void frag_print_ex(FILE *file, enum frag_printer_type_tag printer_type, frag_t *frag, size_t row_offset, size_t limit);
+void frag_insert(struct gs_tuplet_t *out, gs_frag_t *frag, size_t ntuplets);
+void frag_print(FILE *file, gs_frag_t *frag, size_t row_offset, size_t limit);
+void frag_print_ex(FILE *file, enum gs_frag_printer_type_tag_e printer_type, gs_frag_t *frag, size_t row_offset, size_t limit);
 const char *frag_str(enum frag_impl_type_t type);
-size_t frag_num_of_attributes(const frag_t *frag);
-size_t frag_num_of_tuplets(const frag_t *frag);
-schema_t *frag_schema(const frag_t *frag);
-enum field_type frag_field_type(const frag_t *frag, attr_id_t id);
+size_t frag_num_of_attributes(const gs_frag_t *frag);
+size_t frag_num_of_tuplets(const gs_frag_t *frag);
+gs_schema_t *frag_schema(const gs_frag_t *frag);
+enum gs_field_type_e frag_field_type(const gs_frag_t *frag, gs_attr_id_t id);
 
-void gs_checksum_nsm(schema_t *tab, const void *tuplets, size_t ntuplets);
-void gs_checksum_dms(schema_t *tab, const void *tuplets, size_t ntuplets);
-void gs_checksum_begin(checksum_context_t *context);
-void gs_checksum_update(checksum_context_t *context, const void *begin, const void *end);
-void gs_checksum_end(unsigned char *checksum_out, checksum_context_t *context);
+void gs_checksum_nsm(gs_schema_t *tab, const void *tuplets, size_t ntuplets);
+void gs_checksum_dms(gs_schema_t *tab, const void *tuplets, size_t ntuplets);
+void gs_checksum_begin(gs_checksum_context_t *context);
+void gs_checksum_update(gs_checksum_context_t *context, const void *begin, const void *end);
+void gs_checksum_end(unsigned char *checksum_out, gs_checksum_context_t *context);
 
 // F I E L D   T Y P E   O P E R A T I O N S ---------------------------------------------------------------------------
 
-size_t field_type_sizeof(enum field_type type);
-const char *get_type_str(enum field_type t);
+size_t gs_field_type_sizeof(enum gs_field_type_e type);
+const char *get_type_str(enum gs_field_type_e t);
 
 __END_DECLS

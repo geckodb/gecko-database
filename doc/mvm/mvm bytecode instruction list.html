@@ -83,7 +83,7 @@ $(document).ready(function()
         <td></td>
         <td></td>
         <td>pointer to string &rarr; </td>
-        <td>Clones the current database into a path indicated by a string referenced by <i>pointer to string</i>. In case an I/O error occurs, an <code>ABORT</code> is invoked and a rollback is initialized. The program exits with exit code 2 (<code>ABORT BY SYSTEM</code>) in this case.</td>
+        <td>Clones the current database into a path indicated by a string referenced by <i>pointer to string</i>. In case an I/O gs_gc_error occurs, an <code>ABORT</code> is invoked and a rollback is initialized. The program exits with exit code 2 (<code>ABORT BY SYSTEM</code>) in this case.</td>
     </tr>
     <tr>
         <td><strike>dopen</strike></td>
@@ -92,7 +92,7 @@ $(document).ready(function()
         <td></td>
         <td></td>
         <td>&#91;timeout, pointer to string&#93; &rarr; </td>
-        <td>Opens the database stored in a path indicated by a string referenced by <i>pointer to string</i>. In case an I/O error occurs, an <code>ABORT</code> is invoked and a rollback is initialized, i.e., the current database remains open. The program exits with exit code 2 (<code>ABORT BY SYSTEM</code>) in this case. <b>Note</b>: Once this instruction is invoked, newly added transaction are automatically aborted until the opening process finishes. The parameter <i>force</i> defines the handling of running transactions. If <i>force</i> is set to <i>1</i>, all running transactions are aborted immediately. If <i>force</i> is set to <i>0</i>, this instructions waits until other running transactions are completed. If the waiting duration exceeds <i>timeout</i> milliseconds, other running transactions are aborted anyway and the opening process is issued. </td>
+        <td>Opens the database stored in a path indicated by a string referenced by <i>pointer to string</i>. In case an I/O gs_gc_error occurs, an <code>ABORT</code> is invoked and a rollback is initialized, i.e., the current database remains open. The program exits with exit code 2 (<code>ABORT BY SYSTEM</code>) in this case. <b>Note</b>: Once this instruction is invoked, newly added transaction are automatically aborted until the opening process finishes. The parameter <i>force</i> defines the handling of running transactions. If <i>force</i> is set to <i>1</i>, all running transactions are aborted immediately. If <i>force</i> is set to <i>0</i>, this instructions waits until other running transactions are completed. If the waiting duration exceeds <i>timeout</i> milliseconds, other running transactions are aborted anyway and the opening process is issued. </td>
     </tr>
     <tr>
         <td><strike>fdup</strike></td>
@@ -155,7 +155,7 @@ $(document).ready(function()
         <td></td>
         <td></td>
         <td>prog id &rarr; &#91; prog id, name, author, comment, size &#93;</td>
-        <td>Removes <i>prog id</i> that identifies one installed program from the stack, and pushes <i> prog id</i> (u64), <i>name</i> (pointer to string), <i>author</i> (pointer to string), <i>comment</i> (pointer to string), and <i>size</i> (u64) onto the stack. The value of <i>size</i> is the number of bytes for the instructions in the program. In case <i>prog id</i> does not refer to an installed program, an <code>ABORT</code> is invoked and a rollback is initialized. The program exits with exit code 2 (<code>ABORT BY SYSTEM</code>) in this case.</td>
+        <td>Removes <i>prog id</i> that identifies one installed program from the stack, and pushes <i> prog id</i> (gs_u64_t), <i>name</i> (pointer to string), <i>author</i> (pointer to string), <i>comment</i> (pointer to string), and <i>size</i> (gs_u64_t) onto the stack. The value of <i>size</i> is the number of bytes for the instructions in the program. In case <i>prog id</i> does not refer to an installed program, an <code>ABORT</code> is invoked and a rollback is initialized. The program exits with exit code 2 (<code>ABORT BY SYSTEM</code>) in this case.</td>
     </tr>
     <tr>
         <td><strike>progclean</strike></td>
@@ -209,7 +209,7 @@ $(document).ready(function()
         <td></td>
         <td>i</td>
         <td></td>
-        <td>Stores the top value of the stack into an u64 <a href="#localvariables">variable</a> with index i. The stack is not modified.</td>
+        <td>Stores the top value of the stack into an gs_u64_t <a href="#localvariables">variable</a> with index i. The stack is not modified.</td>
     </tr>
     <tr>
         <td>vload</td>
@@ -254,7 +254,7 @@ $(document).ready(function()
         <td></td>
         <td></td>
         <td>&rarr; value</td>
-        <td>Pushes value onto the stack as an u64 value</td>
+        <td>Pushes value onto the stack as an gs_u64_t value</td>
     </tr>
     <tr>
         <td><strike>swap</strike></td>
@@ -394,7 +394,7 @@ $(document).ready(function()
         <td></td>
         <td>i</td>
         <td>value &rarr; </td>
-        <td>Stores the top value of the stack into an u64 <a href="#localvariables">variable</a> with index i and removes <i>value</i> from the stack.</td>
+        <td>Stores the top value of the stack into an gs_u64_t <a href="#localvariables">variable</a> with index i and removes <i>value</i> from the stack.</td>
     </tr>
 
     <tr>

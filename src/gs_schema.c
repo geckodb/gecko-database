@@ -20,17 +20,17 @@
 #include <gs_tuplet_field.h>
 #include <gs_debug.h>
 
-const struct attr_t *schema_attr_by_id(const schema_t *schema, attr_id_t attr_id)
+const struct gs_attr_t *gs_schema_attr_by_id(const gs_schema_t *schema, gs_attr_id_t attr_id)
 {
     assert (attr_id < schema->attr->num_elements);
-    return ((struct attr_t *) vec_at(schema->attr, attr_id));
+    return ((struct gs_attr_t *) gs_vec_at(schema->attr, attr_id));
 }
 
-const struct attr_t *schema_attr_by_name(const schema_t *schema, const char *name)
+const struct gs_attr_t *gs_schema_attr_by_name(const gs_schema_t *schema, const char *name)
 {
     assert (schema);
     for (size_t i = 0; i < schema->attr->num_elements; i++) {
-        attr_t *attr = vec_at(schema->attr, i);
+        gs_attr_t *attr = gs_vec_at(schema->attr, i);
         if (!strcmp(attr->name, name)) {
             return attr;
         }
@@ -38,16 +38,16 @@ const struct attr_t *schema_attr_by_name(const schema_t *schema, const char *nam
     return NULL;
 }
 
-schema_t *schema_new(const char *table_name)
+gs_schema_t *gs_schema_new(const char *table_name)
 {
     assert (table_name);
-    schema_t *result = GS_REQUIRE_MALLOC(sizeof(schema_t));
-    result->attr = vec_new(sizeof(attr_t), 100);
+    gs_schema_t *result = GS_REQUIRE_MALLOC(sizeof(gs_schema_t));
+    result->attr = gs_vec_new(sizeof(gs_attr_t), 100);
     result->frag_name = strdup(table_name);
     return result;
 }
 
-schema_t *schema_subset(schema_t *super, const attr_id_t *indicies, size_t nindicies)
+gs_schema_t *gs_schema_subset(gs_schema_t *super, const gs_attr_id_t *indicies, size_t nindicies)
 {
     GS_REQUIRE_NONNULL(super);
     GS_REQUIRE_NONNULL(indicies);
@@ -55,54 +55,54 @@ schema_t *schema_subset(schema_t *super, const attr_id_t *indicies, size_t nindi
     panic_if(nindicies > super->attr->num_elements, BADINTERNAL,
              "selected indices of super schema illegal.");
 
-    schema_t *schema = schema_new(super->frag_name);
+    gs_schema_t *schema = gs_schema_new(super->frag_name);
     while (nindicies--) {
-        attr_id_t i = *(indicies++);
-        const attr_t *attr = schema_attr_by_id(super, i);
-        attr_cpy(attr, schema);
+        gs_attr_id_t i = *(indicies++);
+        const gs_attr_t *attr = gs_schema_attr_by_id(super, i);
+        gs_attr_cpy(attr, schema);
     }
     return schema;
 }
 
-void schema_delete(schema_t *schema)
+void gs_schema_delete(gs_schema_t *schema)
 {
     assert (schema);
-    vec_free(schema->attr);
+    gs_vec_free(schema->attr);
     free (schema->frag_name);
     free (schema);
 }
 
-schema_t *schema_cpy(const schema_t *schema)
+gs_schema_t *gs_schema_cpy(const gs_schema_t *schema)
 {
     assert (schema);
-    schema_t *cpy = GS_REQUIRE_MALLOC(sizeof(schema_t));
-    cpy->attr = vec_cpy_deep(schema->attr);
+    gs_schema_t *cpy = GS_REQUIRE_MALLOC(sizeof(gs_schema_t));
+    cpy->attr = gs_vec_cpy_deep(schema->attr);
     cpy->frag_name = strdup(schema->frag_name);
     return cpy;
 }
 
-size_t schema_num_attributes(const schema_t *schema)
+size_t gs_schema_num_attributes(const gs_schema_t *schema)
 {
     assert (schema);
     return schema->attr->num_elements;
 }
 
-const attr_id_t *schema_attributes(const schema_t *schema)
+const gs_attr_id_t *gs_schema_attributes(const gs_schema_t *schema)
 {
     assert (schema);
     return schema->attr->data;
 }
 
-enum field_type schema_attr_type(schema_t *schema, attr_id_t id)
+enum gs_field_type_e gs_schema_attr_type(gs_schema_t *schema, gs_attr_id_t id)
 {
     assert(schema);
-    const attr_t *attr = schema_attr_by_id(schema, id);
+    const gs_attr_t *attr = gs_schema_attr_by_id(schema, id);
     return attr->type;
 }
 
-void schema_print(FILE *file, schema_t *schema)
+void gs_schema_print(FILE *file, gs_schema_t *schema)
 {
-    schema_t *print_schema = schema_new("ad hoc info");
+    gs_schema_t *print_schema = gs_schema_new("ad hoc info");
     attr_create_attrid("attr_id", print_schema);
     attr_create_strptr("name", print_schema);
     attr_create_strptr("type", print_schema);
@@ -112,30 +112,30 @@ void schema_print(FILE *file, schema_t *schema)
     attr_create_bool("nullable", print_schema);
     attr_create_bool("autoinc", print_schema);
     attr_create_bool("unique", print_schema);
-    frag_t *frag = frag_new(print_schema, 1, FIT_HOST_NSM_VM);
-    size_t num_attr = schema_num_attributes(schema);
-    tuplet_t tuplet;
+    gs_frag_t *frag = frag_new(print_schema, 1, FIT_HOST_NSM_VM);
+    size_t num_attr = gs_schema_num_attributes(schema);
+    gs_tuplet_t tuplet;
     frag_insert(&tuplet, frag, num_attr);
 
     do {
-        tuplet_field_t field;
-        tuplet_field_open(&field, &tuplet);
-        for (attr_id_t i = 0; i < num_attr; i++) {
-            const attr_t *attr = schema_attr_by_id(schema, i);
-            tuplet_field_write(&field, &i, true);
-            tuplet_field_write(&field, attr->name, true);
-            tuplet_field_write(&field, field_type_str(attr->type), true);
-            tuplet_field_write(&field, &attr->type_rep, true);
-            tuplet_field_write_eval(&field, (attr->flags.primary == 1), true);
-            tuplet_field_write_eval(&field, (attr->flags.foreign == 1), true);
-            tuplet_field_write_eval(&field, (attr->flags.nullable == 1), true);
-            tuplet_field_write_eval(&field, (attr->flags.autoinc == 1), true);
-            tuplet_field_write_eval(&field, (attr->flags.unique == 1), true);
+        gs_tuplet_field_t field;
+        gs_tuplet_field_open(&field, &tuplet);
+        for (gs_attr_id_t i = 0; i < num_attr; i++) {
+            const gs_attr_t *attr = gs_schema_attr_by_id(schema, i);
+            gs_tuplet_field_write(&field, &i, true);
+            gs_tuplet_field_write(&field, attr->name, true);
+            gs_tuplet_field_write(&field, gs_field_type_str(attr->type), true);
+            gs_tuplet_field_write(&field, &attr->type_rep, true);
+            gs_tuplet_field_write_eval(&field, (attr->flags.primary == 1), true);
+            gs_tuplet_field_write_eval(&field, (attr->flags.foreign == 1), true);
+            gs_tuplet_field_write_eval(&field, (attr->flags.nullable == 1), true);
+            gs_tuplet_field_write_eval(&field, (attr->flags.autoinc == 1), true);
+            gs_tuplet_field_write_eval(&field, (attr->flags.unique == 1), true);
         }
-    } while (tuplet_next(&tuplet));
+    } while (gs_tuplet_next(&tuplet));
 
     frag_print(file, frag, 0, INT_MAX);
 
     frag_delete(frag);
-    schema_delete(print_schema);
+    gs_schema_delete(print_schema);
 }

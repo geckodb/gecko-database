@@ -24,7 +24,7 @@
 
 typedef struct _header {
     struct _header *prev, *next;
-    list_t *list;
+    gs_list_t *list;
 } header_t;
 
 struct _list {
@@ -44,10 +44,10 @@ static header_t *_get_node_ptr(const void *);
 // I N T E R F A C E  I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-list_t *list_new(size_t element_size)
+gs_list_t *gs_list_new(size_t element_size)
 {
-    list_t *list = NULL;
-    if (_check_create_args(element_size) && ((list = GS_REQUIRE_MALLOC(sizeof(list_t))))) {
+    gs_list_t *list = NULL;
+    if (_check_create_args(element_size) && ((list = GS_REQUIRE_MALLOC(sizeof(gs_list_t))))) {
         list->element_size = element_size;
         list->num_elements = 0;
         list->root = list->tail = NULL;
@@ -55,19 +55,19 @@ list_t *list_new(size_t element_size)
     return list;
 }
 
-void list_delete(list_t *list)
+void gs_list_delete(gs_list_t *list)
 {
-    list_clear(list);
+    gs_list_clear(list);
     free (list);
 }
 
-bool list_is_empty(const list_t *list)
+bool gs_list_is_empty(const gs_list_t *list)
 {
     GS_REQUIRE_NONNULL(list)
     return (list->num_elements == 0);
 }
 
-void list_clear(list_t *list)
+void gs_list_clear(gs_list_t *list)
 {
     GS_REQUIRE_NONNULL(list)
     header_t *it = list->root, *next = NULL;
@@ -78,7 +78,7 @@ void list_clear(list_t *list)
     }
 }
 
-bool list_push(list_t *list, const void *data)
+bool gs_list_push(gs_list_t *list, const void *data)
 {
     GS_REQUIRE_NONNULL(list)
     GS_REQUIRE_NONNULL(data)
@@ -86,7 +86,7 @@ bool list_push(list_t *list, const void *data)
     if ((node = GS_REQUIRE_MALLOC(sizeof(header_t) + list->element_size))) {
         node->prev = node->next = NULL;
         memcpy(node + 1, data, list->element_size);
-        if (list_is_empty(list)) {
+        if (gs_list_is_empty(list)) {
             list->root = list->tail = node;
         } else {
             list->tail->next = node;
@@ -99,13 +99,13 @@ bool list_push(list_t *list, const void *data)
     return node;
 }
 
-const void *list_begin(const list_t *list)
+const void *gs_list_begin(const gs_list_t *list)
 {
     GS_REQUIRE_NONNULL(list)
-    return ((!list_is_empty(list))) ? _get_data_ptr(list->root) : NULL;
+    return ((!gs_list_is_empty(list))) ? _get_data_ptr(list->root) : NULL;
 }
 
-const void *list_next(const void *data)
+const void *gs_list_next(const void *data)
 {
     GS_REQUIRE_NONNULL(data)
     const header_t *node;
@@ -113,11 +113,11 @@ const void *list_next(const void *data)
             _get_data_ptr(node->next) : NULL;
 }
 
-void list_remove(const void *data)
+void gs_list_remove(const void *data)
 {
     GS_REQUIRE_NONNULL(data)
     header_t *node = _get_node_ptr(data);
-    list_t *list = node->list;
+    gs_list_t *list = node->list;
     if (node->prev) {
         node->prev->next = node->next;
         if (node == list->tail)
@@ -137,7 +137,7 @@ void list_remove(const void *data)
     assert ((list->num_elements != 0) || ((list->tail == list->root) && (list->root == NULL)));
 }
 
-size_t list_length(const list_t *list)
+size_t gs_list_length(const gs_list_t *list)
 {
     GS_REQUIRE_NONNULL(list)
     return list->num_elements;

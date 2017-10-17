@@ -1,6 +1,6 @@
 #include <gs_http.h>
 
-const char *codestr(http_status_code_t code)
+const char *gs_codestr(gs_http_status_code_t code)
 {
     switch (code) {
         case HTTP_STATUS_CODE_100_CONTINUE:           return "100 Continue";
@@ -14,7 +14,7 @@ const char *codestr(http_status_code_t code)
     }
 }
 
-const char *methodstr(http_status_code_t code) {
+const char *gs_methodstr(gs_http_status_code_t code) {
     switch (code) {
         case HTTP_GET:    return HTTP_GET_STRING;
         case HTTP_POST:   return HTTP_POST_STRING;

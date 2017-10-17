@@ -25,40 +25,40 @@
 // F O R W A R D   D E C L A R A T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-struct grid_t;
+struct gs_grid_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // D A T A   T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-typedef struct vindex_t {
-    grid_index_tag tag;
-    hashset_t keys;
+typedef struct gs_vindex_t {
+    gs_grid_index_tag_e tag;
+    gs_hashset_t keys;
 
-    void (*_add)(struct vindex_t *self, const attr_id_t *key, const struct grid_t *grid);
-    void (*_remove)(struct vindex_t *self, const attr_id_t *key);
-    bool (*_contains)(const struct vindex_t *self, const attr_id_t *key);
-    void (*_query)(grid_cursor_t *result, const struct vindex_t *self, const attr_id_t *key_begin,
-                                  const attr_id_t *key_end);
-    void (*_free)(struct vindex_t *self);
+    void (*_add)(struct gs_vindex_t *self, const gs_attr_id_t *key, const struct gs_grid_t *grid);
+    void (*_remove)(struct gs_vindex_t *self, const gs_attr_id_t *key);
+    bool (*_contains)(const struct gs_vindex_t *self, const gs_attr_id_t *key);
+    void (*_query)(gs_grid_cursor_t *result, const struct gs_vindex_t *self, const gs_attr_id_t *key_begin,
+                                  const gs_attr_id_t *key_end);
+    void (*_free)(struct gs_vindex_t *self);
 
     void *extra;
-} vindex_t;
+} gs_vindex_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-void vindex_delete(vindex_t *index);
-void vindex_add(vindex_t *index, const attr_id_t *key, const struct grid_t *grid);
-void vindex_remove(vindex_t *index, const attr_id_t *key);
-bool vindex_contains(const vindex_t *index, const attr_id_t *key);
-grid_cursor_t *vindex_query(const struct vindex_t *index, const attr_id_t *key_range_begin,
-                            const attr_id_t *key_range_end);
-grid_cursor_t *vindex_query_append(const struct vindex_t *index, grid_cursor_t *result,
-                                   const attr_id_t *key_range_begin, const attr_id_t *key_range_end);
-const struct grid_t *vindex_read(grid_cursor_t *result_set);
-void vindex_close(grid_cursor_t *result_set);
-const attr_id_t *vindex_begin(const vindex_t *index);
-const attr_id_t *vindex_end(const vindex_t *index);
-void vindex_print(FILE *file, vindex_t *index);
+void gs_vindex_delete(gs_vindex_t *index);
+void gs_vindex_add(gs_vindex_t *index, const gs_attr_id_t *key, const struct gs_grid_t *grid);
+void gs_vindex_remove(gs_vindex_t *index, const gs_attr_id_t *key);
+bool gs_vindex_contains(const gs_vindex_t *index, const gs_attr_id_t *key);
+gs_grid_cursor_t *gs_vindex_query(const struct gs_vindex_t *index, const gs_attr_id_t *key_range_begin,
+                                  const gs_attr_id_t *key_range_end);
+gs_grid_cursor_t *gs_vindex_query_append(const struct gs_vindex_t *index, gs_grid_cursor_t *result,
+                                         const gs_attr_id_t *key_range_begin, const gs_attr_id_t *key_range_end);
+const struct gs_grid_t *gs_vindex_read(gs_grid_cursor_t *result_set);
+void gs_vindex_close(gs_grid_cursor_t *result_set);
+const gs_attr_id_t *gs_vindex_begin(const gs_vindex_t *index);
+const gs_attr_id_t *gs_vindex_end(const gs_vindex_t *index);
+void gs_vindex_print(FILE *file, gs_vindex_t *index);

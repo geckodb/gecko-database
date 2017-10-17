@@ -20,58 +20,58 @@
 #include <gs.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
-// T Y P E S
+// D A T A T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-enum comp_type {
+enum gs_comp_type_e {
     CT_LESS, CT_LESSEQ, CT_EQUALS, CT_GREATEREQ, CT_GREATER
 };
 
-typedef struct expr_not_t {
-    struct expr_t *expr;
-} expr_not_t;
+typedef struct gs_expr_not_t_e {
+    struct gs_expr_t *expr;
+} gs_expr_not_t_e;
 
-typedef struct expr_const_t {
+typedef struct gs_expr_const_t {
     bool value;
-} expr_const_t;
+} gs_expr_const_t;
 
-struct tuplet_field_t;
+struct gs_tuplet_field_t;
 
-typedef struct expr_var_t {
-    enum comp_type comp;
-    struct tuplet_field_t *lhs;
-    struct tuplet_field_t *rhs;
-} expr_var_t;
+typedef struct gs_expr_var_t {
+    enum gs_comp_type_e comp;
+    struct gs_tuplet_field_t *lhs;
+    struct gs_tuplet_field_t *rhs;
+} gs_expr_var_t;
 
-enum expr_type {
+enum gs_expr_type_e {
     ET_NOT,
     ET_CONST,
     ET_VAR
 };
 
-typedef struct expr_t {
-    enum expr_type type;
-    struct tuplet_field_t *field;
+typedef struct gs_expr_t {
+    enum gs_expr_type_e type;
+    struct gs_tuplet_field_t *field;
     void *expr;
-} expr_t;
+} gs_expr_t;
 
-typedef struct pred_tree_t {
-    struct pred_tree_t *or, *and; /*<! alternatives and mandatories related to this predicate */
-    expr_t *expr; /*<! expression of this predicate */
-} pred_tree_t;
+typedef struct gs_pred_tree_t {
+    struct gs_pred_tree_t *or, *and; /*<! alternatives and mandatories related to this predicate */
+    gs_expr_t *expr; /*<! expression of this predicate */
+} gs_pred_tree_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   D E C L A R A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-pred_tree_t *pred_tree_create(expr_t *expr);
-pred_tree_t *pred_tree_and(pred_tree_t *subj, pred_tree_t *other);
-pred_tree_t *pred_tree_or(pred_tree_t *subj, pred_tree_t *other);
-bool pred_tree_eval(pred_tree_t *tree);
-expr_t *pred_expr_create_var(enum expr_type type, struct tuplet_field_t *field_lhs, struct tuplet_field_t *field_rhs);
-expr_t *pred_expr_create_const(enum expr_type type, struct tuplet_field_t *field, const void *value);
-void pred_expr_bind(expr_t *expr, const void *value);
-void pred_expr_bind2(expr_t *expr, const void *value_lhs, const void *value_rhs);
-bool pred_eval(expr_t *expr);
-expr_t *pred_expr_create_not(expr_t *other);
+gs_pred_tree_t *pred_tree_create(gs_expr_t *expr);
+gs_pred_tree_t *pred_tree_and(gs_pred_tree_t *subj, gs_pred_tree_t *other);
+gs_pred_tree_t *pred_tree_or(gs_pred_tree_t *subj, gs_pred_tree_t *other);
+bool pred_tree_eval(gs_pred_tree_t *tree);
+gs_expr_t *pred_expr_create_var(enum gs_expr_type_e type, struct gs_tuplet_field_t *field_lhs, struct gs_tuplet_field_t *field_rhs);
+gs_expr_t *pred_expr_create_const(enum gs_expr_type_e type, struct gs_tuplet_field_t *field, const void *value);
+void pred_expr_bind(gs_expr_t *expr, const void *value);
+void pred_expr_bind2(gs_expr_t *expr, const void *value_lhs, const void *value_rhs);
+bool pred_eval(gs_expr_t *expr);
+gs_expr_t *pred_expr_create_not(gs_expr_t *other);
 

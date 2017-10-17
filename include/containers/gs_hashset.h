@@ -25,21 +25,21 @@
 // D A T A T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-typedef struct hashset_t
+typedef struct gs_hashset_t
 {
     apr_hash_t *dict;
     apr_pool_t *pool;
-    vec_t *vec;
-} hashset_t;
+    gs_vec_t *vec;
+} gs_hashset_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-void hashset_create(hashset_t *out, size_t elem_size, size_t capacity);
-void hashset_dispose(hashset_t *set);
-void hashset_add(hashset_t *set, const void *data, size_t num_elems);
-void hashset_remove(hashset_t *set, const void *data, size_t num_elems);
-bool hashset_contains(const hashset_t *set, const void *data);
-const void *hashset_begin(const hashset_t *set);
-const void *hashset_end(const hashset_t *set);
+void gs_hashset_create(gs_hashset_t *out, size_t elem_size, size_t capacity);
+void gs_hashset_dispose(gs_hashset_t *set);
+void gs_hashset_add(gs_hashset_t *set, const void *data, size_t num_elems);
+void gs_hashset_remove(gs_hashset_t *set, const void *data, size_t num_elems);
+bool gs_hashset_contains(const gs_hashset_t *set, const void *data);
+const void *gs_hashset_begin(const gs_hashset_t *set);
+const void *gs_hashset_end(const gs_hashset_t *set);

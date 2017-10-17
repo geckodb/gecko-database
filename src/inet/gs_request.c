@@ -200,10 +200,10 @@ GS_DECLARE(gs_status_t) gs_request_is_valid(const gs_request_t *request)
             !strcmp(apr_pstrndup(request->pool, expect, response_code_expected_at), "100")) {
 
             // send 100 continue
-            response_t response;
-            response_create(&response);
-            response_end(&response, HTTP_STATUS_CODE_100_CONTINUE);
-            char *response_text = response_pack(&response);
+            gs_response_t response;
+            gs_response_create(&response);
+            gs_response_end(&response, HTTP_STATUS_CODE_100_CONTINUE);
+            char *response_text = gs_response_pack(&response);
             write(socket_desc, response_text, strlen(response_text));
             free (response_text);
 

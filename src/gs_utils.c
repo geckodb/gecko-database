@@ -21,7 +21,7 @@
 // I N T E R F A C E   I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-size_t strtoint(char* str)
+size_t gs_strtoint(char *str)
 {
     size_t digit = 1;
     size_t result = 0;

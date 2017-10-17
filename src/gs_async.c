@@ -19,32 +19,32 @@
 #include <gs_async.h>
 #include <gs_require.h>
 #include <gs_error.h>
-#include <gs_c11threads.h>
+#include <c11threads.h>
 #include <assert.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 // H E L P E R   P R O T O T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-static bool _eval(future_t future, future_eval_policy policy);
-static bool _sync_exec(void *, future_t, promise_result);
-static bool _lazy_exec(void *, future_t, promise_result);
-static bool _eager_exec(void *, future_t, promise_result);
+static bool _eval(gs_future_t future, gs_future_eval_policy_e policy);
+static bool _sync_exec(void *, gs_future_t, gs_promise_result_e);
+static bool _lazy_exec(void *, gs_future_t, gs_promise_result_e);
+static bool _eager_exec(void *, gs_future_t, gs_promise_result_e);
 static int  _sync_exec_wrapper(void *);
-static void _start_thread(future_t future);
-static void _future_free(future_t future);
+static void _start_thread(gs_future_t future);
+static void _future_free(gs_future_t future);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E  I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-future_t future_new(const void *capture, promise_t func, future_eval_policy policy)
+gs_future_t gs_future_new(const void *capture, promise_t func, gs_future_eval_policy_e policy)
 {
     GS_REQUIRE_NONNULL(capture)
     GS_REQUIRE_NONNULL(func);
-    future_t future = NULL;
+    gs_future_t future = NULL;
 
-    if ((future = GS_REQUIRE_MALLOC(sizeof(struct _future_t)))) {
+    if ((future = GS_REQUIRE_MALLOC(sizeof(struct gs_future_t)))) {
             future->call_result = NULL;
             future->capture = capture;
             future->func = func;
@@ -56,7 +56,7 @@ future_t future_new(const void *capture, promise_t func, future_eval_policy poli
     return (future != NULL ? (_eval(future, policy) ? future : NULL) : NULL);
 }
 
-void future_wait_for(future_t future)
+void gs_future_wait_for(gs_future_t future)
 {
     GS_REQUIRE_NONNULL(future)
     if (future->eval_policy == future_lazy) {
@@ -65,14 +65,14 @@ void future_wait_for(future_t future)
     while (!future->promise_settled);
 }
 
-const void *future_resolve(promise_result *return_type, future_t future)
+const void *gs_future_resolve(gs_promise_result_e *return_type, gs_future_t future)
 {
     void *result = NULL;
     GS_REQUIRE_NONNULL(future)
     GS_REQUIRE_NONNULL(future->thread_args)
 
     if (!atomic_load(&future->promise_settled))
-        future_wait_for(future);
+        gs_future_wait_for(future);
 
     if (return_type != NULL) {
         switch (future->promise_state) {
@@ -83,7 +83,7 @@ const void *future_resolve(promise_result *return_type, future_t future)
                 *return_type = rejected;
                 break;
             default:
-                error(err_internal);
+                gs_gc_error(err_internal);
                 return NULL;
         }
     }
@@ -97,12 +97,12 @@ const void *future_resolve(promise_result *return_type, future_t future)
 // H E L P E R  I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool _eval(future_t future, future_eval_policy policy)
+bool _eval(gs_future_t future, gs_future_eval_policy_e policy)
 {
     GS_REQUIRE_NONNULL(future)
     GS_REQUIRE_NONNULL(future->func)
 
-    promise_result return_value = rejected;
+    gs_promise_result_e return_value = rejected;
     void *call_result = NULL;
 
     future->eval_policy = policy;
@@ -117,12 +117,12 @@ bool _eval(future_t future, future_eval_policy policy)
         case future_sync:
             return _sync_exec(call_result, future, return_value);
         default:
-            error(err_internal);
+            gs_gc_error(err_internal);
             return false;
     }
 }
 
-bool _sync_exec(void *call_result, future_t future, promise_result return_value)
+bool _sync_exec(void *call_result, gs_future_t future, gs_promise_result_e return_value)
 {
     call_result = future->func(&return_value, future->capture);
     atomic_store(&future->promise_settled, true);
@@ -134,7 +134,7 @@ bool _sync_exec(void *call_result, future_t future, promise_result return_value)
             future->promise_state = promise_fulfilled;
             break;
         default:
-            error(err_internal);
+            gs_gc_error(err_internal);
             return false;
     }
     future->call_result = call_result;
@@ -144,8 +144,8 @@ bool _sync_exec(void *call_result, future_t future, promise_result return_value)
 typedef struct
 {
     void *call_result;
-    future_t future;
-    promise_result return_value;
+    gs_future_t future;
+    gs_promise_result_e return_value;
 } _this_exec_args;
 
 static int _sync_exec_wrapper(void * args)
@@ -157,7 +157,7 @@ static int _sync_exec_wrapper(void * args)
     return 0;
 }
 
-bool _lazy_exec(void *call_result, future_t future, promise_result return_value)
+bool _lazy_exec(void *call_result, gs_future_t future, gs_promise_result_e return_value)
 {
     thrd_t *thread;
     _this_exec_args* args;
@@ -173,7 +173,7 @@ bool _lazy_exec(void *call_result, future_t future, promise_result return_value)
     } else return false;
 }
 
-bool _eager_exec(void *call_result, future_t future, promise_result return_value)
+bool _eager_exec(void *call_result, gs_future_t future, gs_promise_result_e return_value)
 {
     if (_lazy_exec(call_result, future, return_value)) {
         _start_thread(future);
@@ -181,14 +181,14 @@ bool _eager_exec(void *call_result, future_t future, promise_result return_value
     } else return false;
 }
 
-void _start_thread(future_t future)
+void _start_thread(gs_future_t future)
 {
     assert (future->thread != NULL && future->thread_args != NULL);
     thrd_create(future->thread, &_sync_exec_wrapper, future->thread_args);
     thrd_detach(*future->thread);
 }
 
-void _future_free(future_t future)
+void _future_free(gs_future_t future)
 {
     GS_REQUIRE_NONNULL(future)
     if (future->call_result != NULL)

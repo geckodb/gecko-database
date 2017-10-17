@@ -19,6 +19,10 @@
 
 #include <gs.h>
 
+// ---------------------------------------------------------------------------------------------------------------------
+// C O N F I G
+// ---------------------------------------------------------------------------------------------------------------------
+
 #define MONDRIAN_OK                 1
 #define MONDRIAN_CONTINUE           1
 #define MONDRIAN_BREAK              0
@@ -29,6 +33,19 @@
 #define MONDRIAN_VM_COMMIT          0
 #define MONDRIAN_VM_USER_ABORT      1
 #define MONDRIAN_VM_SYSTEM_ABORT    2
+
+#define GS_SUCCESS          true
+#define GS_FAILED           false
+#define GS_CATCHED          2
+#define GS_SKIPPED          3
+#define GS_ILLEGALARG       4
+#define GS_TRYAGAIN         5
+#define GS_TRUE             true
+#define GS_FALSE            false
+
+// ---------------------------------------------------------------------------------------------------------------------
+// D A T A T Y P E S
+// ---------------------------------------------------------------------------------------------------------------------
 
 typedef enum {
     err_no_error,
@@ -51,32 +68,19 @@ typedef enum {
     err_connect_failed,
     err_no_stdin,
     err_no_stdout
-} error_code;
-
-#define GS_SUCCESS          true
-#define GS_FAILED           false
-#define GS_CATCHED          2
-#define GS_SKIPPED          3
-#define GS_ILLEGALARG       4
-#define GS_TRYAGAIN         5
-#define GS_TRUE             true
-#define GS_FALSE            false
+} gs_error_code_e;
 
 typedef int gs_status_t;
 
-void error(error_code code);
-
-void error_reset();
-
-error_code error_get();
-
-void trace_print(FILE *file);
+// ---------------------------------------------------------------------------------------------------------------------
+// M A R C O S
+// ---------------------------------------------------------------------------------------------------------------------
 
 #define begin_write(caption)                                                                                           \
         fflush(stdout);                                                                                                \
         fflush(stderr);                                                                                                \
         fprintf(stderr, "# \n");                                                                                       \
-        trace_print(stderr);                                                                                           \
+        gs_trace_print(stderr);                                                                                           \
         fprintf(stderr, "# \n");                                                                                       \
         fprintf(stderr, "# " caption " ('%s:%d'): ", __FILE__, __LINE__);
 
@@ -123,8 +127,21 @@ void trace_print(FILE *file);
         if (expr) { warn(msg, args); }                                                                                 \
     }
 
-void error_if(bool expr, error_code code);
 
-const char *error_str(error_code code);
+// ---------------------------------------------------------------------------------------------------------------------
+// I N T E R F A C E   F U N C T I O N S
+// ---------------------------------------------------------------------------------------------------------------------
 
-void error_print();
+void gs_gc_error(gs_error_code_e code);
+
+void gs_error_reset();
+
+gs_error_code_e gs_error_get();
+
+void gs_trace_print(FILE *file);
+
+void gs_error_if(bool expr, gs_error_code_e code);
+
+const char *gs_error_str(gs_error_code_e code);
+
+void gs_error_print();

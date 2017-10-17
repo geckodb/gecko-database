@@ -13,7 +13,7 @@ typedef struct gs_dispatcher_t
     gs_hash_t      *handler_map;
 } gs_dispatcher_t;
 
- vec_t *dispatcher_get_handler(gs_dispatcher_t *dispatcher, gs_signal_type_e signal);
+ gs_vec_t *dispatcher_get_handler(gs_dispatcher_t *dispatcher, gs_signal_type_e signal);
 
 static inline int singnal_comp(const void *lhs, const void *rhs);
 
@@ -50,7 +50,7 @@ GS_DECLARE(gs_status_t) gs_dispatcher_start(gs_dispatcher_t *dispatcher)
     apr_status_t status;
     gs_signal_type_e signal;
     gs_event_t *event;
-    vec_t *handlers;
+    gs_vec_t *handlers;
 
     GS_DEBUG("dispatcher %p is starting", dispatcher);
 
@@ -60,14 +60,14 @@ GS_DECLARE(gs_status_t) gs_dispatcher_start(gs_dispatcher_t *dispatcher)
             break;
         }
         if ((status = apr_queue_pop(dispatcher->queue, (void **) &event)) != APR_EINTR) {
-            error_if((status == APR_EOF), err_dispatcher_terminated);
+            gs_error_if((status == APR_EOF), err_dispatcher_terminated);
             assert (status == APR_SUCCESS && event != NULL);
             signal = gs_event_get_signal(event);
             handlers = dispatcher_get_handler(dispatcher, signal);
             WARN_IF(((signal != GS_SIG_HEARTBEAT) && (!handlers)), "no handler for signal '%d' registered", signal);
             GS_DEBUG("dispatcher %p received event for signal %d", dispatcher, signal);
-            for (gs_event_handler_t *it = vec_begin(handlers);
-                (it && (it != vec_end(handlers))); it++) {
+            for (gs_event_handler_t *it = gs_vec_begin(handlers);
+                (it && (it != gs_vec_end(handlers))); it++) {
                 (*it)(event); // TODO: handler can return void
             }
             gs_event_free(event);
@@ -91,17 +91,17 @@ GS_DECLARE(gs_status_t) gs_dispatcher_connect(gs_dispatcher_t *dispatcher, gs_si
     GS_REQUIRE_NONNULL(dispatcher)
     GS_REQUIRE_NONNULL(handler)
 
-    //sizeof(gs_signal_type_e), sizeof(vec_t)
+    //sizeof(gs_signal_type_e), sizeof(gs_vec_t)
 
     if (gs_hash_get(dispatcher->handler_map, &signal, sizeof(gs_signal_type_e)) == NULL) {
-        vec_t *vec = vec_new(sizeof(gs_event_handler_t), 10);
+        gs_vec_t *vec = gs_vec_new(sizeof(gs_event_handler_t), 10);
         gs_signal_type_e *signal_cpy = GS_REQUIRE_MALLOC(sizeof(gs_signal_type_e));
         *signal_cpy = signal;
         gs_hash_set(dispatcher->handler_map, signal_cpy, sizeof(gs_signal_type_e), vec, singnal_comp);
     }
-    vec_t *handlers = (vec_t *) gs_hash_get(dispatcher->handler_map, &signal, sizeof(gs_signal_type_e));
+    gs_vec_t *handlers = (gs_vec_t *) gs_hash_get(dispatcher->handler_map, &signal, sizeof(gs_signal_type_e));
     assert (handlers);
-    vec_pushback(handlers, 1, &handler);
+    gs_vec_pushback(handlers, 1, &handler);
     return GS_SUCCESS;
 }
 
@@ -112,7 +112,7 @@ GS_DECLARE(gs_status_t) gs_dispatcher_publish(gs_dispatcher_t *dispatcher, gs_ev
     if (dispatcher->accept_new) {
         apr_status_t status;
         while ((status = apr_queue_push(dispatcher->queue, event)) == APR_EINTR);
-        error_if((status != APR_SUCCESS), err_internal);
+        gs_error_if((status != APR_SUCCESS), err_internal);
         return GS_SUCCESS;
     } else {
         GS_DEBUG("dispatcher %p is shutting down and skipped event %p", dispatcher, event);
@@ -132,9 +132,9 @@ GS_DECLARE(gs_status_t) gs_dispatcher_waitfor(gs_dispatcher_t *dispatcher, gs_ev
     return GS_SUCCESS;
 }
 
- vec_t *dispatcher_get_handler(gs_dispatcher_t *dispatcher, gs_signal_type_e signal)
+ gs_vec_t *dispatcher_get_handler(gs_dispatcher_t *dispatcher, gs_signal_type_e signal)
 {
-    return (vec_t *) gs_hash_get(dispatcher->handler_map, &signal, sizeof(gs_signal_type_e));
+    return (gs_vec_t *) gs_hash_get(dispatcher->handler_map, &signal, sizeof(gs_signal_type_e));
 }
 
 static inline int singnal_comp(const void *a, const void *b)

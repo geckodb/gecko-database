@@ -19,7 +19,7 @@
 #include <gs_tuplet_field.h>
 #include <gs_schema.h>
 
-void tuplet_open(tuplet_t *dst, struct frag_t *frag, tuplet_id_t tuplet_id)
+void gs_tuplet_open(gs_tuplet_t *dst, struct gs_frag_t *frag, gs_tuplet_id_t tuplet_id)
 {
     if (frag->ntuplets > 0) {
         GS_REQUIRE_NONNULL(frag);
@@ -28,64 +28,64 @@ void tuplet_open(tuplet_t *dst, struct frag_t *frag, tuplet_id_t tuplet_id)
     }
 }
 
-bool tuplet_next(tuplet_t *tuplet)
+bool gs_tuplet_next(gs_tuplet_t *tuplet)
 {
     GS_REQUIRE_NONNULL(tuplet);
     GS_REQUIRE_NONNULL(tuplet->_next);
     return tuplet->_next(tuplet);
 }
 
-void tuplet_rewind(tuplet_t *tuplet)
+void gs_tuplet_rewind(gs_tuplet_t *tuplet)
 {
     GS_REQUIRE_NONNULL(tuplet);
-    frag_t *frag = tuplet->fragment;
-    tuplet_open(tuplet, frag, 0);
+    gs_frag_t *frag = tuplet->fragment;
+    gs_tuplet_open(tuplet, frag, 0);
 }
 
-void tuplet_set_null(tuplet_t *tuplet)
+void gs_tuplet_set_null(gs_tuplet_t *tuplet)
 {
     GS_REQUIRE_NONNULL(tuplet);
     GS_REQUIRE_NONNULL(tuplet->_set_null);
     tuplet->_set_null(tuplet);
 }
 
-bool tuplet_is_null(tuplet_t *tuplet)
+bool gs_tuplet_is_null(gs_tuplet_t *tuplet)
 {
     GS_REQUIRE_NONNULL(tuplet);
     GS_REQUIRE_NONNULL(tuplet->_is_null);
     return (tuplet->_is_null(tuplet));
 }
 
-size_t tuplet_size(tuplet_t *tuplet)
+size_t gs_tuplet_size(gs_tuplet_t *tuplet)
 {
     GS_REQUIRE_NONNULL(tuplet);
     GS_REQUIRE_NONNULL(tuplet->fragment);
     return tuplet->fragment->tuplet_size;
 }
 
-void *tuplet_update(void *dst, schema_t *frag, attr_id_t attr_id, void *src)
+void *gs_tuplet_update(void *dst, gs_schema_t *frag, gs_attr_id_t attr_id, void *src)
 {
-    panic(NOTIMPLEMENTED, to_string(tuplet_update))
+    panic(NOTIMPLEMENTED, to_string(gs_tuplet_update))
     return NULL;
 }
 
-size_t tuplet_size_by_schema(const schema_t *schema)
+size_t gs_tuplet_size_by_schema(const gs_schema_t *schema)
 {
     size_t total = 0;
     for (size_t attr_idx = 0; attr_idx < schema->attr->num_elements; attr_idx++) {
-        const struct attr_t *attr = schema_attr_by_id(schema, attr_idx);
-        total += attr_total_size(attr);
+        const struct gs_attr_t *attr = gs_schema_attr_by_id(schema, attr_idx);
+        total += gs_attr_total_size(attr);
     }
     return total;
 }
 
-enum field_type tuplet_field_type(const tuplet_t *tuplet, attr_id_t id)
+enum gs_field_type_e gs_tuplet_field_type(const gs_tuplet_t *tuplet, gs_attr_id_t id)
 {
     assert(tuplet);
     return frag_field_type(tuplet->fragment, id);
 }
 
-const char *tuplet_format_str(enum tuplet_format format)
+const char *gs_tuplet_format_str(enum gs_tuplet_format_e format)
 {
     switch (format) {
         case TF_NSM: return "row";

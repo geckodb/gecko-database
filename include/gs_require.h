@@ -30,7 +30,7 @@ typedef enum {
     constraint_equal,
     constraint_greater_equal,
     constraint_greater
-} relation_constraint;
+} gs_relation_constraint_e;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // M A C R O S

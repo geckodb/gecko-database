@@ -28,19 +28,19 @@ typedef enum {
     GI_VINDEX_HASH,
 
     GI_HINDEX_BESEARCH
-} grid_index_tag;
+} gs_grid_index_tag_e;
 
-typedef struct grid_cursor_t {
+typedef struct gs_grid_cursor_t {
     void *extra;
-} grid_cursor_t;
+} gs_grid_cursor_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // F O R W A R D   D E C L A R A T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-grid_cursor_t *grid_cursor_new(size_t cursor);
-void grid_cursor_delete(grid_cursor_t *cursor);
-void grid_cursor_pushback(grid_cursor_t *cursor, const void *data);
-struct grid_t *grid_cursor_next(grid_cursor_t *cursor);
-size_t grid_cursor_numelem(const grid_cursor_t *cursor);
-bool grid_cursor_is_empty(const grid_cursor_t *cursor);
+gs_grid_cursor_t *gs_grid_cursor_new(size_t cursor);
+void gs_grid_cursor_delete(gs_grid_cursor_t *cursor);
+void gs_grid_cursor_pushback(gs_grid_cursor_t *cursor, const void *data);
+struct gs_grid_t *gs_grid_cursor_next(gs_grid_cursor_t *cursor);
+size_t gs_grid_cursor_numelem(const gs_grid_cursor_t *cursor);
+bool gs_grid_cursor_is_empty(const gs_grid_cursor_t *cursor);

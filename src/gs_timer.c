@@ -17,19 +17,19 @@
 
 #include <gs_timer.h>
 
-void timer_start(m_timer_t *timer)
+void gs_timer_start(gs_timer_t *timer)
 {
     assert (timer);
     timer->start = clock();
 }
 
-void timer_stop(m_timer_t *timer)
+void gs_timer_stop(gs_timer_t *timer)
 {
     assert (timer);
     timer->stop = clock();
 }
 
-double timer_diff_ms(m_timer_t *timer)
+double gs_timer_diff_ms(gs_timer_t *timer)
 {
     assert (timer);
     return (double)(timer->stop - timer->start) / CLOCKS_PER_SEC;

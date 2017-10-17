@@ -17,34 +17,34 @@
 
 #include <gs_tuple_cursor.h>
 
-void tuple_cursor_create(tuple_cursor_t *cursor, struct table_t *context, tuple_id_t *tuple_ids,
-                         size_t ntuple_ids)
+void gs_tuple_cursor_create(gs_tuple_cursor_t *cursor, struct gs_table_t *context, gs_tuple_id_t *tuple_ids,
+                            size_t ntuple_ids)
 {
     GS_REQUIRE_NONNULL(cursor);
     cursor->context = context;
     cursor->ntuple_ids = ntuple_ids;
     cursor->tuple_ids = tuple_ids;
-    tuple_cursor_rewind(cursor);
+    gs_tuple_cursor_rewind(cursor);
 }
 
-void tuple_cursor_dispose(tuple_cursor_t *cursor)
+void gs_tuple_cursor_dispose(gs_tuple_cursor_t *cursor)
 {
     GS_REQUIRE_NONNULL(cursor);
     free (cursor->tuple_ids);
 }
 
-void tuple_cursor_rewind(tuple_cursor_t *cursor)
+void gs_tuple_cursor_rewind(gs_tuple_cursor_t *cursor)
 {
     GS_REQUIRE_NONNULL(cursor);
     cursor->tuple_id_cursor = 0;
 }
 
-bool tuple_cursor_next(tuple_t *tuple, tuple_cursor_t *cursor)
+bool gs_tuple_cursor_next(gs_tuple_t *tuple, gs_tuple_cursor_t *cursor)
 {
     GS_REQUIRE_NONNULL(cursor);
     GS_REQUIRE_NONNULL(tuple);
     if (cursor->tuple_id_cursor < cursor->ntuple_ids) {
-        tuple_open(tuple, cursor->context, cursor->tuple_ids[cursor->tuple_id_cursor++]);
+        gs_tuple_open(tuple, cursor->context, cursor->tuple_ids[cursor->tuple_id_cursor++]);
         return true;
     } else return false;
 }

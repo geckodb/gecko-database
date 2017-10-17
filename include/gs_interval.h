@@ -24,15 +24,15 @@
 // D A T A   T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-typedef struct interval_t {
+typedef struct gs_interval_t {
     size_t begin;
     size_t end;
-} interval_t;
+} gs_interval_t;
 
-typedef struct tuple_id_interval_t {
-    tuple_id_t begin;
-    tuple_id_t end;
-} tuple_id_interval_t;
+typedef struct gs_tuple_id_interval_t {
+    gs_tuple_id_t begin;
+    gs_tuple_id_t end;
+} gs_tuple_id_interval_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // M A C R O S
@@ -57,4 +57,4 @@ typedef struct tuple_id_interval_t {
 // I N L I N E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-int interval_tuple_id_comp_by_lower_bound(const void *lhs, const void *rhs);
+int gs_interval_tuple_id_comp_by_lower_bound(const void *lhs, const void *rhs);

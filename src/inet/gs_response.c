@@ -18,7 +18,7 @@
 #include <inet/gs_response.h>
 #include <apr_strings.h>
 
-void response_create(response_t *response)
+void gs_response_create(gs_response_t *response)
 {
     GS_REQUIRE_NONNULL(response);
     response->code = HTTP_STATUS_CODE_500_INTERNAL_ERR;
@@ -27,19 +27,19 @@ void response_create(response_t *response)
     response->fields = apr_hash_make(response->pool);
 }
 
-char *response_pack(response_t *response)
+char *gs_response_pack(gs_response_t *response)
 {
     GS_REQUIRE_NONNULL(response);
     const char *pack = "HTTP/1.1 %s\r\n%s\r\n%s";
-    const char *code = codestr(response->code);
-    const char *mime = response_format_fields(response);
-    const char *body = response_body_get(response);
+    const char *code = gs_codestr(response->code);
+    const char *mime = gs_response_format_fields(response);
+    const char *body = gs_response_body_get(response);
     char *buffer = GS_REQUIRE_MALLOC(strlen(pack) + 1 + strlen(mime) + 1 + strlen(body) + 1);
     sprintf(buffer, pack, code, mime, body);
     return buffer;
 }
 
-void response_field_set(response_t *response, const char *field, const char *value)
+void gs_response_field_set(gs_response_t *response, const char *field, const char *value)
 {
     GS_REQUIRE_NONNULL(response);
     GS_REQUIRE_NONNULL(response->fields);
@@ -48,7 +48,7 @@ void response_field_set(response_t *response, const char *field, const char *val
     apr_hash_set(response->fields, imp_key, APR_HASH_KEY_STRING, imp_val);
 }
 
-const char *response_field_get(response_t *response, const char *field)
+const char *gs_response_field_get(gs_response_t *response, const char *field)
 {
     GS_REQUIRE_NONNULL(response);
     GS_REQUIRE_NONNULL(field);
@@ -57,7 +57,7 @@ const char *response_field_get(response_t *response, const char *field)
     return (result != NULL ? *(char **) result : "");
 }
 
-void response_body_set(response_t *response, const char *body)
+void gs_response_body_set(gs_response_t *response, const char *body)
 {
     GS_REQUIRE_NONNULL(response);
     GS_REQUIRE_NONNULL(body);
@@ -69,26 +69,26 @@ void response_body_set(response_t *response, const char *body)
     }
 }
 
-void response_content_type_set(response_t *response, const char *content_type)
+void gs_response_content_type_set(gs_response_t *response, const char *content_type)
 {
     GS_REQUIRE_NONNULL(response);
     GS_REQUIRE_NONNULL(response->fields);
     GS_REQUIRE_NONNULL(content_type);
-    response_field_set(response, MIME_CONTENT_TYPE, content_type);
+    gs_response_field_set(response, MIME_CONTENT_TYPE, content_type);
 }
 
-const char *response_content_type_get(response_t *response)
+const char *gs_response_content_type_get(gs_response_t *response)
 {
-    return response_field_get(response, MIME_CONTENT_TYPE);
+    return gs_response_field_get(response, MIME_CONTENT_TYPE);
 }
 
-const char *response_body_get(response_t *response)
+const char *gs_response_body_get(gs_response_t *response)
 {
     GS_REQUIRE_NONNULL(response);
     return (response->body != NULL ? response->body : "");
 }
 
-void response_dispose(response_t *response)
+void gs_response_dispose(gs_response_t *response)
 {
     GS_REQUIRE_NONNULL(response);
     GS_REQUIRE_NONNULL(response->fields);
@@ -99,13 +99,13 @@ void response_dispose(response_t *response)
    // dict_delete(response->fields);
 }
 
-void response_end(response_t *response, http_status_code_t code)
+void gs_response_end(gs_response_t *response, gs_http_status_code_t code)
 {
     GS_REQUIRE_NONNULL(response);
     response->code = code;
 }
 
-const char *response_format_fields(const response_t *response)
+const char *gs_response_format_fields(const gs_response_t *response)
 {
     GS_REQUIRE_NONNULL(response);
 

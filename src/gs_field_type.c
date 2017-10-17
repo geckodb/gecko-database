@@ -18,7 +18,7 @@
 #include <gs_field_type.h>
 #include <gs_grid.h>
 
-size_t field_type_sizeof(enum field_type type)
+size_t gs_field_type_sizeof(enum gs_field_type_e type)
 {
     switch (type) {
         case FT_CHAR:
@@ -66,7 +66,7 @@ size_t field_type_sizeof(enum field_type type)
     }
 }
 
-const char *field_type_str(enum field_type type)
+const char *gs_field_type_str(enum gs_field_type_e type)
 {
     switch (type) {
         case FT_CHAR:
@@ -76,21 +76,21 @@ const char *field_type_str(enum field_type type)
         case FT_INT8:
             return "s8";
         case FT_UINT8:
-            return "u8";
+            return "gs_u8_t";
         case FT_INT16:
             return "s16";
         case FT_UINT16:
-            return "u16";
+            return "gs_u16_t";
         case FT_INT32:
             return "s32";
         case FT_UINT32:
-            return "u32";
+            return "gs_u32_t";
         case FT_FLOAT32:
             return "float32";
         case FT_INT64:
-            return "s64";
+            return "gs_s64_t";
         case FT_UINT64:
-            return "u64";
+            return "gs_u64_t";
         case FT_FLOAT64:
             return "float64";
             /* internal */

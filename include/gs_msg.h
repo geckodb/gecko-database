@@ -14,7 +14,7 @@
 #pragma once
 
 // ---------------------------------------------------------------------------------------------------------------------
-// C O N S T A N T S
+// C O N F I G
 // ---------------------------------------------------------------------------------------------------------------------
 
 #define BADARG           "Illegal argument: '%s'"
@@ -22,10 +22,10 @@
 #define BADMALLOC        "Memory allocation failed: '%s'"
 #define BADEXPR          "Bad expression evaluation: '%s'"
 #define NOTIMPLEMENTED   "Not implemented: '%s'"
-#define BADBRANCH        "Internal error: unknown condition during operation on object %p."
+#define BADBRANCH        "Internal gs_gc_error: unknown condition during operation on object %p."
 #define BADCAST          "Unsupported cast request for persistent ptr %p."
-#define BADPOOLINIT      "Internal error: page pool %p is already initialized."
-#define BADPAGEID        "Internal error: page id '%du' was not loaded into hot store. Maybe it does not exists."
+#define BADPOOLINIT      "Internal gs_gc_error: page pool %p is already initialized."
+#define BADPAGEID        "Internal gs_gc_error: page id '%du' was not loaded into hot store. Maybe it does not exists."
 #define BADARGNULL       "Illegal argument for function. Parameter '%s' points to null"
 #define BADARGZERO       "Illegal argument for function. Parameter '%s' is zero"
 #define UNEXPECTED       "Unexpected behavior: '%s'"
@@ -34,8 +34,8 @@
 #define BADCOLDSTOREINIT "Memory allocation failed: unable to initialize cold store of buffer manager"
 #define BADFREELISTINIT  "Memory allocation failed: unable to initialize page free list in buffer manager"
 #define BADHOTSTOREOBJ   "Page with id '%du' is not located in hot store"
-#define BADINTERNAL      "Internal error: %s"
+#define BADINTERNAL      "Internal gs_gc_error: %s"
 #define BADBOUNDS        "Out of bounds access: %s"
-#define BADTAG           "Casting error. Object is not instance of required type."
+#define BADTAG           "Casting gs_gc_error. Object is not instance of required type."
 #define BADFRAGTYPE      "Unknown fragment type was requested: %d"
 #define BADINT           "Argument must be a positive non-zero integer."

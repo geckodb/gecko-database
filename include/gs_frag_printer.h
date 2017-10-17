@@ -25,33 +25,34 @@
 // F O R W A R D   D E C L A R A T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-struct frag_t;
+struct gs_frag_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // D A T A   T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-typedef enum frag_printer_type_tag {
+typedef enum gs_frag_printer_type_tag_e {
     FPTT_CONSOLE_PRINTER
-} frag_printer_type_tag;
+} gs_frag_printer_type_tag_e;
 
-typedef struct frag_printer_t {
-    void (*_print)(struct frag_printer_t *self, FILE *file, struct frag_t *frag, size_t row_offset, size_t limit);
-    void (*_free)(struct frag_printer_t *self);
-    frag_printer_type_tag tag;
+typedef struct gs_frag_printer_t {
+    void (*_print)(struct gs_frag_printer_t *self, FILE *file, struct gs_frag_t *frag, size_t row_offset, size_t limit);
+    void (*_free)(struct gs_frag_printer_t *self);
+    gs_frag_printer_type_tag_e tag;
     void *extra;
-} frag_printer_t;
+} gs_frag_printer_t;
 
-static struct frag_printer_register_entry {
-    frag_printer_type_tag type;
-    frag_printer_t *(*create)();
+static struct gs_frag_printer_register_entry_t {
+    gs_frag_printer_type_tag_e type;
+    gs_frag_printer_t *(*create)();
 } frag_printer_register[] = {
-    { FPTT_CONSOLE_PRINTER, console_printer_new }
+    { FPTT_CONSOLE_PRINTER, gs_console_printer_new }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   D E C L A R A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-void frag_printer_print(FILE *file, frag_printer_type_tag type, struct frag_t *frag, size_t row_offset, size_t limit);
+void gs_frag_printer_print(FILE *file, gs_frag_printer_type_tag_e type, struct gs_frag_t *frag, size_t row_offset,
+                           size_t limit);
 

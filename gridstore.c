@@ -59,20 +59,20 @@ int main(int argc, char* argv[])
 
  void setup_config(int argc, char **argv)
 {
-    startup_config.port = 35497;
+    gs_startup_config.port = 35497;
 
-    argp_parse (&argp, argc, argv, 0, 0, &startup_config);
+    argp_parse (&argp, argc, argv, 0, 0, &gs_startup_config);
 }
 
  void setup_core()
 {
-    error_if((apr_initialize() != APR_SUCCESS), err_apr_initfailed);
+    gs_error_if((apr_initialize() != APR_SUCCESS), err_apr_initfailed);
     gs_gridstore_create(&gridstore);
 }
 
  void setup_event_loop()
 {
-    error_if((gs_dispatcher_create(&dispatcher) != GS_SUCCESS), err_init_failed);
+    gs_error_if((gs_dispatcher_create(&dispatcher) != GS_SUCCESS), err_init_failed);
 }
 
  void setup_shell()
@@ -82,12 +82,12 @@ int main(int argc, char* argv[])
 
  void setup_server()
 {
-    gs_server_create(&server, startup_config.port, dispatcher);
+    gs_server_create(&server, gs_startup_config.port, dispatcher);
 //    const char *x = "/api/types/create";
   //  const char *y = "/api/1.0/nodes";
-   // gs_server_router_add(server, x, router_api_types_create);
-  //  gs_server_router_add(server, y, router_api_1_0_nodes);
-    gs_server_start(server, router_catch);
+   // gs_server_router_add(server, x, gs_router_api_types_create);
+  //  gs_server_router_add(server, y, gs_router_api_1_0_nodes);
+     gs_server_start(server, gs_router_catch);
 }
 
  void stop_system()
@@ -142,7 +142,7 @@ int main(int argc, char* argv[])
 {
     gs_status_t dispatcher_shutdown(const gs_event_t *event);
 
-    GS_CONNECT(GS_SIG_SYSEXIT,  system_handle_events);
+    GS_CONNECT(GS_SIG_SYSEXIT, system_handle_events);
 
 
     GS_CONNECT(GS_SIG_SHUTDOWN, dispatcher_shutdown);
@@ -153,8 +153,8 @@ int main(int argc, char* argv[])
 
     GS_CONNECT(GS_SIG_SHUTDOWN, gs_server_handle_events);
 
-    GS_CONNECT(GS_SIG_TEST,     gs_gridstore_handle_events);
-    GS_CONNECT(GS_SIG_INVOKE,   gs_gridstore_handle_events);
+    GS_CONNECT(GS_SIG_TEST, gs_gridstore_handle_events);
+    GS_CONNECT(GS_SIG_INVOKE, gs_gridstore_handle_events);
 }
 
  void start_system()

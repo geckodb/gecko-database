@@ -21,6 +21,10 @@
 #include <gs_attr.h>
 #include <gs_frag.h>
 
+// ---------------------------------------------------------------------------------------------------------------------
+// C O N F I G
+// ---------------------------------------------------------------------------------------------------------------------
+
 #define TIMG_MAGIC_WORD_MAX 100
 #define TIMG_MAGIC_WORD     "mptimg"
 #define TIMG_FORMAT_VERSION   1
@@ -28,14 +32,14 @@
 #define TIMG_FORMAT_NSM  0
 #define TIMG_FORMAT_DSM  1
 
-
-
-
+// ---------------------------------------------------------------------------------------------------------------------
+// D A T A T Y P E S
+// ---------------------------------------------------------------------------------------------------------------------
 
 typedef struct {
     const char *dest_file;
-    enum tuplet_format format;
-} serialization_config_t;
+    enum gs_tuplet_format_e format;
+} gs_serialization_config_t;
 
 
 
@@ -57,7 +61,7 @@ typedef struct {
     uint64_t         num_tuples;
     uint64_t         timestamp_created;
     unsigned char    raw_table_data_checksum[MD5_DIGEST_LENGTH];
-} timg_header_t;
+} gs_timg_header_t;
 
 typedef struct
 {
@@ -65,8 +69,8 @@ typedef struct
     char             *table_name;
     char             *table_spec_ref;
     char             *comment;
-    attr_t         *attributes;
-} timg_var_header_t;
+    gs_attr_t         *attributes;
+} gs_timg_var_header_t;
 
 typedef enum {
     TIMG_ERR_OK                 =    1,
@@ -80,42 +84,42 @@ typedef enum {
     TIMG_ERR_CORRUPTED          =    9,
     TIMG_ERR_COMMENT_TOOLONG    =   10,
 
-} timg_error_t;
+} gs_timg_error_e;
 
 typedef enum {
     TIMG_VER_1 = 1
-} timg_version_t;
+} gs_timg_version_e;
 
 
 
 
-timg_error_t tableimg_header_load(
+gs_timg_error_e gs_tableimg_header_load(
         FILE *file,
-        timg_header_t *header,
-        timg_var_header_t *var_header
+        gs_timg_header_t *header,
+        gs_timg_var_header_t *var_header
 );
 
-timg_error_t tableimg_header_free(
-        timg_var_header_t *var_header
+gs_timg_error_e tableimg_header_free(
+        gs_timg_var_header_t *var_header
 );
 
-timg_error_t tableimg_fwrite(
+gs_timg_error_e gs_tableimg_fwrite(
         FILE *file,
-        timg_version_t version,
+        gs_timg_version_e version,
         const char *database_name,
         const char *table_name,
         const char *table_spec_ref,
         const char *comment,
-        schema_t *frag,
+        gs_schema_t *frag,
         const void *tuple_data,
         size_t num_tuples,
-        enum tuplet_format format_in,
-        enum tuplet_format format_out);
+        enum gs_tuplet_format_e format_in,
+        enum gs_tuplet_format_e format_out);
 
 
 
-size_t tableimg_rawsize(
-        timg_header_t *header,
-        timg_var_header_t *var_header
+size_t gs_tableimg_rawsize(
+        gs_timg_header_t *header,
+        gs_timg_var_header_t *var_header
 );
 

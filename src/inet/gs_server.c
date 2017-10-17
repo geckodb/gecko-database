@@ -21,7 +21,7 @@
 #include <sys/socket.h>
 #include <poll.h>
 #include <apr_pools.h>
-#include <gs_c11threads.h>
+#include <c11threads.h>
 #include <stdatomic.h>
 #include <inet/gs_request.h>
 #include <apr_hash.h>
@@ -92,7 +92,7 @@ GS_DECLARE(gs_status_t) gs_server_create(gs_server_t **out, unsigned short port,
         panic("unable to start_system listening to port %d (%s).", (int) ntohs(server->server_addr.sin_port), strerror(errno));
     }
 
-  /*  server->routers = hash_table_new_ex(&(hash_function_t) {.capture = NULL, .hash_code = hash_code_jen},
+  /*  server->routers = hash_table_new_ex(&(hash_function_t) {.capture = NULL, .hash_code = gs_hash_code_jen},
                                         sizeof(char *), sizeof(router_t), RESPONSE_DICT_CAPACITY,
                                         RESPONSE_DICT_CAPACITY, 1.7f, 0.75f,
                                         str_equals, str_clean_up, true);*/
@@ -189,7 +189,7 @@ int server_loop(void *args)
 
     int client;
     char buffer[131072];
-    response_t response;
+    gs_response_t response;
     fd_set set;
 
     while (loop_args->server->is_running) {
@@ -214,15 +214,15 @@ int server_loop(void *args)
         } else {
             memset (buffer, 0, sizeof(buffer));
             struct pollfd pollfd = { .fd = client, .events = POLLIN };
-            response_create(&response);
+            gs_response_create(&response);
             if (poll(&pollfd, 1, 100000)) {
                 gs_request_t *request;
                 gs_request_create(&request, client);
 
                 if (!gs_request_is_valid(request)) {
                     GS_DEBUG2("request rejected");
-                    response_content_type_set(&response, MIME_CONTENT_TYPE_TEXT_PLAIN);
-                    response_end(&response, HTTP_STATUS_CODE_400_BAD_REQUEST);
+                    gs_response_content_type_set(&response, MIME_CONTENT_TYPE_TEXT_PLAIN);
+                    gs_response_end(&response, HTTP_STATUS_CODE_400_BAD_REQUEST);
                 } else {
                     const router_t *router;
                     char *resource;
@@ -242,13 +242,13 @@ int server_loop(void *args)
 
                 gs_request_dispose(&request);
             } else {
-                response_end(&response, HTTP_STATUS_CODE_408_REQUEST_TIMEOUT);
+                gs_response_end(&response, HTTP_STATUS_CODE_408_REQUEST_TIMEOUT);
             }
-            char *response_text = response_pack(&response);
+            char *response_text = gs_response_pack(&response);
             GS_DEBUG("RESPONSE TEXT: %s\n", response_text);
             write(client, response_text, strlen(response_text));
             free(response_text);
-            response_dispose(&response);
+            gs_response_dispose(&response);
             close(client);
         }
         close (client);

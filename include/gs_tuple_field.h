@@ -26,22 +26,22 @@
 // D A T A   T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-typedef struct tuple_field_t
+typedef struct gs_tuple_field_t
 {
-    const grid_t *grid;
-    attr_id_t table_attr_id;
-    attr_id_t grid_attr_id;
-    tuple_t *tuple;
-    tuplet_t tuplet;
-    tuplet_field_t tuplet_field;
-} tuple_field_t;
+    const gs_grid_t *grid;
+    gs_attr_id_t table_attr_id;
+    gs_attr_id_t grid_attr_id;
+    gs_tuple_t *tuple;
+    gs_tuplet_t tuplet;
+    gs_tuplet_field_t tuplet_field;
+} gs_tuple_field_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   D E C L A R A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-void tuple_field_open(tuple_field_t *field, tuple_t *tuple);
-void tuple_field_seek(tuple_field_t *tuple_field, tuple_t *tuple, attr_id_t table_attr_id);
-void tuple_field_next(tuple_field_t *field);
-void tuple_field_write(tuple_field_t *field, const void *data);
-const void *tuple_field_read(tuple_field_t *field);
+void gs_tuple_field_open(gs_tuple_field_t *field, gs_tuple_t *tuple);
+void gs_tuple_field_seek(gs_tuple_field_t *tuple_field, gs_tuple_t *tuple, gs_attr_id_t table_attr_id);
+void gs_tuple_field_next(gs_tuple_field_t *field);
+void gs_tuple_field_write(gs_tuple_field_t *field, const void *data);
+const void *gs_tuple_field_read(gs_tuple_field_t *field);

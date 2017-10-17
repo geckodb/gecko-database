@@ -23,4 +23,4 @@
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-hindex_t *lesearch_hindex_new(size_t approx_num_horizontal_partitions, const schema_t *table_schema);
+gs_hindex_t *gs_lesearch_hindex_new(size_t approx_num_horizontal_partitions, const gs_schema_t *table_schema);

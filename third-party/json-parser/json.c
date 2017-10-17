@@ -927,7 +927,7 @@ e_failed:
       if (*error)
          strcpy (error_buf, error);
       else
-         strcpy (error_buf, "Unknown error");
+         strcpy (error_buf, "Unknown gs_gc_error");
    }
 
    if (state.first_pass)

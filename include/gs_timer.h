@@ -23,14 +23,14 @@
 // D A T A   T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-typedef struct m_timer_t {
+typedef struct gs_timer_t {
     clock_t start, stop;
-} m_timer_t;
+} gs_timer_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   D E C L A R A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-void timer_start(m_timer_t *timer);
-void timer_stop(m_timer_t *timer);
-double timer_diff_ms(m_timer_t *timer);
+void gs_timer_start(gs_timer_t *timer);
+void gs_timer_stop(gs_timer_t *timer);
+double gs_timer_diff_ms(gs_timer_t *timer);

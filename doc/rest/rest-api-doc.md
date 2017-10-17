@@ -21,7 +21,7 @@ A list is a unorder collection of elements formatted as **YAML** *inline list*. 
 
 ## Map
 
-A map is a **YAML** formated *inline list* that associates keys to values. For example `{name: char(256), age: u8}` describes a list of two elements, `name` that maps to `char(256)` and `age` that maps to `u8`. A map is used for instance to define the attributes for a certain type, see [Create Type](#create-type) command.
+A map is a **YAML** formated *inline list* that associates keys to values. For example `{name: char(256), age: gs_u8_t}` describes a list of two elements, `name` that maps to `char(256)` and `age` that maps to `gs_u8_t`. A map is used for instance to define the attributes for a certain type, see [Create Type](#create-type) command.
 
 ## Attribute Types
 
@@ -32,14 +32,14 @@ A attribute type defines a certain data types for an attribute for a user-define
 | `char`    |  1     | 
 | `bool`    |  1     |
 | `s8`      |  1     |
-| `u8`      |  1     |
+| `gs_u8_t`      |  1     |
 | `s16`     |  2     |
-| `u16`     |  2     |
+| `gs_u16_t`     |  2     |
 | `s32`     |  4     |
-| `u32`     |  4     |
+| `gs_u32_t`     |  4     |
 | `float32` |  4     |
-| `s64`     |  8     |
-| `u64`     |  8     |
+| `gs_s64_t`     |  8     |
+| `gs_u64_t`     |  8     |
 | `float64` |  8     |
 
 
@@ -78,7 +78,7 @@ No further information in the header is required.
 curl http://localhost:36895/api/types/create \
   -X PUT \
   -F name="Movie" \
-  -F attributes='{name: char(256), released: u64, rating: u8}' \
+  -F attributes='{name: char(256), released: gs_u64_t, rating: gs_u8_t}' \
   -F primary='[name]'
 
 ````
@@ -126,7 +126,7 @@ No further information in the header is required.
 ````bash
 
 curl http://localhost:35497/api/1.0/nodes -X POST \
-  -F nodes='{[{"name":{"type":"string", value="mike"}, "age":{"type":"u8", value="32"}}]}' 
+  -F nodes='{[{"name":{"type":"string", value="mike"}, "age":{"type":"gs_u8_t", value="32"}}]}'
 
 ````
 

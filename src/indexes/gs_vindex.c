@@ -19,94 +19,94 @@
 #include <gs_grid.h>
 #include <gs_tuplet_field.h>
 
-void vindex_delete(vindex_t *index)
+void gs_vindex_delete(gs_vindex_t *index)
 {
     DELEGATE_CALL(index, _free);
 }
 
-void vindex_add(vindex_t *index, const attr_id_t *key, const struct grid_t *grid)
+void gs_vindex_add(gs_vindex_t *index, const gs_attr_id_t *key, const struct gs_grid_t *grid)
 {
     DELEGATE_CALL_WARGS(index, _add, key, grid);
-    hashset_add(&index->keys, key, 1);
+    gs_hashset_add(&index->keys, key, 1);
 }
 
-void vindex_remove(vindex_t *index, const attr_id_t *key)
+void gs_vindex_remove(gs_vindex_t *index, const gs_attr_id_t *key)
 {
     DELEGATE_CALL_WARGS(index, _remove, key);
-    hashset_remove(&index->keys, key, 1);
+    gs_hashset_remove(&index->keys, key, 1);
 }
 
-bool vindex_contains(const vindex_t *index, const attr_id_t *key)
+bool gs_vindex_contains(const gs_vindex_t *index, const gs_attr_id_t *key)
 {
     return DELEGATE_CALL_WARGS(index, _contains, key);
 }
 
-grid_cursor_t *vindex_query(const struct vindex_t *index, const attr_id_t *key_range_begin,
-                            const attr_id_t *key_range_end)
+gs_grid_cursor_t *gs_vindex_query(const struct gs_vindex_t *index, const gs_attr_id_t *key_range_begin,
+                                  const gs_attr_id_t *key_range_end)
 {
     GS_REQUIRE_NONNULL(key_range_begin);
     GS_REQUIRE_NONNULL(key_range_end);
     REQUIRE(key_range_begin < key_range_end, "Corrupted range");
     size_t result_capacity = (key_range_end - key_range_begin);
-    grid_cursor_t *result = grid_cursor_new(result_capacity);
+    gs_grid_cursor_t *result = gs_grid_cursor_new(result_capacity);
     index->_query(result, index, key_range_begin, key_range_end);
     return result;
 }
 
-grid_cursor_t *vindex_query_append(const struct vindex_t *index, grid_cursor_t *result,
-                                   const attr_id_t *key_range_begin, const attr_id_t *key_range_end)
+gs_grid_cursor_t *gs_vindex_query_append(const struct gs_vindex_t *index, gs_grid_cursor_t *result,
+                                         const gs_attr_id_t *key_range_begin, const gs_attr_id_t *key_range_end)
 {
     index->_query(result, index, key_range_begin, key_range_end);
     return result;
 }
 
-const struct grid_t *vindex_read(grid_cursor_t *result_set)
+const struct gs_grid_t *gs_vindex_read(gs_grid_cursor_t *result_set)
 {
-    return grid_cursor_next(result_set);
+    return gs_grid_cursor_next(result_set);
 }
 
-void vindex_close(grid_cursor_t *result_set)
+void gs_vindex_close(gs_grid_cursor_t *result_set)
 {
-    grid_cursor_delete(result_set);
+    gs_grid_cursor_delete(result_set);
 }
 
-const attr_id_t *vindex_begin(const vindex_t *index)
-{
-    GS_REQUIRE_NONNULL(index);
-    return hashset_begin(&index->keys);
-}
-
-const attr_id_t *vindex_end(const vindex_t *index)
+const gs_attr_id_t *gs_vindex_begin(const gs_vindex_t *index)
 {
     GS_REQUIRE_NONNULL(index);
-    return hashset_end(&index->keys);
+    return gs_hashset_begin(&index->keys);
 }
 
-void vindex_print(FILE *file, vindex_t *index)
+const gs_attr_id_t *gs_vindex_end(const gs_vindex_t *index)
+{
+    GS_REQUIRE_NONNULL(index);
+    return gs_hashset_end(&index->keys);
+}
+
+void gs_vindex_print(FILE *file, gs_vindex_t *index)
 {
     GS_REQUIRE_NONNULL(file);
     GS_REQUIRE_NONNULL(index);
 
-    schema_t *print_schema = schema_new("ad hoc info");
+    gs_schema_t *print_schema = gs_schema_new("ad hoc info");
     attr_create_strptr("attribute", print_schema);
     attr_create_gridid("grid id", print_schema);
-    frag_t *frag = frag_new(print_schema, 1, FIT_HOST_NSM_VM);
-    tuplet_t tuplet;
-    tuplet_field_t field;
+    gs_frag_t *frag = frag_new(print_schema, 1, FIT_HOST_NSM_VM);
+    gs_tuplet_t tuplet;
+    gs_tuplet_field_t field;
 
-    for (const attr_id_t *it = vindex_begin(index); it < vindex_end(index); it++) {
-        grid_cursor_t *cursor = vindex_query(index, it, it + 1);
-        for (struct grid_t *grid = grid_cursor_next(cursor); grid != NULL; grid = grid_cursor_next(NULL)) {
+    for (const gs_attr_id_t *it = gs_vindex_begin(index); it < gs_vindex_end(index); it++) {
+        gs_grid_cursor_t *cursor = gs_vindex_query(index, it, it + 1);
+        for (struct gs_grid_t *grid = gs_grid_cursor_next(cursor); grid != NULL; grid = gs_grid_cursor_next(NULL)) {
             frag_insert(&tuplet, frag, 1);
-            tuplet_field_open(&field, &tuplet);
-            tuplet_field_write(&field, table_attr_by_id(grid->context, *it)->name, true);
-            tuplet_field_write(&field, &grid->grid_id, true);
+            gs_tuplet_field_open(&field, &tuplet);
+            gs_tuplet_field_write(&field, gs_table_attr_by_id(grid->context, *it)->name, true);
+            gs_tuplet_field_write(&field, &grid->grid_id, true);
         }
-        grid_cursor_delete(cursor);
+        gs_grid_cursor_delete(cursor);
     }
 
     frag_print(file, frag, 0, INT_MAX);
     frag_delete(frag);
-    schema_delete(print_schema);
+    gs_schema_delete(print_schema);
 
 }

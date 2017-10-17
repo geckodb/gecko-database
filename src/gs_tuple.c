@@ -18,7 +18,7 @@
 #include <gs_tuple.h>
 #include <gs_grid.h>
 
-void tuple_open(tuple_t *tuple, const struct table_t *table, tuple_id_t tuple_id)
+void gs_tuple_open(gs_tuple_t *tuple, const struct gs_table_t *table, gs_tuple_id_t tuple_id)
 {
     GS_REQUIRE_NONNULL(tuple);
     GS_REQUIRE_NONNULL(table);
@@ -26,12 +26,12 @@ void tuple_open(tuple_t *tuple, const struct table_t *table, tuple_id_t tuple_id
     tuple->tuple_id = tuple_id;
 }
 
-void tuple_id_init(void *data)
+void gs_tuple_id_init(void *data)
 {
-    *((tuple_id_t *) data) = 0;
+    *((gs_tuple_id_t *) data) = 0;
 }
 
-void tuple_id_inc(void *data)
+void gs_tuple_id_inc(void *data)
 {
-    *((tuple_id_t *) data) += 1;
+    *((gs_tuple_id_t *) data) += 1;
 }

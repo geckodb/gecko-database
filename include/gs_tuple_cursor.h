@@ -23,19 +23,19 @@
 // D A T A   T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-typedef struct tuple_cursor_t {
-    struct table_t *context;
-    tuple_id_t *tuple_ids;
+typedef struct gs_tuple_cursor_t {
+    struct gs_table_t *context;
+    gs_tuple_id_t *tuple_ids;
     size_t ntuple_ids;
     size_t tuple_id_cursor;
-} tuple_cursor_t;
+} gs_tuple_cursor_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   D E C L A R A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-void tuple_cursor_create(tuple_cursor_t *cursor, struct table_t *context, tuple_id_t *tuple_ids,
-                         size_t ntuple_ids);
-void tuple_cursor_dispose(tuple_cursor_t *cursor);
-void tuple_cursor_rewind(tuple_cursor_t *cursor);
-bool tuple_cursor_next(tuple_t *tuple, tuple_cursor_t *cursor);
+void gs_tuple_cursor_create(gs_tuple_cursor_t *cursor, struct gs_table_t *context, gs_tuple_id_t *tuple_ids,
+                            size_t ntuple_ids);
+void gs_tuple_cursor_dispose(gs_tuple_cursor_t *cursor);
+void gs_tuple_cursor_rewind(gs_tuple_cursor_t *cursor);
+bool gs_tuple_cursor_next(gs_tuple_t *tuple, gs_tuple_cursor_t *cursor);

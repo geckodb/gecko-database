@@ -20,7 +20,7 @@
 
 #include <gs.h>
 #include <stdatomic.h>
-#include "gs_c11threads.h"
+#include "c11threads.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 // D A T A   T Y P E S
@@ -30,38 +30,38 @@ typedef enum {
     future_eager,
     future_lazy,
     future_sync
-} future_eval_policy;
+} gs_future_eval_policy_e;
 
 typedef enum {
     promise_pending,
     promise_fulfilled,
     promise_rejected
-} promise_state;
+} gs_promise_state_e;
 
 typedef enum {
     resolved,
     rejected
-} promise_result;
+} gs_promise_result_e;
 
-typedef void *(*promise_t)(promise_result *return_value, const void *capture);
+typedef void *(*promise_t)(gs_promise_result_e *return_value, const void *capture);
 
-struct _future_t {
+struct gs_future_t {
     const void *capture;
     promise_t func;
-    promise_state promise_state;
+    gs_promise_state_e promise_state;
     atomic_bool promise_settled;
     thrd_t *thread;
     void *thread_args;
-    future_eval_policy eval_policy;
+    gs_future_eval_policy_e eval_policy;
     void *call_result;
 };
 
-typedef struct _future_t *future_t;
+typedef struct gs_future_t *gs_future_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-future_t future_new(const void *capture, promise_t func, future_eval_policy policy);
-void future_wait_for(future_t future);
-const void *future_resolve(promise_result *return_type, future_t future);
+gs_future_t gs_future_new(const void *capture, promise_t func, gs_future_eval_policy_e policy);
+void gs_future_wait_for(gs_future_t future);
+const void *gs_future_resolve(gs_promise_result_e *return_type, gs_future_t future);
