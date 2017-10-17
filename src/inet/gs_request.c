@@ -1,5 +1,5 @@
 #include <inet/gs_request.h>
-#include <inet/response.h>
+#include <inet/gs_response.h>
 #include <apr_strings.h>
 #include <apr_tables.h>
 

@@ -17,13 +17,13 @@
 
 #include <gs.h>
 #include <argp.h>
-#include <info.h>
+#include <gs_info.h>
 #include <gs_dispatcher.h>
 #include <gs_shell.h>
-#include <routers/api/types/create/router.h>
-#include <routers/catch.h>
+#include <routers/api/types/create/gs_router.h>
+#include <routers/gs_catch.h>
 #include <inet/gs_server.h>
-#include <routers/api/1.0/nodes.h>
+#include <routers/api/1.0/gs_nodes.h>
 
 // curl -i -G -d "key=val" -d "abs=[1,2,3,4]" http://localhost:36895/api/test
 

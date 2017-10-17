@@ -1,7 +1,7 @@
 #pragma once
 
 #include <gs.h>
-#include <containers/vec.h>
+#include <containers/gs_vec.h>
 
 typedef struct gs_hash_t gs_hash_t;
 

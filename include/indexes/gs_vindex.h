@@ -18,44 +18,47 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <gs.h>
-#include <gs_event.h>
-#include <inet/gs_response.h>
-#include <inet/gs_request.h>
+#include <gs_grid_cursor.h>
+#include <containers/gs_hashset.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
-// C O N S T A N T S
+// F O R W A R D   D E C L A R A T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-static char response[] =
-        "HTTP/1.1 200 OK\r\n"
-        "Content-Type: text/html: charset=UTF-8\r\n\r\n"
-        "<!doctype html>\r\n"
-        "<html><head>MyTitle</head><body><h1>Hello World</h1></body></html>\r\n";
-
-__BEGIN_DECLS
+struct grid_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // D A T A   T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-typedef struct gs_server_t gs_server_t;
+typedef struct vindex_t {
+    grid_index_tag tag;
+    hashset_t keys;
 
-typedef void (*router_t)(gs_dispatcher_t *dispatcher, const gs_request_t *req, response_t *res);
+    void (*_add)(struct vindex_t *self, const attr_id_t *key, const struct grid_t *grid);
+    void (*_remove)(struct vindex_t *self, const attr_id_t *key);
+    bool (*_contains)(const struct vindex_t *self, const attr_id_t *key);
+    void (*_query)(grid_cursor_t *result, const struct vindex_t *self, const attr_id_t *key_begin,
+                                  const attr_id_t *key_end);
+    void (*_free)(struct vindex_t *self);
+
+    void *extra;
+} vindex_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-GS_DECLARE(gs_status_t) gs_server_create(gs_server_t **server, unsigned short port, gs_dispatcher_t *dispatcher);
-
-GS_DECLARE(gs_status_t) gs_server_router_add(gs_server_t *server, const char *resource, router_t router);
-
-GS_DECLARE(gs_status_t) gs_server_start(gs_server_t *server, router_t catch);
-
-GS_DECLARE(gs_status_t) gs_server_dispose(gs_server_t **server);
-
-GS_DECLARE(gs_status_t) gs_server_shutdown(gs_server_t *server);
-
-GS_DECLARE(gs_status_t) gs_server_handle_events(const gs_event_t *event);
-
-__END_DECLS
+void vindex_delete(vindex_t *index);
+void vindex_add(vindex_t *index, const attr_id_t *key, const struct grid_t *grid);
+void vindex_remove(vindex_t *index, const attr_id_t *key);
+bool vindex_contains(const vindex_t *index, const attr_id_t *key);
+grid_cursor_t *vindex_query(const struct vindex_t *index, const attr_id_t *key_range_begin,
+                            const attr_id_t *key_range_end);
+grid_cursor_t *vindex_query_append(const struct vindex_t *index, grid_cursor_t *result,
+                                   const attr_id_t *key_range_begin, const attr_id_t *key_range_end);
+const struct grid_t *vindex_read(grid_cursor_t *result_set);
+void vindex_close(grid_cursor_t *result_set);
+const attr_id_t *vindex_begin(const vindex_t *index);
+const attr_id_t *vindex_end(const vindex_t *index);
+void vindex_print(FILE *file, vindex_t *index);

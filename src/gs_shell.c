@@ -1,5 +1,5 @@
 #include <gs_shell.h>
-#include <c11threads.h>
+#include <gs_c11threads.h>
 #include <apr_file_io.h>
 #include <apr_strings.h>
 #include <gs_dispatcher.h>

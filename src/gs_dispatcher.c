@@ -1,7 +1,7 @@
 #include <gs_dispatcher.h>
 #include <gs_spinlock.h>
 #include <apr_hash.h>
-#include <containers/vec.h>
+#include <containers/gs_vec.h>
 #include <apr_strings.h>
 #include <containers/gs_hash.h>
 

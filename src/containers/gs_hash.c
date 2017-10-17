@@ -1,5 +1,5 @@
 #include <containers/gs_hash.h>
-#include <containers/freelist.h>
+#include <containers/gs_freelist.h>
 
 typedef struct gs_hash_func_t {
     const void         *capture;

@@ -39,17 +39,17 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <utils.h>
+#include <gs_utils.h>
 #include <sys/stat.h>
 
 #include <openssl/md5.h>
 
-#include <platform.h>
-#include <global.h>
-#include <msg.h>
-#include <error.h>
-#include <require.h>
-#include <hash.h>
+#include <gs_platform.h>
+#include <gs_global.h>
+#include <gs_msg.h>
+#include <gs_error.h>
+#include <gs_require.h>
+#include <gs_hash.h>
 #include <zconf.h>
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -1,3 +1,4 @@
+// Asynchronous program execution
 // Copyright (C) 2017 Marcus Pinnecke
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -18,44 +19,49 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <gs.h>
-#include <gs_event.h>
-#include <inet/gs_response.h>
-#include <inet/gs_request.h>
-
-// ---------------------------------------------------------------------------------------------------------------------
-// C O N S T A N T S
-// ---------------------------------------------------------------------------------------------------------------------
-
-static char response[] =
-        "HTTP/1.1 200 OK\r\n"
-        "Content-Type: text/html: charset=UTF-8\r\n\r\n"
-        "<!doctype html>\r\n"
-        "<html><head>MyTitle</head><body><h1>Hello World</h1></body></html>\r\n";
-
-__BEGIN_DECLS
+#include <stdatomic.h>
+#include "gs_c11threads.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 // D A T A   T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-typedef struct gs_server_t gs_server_t;
+typedef enum {
+    future_eager,
+    future_lazy,
+    future_sync
+} future_eval_policy;
 
-typedef void (*router_t)(gs_dispatcher_t *dispatcher, const gs_request_t *req, response_t *res);
+typedef enum {
+    promise_pending,
+    promise_fulfilled,
+    promise_rejected
+} promise_state;
+
+typedef enum {
+    resolved,
+    rejected
+} promise_result;
+
+typedef void *(*promise_t)(promise_result *return_value, const void *capture);
+
+struct _future_t {
+    const void *capture;
+    promise_t func;
+    promise_state promise_state;
+    atomic_bool promise_settled;
+    thrd_t *thread;
+    void *thread_args;
+    future_eval_policy eval_policy;
+    void *call_result;
+};
+
+typedef struct _future_t *future_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-GS_DECLARE(gs_status_t) gs_server_create(gs_server_t **server, unsigned short port, gs_dispatcher_t *dispatcher);
-
-GS_DECLARE(gs_status_t) gs_server_router_add(gs_server_t *server, const char *resource, router_t router);
-
-GS_DECLARE(gs_status_t) gs_server_start(gs_server_t *server, router_t catch);
-
-GS_DECLARE(gs_status_t) gs_server_dispose(gs_server_t **server);
-
-GS_DECLARE(gs_status_t) gs_server_shutdown(gs_server_t *server);
-
-GS_DECLARE(gs_status_t) gs_server_handle_events(const gs_event_t *event);
-
-__END_DECLS
+future_t future_new(const void *capture, promise_t func, future_eval_policy policy);
+void future_wait_for(future_t future);
+const void *future_resolve(promise_result *return_type, future_t future);

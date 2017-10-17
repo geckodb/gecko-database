@@ -17,45 +17,25 @@
 // I N C L U D E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <gs.h>
-#include <gs_event.h>
-#include <inet/gs_response.h>
-#include <inet/gs_request.h>
-
-// ---------------------------------------------------------------------------------------------------------------------
-// C O N S T A N T S
-// ---------------------------------------------------------------------------------------------------------------------
-
-static char response[] =
-        "HTTP/1.1 200 OK\r\n"
-        "Content-Type: text/html: charset=UTF-8\r\n\r\n"
-        "<!doctype html>\r\n"
-        "<html><head>MyTitle</head><body><h1>Hello World</h1></body></html>\r\n";
-
-__BEGIN_DECLS
+#include <gs_tuple.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 // D A T A   T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-typedef struct gs_server_t gs_server_t;
-
-typedef void (*router_t)(gs_dispatcher_t *dispatcher, const gs_request_t *req, response_t *res);
+typedef struct tuple_cursor_t {
+    struct table_t *context;
+    tuple_id_t *tuple_ids;
+    size_t ntuple_ids;
+    size_t tuple_id_cursor;
+} tuple_cursor_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
-// I N T E R F A C E   F U N C T I O N S
+// I N T E R F A C E   D E C L A R A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-GS_DECLARE(gs_status_t) gs_server_create(gs_server_t **server, unsigned short port, gs_dispatcher_t *dispatcher);
-
-GS_DECLARE(gs_status_t) gs_server_router_add(gs_server_t *server, const char *resource, router_t router);
-
-GS_DECLARE(gs_status_t) gs_server_start(gs_server_t *server, router_t catch);
-
-GS_DECLARE(gs_status_t) gs_server_dispose(gs_server_t **server);
-
-GS_DECLARE(gs_status_t) gs_server_shutdown(gs_server_t *server);
-
-GS_DECLARE(gs_status_t) gs_server_handle_events(const gs_event_t *event);
-
-__END_DECLS
+void tuple_cursor_create(tuple_cursor_t *cursor, struct table_t *context, tuple_id_t *tuple_ids,
+                         size_t ntuple_ids);
+void tuple_cursor_dispose(tuple_cursor_t *cursor);
+void tuple_cursor_rewind(tuple_cursor_t *cursor);
+bool tuple_cursor_next(tuple_t *tuple, tuple_cursor_t *cursor);

@@ -18,44 +18,29 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <gs.h>
-#include <gs_event.h>
-#include <inet/gs_response.h>
-#include <inet/gs_request.h>
-
-// ---------------------------------------------------------------------------------------------------------------------
-// C O N S T A N T S
-// ---------------------------------------------------------------------------------------------------------------------
-
-static char response[] =
-        "HTTP/1.1 200 OK\r\n"
-        "Content-Type: text/html: charset=UTF-8\r\n\r\n"
-        "<!doctype html>\r\n"
-        "<html><head>MyTitle</head><body><h1>Hello World</h1></body></html>\r\n";
-
-__BEGIN_DECLS
+#include <containers/gs_vec.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 // D A T A   T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-typedef struct gs_server_t gs_server_t;
-
-typedef void (*router_t)(gs_dispatcher_t *dispatcher, const gs_request_t *req, response_t *res);
+typedef struct {
+    char *frag_name;
+    vec_t *attr;
+} schema_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
-// I N T E R F A C E   F U N C T I O N S
+// I N T E R F A C E   D E C L A R A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-GS_DECLARE(gs_status_t) gs_server_create(gs_server_t **server, unsigned short port, gs_dispatcher_t *dispatcher);
-
-GS_DECLARE(gs_status_t) gs_server_router_add(gs_server_t *server, const char *resource, router_t router);
-
-GS_DECLARE(gs_status_t) gs_server_start(gs_server_t *server, router_t catch);
-
-GS_DECLARE(gs_status_t) gs_server_dispose(gs_server_t **server);
-
-GS_DECLARE(gs_status_t) gs_server_shutdown(gs_server_t *server);
-
-GS_DECLARE(gs_status_t) gs_server_handle_events(const gs_event_t *event);
-
-__END_DECLS
+schema_t *schema_new(const char *table_name);
+void schema_delete(schema_t *schema);
+schema_t *schema_subset(schema_t *super, const attr_id_t *indicies, size_t nindicies);
+schema_t *schema_cpy(const schema_t *schema);
+const struct attr_t *schema_attr_by_id(const schema_t *schema, attr_id_t attr_id);
+const struct attr_t *schema_attr_by_name(const schema_t *schema, const char *name);
+size_t schema_attr_size_by_id(schema_t *schema, attr_id_t attr_id);
+size_t schema_num_attributes(const schema_t *schema);
+const attr_id_t *schema_attributes(const schema_t *schema);
+enum field_type schema_attr_type(schema_t *schema, attr_id_t id);
+void schema_print(FILE *file, schema_t *schema);
