@@ -1,41 +1,30 @@
+// Copyright (C) 2017 Marcus Pinnecke
+//
+// This program is free software: you can redistribute it and/or modify it under the terms of the
+// GNU General Public License as published by the Free Software Foundation, either user_port 3 of the License, or
+// (at your option) any later user_port.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with this program.
+// If not, see <http://www.gnu.org/licenses/>.
+
 #pragma once
+
+// ---------------------------------------------------------------------------------------------------------------------
+// I N C L U D E S
+// ---------------------------------------------------------------------------------------------------------------------
 
 #include <gs.h>
 #include <gs_gridstore.h>
 #include <gs_shell.h>
 #include "gs_spinlock.h"
 
-typedef struct gs_dispatcher_t gs_dispatcher_t; /* forwarding */
-typedef struct gs_server_t gs_server_t; /* forwarding */
-
-typedef enum gs_signal_type_e {
-    GS_SIG_HEARTBEAT,
-    GS_SIG_SYSEXIT,
-    GS_SIG_SHUTDOWN,
-    GS_SIG_TEST,
-    GS_SIG_INVOKE
-} gs_signal_type_e;
-
-typedef enum gs_object_type_tag_e {
-    GS_OBJECT_TYPE_NONE,
-    GS_OBJECT_TYPE_SYSTEM,
-    GS_OBJECT_TYPE_GRIDSTORE,
-    GS_OBJECT_TYPE_DISPATCHER,
-    GS_OBJECT_TYPE_SHELL,
-    GS_OBJECT_TYPE_SERVER,
-    GS_OBJECT_TYPE_EVENT_WRAPPER,
-} gs_object_type_tag_e;
-
-typedef enum gs_subject_kind_e {
-    GS_SENDER,
-    GS_RECEIVER
-} gs_subject_kind_e;
-
-typedef struct gs_event_t gs_event_t;
-
-typedef gs_status_t (*gs_event_handler_t)(const gs_event_t *event);
-
-typedef void (*gs_event_dispose)(gs_event_t *self);
+// ---------------------------------------------------------------------------------------------------------------------
+// M A R C O S
+// ---------------------------------------------------------------------------------------------------------------------
 
 #define GS_EVENT_PROCEED() \
     return GS_PROCEED
@@ -63,6 +52,50 @@ typedef void (*gs_event_dispose)(gs_event_t *self);
 ({                                                                                                                     \
     gs_event_get_signal(event);                                                                                        \
 })
+
+// ---------------------------------------------------------------------------------------------------------------------
+// F O R W A R D   D E C L A R A T I O N S
+// ---------------------------------------------------------------------------------------------------------------------
+
+typedef struct gs_dispatcher_t gs_dispatcher_t; /* forwarding */
+typedef struct gs_server_t gs_server_t; /* forwarding */
+typedef struct gs_event_t gs_event_t;
+
+// ---------------------------------------------------------------------------------------------------------------------
+// D A T A T Y P E S
+// ---------------------------------------------------------------------------------------------------------------------
+
+typedef enum gs_signal_type_e {
+    GS_SIG_HEARTBEAT,
+    GS_SIG_SYSEXIT,
+    GS_SIG_SHUTDOWN,
+    GS_SIG_TEST,
+    GS_SIG_INVOKE
+} gs_signal_type_e;
+
+typedef enum gs_object_type_tag_e {
+    GS_OBJECT_TYPE_NONE,
+    GS_OBJECT_TYPE_SYSTEM,
+    GS_OBJECT_TYPE_GRIDSTORE,
+    GS_OBJECT_TYPE_DISPATCHER,
+    GS_OBJECT_TYPE_SHELL,
+    GS_OBJECT_TYPE_SERVER,
+    GS_OBJECT_TYPE_EVENT_WRAPPER,
+} gs_object_type_tag_e;
+
+typedef enum gs_subject_kind_e {
+    GS_SENDER,
+    GS_RECEIVER
+} gs_subject_kind_e;
+
+
+typedef gs_status_t (*gs_event_handler_t)(const gs_event_t *event);
+
+typedef void (*gs_event_dispose)(gs_event_t *self);
+
+// ---------------------------------------------------------------------------------------------------------------------
+// I N T E R F A C E   F U N C T I O N S
+// ---------------------------------------------------------------------------------------------------------------------
 
 gs_event_t *gs_event_new(gs_signal_type_e s, gs_object_type_tag_e t, void *sdr, gs_object_type_tag_e rcvr_t,
                          void *rcvr, void *data, gs_event_dispose d);
@@ -92,5 +125,4 @@ gs_event_t *gs_event_gridstore_shutdown(gs_dispatcher_t *dispatcher, gs_gridstor
 gs_event_t *gs_event_gridstore_test(gs_gridstore_t *gridstore);
 
 gs_event_t *gs_event_gridstore_invoke();
-
 

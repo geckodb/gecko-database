@@ -17,7 +17,6 @@
 // C O N F I G
 // ---------------------------------------------------------------------------------------------------------------------
 
-
 #if (defined(__APPLE__) || defined(__MACH__))
     #define GS_PLATFORM_MACOS
 #elif (defined(__linux__) || defined(linux) || defined(__linux))

@@ -32,14 +32,13 @@
 
 typedef struct gs_dispatcher_t gs_dispatcher_t;
 typedef struct gs_event_t gs_event_t;
+typedef struct gs_shell_t gs_shell_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
 __BEGIN_DECLS
-
-typedef struct gs_shell_t gs_shell_t;
 
 
 GS_DECLARE(gs_status_t) gs_shell_create(gs_shell_t **shell, gs_dispatcher_t *dispatcher);

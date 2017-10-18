@@ -53,52 +53,6 @@
 #include <zconf.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
-// C O N F I G
-// ---------------------------------------------------------------------------------------------------------------------
-
-#ifndef ATTR_NAME_MAXLEN
-#define ATTR_NAME_MAXLEN     1024
-#endif
-#define FLAG_REGULAR          0
-#define FLAG_PRIMARY     1 << 1
-#define FLAG_FOREIGN     1 << 2
-#define FLAG_NULLABLE    1 << 3
-#define FLAG_AUTOINC     1 << 4
-#define FLAG_UNIQUE      1 << 5
-
-// ---------------------------------------------------------------------------------------------------------------------
-// D A T A T Y P E S
-// ---------------------------------------------------------------------------------------------------------------------
-
-typedef uint64_t gs_attr_id_t;
-
-typedef uint32_t gs_tuplet_id_t;
-
-typedef int (*gs_comp_func_t)(const void *lhs, const void *rhs);
-
-typedef uint8_t     gs_u8_t;
-typedef uint16_t   gs_u16_t;
-typedef uint32_t   gs_u32_t;
-typedef uint64_t   gs_u64_t;
-typedef int64_t    gs_s64_t;
-
-enum gs_tuplet_format_e {
-    TF_NSM  = 1,
-    TF_DSM  = 2,
-};
-
-
-typedef struct {
-    uint8_t primary  : 1;
-    uint8_t foreign  : 1;
-    uint8_t nullable : 1;
-    uint8_t autoinc  : 1;
-    uint8_t unique   : 1;
-} GS_ATTR_FLAGS_t;
-
-typedef MD5_CTX gs_checksum_context_t;
-
-// ---------------------------------------------------------------------------------------------------------------------
 // M A C R O S
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -139,10 +93,20 @@ typedef MD5_CTX gs_checksum_context_t;
 #define GS_CONNECT(sig, slot)                                                                                          \
     gs_error_if((gs_dispatcher_connect(dispatcher, sig, slot) != GS_SUCCESS), err_connect_failed);
 
+
 // ---------------------------------------------------------------------------------------------------------------------
-// D E F I N E S
+// C O N F I G
 // ---------------------------------------------------------------------------------------------------------------------
 
+#ifndef ATTR_NAME_MAXLEN
+#define ATTR_NAME_MAXLEN     1024
+#endif
+#define FLAG_REGULAR          0
+#define FLAG_PRIMARY     1 << 1
+#define FLAG_FOREIGN     1 << 2
+#define FLAG_NULLABLE    1 << 3
+#define FLAG_AUTOINC     1 << 4
+#define FLAG_UNIQUE      1 << 5
 #ifndef BOOL
 #define BOOL      bool
 #endif
@@ -200,3 +164,39 @@ typedef MD5_CTX gs_checksum_context_t;
 #ifndef TFORMAT
 #define TFORMAT   enum gs_tuplet_format_e
 #endif
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+// D A T A T Y P E S
+// ---------------------------------------------------------------------------------------------------------------------
+
+typedef uint64_t gs_attr_id_t;
+
+typedef uint32_t gs_tuplet_id_t;
+
+typedef int (*gs_comp_func_t)(const void *lhs, const void *rhs);
+
+typedef uint8_t     gs_u8_t;
+typedef uint16_t   gs_u16_t;
+typedef uint32_t   gs_u32_t;
+typedef uint64_t   gs_u64_t;
+typedef int64_t    gs_s64_t;
+
+enum gs_tuplet_format_e {
+    TF_NSM  = 1,
+    TF_DSM  = 2,
+};
+
+
+typedef struct {
+    uint8_t primary  : 1;
+    uint8_t foreign  : 1;
+    uint8_t nullable : 1;
+    uint8_t autoinc  : 1;
+    uint8_t unique   : 1;
+} GS_ATTR_FLAGS_t;
+
+typedef MD5_CTX gs_checksum_context_t;
+
+
+

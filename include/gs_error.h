@@ -20,59 +20,6 @@
 #include <gs.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
-// C O N F I G
-// ---------------------------------------------------------------------------------------------------------------------
-
-#define MONDRIAN_OK                 1
-#define MONDRIAN_CONTINUE           1
-#define MONDRIAN_BREAK              0
-#define MONDRIAN_ERROR              0
-#define MONDRIAN_NOSUCHELEM         2
-#define MONDRIAN_ALREADY_DONE   3
-
-#define MONDRIAN_VM_COMMIT          0
-#define MONDRIAN_VM_USER_ABORT      1
-#define MONDRIAN_VM_SYSTEM_ABORT    2
-
-#define GS_SUCCESS          true
-#define GS_FAILED           false
-#define GS_CATCHED          2
-#define GS_SKIPPED          3
-#define GS_ILLEGALARG       4
-#define GS_TRYAGAIN         5
-#define GS_TRUE             true
-#define GS_FALSE            false
-
-// ---------------------------------------------------------------------------------------------------------------------
-// D A T A T Y P E S
-// ---------------------------------------------------------------------------------------------------------------------
-
-typedef enum {
-    err_no_error,
-    err_illegal_args,
-    err_bad_malloc,
-    err_null_ptr,
-    err_bad_realloc,
-    err_illegal_opp,
-    err_bad_type,
-    err_out_of_bounds,
-    err_corrupted,
-    err_internal,
-    err_constraint_violated,
-    err_limitreached,
-    err_no_free_space,
-    err_notincharge,
-    err_dispatcher_terminated,
-    err_apr_initfailed,
-    err_init_failed,
-    err_connect_failed,
-    err_no_stdin,
-    err_no_stdout
-} gs_error_code_e;
-
-typedef int gs_status_t;
-
-// ---------------------------------------------------------------------------------------------------------------------
 // M A R C O S
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -126,6 +73,60 @@ typedef int gs_status_t;
     {                                                                                                                  \
         if (expr) { warn(msg, args); }                                                                                 \
     }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// C O N F I G
+// ---------------------------------------------------------------------------------------------------------------------
+
+#define MONDRIAN_OK                 1
+#define MONDRIAN_CONTINUE           1
+#define MONDRIAN_BREAK              0
+#define MONDRIAN_ERROR              0
+#define MONDRIAN_NOSUCHELEM         2
+#define MONDRIAN_ALREADY_DONE   3
+
+#define MONDRIAN_VM_COMMIT          0
+#define MONDRIAN_VM_USER_ABORT      1
+#define MONDRIAN_VM_SYSTEM_ABORT    2
+
+#define GS_SUCCESS          true
+#define GS_FAILED           false
+#define GS_CATCHED          2
+#define GS_SKIPPED          3
+#define GS_ILLEGALARG       4
+#define GS_TRYAGAIN         5
+#define GS_TRUE             true
+#define GS_FALSE            false
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+// D A T A T Y P E S
+// ---------------------------------------------------------------------------------------------------------------------
+
+typedef enum {
+    err_no_error,
+    err_illegal_args,
+    err_bad_malloc,
+    err_null_ptr,
+    err_bad_realloc,
+    err_illegal_opp,
+    err_bad_type,
+    err_out_of_bounds,
+    err_corrupted,
+    err_internal,
+    err_constraint_violated,
+    err_limitreached,
+    err_no_free_space,
+    err_notincharge,
+    err_dispatcher_terminated,
+    err_apr_initfailed,
+    err_init_failed,
+    err_connect_failed,
+    err_no_stdin,
+    err_no_stdout
+} gs_error_code_e;
+
+typedef int gs_status_t;
 
 
 // ---------------------------------------------------------------------------------------------------------------------
