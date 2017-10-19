@@ -2,7 +2,7 @@
 set(CMAKE_CXX_COMPILER  "/usr/bin/clang++")
 set(CMAKE_C_COMPILER "/usr/bin/clang")
 
-project(gridstore)
+project(gecko)
 
 set(CMAKE_BINARY_DIR          ${CMAKE_SOURCE_DIR}/bin)
 set(EXECUTABLE_OUTPUT_PATH    ${CMAKE_SOURCE_DIR}/bin)
@@ -176,7 +176,7 @@ ELSEIF (PROJECT_OS_OSX)
 ENDIF (PROJECT_OS_LINUX)
 
 add_executable(
-    gridstore
+    gecko
     gridstore.c
     ${SOURCE_FILES}
 )
@@ -186,7 +186,7 @@ IF (PROJECT_OS_LINUX)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_XOPEN_SOURCE=700 -D_BSD_SOURCE")
 
     target_link_libraries(
-            gridstore
+            gecko
             bsd
             m
             ${APR_LIBRARIES}
@@ -196,7 +196,7 @@ IF (PROJECT_OS_LINUX)
     )
 ELSEIF (PROJECT_OS_OSX)
    target_link_libraries(
-            gridstore
+            gecko
             ${APR_LIBRARIES}
             ${APRUTIL_LIBRARIES}
             /usr/local/opt/argp-standalone/lib

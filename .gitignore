@@ -72,3 +72,4 @@ Makefile
 .idea
 gridstore.cbp
 *.class
+*.orig
