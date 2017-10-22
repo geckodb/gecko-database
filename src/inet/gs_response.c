@@ -18,6 +18,10 @@
 #include <inet/gs_response.h>
 #include <apr_strings.h>
 
+// ---------------------------------------------------------------------------------------------------------------------
+// I N T E R F A C E  I M P L E M E N T A T I O N
+// ---------------------------------------------------------------------------------------------------------------------
+
 void gs_response_create(gs_response_t *response)
 {
     GS_REQUIRE_NONNULL(response);

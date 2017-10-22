@@ -20,6 +20,10 @@
 #include <gs_frag_printer.h>
 #include <gs_schema.h>
 
+// ---------------------------------------------------------------------------------------------------------------------
+// I N T E R F A C E  I M P L E M E N T A T I O N
+// ---------------------------------------------------------------------------------------------------------------------
+
 void gs_checksum_nsm(gs_schema_t *tab, const void *tuplets, size_t ntuplets)
 {
     panic(NOTIMPLEMENTED, "this")
@@ -85,6 +89,15 @@ size_t find_type_match(enum frag_impl_type_t type)
     panic(BADFRAGTYPE, type);
 }
 
+enum gs_field_type_e frag_field_type(const gs_frag_t *frag, gs_attr_id_t id)
+{
+    assert (frag);
+    return gs_schema_attr_type(frag->schema, id);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// H E L P E R  I M P L E M E N T A T I O N
+// ---------------------------------------------------------------------------------------------------------------------
 
 gs_frag_t *frag_new(gs_schema_t *schema, size_t tuplet_capacity, enum frag_impl_type_t type)
 {
@@ -159,8 +172,3 @@ gs_schema_t *frag_schema(const gs_frag_t *frag)
     return frag->schema;
 }
 
-enum gs_field_type_e frag_field_type(const gs_frag_t *frag, gs_attr_id_t id)
-{
-    assert (frag);
-    return gs_schema_attr_type(frag->schema, id);
-}

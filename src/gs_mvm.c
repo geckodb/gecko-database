@@ -22,28 +22,10 @@
 #include <gs_frag.h>
 #include <gs_tuplet_field.h>
 #include <inttypes.h>
-#ifndef OPERAND_STACK_CAPACITY
-#define OPERAND_STACK_CAPACITY  1024
-#endif
 
-#define MVM_MAGIC_WORD     0x4D564D
-#define MVM_MAJOR_VERSION  1
-#define MVM_MINOR_VERSION  1
-#define STRING_CAST(opperand) (const char *) opperand
-
-#define MVM_EC_NOERR                0
-#define MVM_EC_STACKUNDERFLOW       1
-#define MVM_EC_ILLEGALARG           2
-#define MVM_EC_BADCONTAINER         3
-#define MVM_EC_BADELEMENT           4
-#define MVM_EC_STACKOVERFLOW        5
-#define MVM_EC_BADSCOPE             6
-#define MVM_EC_FRAGMENT_EXISTS      7
-#define MVM_EC_UNKNOWNATTRTYPE      8
-#define MVM_EC_BADFIELDLEN          9
-#define MVM_EC_BADCOLUMNFLAGS      10
-#define MVM_EC_BADFRAGMENTTYPE     11
-#define MVM_EC_NOFRAGMENT          12
+// ---------------------------------------------------------------------------------------------------------------------
+// M A C R O S
+// ---------------------------------------------------------------------------------------------------------------------
 
 #define CHECKFOR(expr, errcode, msg, ...)                                                                              \
 {                                                                                                                      \
@@ -158,6 +140,39 @@
     vec_add_unsafe(vm->operand_stack, 1, &value);                                                                      \
 }
 
+
+// ---------------------------------------------------------------------------------------------------------------------
+// C O N F I G
+// ---------------------------------------------------------------------------------------------------------------------
+
+#ifndef OPERAND_STACK_CAPACITY
+#define OPERAND_STACK_CAPACITY  1024
+#endif
+
+#define MVM_MAGIC_WORD     0x4D564D
+#define MVM_MAJOR_VERSION  1
+#define MVM_MINOR_VERSION  1
+#define STRING_CAST(opperand) (const char *) opperand
+
+#define MVM_EC_NOERR                0
+#define MVM_EC_STACKUNDERFLOW       1
+#define MVM_EC_ILLEGALARG           2
+#define MVM_EC_BADCONTAINER         3
+#define MVM_EC_BADELEMENT           4
+#define MVM_EC_STACKOVERFLOW        5
+#define MVM_EC_BADSCOPE             6
+#define MVM_EC_FRAGMENT_EXISTS      7
+#define MVM_EC_UNKNOWNATTRTYPE      8
+#define MVM_EC_BADFIELDLEN          9
+#define MVM_EC_BADCOLUMNFLAGS      10
+#define MVM_EC_BADFRAGMENTTYPE     11
+#define MVM_EC_NOFRAGMENT          12
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+// D A T A T Y P E S
+// ---------------------------------------------------------------------------------------------------------------------
+
 typedef u64 operand_t;
 typedef u64 frag_id_t;
 typedef u8  opcode_t;
@@ -233,7 +248,9 @@ typedef struct program_t
 
 } program_t;
 
-//----------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+// H E L P E R   P R O T O T Y P E S
+// ---------------------------------------------------------------------------------------------------------------------
 
 static inline int mondrian_vm_tick(mondrian_vm_t *vm);
 static inline int mondrian_vm_rollback(mondrian_vm_t *vm);
@@ -354,7 +371,9 @@ static struct {
         { MVM_OC_PRINT,      "print",     false,     exec_print }
 };
 
-//----------------------------------------------------------------------------------------------------------------------
+/// ---------------------------------------------------------------------------------------------------------------------
+// H E L P E R  I M P L E M E N T A T I O N
+// ---------------------------------------------------------------------------------------------------------------------
 
 int mondrian_vm_create(mondrian_vm_t **out, mondrian_t *db)
 {

@@ -1,5 +1,26 @@
+// Copyright (C) 2017 Marcus Pinnecke
+//
+// This program is free software: you can redistribute it and/or modify it under the terms of the
+// GNU General Public License as published by the Free Software Foundation, either user_port 3 of the License, or
+// (at your option) any later user_port.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with this program.
+// If not, see <http://www.gnu.org/licenses/>.
+
+// ---------------------------------------------------------------------------------------------------------------------
+// I N C L U D E S
+// ---------------------------------------------------------------------------------------------------------------------
+
 #include <gs_event.h>
 #include <gs_spinlock.h>
+
+// ---------------------------------------------------------------------------------------------------------------------
+// D A T A T Y P E S
+// ---------------------------------------------------------------------------------------------------------------------
 
 typedef struct gs_event_t {
     gs_signal_type_e        signal;
@@ -11,6 +32,24 @@ typedef struct gs_event_t {
     void                   *data;
     void (*dispose)(gs_event_t *self);
 } gs_event_t;
+
+typedef struct blocking_event_args_t
+{
+    volatile gs_spinlock_t *lock;
+    gs_event_t *contained_event;
+} blocking_event_args_t;
+
+// ---------------------------------------------------------------------------------------------------------------------
+// H E L P E R   P R O T O T Y P E S
+// ---------------------------------------------------------------------------------------------------------------------
+
+void *blocking_event_wrap_data(volatile gs_spinlock_t *lock, gs_event_t *contained_event);
+void blocking_event_unlock_and_dispose(gs_event_t *blocking_event);
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+// I N T E R F A C E  I M P L E M E N T A T I O N
+// ---------------------------------------------------------------------------------------------------------------------
 
 gs_event_t *gs_event_new(gs_signal_type_e s, gs_object_type_tag_e sdr_t, void *sdr, gs_object_type_tag_e rcvr_t,
                          void *rcvr, void *data, gs_event_dispose d)
@@ -48,8 +87,6 @@ void *gs_event_get_data(const gs_event_t *event)
     return (event->data);
 }
 
- void *blocking_event_wrap_data(volatile gs_spinlock_t *lock, gs_event_t *contained_event);
- void blocking_event_unlock_and_dispose(gs_event_t *blocking_event);
 
 gs_status_t gs_event_get_subject(gs_object_type_tag_e *type_tag, void **ptr, const gs_event_t *event, gs_subject_kind_e subj)
 {
@@ -108,11 +145,6 @@ gs_event_t *gs_event_gridstore_invoke()
 }
 
 
-typedef struct blocking_event_args_t
-{
-    volatile gs_spinlock_t *lock;
-    gs_event_t *contained_event;
-} blocking_event_args_t;
 
 gs_event_t *gs_event_new_blocking(volatile gs_spinlock_t *lock, gs_event_t *contained_event)
 {
@@ -128,7 +160,11 @@ gs_event_t *gs_event_new_blocking(volatile gs_spinlock_t *lock, gs_event_t *cont
     return result;
 }
 
- void *blocking_event_wrap_data(volatile gs_spinlock_t *lock, gs_event_t *contained_event)
+// ---------------------------------------------------------------------------------------------------------------------
+// H E L P E R  I M P L E M E N T A T I O N
+// ---------------------------------------------------------------------------------------------------------------------
+
+void *blocking_event_wrap_data(volatile gs_spinlock_t *lock, gs_event_t *contained_event)
 {
     blocking_event_args_t *result = GS_REQUIRE_MALLOC(sizeof(blocking_event_args_t));
     result->lock = lock;

@@ -20,6 +20,11 @@
 #include <gs_tuplet_field.h>
 #include <gs_debug.h>
 
+
+// ---------------------------------------------------------------------------------------------------------------------
+// I N T E R F A C E  I M P L E M E N T A T I O N
+// ---------------------------------------------------------------------------------------------------------------------
+
 const struct gs_attr_t *gs_schema_attr_by_id(const gs_schema_t *schema, gs_attr_id_t attr_id)
 {
     assert (attr_id < schema->attr->num_elements);

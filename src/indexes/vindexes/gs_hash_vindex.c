@@ -28,6 +28,10 @@
 #define REQUIRE_INSTANCEOF_THIS(index)                                                                                 \
     { GS_REQUIRE_NONNULL(index); GS_REQUIRE_NONNULL(index->extra); require_besearch_hindex_tag(index); }
 
+// ---------------------------------------------------------------------------------------------------------------------
+// D A T A T Y P E S
+// ---------------------------------------------------------------------------------------------------------------------
+
 typedef struct hash_vindex_extra_t {
     apr_pool_t *pool;
     apr_hash_t *hash;
@@ -61,7 +65,7 @@ static void this_query(gs_grid_cursor_t *result, const struct gs_vindex_t *self,
     gs_vec_dispose((gs_vec_t *) value);
 }
 
-gs_vindex_t *hash_vindex_new(size_t key_size, size_t num_init_slots)   // TODO: remove key_size; it's gs_attr_id_t always!
+gs_vindex_t *gs_hash_vindex_new(size_t key_size, size_t num_init_slots)   // TODO: remove key_size; it's gs_attr_id_t always!
 {
     gs_vindex_t *result = GS_REQUIRE_MALLOC(sizeof(gs_vindex_t));
     *result = (gs_vindex_t) {

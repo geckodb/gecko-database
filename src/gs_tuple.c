@@ -18,6 +18,11 @@
 #include <gs_tuple.h>
 #include <gs_grid.h>
 
+// ---------------------------------------------------------------------------------------------------------------------
+// I N T E R F A C E  I M P L E M E N T A T I O N
+// ---------------------------------------------------------------------------------------------------------------------
+
+
 void gs_tuple_open(gs_tuple_t *tuple, const struct gs_table_t *table, gs_tuple_id_t tuple_id)
 {
     GS_REQUIRE_NONNULL(tuple);

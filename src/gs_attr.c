@@ -21,6 +21,10 @@
 #include <gs_frag.h>
 #include <gs_schema.h>
 
+// ---------------------------------------------------------------------------------------------------------------------
+// M A C R O S
+// ---------------------------------------------------------------------------------------------------------------------
+
 #define DEFINE_ATTRIBUTE_CREATE(type_name,internal_type)                                                               \
 gs_attr_id_t attr_create_##type_name(const char *name, gs_schema_t *schema) {                                                \
     return gs_attr_create(name, internal_type, 1, schema);                                                                \
@@ -30,6 +34,10 @@ gs_attr_id_t attr_create_##type_name(const char *name, gs_schema_t *schema) {   
 gs_attr_id_t attr_create_##type_name(const char *name, size_t length, gs_schema_t *schema) {                                 \
     return gs_attr_create(name, internal_type, length, schema);                                                           \
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// I N T E R F A C E  I M P L E M E N T A T I O N
+// ---------------------------------------------------------------------------------------------------------------------
 
 gs_attr_id_t _attr_create(const char *name, enum gs_field_type_e data_type, size_t data_type_rep, GS_ATTR_FLAGS_t attr_flags, gs_schema_t *schema)
 {
@@ -117,7 +125,11 @@ DEFINE_ATTRIBUTE_CREATE(float64, FT_FLOAT64)
 
 DEFINE_ATTRIBUTE_ARRAY_CREATE(string, FT_CHAR)
 
-/* internal */
+
+// ---------------------------------------------------------------------------------------------------------------------
+// H E L P E R  I M P L E M E N T A T I O N
+// ---------------------------------------------------------------------------------------------------------------------
+
 
 DEFINE_ATTRIBUTE_CREATE(strptr, FT_STRPTR)
 

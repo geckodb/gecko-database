@@ -1,9 +1,30 @@
+// Copyright (C) 2017 Marcus Pinnecke
+//
+// This program is free software: you can redistribute it and/or modify it under the terms of the
+// GNU General Public License as published by the Free Software Foundation, either user_port 3 of the License, or
+// (at your option) any later user_port.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with this program.
+// If not, see <http://www.gnu.org/licenses/>.
+
+// ---------------------------------------------------------------------------------------------------------------------
+// I N C L U D E S
+// ---------------------------------------------------------------------------------------------------------------------
+
 #include <gs_dispatcher.h>
 #include <gs_spinlock.h>
 #include <apr_hash.h>
 #include <containers/gs_vec.h>
 #include <apr_strings.h>
 #include <containers/gs_hash.h>
+
+// ---------------------------------------------------------------------------------------------------------------------
+// D A T A T Y P E S
+// ---------------------------------------------------------------------------------------------------------------------
 
 typedef struct gs_dispatcher_t
 {
@@ -13,9 +34,17 @@ typedef struct gs_dispatcher_t
     gs_hash_t      *handler_map;
 } gs_dispatcher_t;
 
+// ---------------------------------------------------------------------------------------------------------------------
+// H E L P E R   P R O T O T Y P E S
+// ---------------------------------------------------------------------------------------------------------------------
+
  gs_vec_t *dispatcher_get_handler(gs_dispatcher_t *dispatcher, gs_signal_type_e signal);
 
 static inline int singnal_comp(const void *lhs, const void *rhs);
+
+// ---------------------------------------------------------------------------------------------------------------------
+// I N T E R F A C E  I M P L E M E N T A T I O N
+// ---------------------------------------------------------------------------------------------------------------------
 
 GS_DECLARE(gs_status_t) gs_dispatcher_create(gs_dispatcher_t **dispatcher)
 {
@@ -131,6 +160,10 @@ GS_DECLARE(gs_status_t) gs_dispatcher_waitfor(gs_dispatcher_t *dispatcher, gs_ev
     gs_spinlock_dispose(&lock);
     return GS_SUCCESS;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// H E L P E R  I M P L E M E N T A T I O N
+// ---------------------------------------------------------------------------------------------------------------------
 
  gs_vec_t *dispatcher_get_handler(gs_dispatcher_t *dispatcher, gs_signal_type_e signal)
 {

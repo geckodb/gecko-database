@@ -17,6 +17,10 @@
 
 #include <containers/gs_hashset.h>
 
+// ---------------------------------------------------------------------------------------------------------------------
+// I N T E R F A C E  I M P L E M E N T A T I O N
+// ---------------------------------------------------------------------------------------------------------------------
+
 void gs_hashset_create(gs_hashset_t *out, size_t elem_size, size_t capacity)
 {
     GS_REQUIRE_NONNULL(out)

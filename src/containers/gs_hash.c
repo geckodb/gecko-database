@@ -1,5 +1,35 @@
+// An implementation of the vector data structure
+// Copyright (C) 2017 Marcus Pinnecke
+//
+// This program is free software: you can redistribute it and/or modify it under the terms of the
+// GNU General Public License as published by the Free Software Foundation, either user_port 3 of the License, or
+// (at your option) any later user_port.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with this program.
+// If not, see <http://www.gnu.org/licenses/>.
+
+// ---------------------------------------------------------------------------------------------------------------------
+// I N C L U D E S
+// ---------------------------------------------------------------------------------------------------------------------
+
 #include <containers/gs_hash.h>
 #include <containers/gs_freelist.h>
+
+// ---------------------------------------------------------------------------------------------------------------------
+// M A C R O S
+// ---------------------------------------------------------------------------------------------------------------------
+
+#define GET_HASH_CODE(key, key_size)                                \
+    (hash->hash_func(NULL, key_size, key) % hash->num_buckets)
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+// D A T A T Y P E S
+// ---------------------------------------------------------------------------------------------------------------------
 
 typedef struct gs_hash_func_t {
     const void         *capture;
@@ -24,8 +54,9 @@ typedef struct gs_hash_t {
     gs_hash_code_fn_t       hash_func;
 } gs_hash_t;
 
-#define GET_HASH_CODE(key, key_size)                                \
-    (hash->hash_func(NULL, key_size, key) % hash->num_buckets)
+// ---------------------------------------------------------------------------------------------------------------------
+// H E L P E R   P R O T O T Y P E S
+// ---------------------------------------------------------------------------------------------------------------------
 
 static inline void setup_hash_buckets(hash_bucket_t *buckets, size_t num_buckets, gs_comp_func_t key_comp);
 static inline void cleanup_hash_buckets(hash_bucket_t *buckets, size_t num_buckets);
@@ -39,6 +70,13 @@ static inline int entry_comp_by_key(const void *a, const void *b);
 
 static inline void size_t_init(void *data);
 static inline void size_t_inc(void *data);
+
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+// I N T E R F A C E  I M P L E M E N T A T I O N
+// ---------------------------------------------------------------------------------------------------------------------
+
 
 GS_DECLARE(gs_status_t) gs_hash_create(gs_hash_t **hash, size_t num_buckets, gs_comp_func_t key_comp)
 {
@@ -127,6 +165,10 @@ GS_DECLARE(gs_status_t) gs_hash_get_ex(gs_vec_t *result, const gs_hash_t *hash, 
 
     return GS_SUCCESS;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// H E L P E R   I M P L E M E N T A T I O N
+// ---------------------------------------------------------------------------------------------------------------------
 
 static inline void setup_hash_buckets(hash_bucket_t *buckets, size_t num_buckets, gs_comp_func_t key_comp)
 {

@@ -17,6 +17,10 @@
 
 #include <gs_interval.h>
 
+// ---------------------------------------------------------------------------------------------------------------------
+// I N T E R F A C E  I M P L E M E N T A T I O N
+// ---------------------------------------------------------------------------------------------------------------------
+
 int gs_interval_tuple_id_comp_by_lower_bound(const void *lhs, const void *rhs)
 {
     const gs_tuple_id_interval_t *a = lhs;

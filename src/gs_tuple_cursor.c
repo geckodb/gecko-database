@@ -17,6 +17,10 @@
 
 #include <gs_tuple_cursor.h>
 
+// ---------------------------------------------------------------------------------------------------------------------
+// I N T E R F A C E  I M P L E M E N T A T I O N
+// ---------------------------------------------------------------------------------------------------------------------
+
 void gs_tuple_cursor_create(gs_tuple_cursor_t *cursor, struct gs_table_t *context, gs_tuple_id_t *tuple_ids,
                             size_t ntuple_ids)
 {

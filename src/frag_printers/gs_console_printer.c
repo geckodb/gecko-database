@@ -19,8 +19,16 @@
 #include <gs_tuplet_field.h>
 #include <gs_attr.h>
 
+// ---------------------------------------------------------------------------------------------------------------------
+// M A C R O S
+// ---------------------------------------------------------------------------------------------------------------------
+
 #define REQUIRE_INSTANCEOF_THIS(x)                                                                                     \
     REQUIRE((x->tag == FPTT_CONSOLE_PRINTER), BADTAG);
+
+// ---------------------------------------------------------------------------------------------------------------------
+// H E L P E R   P R O T O T Y P E S
+// ---------------------------------------------------------------------------------------------------------------------
 
  void console_printer_print(struct gs_frag_printer_t *self, FILE *file, gs_frag_t *frag, size_t row_offset, size_t limit);
  void console_printer_free(struct gs_frag_printer_t *self);
@@ -31,6 +39,8 @@
  void print_frag_header(FILE *file, const gs_frag_t *frag, gs_vec_t *field_print_lens, size_t num_attr);
  void print_frag_body(FILE *file, gs_frag_t *frag, gs_vec_t *field_print_lens, size_t num_attr, size_t row_offset, size_t limit);
 
+// ---------------------------------------------------------------------------------------------------------------------
+// I N T E R F A C E  I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
 struct gs_frag_printer_t *gs_console_printer_new()
@@ -45,6 +55,8 @@ struct gs_frag_printer_t *gs_console_printer_new()
     return result;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+// H E L P E R  I M P L E M E N T A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
  void calc_field_print_lens(gs_vec_t *field_print_lens, gs_frag_t *frag, size_t num_attr)

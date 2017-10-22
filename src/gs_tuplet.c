@@ -19,6 +19,10 @@
 #include <gs_tuplet_field.h>
 #include <gs_schema.h>
 
+// ---------------------------------------------------------------------------------------------------------------------
+// I N T E R F A C E  I M P L E M E N T A T I O N
+// ---------------------------------------------------------------------------------------------------------------------
+
 void gs_tuplet_open(gs_tuplet_t *dst, struct gs_frag_t *frag, gs_tuplet_id_t tuplet_id)
 {
     if (frag->ntuplets > 0) {

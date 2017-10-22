@@ -23,21 +23,24 @@
 #include <gs_tuple_field.h>
 #include <apr_strings.h>
 
+// ---------------------------------------------------------------------------------------------------------------------
+// H E L P E R   P R O T O T Y P E S
+// ---------------------------------------------------------------------------------------------------------------------
+
 void create_indexes(gs_table_t *table, size_t approx_num_horizontal_partitions);
+void create_grid_ptr_store(gs_table_t *table);
+void create_tuple_id_store(gs_table_t *table);
+void register_grid(gs_table_t *table, gs_grid_t *grid);
+bool free_grids(void *capture, void *begin, void *end);
+gs_grid_t *create_grid(gs_table_t *table, const gs_attr_id_t *attr, size_t nattr,
+                       const gs_tuple_id_interval_t *tuple_ids, size_t ntuple_ids, enum frag_impl_type_t type);
+size_t get_required_capacity(const gs_tuple_id_interval_t *tuple_ids, size_t ntuple_ids);
+void indexes_insert(gs_table_t *table, gs_grid_t *grid, const gs_attr_id_t *attr, size_t nattr,
+                    const gs_tuple_id_interval_t *tuples, size_t ntuples);
 
- void create_grid_ptr_store(gs_table_t *table);
-
- void create_tuple_id_store(gs_table_t *table);
-
- gs_grid_t *create_grid(gs_table_t *table, const gs_attr_id_t *attr, size_t nattr,
-                                  const gs_tuple_id_interval_t *tuple_ids, size_t ntuple_ids, enum frag_impl_type_t type);
-
- size_t get_required_capacity(const gs_tuple_id_interval_t *tuple_ids, size_t ntuple_ids);
-
- void indexes_insert(gs_table_t *table, gs_grid_t *grid, const gs_attr_id_t *attr, size_t nattr,
-                                  const gs_tuple_id_interval_t *tuples, size_t ntuples);
-
- void register_grid(gs_table_t *table, gs_grid_t *grid);
+// ---------------------------------------------------------------------------------------------------------------------
+// I N T E R F A C E  I M P L E M E N T A T I O N
+// ---------------------------------------------------------------------------------------------------------------------
 
 gs_table_t *gs_table_new(const gs_schema_t *schema, size_t approx_num_horizontal_partitions)
 {
@@ -52,14 +55,6 @@ gs_table_t *gs_table_new(const gs_schema_t *schema, size_t approx_num_horizontal
     } else return NULL;
 }
 
- bool free_grids(void *capture, void *begin, void *end)
-{
-    for (gs_grid_t **it = (gs_grid_t **) begin; it < (gs_grid_t **) end; it++) {
-        gs_grid_delete(*it);
-        free(*it);
-    }
-    return true;
-}
 
 void gs_table_delete(gs_table_t *table)
 {
@@ -391,10 +386,14 @@ void gs_table_structure_print(FILE *file, const gs_table_t *table, size_t row_of
     gs_schema_delete(write_schema);
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+// H E L P E R  I M P L E M E N T A T I O N
+// ---------------------------------------------------------------------------------------------------------------------
+
  void create_indexes(gs_table_t *table, size_t approx_num_horizontal_partitions)
 {
     size_t num_schema_slots = 2 * table->schema->attr->num_elements;
-    table->schema_cover = hash_vindex_new(sizeof(gs_attr_id_t), num_schema_slots);
+    table->schema_cover = gs_hash_vindex_new(sizeof(gs_attr_id_t), num_schema_slots);
     table->tuple_cover  = gs_lesearch_hindex_new(approx_num_horizontal_partitions, table->schema);
 }
 
@@ -470,4 +469,13 @@ void gs_table_structure_print(FILE *file, const gs_table_t *table, size_t row_of
 {
     gs_vec_pushback(table->grid_ptrs, 1, &grid);
     grid->grid_id = gs_vec_length(table->grid_ptrs) - 1;
+}
+
+bool free_grids(void *capture, void *begin, void *end)
+{
+    for (gs_grid_t **it = (gs_grid_t **) begin; it < (gs_grid_t **) end; it++) {
+        gs_grid_delete(*it);
+        free(*it);
+    }
+    return true;
 }

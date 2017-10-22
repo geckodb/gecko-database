@@ -19,6 +19,17 @@
 #include <gs_frag.h>
 #include <gs_grid.h>
 #include <inttypes.h>
+
+// ---------------------------------------------------------------------------------------------------------------------
+// H E L P E R   P R O T O T Y P E S
+// ---------------------------------------------------------------------------------------------------------------------
+
+char *clip(const char *str, size_t max_len);
+
+// ---------------------------------------------------------------------------------------------------------------------
+// I N T E R F A C E  I M P L E M E N T A T I O N
+// ---------------------------------------------------------------------------------------------------------------------
+
 size_t gs_unsafe_field_println(enum gs_field_type_e type, const void *data)
 {
     char *buffer = gs_unsafe_field_str(type, data);
@@ -27,14 +38,6 @@ size_t gs_unsafe_field_println(enum gs_field_type_e type, const void *data)
     return print_len;
 }
 
-char *clip(const char *str, size_t max_len)
-{
-    char *out = malloc(max_len);
-    memset(out, 32, strlen(str));
-    strcpy(out, str);
-    out[max_len - 1] = out[max_len - 2] = out[max_len - 3] = '.';
-    return out;
-}
 
 char *gs_unsafe_field_str(enum gs_field_type_e type, const void *data)
 {
@@ -109,4 +112,17 @@ char *gs_unsafe_field_str(enum gs_field_type_e type, const void *data)
             abort();
     }
     return buffer;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// H E L P E R  I M P L E M E N T A T I O N
+// ---------------------------------------------------------------------------------------------------------------------
+
+char *clip(const char *str, size_t max_len)
+{
+    char *out = malloc(max_len);
+    memset(out, 32, strlen(str));
+    strcpy(out, str);
+    out[max_len - 1] = out[max_len - 2] = out[max_len - 3] = '.';
+    return out;
 }

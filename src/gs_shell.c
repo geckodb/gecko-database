@@ -1,8 +1,29 @@
+// Copyright (C) 2017 Marcus Pinnecke
+//
+// This program is free software: you can redistribute it and/or modify it under the terms of the
+// GNU General Public License as published by the Free Software Foundation, either user_port 3 of the License, or
+// (at your option) any later user_port.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with this program.
+// If not, see .
+
+// ---------------------------------------------------------------------------------------------------------------------
+// I N C L U D E S
+// ---------------------------------------------------------------------------------------------------------------------
+
 #include <gs_shell.h>
 #include <c11threads.h>
 #include <apr_file_io.h>
 #include <apr_strings.h>
 #include <gs_dispatcher.h>
+
+// ---------------------------------------------------------------------------------------------------------------------
+// D A T A T Y P E S
+// ---------------------------------------------------------------------------------------------------------------------
 
 typedef struct gs_shell_t {
     gs_dispatcher_t     *dispatcher;
@@ -16,6 +37,10 @@ typedef struct gs_shell_t {
     apr_time_t           uptime;
 } gs_shell_t;
 
+// ---------------------------------------------------------------------------------------------------------------------
+// H E L P E R   P R O T O T Y P E S
+// ---------------------------------------------------------------------------------------------------------------------
+
  int shell_loop(void *args);
 
  bool process_input(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input);
@@ -23,6 +48,10 @@ typedef struct gs_shell_t {
  void process_command_help(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input);
  void process_command_exit(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input);
  void process_command_uptime(gs_shell_t *shell, apr_file_t *in, apr_file_t *out, char *input);
+
+// ---------------------------------------------------------------------------------------------------------------------
+// I N T E R F A C E  I M P L E M E N T A T I O N
+// ---------------------------------------------------------------------------------------------------------------------
 
 GS_DECLARE(gs_status_t) gs_shell_create(gs_shell_t **shell, gs_dispatcher_t *dispatcher)
 {
@@ -96,6 +125,10 @@ GS_DECLARE(gs_status_t) gs_shell_shutdown(gs_shell_t *shell)
         return GS_FAILED;
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// H E L P E R  I M P L E M E N T A T I O N
+// ---------------------------------------------------------------------------------------------------------------------
 
  int shell_loop(void *args)
 {

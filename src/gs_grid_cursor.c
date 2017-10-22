@@ -18,6 +18,10 @@
 #include <gs_grid_cursor.h>
 #include <containers/gs_vec.h>
 
+// ---------------------------------------------------------------------------------------------------------------------
+// I N T E R F A C E  I M P L E M E N T A T I O N
+// ---------------------------------------------------------------------------------------------------------------------
+
 gs_grid_cursor_t *gs_grid_cursor_new(size_t cursor)
 {
     gs_grid_cursor_t *result = GS_REQUIRE_MALLOC(sizeof(gs_grid_cursor_t));

@@ -19,6 +19,10 @@
 #include <gs_grid.h>
 #include <gs_schema.h>
 
+// ---------------------------------------------------------------------------------------------------------------------
+// I N T E R F A C E  I M P L E M E N T A T I O N
+// ---------------------------------------------------------------------------------------------------------------------
+
 void gs_tuple_field_open(gs_tuple_field_t *field, gs_tuple_t *tuple)
 {
     gs_tuple_field_seek(field, tuple, 0);
