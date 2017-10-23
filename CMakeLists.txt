@@ -182,6 +182,11 @@ add_executable(
     ${SOURCE_FILES}
 )
 
+add_executable(
+    xjson-sample
+    libs/libxjson/src/xjson/samples/sample.c
+)
+
 IF (PROJECT_OS_LINUX)
     # add two aditional flags to call posix functions and to use the bsd library
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_XOPEN_SOURCE=700 -D_BSD_SOURCE")

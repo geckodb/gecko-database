@@ -29,6 +29,29 @@ extern "C" {
 #endif
 
 // ---------------------------------------------------------------------------------------------------------------------
+// C O N S T A N T S
+// ---------------------------------------------------------------------------------------------------------------------
+
+#define XJSON_ROOT                   NULL
+
+// ---------------------------------------------------------------------------------------------------------------------
+// C O N F I G
+// ---------------------------------------------------------------------------------------------------------------------
+
+#ifndef XJSON_POOL_OBJ_CAPACITY_DEFAULT
+    #define XJSON_POOL_OBJ_CAPACITY_DEFAULT     15
+#endif
+#ifndef XJSON_POOL_ARRAY_CAPACITY_DEFAULT
+    #define XJSON_POOL_ARRAY_CAPACITY_DEFAULT   15
+#endif
+#ifndef XJSON_JSON_ENTRIES_CAPACITY_DEFAULT
+#define XJSON_JSON_ENTRIES_CAPACITY_DEFAULT     15
+#endif
+#ifndef XJSON_JSON_ARRAY_CAPACITY_DEFAULT
+#define XJSON_JSON_ARRAY_CAPACITY_DEFAULT       15
+#endif
+
+// ---------------------------------------------------------------------------------------------------------------------
 // T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -48,7 +71,16 @@ typedef enum
 
 typedef enum
 {
-    xjson_result_ok
+    xjson_result_ok,
+    xjson_result_failed,
+    xjson_result_malloc_err,
+    xjson_result_pmalloc_err,
+    xjson_result_realloc_err,
+    xjson_result_nullptr,
+    xjson_result_notype,
+    xjson_result_interalerr,
+    xjson_result_wrongusage,
+    xjson_result_nopool
 }                                   xjson_result_e;
 
 typedef unsigned long long          xjson_size_t;
@@ -65,9 +97,13 @@ typedef xjson_double_t              xjson_type_double_t;
 
 typedef char *                      xjson_type_string_t;
 
+typedef xjson_bool_t                xjson_type_boolean_t;
+
 // ---------------------------------------------------------------------------------------------------------------------
 // F O R W A R D   D E C L A R A T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
+
+typedef struct xjson_pool_t         xjson_pool_t;
 
 typedef struct xjson_json_t         xjson_json_t;
 
@@ -95,15 +131,32 @@ typedef void (*xjson_array_pred_t)(xjson_bool_t *result, const void *capture,
 // I N T E R F A C E   D E C L A R A T I O N
 // ---------------------------------------------------------------------------------------------------------------------
 
-xjson_result_e  xjson_json_create(xjson_json_t **json);
+xjson_result_e  xjson_pool_create(xjson_pool_t **pool);
+
+xjson_result_e  xjson_pool_dispose(xjson_pool_t **pool);
+
+xjson_result_e  xjson_json_create(xjson_json_t **json, xjson_pool_t *pool);
 
 xjson_result_e  xjson_json_parse(xjson_json_t **json, const char *text);
 
-xjson_result_e  xjson_json_dispose(xjson_json_t *json);
-
 xjson_result_e  xjson_json_print(FILE *file, const xjson_json_t *json);
 
-xjson_result_e  xjson_json_add(xjson_json_t *json, const xjson_entry_t *entry);
+xjson_result_e  xjson_json_add_property(xjson_json_t *parent, xjson_type_e type, const char *key, const void *data);
+
+xjson_result_e  xjson_json_add_object(xjson_json_t **object, xjson_json_t *parent, const char *key);
+
+xjson_result_e  xjson_json_add_array(xjson_array_t **array, xjson_json_t *parent, xjson_type_e type, const char *key);
+
+xjson_result_e  xjson_array_add_property(xjson_array_t *parent, const void *data);
+
+xjson_result_e  xjson_array_add_object(xjson_json_t **object, const xjson_array_t *parent);
+
+xjson_result_e  xjson_array_add_array(xjson_entry_t **array, const xjson_array_t *parent);
+
+
+
+/*
+
 
 xjson_result_e  xjson_json_remove(xjson_json_t *json, const xjson_entry_t *entry);
 
@@ -144,21 +197,7 @@ xjson_result_e  xjson_query_value_get_number_string(const char **value, const xj
 
 xjson_result_e  xjson_query_value_get_number_boolean(xjson_bool_t **value, const xjson_entry_t *entry);
 
-xjson_result_e  xjson_entry_create_object(xjson_entry_t **entry, const char *key, const xjson_json_t *value);
 
-xjson_result_e  xjson_entry_create_array(xjson_entry_t **entry, xjson_type_e type);
-
-xjson_result_e  xjson_entry_create_number_int(xjson_entry_t **entry, const char *key, xjson_type_integer_t value);
-
-xjson_result_e  xjson_entry_create_number_double(xjson_entry_t **entry, const char *key, xjson_type_double_t value);
-
-xjson_result_e  xjson_entry_create_string(xjson_entry_t **entry, const char *key, const char *value);
-
-xjson_result_e  xjson_entry_create_boolean(xjson_entry_t **entry, const char *key, xjson_bool_t value);
-
-xjson_result_e  xjson_entry_create_null(xjson_entry_t **entry, const char *key);
-
-xjson_result_e  xjson_entry_dispose(xjson_entry_t *entry);
 
 xjson_result_e  xjson_entry_get_type(xjson_type_e *type, const xjson_entry_t *entry);
 
@@ -186,7 +225,9 @@ xjson_result_e  xjson_entry_value_get_number_boolean(xjson_bool_t **value, const
 
 xjson_result_e  xjson_array_get_length(xjson_size_t **length, const xjson_array_t *array);
 
-xjson_result_e  xjson_array_query(xjson_array_t *array, const void *capture, xjson_array_pred_t pred);
+
+
+xjson_result_e  xjson_array_query(xjson_array_t *array, const void *capture, xjson_array_pred_t pred);*/
 
 #ifdef __cplusplus
 }
