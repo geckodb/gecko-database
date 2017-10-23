@@ -35,6 +35,7 @@ include_directories(
     "/usr/local/include/"
     "include"
     "third-party"
+    "libs/libxjson/include"
     ${APR_INCLUDE_DIR}
     ${OPENSSL_INCLUDE_DIR}
     ${CURSES_INCLUDE_DIR}
@@ -172,7 +173,7 @@ ELSEIF (PROJECT_OS_OSX)
     set (SOURCE_FILES   ${SOURCE_FILES}
             include/platforms/macos/platform.h
             include/platforms/macos/third-party/fmemopen/fmemopen.h
-            src/platforms/macos/third-party/fmemopen/fmemopen.c)
+            src/platforms/macos/third-party/fmemopen/fmemopen.c libs/libxjson/include/xjson/xjson.h libs/libxjson/src/xjson/xjson.c)
 ENDIF (PROJECT_OS_LINUX)
 
 add_executable(
