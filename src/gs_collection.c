@@ -17,8 +17,8 @@ GS_DECLARE(gs_status_t) gs_collection_create(gs_collection_t **collection, const
 {
     gs_collection_t *result = GS_REQUIRE_MALLOC(sizeof(gs_collection_t));
 
-    schema_t *documents_schema = schema_new("records");
-    schema_t *relations_schema = schema_new("relations");
+    schema_t *documents_schema = schema_new("collection_records");
+    schema_t *relations_schema = schema_new("collection_relations");
 
     create_core_schema(documents_schema);
     create_core_schema(relations_schema);

@@ -136,7 +136,7 @@ GS_DECLARE(gs_status_t) gs_server_router_add(gs_server_t *server, const char *re
     GS_REQUIRE_NONNULL(server)
    // dict_put(gateway->routers, &resource, &router);
     char *key = apr_pstrdup(server->pool, resource);
-    gs_hash_set(server->routers, key, sizeof(char *), router, GS_STRING_COMP);
+    gs_hash_set(server->routers, key, strlen(key), router);
     return GS_SUCCESS;
 }
 

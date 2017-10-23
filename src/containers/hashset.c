@@ -16,30 +16,27 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <containers/hashset.h>
+#include <containers/gs_hash.h>
 
-void hashset_create(hashset_t *out, size_t elem_size, size_t capacity)
+void hashset_create(hashset_t *out, size_t elem_size, size_t capacity, gs_comp_func_t key_comp)
 {
     GS_REQUIRE_NONNULL(out)
     REQUIRE_NONZERO(elem_size)
     REQUIRE_NONZERO(capacity)
-    apr_pool_create(&out->pool, NULL);
-   // out->dict = hash_table_new_jenkins(elem_size, sizeof(bool), capacity, 1.7f, 0.75f);
-    panic("Hashtable for '%s' not implemented", "hashset_create"); // TODO: implement hash test
+    gs_hash_create(&out->dict, capacity, key_comp);
     out->vec  = vec_new(sizeof(elem_size), capacity);
 }
 
 void hashset_dispose(hashset_t *set)
 {
     GS_REQUIRE_NONNULL(set)
-    //dict_delete(set->dict);
-    panic("Hashtable for '%s' not implemented", "hashset_create"); // TODO: implement hash test
-
+    gs_hash_dispose(set->dict);
     vec_free(set->vec);
     set->dict = NULL;
     set->vec = NULL;
 }
 
-void hashset_add(hashset_t *set, const void *data, size_t num_elems)
+void hashset_add(hashset_t *set, const void *data, size_t num_elems, gs_comp_func_t key_comp)
 {
     GS_REQUIRE_NONNULL(set)
     GS_REQUIRE_NONNULL(set->vec)
@@ -47,13 +44,15 @@ void hashset_add(hashset_t *set, const void *data, size_t num_elems)
     GS_REQUIRE_NONNULL(data)
     REQUIRE_NONZERO(num_elems)
 
-    /*
-    if (!dict_contains_key(set->dict, data)) {
-        vec_pushback(set->vec, num_elems, data);
-        bool dummy;
-        dict_put(set->dict, data, &dummy);
-    }*/
-    panic("Hashtable for '%s' not implemented","hashset_create"); // TODO: implement hash test
+    size_t element_size = set->vec->sizeof_element;
+    for (size_t idx = 0; idx < num_elems; idx++) {
+        const void *key = data + (idx * element_size);
+        const void *value = gs_hash_get(set->dict, key, element_size);
+        if (value != NULL) {
+            gs_hash_set(set->dict, key, element_size, NULL);
+            vec_pushback(set->vec, 1, key);
+        }
+    }
 }
 
 void hashset_remove(hashset_t *set, const void *data, size_t num_elems)
@@ -65,8 +64,7 @@ bool hashset_contains(const hashset_t *set, const void *data)
 {
     GS_REQUIRE_NONNULL(set)
     GS_REQUIRE_NONNULL(set->dict)
-   // return dict_contains_key(set->dict, data);
-    panic("Hashtable for '%s' not implemented","hashset_create"); // TODO: implement hash test
+    return (gs_hash_get(set->dict, data, set->vec->sizeof_element) != NULL);
     return false;
 }
 

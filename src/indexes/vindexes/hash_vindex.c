@@ -61,7 +61,7 @@ static void this_query(grid_cursor_t *result, const struct vindex_t *self, const
     vec_dispose((vec_t *) value);
 }
 
-vindex_t *hash_vindex_new(size_t key_size, size_t num_init_slots)   // TODO: remove key_size; it's attr_id_t always!
+vindex_t *hash_vindex_new(size_t num_init_slots)   // TODO: remove key_size; it's attr_id_t always!
 {
     vindex_t *result = GS_REQUIRE_MALLOC(sizeof(vindex_t));
     *result = (vindex_t) {
@@ -73,12 +73,12 @@ vindex_t *hash_vindex_new(size_t key_size, size_t num_init_slots)   // TODO: rem
         .tag = GI_VINDEX_HASH
     };
 
-    hashset_create(&result->keys, key_size, num_init_slots);
+    hashset_create(&result->keys, sizeof(attr_id_t), num_init_slots, GS_ATTR_ID_COMP);
 
     hash_vindex_extra_t *extra = GS_REQUIRE_MALLOC(sizeof(hash_vindex_extra_t));
     apr_pool_create(&extra->pool, NULL);
     extra->hash = apr_hash_make(extra->pool);
-    extra->key_size = key_size;
+    extra->key_size = sizeof(attr_id_t);
 
     result->extra = extra;
 
@@ -141,4 +141,3 @@ static void this_query(grid_cursor_t *result, const struct vindex_t *self, const
         }
     }
 }
-

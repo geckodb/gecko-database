@@ -97,7 +97,7 @@ GS_DECLARE(gs_status_t) gs_dispatcher_connect(gs_dispatcher_t *dispatcher, gs_si
         vec_t *vec = vec_new(sizeof(gs_event_handler_t), 10);
         gs_signal_type_e *signal_cpy = GS_REQUIRE_MALLOC(sizeof(gs_signal_type_e));
         *signal_cpy = signal;
-        gs_hash_set(dispatcher->handler_map, signal_cpy, sizeof(gs_signal_type_e), vec, singnal_comp);
+        gs_hash_set(dispatcher->handler_map, signal_cpy, sizeof(gs_signal_type_e), vec);
     }
     vec_t *handlers = (vec_t *) gs_hash_get(dispatcher->handler_map, &signal, sizeof(gs_signal_type_e));
     assert (handlers);

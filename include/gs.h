@@ -152,7 +152,21 @@ static inline int gs_comp_func_str(const void *lhs, const void *rhs)
     return (strcmp(lhs, rhs));
 }
 
-#define GS_STRING_COMP gs_comp_func_str
+static inline int gs_comp_func_attr_id(const void *lhs, const void *rhs)
+{
+    attr_id_t a = *(attr_id_t *) lhs;
+    attr_id_t b = *(attr_id_t *) rhs;
+    if (a < b) {
+        return -1;
+    } else if (a > b) {
+        return +1;
+    } else return 0;
+}
+
+
+#define GS_STRING_COMP      gs_comp_func_str
+#define GS_ATTR_ID_COMP     gs_comp_func_attr_id
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 // D E F I N E S

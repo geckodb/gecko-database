@@ -30,7 +30,7 @@
  void init_vector(vec_t *, vector_flags, size_t, size_t, float);
  bool check_add_args(vec_t *, size_t, const void *);
  bool check_auto_resize(vec_t *, size_t);
- bool check_set_args(vec_t *, size_t, const void *);
+ bool check_set_args(vec_t *, const void *);
  bool outside_bounds_enabled(vec_t *, size_t, size_t);
  bool realloc_vector(vec_t *, size_t);
  bool advance(vec_t *, size_t, size_t);
@@ -242,7 +242,7 @@ void *vec_peek_unsafe(vec_t *vec)
 bool vec_set(vec_t *vec, size_t idx, size_t num_elements, const void *data)
 {
     GS_REQUIRE_NONNULL(vec)
-    if (check_set_args(vec, num_elements, data)) {
+    if (check_set_args(vec, data)) {
         vec->is_sorted = false;
         size_t last_idx = idx + num_elements;
         if (last_idx < vec->element_capacity) {
@@ -509,9 +509,9 @@ bool get_sizeof_strings(void *capture, void *begin, void *end)
     return result;
 }
 
- bool check_set_args(vec_t *vec, size_t num_elements, const void *data)
+ bool check_set_args(vec_t *vec, const void *data)
 {
-    bool result = (vec != NULL && num_elements > 0 && data != NULL);
+    bool result = (vec != NULL && data != NULL);
     error_if(!result, err_illegal_args);
     return result;
 }

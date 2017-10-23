@@ -2,10 +2,12 @@
 #include <containers/vec.h>
 #include <containers/freelist.h>
 #include <gs_collection.h>
+#include <grid.h>
 
 typedef struct gs_collections_t
 {
     vec_t              *collections;
+    table_t            *relations;
     freelist_t          id_freelist;
 } gs_collections_t;
 
@@ -24,6 +26,8 @@ GS_DECLARE(gs_status_t) gs_collections_create(gs_collections_t **collections)
     gs_collections_t *result = GS_REQUIRE_MALLOC(sizeof(gs_collections_t));
     result->collections = vec_new(sizeof(gs_collections_entry_t), 1);
     freelist_create(&result->id_freelist, sizeof(collection_id_t), 10, gs_collections_id_init, gs_collections_id_inc);
+    schema_t *relation_schema = schema_new("cross_collection_relations");
+    result->relations = table_new(relation_schema, 1);
     *collections = result;
     return GS_SUCCESS;
 }
@@ -33,6 +37,7 @@ GS_DECLARE(gs_status_t) gs_collections_dispose(gs_collections_t *collections)
     GS_REQUIRE_NONNULL(collections);
     vec_free_ex(collections->collections, NULL, free_collection_object);
     freelist_dispose(&collections->id_freelist);
+    table_delete(collections->relations);
     free(collections);
     return GS_SUCCESS;
 }
@@ -117,13 +122,16 @@ GS_DECLARE(gs_status_t) gs_collections_print(FILE *file, const gs_collections_t 
     gs_collections_entry_t *begin = vec_begin(collections->collections);
     gs_collections_entry_t *end = vec_end(collections->collections);
 
-    fprintf(file, "%s :)\n", "Yeah");
+    fprintf(file, "{\"collections\"=[");
 
     for (gs_collections_entry_t *it = begin; it != end; it++) {
         if (it->in_use) {
             gs_collection_print(file, it->collection);
         }
     }
+
+    fprintf(file, "]}\n");
+
     return GS_SUCCESS;
 }
 

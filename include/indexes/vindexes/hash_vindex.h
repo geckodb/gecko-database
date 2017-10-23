@@ -29,4 +29,4 @@ struct schema_t;
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-vindex_t *hash_vindex_new(size_t key_size, size_t num_init_slots);
+vindex_t *hash_vindex_new(size_t num_init_slots);

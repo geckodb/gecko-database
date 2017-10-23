@@ -2,6 +2,7 @@
 #include <inet/response.h>
 #include <apr_strings.h>
 #include <apr_tables.h>
+#include <containers/gs_hash.h>
 
 typedef enum gs_request_body_e {
     GS_BODY_UNKNOWN,
@@ -9,16 +10,16 @@ typedef enum gs_request_body_e {
 } gs_request_body_e;
 
 typedef struct gs_request_t {
-    apr_pool_t *pool;
-    char *original;
-    apr_table_t *fields;
-    apr_table_t *form_data;
-    gs_http_method_e method;
-    char *resource;
-    bool is_valid;
-    bool is_multipart;
-    char *boundary;
-    gs_request_body_e body_type;
+    apr_pool_t          *pool;
+    char                *original;
+    gs_hash_t           *fields;
+    gs_hash_t           *form_data;
+    gs_http_method_e     method;
+    char                *resource;
+    bool                 is_valid;
+    bool                 is_multipart;
+    char                *boundary;
+    gs_request_body_e    body_type;
 } gs_request_t;
 
  void parse_request(gs_request_t *request, int socket_desc);
@@ -27,8 +28,8 @@ GS_DECLARE(gs_status_t) gs_request_create(gs_request_t **request, int socket_des
 {
     gs_request_t *result = GS_REQUIRE_MALLOC(sizeof(gs_request_t));
     apr_pool_create(&result->pool, NULL);
-    result->fields = apr_table_make(result->pool, 10);
-    result->form_data = apr_table_make(result->pool, 10);
+    gs_hash_create(&result->fields, 10, GS_STRING_COMP);
+    gs_hash_create(&result->form_data, 10, GS_STRING_COMP);
     result->is_valid = false;
     result->is_multipart = false;
     result->body_type = GS_BODY_UNKNOWN;
@@ -45,9 +46,9 @@ GS_DECLARE(gs_status_t) gs_request_dispose(gs_request_t **request_ptr)
     GS_REQUIRE_NONNULL(request_ptr)
     GS_REQUIRE_NONNULL(*request_ptr)
     gs_request_t *request = *request_ptr;
-    apr_table_clear(request->form_data);
-    apr_table_clear(request->fields);
     apr_pool_destroy(request->pool);
+    gs_hash_dispose(request->form_data);
+    gs_hash_dispose(request->fields);
     free (request);
     *request_ptr = NULL;
     return GS_SUCCESS;
@@ -65,7 +66,7 @@ GS_DECLARE(gs_status_t) gs_request_has_field(const gs_request_t *request, const 
 {
     GS_REQUIRE_NONNULL(request);
     GS_REQUIRE_NONNULL(key);
-    return (apr_table_get(request->fields, key) != NULL);
+    return (gs_hash_get(request->fields, key, strlen(key)) != NULL);
 }
 
 GS_DECLARE(gs_status_t) gs_request_field_by_name(char const ** value, const gs_request_t *request, const char *key)
@@ -73,7 +74,7 @@ GS_DECLARE(gs_status_t) gs_request_field_by_name(char const ** value, const gs_r
     GS_REQUIRE_NONNULL(request);
     GS_REQUIRE_NONNULL(key);
     GS_REQUIRE_NONNULL(value);
-    *value = apr_table_get(request->fields, key);
+    *value = gs_hash_get(request->fields, key, strlen(key));
     return GS_SUCCESS;
 }
 
@@ -81,7 +82,7 @@ GS_DECLARE(gs_status_t) gs_request_has_form(const gs_request_t *request, const c
 {
     GS_REQUIRE_NONNULL(request);
     GS_REQUIRE_NONNULL(key);
-    return (apr_table_get(request->form_data, key) != NULL);
+    return (gs_hash_get(request->form_data, key, strlen(key)) != NULL);
 }
 
 GS_DECLARE(gs_status_t) gs_request_form_by_name(char const **value, const gs_request_t *request, const char *key)
@@ -89,7 +90,7 @@ GS_DECLARE(gs_status_t) gs_request_form_by_name(char const **value, const gs_req
     GS_REQUIRE_NONNULL(request);
     GS_REQUIRE_NONNULL(key);
     GS_REQUIRE_NONNULL(value);
-    *value = apr_table_get(request->form_data, key);
+    *value = gs_hash_get(request->form_data, key, strlen(key));
     return GS_SUCCESS;
 }
 
@@ -185,7 +186,7 @@ GS_DECLARE(gs_status_t) gs_request_is_valid(const gs_request_t *request)
                 if (assignment_at > 0) {
                     char *field_name = apr_pstrndup(request->pool, line, assignment_at);
                     char *field_value = apr_pstrndup(request->pool, line + assignment_at + 2, strlen(line) + 2 - assignment_at);
-                    apr_table_add(request->fields, field_name, field_value);
+                    gs_hash_set(request->fields, field_name, strlen(field_name), field_value);
                 }
             }
         }
@@ -193,11 +194,12 @@ GS_DECLARE(gs_status_t) gs_request_is_valid(const gs_request_t *request)
     }
 
     // in case the request requires an additional response to proceed, send this response
-    const char *expect = apr_table_get(request->fields, "Expect");
-    if (request->is_valid && expect && strlen(expect)) {
-        int response_code_expected_at = strcspn(expect, "-");
+    const char *expect_key = "Expect";
+    const char *expect_value = gs_hash_get(request->fields, expect_key, strlen(expect_key));
+    if (request->is_valid && expect_value && strlen(expect_value)) {
+        int response_code_expected_at = strcspn(expect_value, "-");
         if (response_code_expected_at > 0 &&
-            !strcmp(apr_pstrndup(request->pool, expect, response_code_expected_at), "100")) {
+            !strcmp(apr_pstrndup(request->pool, expect_value, response_code_expected_at), "100")) {
 
             // send 100 continue
             response_t response;
@@ -214,19 +216,20 @@ GS_DECLARE(gs_status_t) gs_request_is_valid(const gs_request_t *request)
     }
 
     // in case the request contains form-data resp. is multipart, read the subsequent data
-    const char *content_type = apr_table_get(request->fields, "Content-Type");
-    if (request->is_valid && content_type && strlen(content_type)) {
+    const char *content_type_key = "Content-Type";
+    const char *content_type_value = gs_hash_get(request->fields, content_type_key, strlen(content_type_key));
+    if (request->is_valid && content_type_value && strlen(content_type_value)) {
         // if the content is multipart, then there is a boundary definition which is starts after ";"
-        if (strstr(content_type, ";")) {
-            int multipart_at = strcspn(content_type, ";");
+        if (strstr(content_type_value, ";")) {
+            int multipart_at = strcspn(content_type_value, ";");
             if (multipart_at > 0 &&
-                !strcmp(apr_pstrndup(request->pool, content_type, multipart_at), "multipart/form-data")) {
-                int boundary_def_at = strcspn(content_type, "=");
+                !strcmp(apr_pstrndup(request->pool, content_type_value, multipart_at), "multipart/form-data")) {
+                int boundary_def_at = strcspn(content_type_value, "=");
                 if (boundary_def_at > 0) {
                     request->is_multipart = true;
                     int boundary_def_prefix = boundary_def_at + 1;
-                    request->boundary = apr_pstrndup(request->pool, content_type + boundary_def_prefix,
-                                                     strlen(content_type) - boundary_def_prefix);
+                    request->boundary = apr_pstrndup(request->pool, content_type_value + boundary_def_prefix,
+                                                     strlen(content_type_value) - boundary_def_prefix);
                     request->body_type = GS_MULTIPART;
                 }
             }
@@ -237,9 +240,9 @@ GS_DECLARE(gs_status_t) gs_request_is_valid(const gs_request_t *request)
     switch (request->body_type) {
         case GS_MULTIPART: {
                 bool read_name = true;
+            char *attribute_name = NULL, *attribute_value = NULL;
                 while(line != NULL) {
                     if (!strstr(line, request->boundary)) {
-                        char *attribute_name, *attribute_value;
                         if (read_name) {
                             if (strstr(line, "form-data; name=")) {
                                 // read form name
@@ -255,7 +258,10 @@ GS_DECLARE(gs_status_t) gs_request_is_valid(const gs_request_t *request)
                             attribute_value = apr_pstrdup(request->pool, line);
                             read_name = true;
                         }
-                        apr_table_add(request->form_data, attribute_name, attribute_value);
+                    }
+                    if (attribute_name != NULL && attribute_value != NULL) {
+                        gs_hash_set(request->form_data, attribute_name, strlen(attribute_name), attribute_value);
+                        attribute_name = attribute_value = NULL;
                     }
                     line = apr_strtok( NULL, "\r\n",  &last_line);
                 }

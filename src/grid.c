@@ -392,8 +392,8 @@ void table_structure_print(FILE *file, const table_t *table, size_t row_offset, 
 
  void create_indexes(table_t *table, size_t approx_num_horizontal_partitions)
 {
-    size_t num_schema_slots = 2 * table->schema->attr->num_elements;
-    table->schema_cover = hash_vindex_new(sizeof(attr_id_t), num_schema_slots);
+    size_t num_schema_slots = max(1 , 2 * table->schema->attr->num_elements);
+    table->schema_cover = hash_vindex_new(num_schema_slots);
     table->tuple_cover  = lesearch_hindex_new(approx_num_horizontal_partitions, table->schema);
 }
 

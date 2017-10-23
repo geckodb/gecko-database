@@ -22,13 +22,18 @@
 #include <containers/vec.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
+// T Y P E   F O R W A R D I N G
+// ---------------------------------------------------------------------------------------------------------------------
+
+typedef struct gs_hash_t gs_hash_t;
+
+// ---------------------------------------------------------------------------------------------------------------------
 // D A T A T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
 typedef struct hashset_t
 {
-    apr_hash_t *dict;
-    apr_pool_t *pool;
+    gs_hash_t *dict;
     vec_t *vec;
 } hashset_t;
 
@@ -36,9 +41,9 @@ typedef struct hashset_t
 // I N T E R F A C E   F U N C T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
-void hashset_create(hashset_t *out, size_t elem_size, size_t capacity);
+void hashset_create(hashset_t *out, size_t elem_size, size_t capacity, gs_comp_func_t key_comp);
 void hashset_dispose(hashset_t *set);
-void hashset_add(hashset_t *set, const void *data, size_t num_elems);
+void hashset_add(hashset_t *set, const void *data, size_t num_elems, gs_comp_func_t key_comp);
 void hashset_remove(hashset_t *set, const void *data, size_t num_elems);
 bool hashset_contains(const hashset_t *set, const void *data);
 const void *hashset_begin(const hashset_t *set);

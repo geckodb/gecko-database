@@ -27,7 +27,7 @@ void vindex_delete(vindex_t *index)
 void vindex_add(vindex_t *index, const attr_id_t *key, const struct grid_t *grid)
 {
     DELEGATE_CALL_WARGS(index, _add, key, grid);
-    hashset_add(&index->keys, key, 1);
+    hashset_add(&index->keys, key, 1, GS_ATTR_ID_COMP);
 }
 
 void vindex_remove(vindex_t *index, const attr_id_t *key)

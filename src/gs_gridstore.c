@@ -1,6 +1,5 @@
 #include <gs_gridstore.h>
 #include <gs_dispatcher.h>
-#include <grid.h>
 #include <gs_collections.h>
 
 typedef struct gs_gridstore_t {

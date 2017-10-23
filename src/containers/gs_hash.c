@@ -22,6 +22,7 @@ typedef struct gs_hash_t {
     hash_bucket_t       *buckets;
     size_t               num_buckets;
     hash_code_fn_t       hash_func;
+    gs_comp_func_t       key_comp_func;
 } gs_hash_t;
 
 #define GET_HASH_CODE(key, key_size)                                \
@@ -30,9 +31,9 @@ typedef struct gs_hash_t {
 static inline void setup_hash_buckets(hash_bucket_t *buckets, size_t num_buckets, gs_comp_func_t key_comp);
 static inline void cleanup_hash_buckets(hash_bucket_t *buckets, size_t num_buckets);
 static inline void hash_bucket_init(hash_bucket_t *bucket, gs_comp_func_t key_comp);
-static inline void hash_bucket_set(hash_bucket_t *bucket, void *key, void *value, gs_comp_func_t key_comp);
+static inline void hash_bucket_set(hash_bucket_t *bucket, const void *key, const void *value, gs_comp_func_t key_comp);
 static inline void hash_bucket_unset(hash_bucket_t *bucket, void *key);
-static inline const void *hash_bucket_get(hash_bucket_t *bucket, void *key);
+static inline const void *hash_bucket_get(hash_bucket_t *bucket, const void *key);
 static inline void hash_bucket_cleanup(hash_bucket_t *bucket);
 static inline void hash_bucket_entry_init(hash_bucket_entry_t *entry, gs_comp_func_t key_comp);
 static inline int entry_comp_by_key(const void *a, const void *b);
@@ -47,10 +48,11 @@ GS_DECLARE(gs_status_t) gs_hash_create(gs_hash_t **hash, size_t num_buckets, gs_
 
 GS_DECLARE(gs_status_t) gs_hash_create_ex(gs_hash_t **hash, size_t num_buckets, hash_code_fn_t hash_func, gs_comp_func_t key_comp)
 {
-    gs_hash_t *result   = GS_REQUIRE_MALLOC(sizeof(gs_hash_t));
-    result->buckets     = GS_REQUIRE_MALLOC(num_buckets * sizeof(hash_bucket_t));
-    result->hash_func   = hash_func;
-    result->num_buckets = num_buckets;
+    gs_hash_t *result     = GS_REQUIRE_MALLOC(sizeof(gs_hash_t));
+    result->buckets       = GS_REQUIRE_MALLOC(num_buckets * sizeof(hash_bucket_t));
+    result->hash_func     = hash_func;
+    result->num_buckets   = num_buckets;
+    result->key_comp_func = key_comp;
     setup_hash_buckets(result->buckets, result->num_buckets, key_comp);
     *hash = result;
     return GS_SUCCESS;
@@ -64,35 +66,36 @@ GS_DECLARE(gs_status_t) gs_hash_dispose(gs_hash_t *hash)
     return GS_SUCCESS;
 }
 
-GS_DECLARE(gs_status_t) gs_hash_set(gs_hash_t *hash, void *key, size_t key_size, void *val, gs_comp_func_t key_comp)
+GS_DECLARE(gs_status_t) gs_hash_set(gs_hash_t *hash, const void *key, size_t key_size, const void *val)
 {
-    return gs_hash_set_ex(hash, key, key_size, val, 1, key_comp);
+    return gs_hash_set_ex(hash, key, val, &key_size, 1);
 }
 
-GS_DECLARE(gs_status_t) gs_hash_set_ex(gs_hash_t *hash, void *keys, size_t key_size, void *vals, size_t num_elems,
-                                       gs_comp_func_t key_comp)
+GS_DECLARE(gs_status_t) gs_hash_set_ex(gs_hash_t *hash, const void *keys, const void *vals, const size_t *key_sizes, size_t num_elems)
 {
     GS_REQUIRE_NONNULL(hash);
     GS_REQUIRE_NONNULL(keys);
     GS_REQUIRE_NONNULL(vals);
 
     while (num_elems--) {
-        void *key = keys++;
-        void *val = vals++;
+        const void *key       = keys++;
+        const void *val       = vals++;
+        const size_t key_size = *(key_sizes++);
         size_t bucket_idx = GET_HASH_CODE(key, key_size);
-        hash_bucket_set(hash->buckets + bucket_idx, key, val, key_comp);
+        hash_bucket_set(hash->buckets + bucket_idx, key, val, hash->key_comp_func);
     }
 
     return GS_SUCCESS;
 }
 
-GS_DECLARE(gs_status_t) gs_hash_unset_ex(gs_hash_t *hash, void *keys, size_t key_size, size_t num_elems)
+GS_DECLARE(gs_status_t) gs_hash_unset_ex(gs_hash_t *hash, void *keys, const size_t *key_sizes, size_t num_elems)
 {
     GS_REQUIRE_NONNULL(hash);
     GS_REQUIRE_NONNULL(keys);
 
     while (num_elems--) {
         void *key = keys++;
+        const size_t key_size = *(key_sizes++);
         size_t bucket_idx = GET_HASH_CODE(key, key_size);
         hash_bucket_unset(hash->buckets + bucket_idx, key);
     }
@@ -100,16 +103,16 @@ GS_DECLARE(gs_status_t) gs_hash_unset_ex(gs_hash_t *hash, void *keys, size_t key
     return GS_SUCCESS;
 }
 
-GS_DECLARE(void *) gs_hash_get(const gs_hash_t *hash, void *key, size_t key_size)
+GS_DECLARE(void *) gs_hash_get(const gs_hash_t *hash, const void *key, size_t key_size)
 {
     vec_t *result = vec_new(sizeof(void *), 1);
-    gs_hash_get_ex(result, hash, key, key_size, 1);
+    gs_hash_get_ex(result, hash, key, &key_size, 1);
     void *retval = (vec_length(result) != 0 ? *(void **) vec_at(result, 0) : NULL);
     vec_free(result);
     return retval;
 }
 
-GS_DECLARE(gs_status_t) gs_hash_get_ex(vec_t *result, const gs_hash_t *hash, void *keys, size_t key_size,
+GS_DECLARE(gs_status_t) gs_hash_get_ex(vec_t *result, const gs_hash_t *hash, const void *keys, const size_t *key_sizes,
                                        size_t num_elems)
 {
     GS_REQUIRE_NONNULL(result);
@@ -117,7 +120,8 @@ GS_DECLARE(gs_status_t) gs_hash_get_ex(vec_t *result, const gs_hash_t *hash, voi
     GS_REQUIRE_NONNULL(keys);
 
     while (num_elems--) {
-        void *key = keys++;
+        const void *key = keys++;
+        const size_t key_size = *(key_sizes++);
         size_t bucket_idx = GET_HASH_CODE(key, key_size);
         const void *value;
         if ((value = hash_bucket_get(hash->buckets + bucket_idx, key)) != NULL) {
@@ -155,7 +159,7 @@ static inline void hash_bucket_init(hash_bucket_t *bucket, gs_comp_func_t key_co
     vec_resize(bucket->entries, 0);
 }
 
-static inline void hash_bucket_set(hash_bucket_t *bucket, void *key, void *value, gs_comp_func_t key_comp)
+static inline void hash_bucket_set(hash_bucket_t *bucket, const void *key, const void *value, gs_comp_func_t key_comp)
 {
     hash_bucket_entry_t new_entry = { .key = key, .value = value, .in_use = true, .key_comp = key_comp };
     hash_bucket_entry_t *it = vec_bsearch(bucket->entries, &new_entry, entry_comp_by_key, entry_comp_by_key);
@@ -181,7 +185,7 @@ static inline void hash_bucket_unset(hash_bucket_t *bucket, void *key)
     }
 }
 
-static inline const void *hash_bucket_get(hash_bucket_t *bucket, void *key)
+static inline const void *hash_bucket_get(hash_bucket_t *bucket, const void *key)
 {
     hash_bucket_entry_t new_entry = { .key = key };
     hash_bucket_entry_t *it = vec_bsearch(bucket->entries, &new_entry, entry_comp_by_key, entry_comp_by_key);
