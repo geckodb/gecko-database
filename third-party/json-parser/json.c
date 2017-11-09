@@ -38,7 +38,7 @@
 const struct _json_value json_value_none;
 
 #include <stdio.h>
-#include <utils.h>
+#include <gs_utils.h>
 #include <ctype.h>
 #include <math.h>
 
@@ -927,7 +927,7 @@ e_failed:
       if (*error)
          strcpy (error_buf, error);
       else
-         strcpy (error_buf, "Unknown error");
+         strcpy (error_buf, "Unknown gs_gc_error");
    }
 
    if (state.first_pass)

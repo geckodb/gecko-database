@@ -78,7 +78,7 @@ Changes in version 1.1.0
 
 * Allows cross-compilation by honoring --host if given (@wkz)
 
-* Maximum size for error buffer is now exposed in header (@LB--)
+* Maximum size for gs_gc_error buffer is now exposed in header (@LB--)
 
 * GCC warning for `static` after `const` fixed (@batrick)
 

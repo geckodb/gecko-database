@@ -1,17 +1,28 @@
+// Several pre-defined functions related to hash operations
+// Copyright (C) 2017 Marcus Pinnecke
+//
+// This program is free software: you can redistribute it and/or modify it under the terms of the
+// GNU General Public License as published by the Free Software Foundation, either user_port 3 of the License, or
+// (at your option) any later user_port.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along with this program.
+// If not, see <http://www.gnu.org/licenses/>.
+
 #pragma once
+
+// ---------------------------------------------------------------------------------------------------------------------
+// I N C L U D E S
+// ---------------------------------------------------------------------------------------------------------------------
 
 #include <gs.h>
 
-typedef uint32_t http_status_code_t;
-
-typedef enum content_type_t
-{
-    MEDIA_MULTI_PART_FORM_DATA
-} content_type_t;
-
-typedef enum method_t {
-    HTTP_GET, HTTP_POST, HTTP_PUT, HTTP_DELETE, HTTP_OTHERS
-} method_t;
+// ---------------------------------------------------------------------------------------------------------------------
+// C O N F I G
+// ---------------------------------------------------------------------------------------------------------------------
 
 #define HTTP_STATUS_CODE_100_CONTINUE           100
 #define HTTP_STATUS_CODE_200_OK                 200
@@ -27,6 +38,26 @@ typedef enum method_t {
 #define HTTP_POST_STRING   "POST"
 #define HTTP_DELETE_STRING "DELETE"
 
-const char *codestr(http_status_code_t code);
+// ---------------------------------------------------------------------------------------------------------------------
+// D A T A T Y P E S
+// ---------------------------------------------------------------------------------------------------------------------
 
-const char *methodstr(http_status_code_t code);
+typedef uint32_t gs_http_status_code_t;
+
+typedef enum gs_content_type_e
+{
+    MEDIA_MULTI_PART_FORM_DATA
+} gs_content_type_e;
+
+typedef enum gs_method_e {
+    HTTP_GET, HTTP_POST, HTTP_PUT, HTTP_DELETE, HTTP_OTHERS
+} gs_method_e;
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+// I N T E R F A C E   F U N C T I O N S
+// ---------------------------------------------------------------------------------------------------------------------
+
+const char *gs_codestr(gs_http_status_code_t code);
+
+const char *gs_methodstr(gs_http_status_code_t code);

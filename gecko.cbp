@@ -1,0 +1,435 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="gecko"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="clang"/>
+		<Option virtualFolders="CMake Files\;CMake Files\cmake\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/Users/marcus/git/basement"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -f &quot;/Users/marcus/git/basement/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -f &quot;/Users/marcus/git/basement/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -f &quot;/Users/marcus/git/basement/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -f &quot;/Users/marcus/git/basement/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/Users/marcus/git/basement"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -f &quot;/Users/marcus/git/basement/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -f &quot;/Users/marcus/git/basement/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -f &quot;/Users/marcus/git/basement/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -f &quot;/Users/marcus/git/basement/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/Users/marcus/git/basement"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -f &quot;/Users/marcus/git/basement/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -f &quot;/Users/marcus/git/basement/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -f &quot;/Users/marcus/git/basement/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -f &quot;/Users/marcus/git/basement/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="doc">
+				<Option working_dir="/Users/marcus/git/basement"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -f &quot;/Users/marcus/git/basement/Makefile&quot;  VERBOSE=1 doc"/>
+					<CompileFile command="/usr/bin/make -f &quot;/Users/marcus/git/basement/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -f &quot;/Users/marcus/git/basement/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -f &quot;/Users/marcus/git/basement/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="gecko">
+				<Option output="/Users/marcus/git/basement/bin/gecko" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/marcus/git/basement/bin"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="clang"/>
+				<Compiler>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Users/marcus/git/basement/include"/>
+					<Add directory="/Users/marcus/git/basement/third-party"/>
+					<Add directory="/usr/include/apr-1"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -f &quot;/Users/marcus/git/basement/Makefile&quot;  VERBOSE=1 gecko"/>
+					<CompileFile command="/usr/bin/make -f &quot;/Users/marcus/git/basement/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -f &quot;/Users/marcus/git/basement/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -f &quot;/Users/marcus/git/basement/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="gecko/fast">
+				<Option output="/Users/marcus/git/basement/bin/gecko" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/marcus/git/basement/bin"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="clang"/>
+				<Compiler>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Users/marcus/git/basement/include"/>
+					<Add directory="/Users/marcus/git/basement/third-party"/>
+					<Add directory="/usr/include/apr-1"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -f &quot;/Users/marcus/git/basement/Makefile&quot;  VERBOSE=1 gecko/fast"/>
+					<CompileFile command="/usr/bin/make -f &quot;/Users/marcus/git/basement/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -f &quot;/Users/marcus/git/basement/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -f &quot;/Users/marcus/git/basement/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/Users/marcus/git/basement/gecko.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/c11threads.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/containers/gs_freelist.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/containers/gs_hash.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/containers/gs_hashset.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/containers/gs_list.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/containers/gs_vec.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/frag_printers/gs_console_printer.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/frags/gs_frag_host_vm.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_async.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_attr.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_collection.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_collections.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_debug.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_dispatcher.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_error.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_event.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_field_type.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_frag.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_frag_printer.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_global.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_grid.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_grid_cursor.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_gridstore.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_hash.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_http.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_info.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_interval.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_msg.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_platform.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_pred.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_reltype.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_require.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_schema.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_shell.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_spinlock.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_system.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_timer.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_tuple.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_tuple_cursor.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_tuple_field.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_tuplet.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_tuplet_field.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_unsafe.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/gs_utils.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/indexes/gs_hindex.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/indexes/gs_vindex.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/indexes/hindexes/gs_lsearch_hindex.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/indexes/vindexes/gs_hash_vindex.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/inet/gs_request.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/inet/gs_response.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/inet/gs_server.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/operators/gs_scan.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/platforms/macos/gs_platform.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/routers/api/1.0/gs_collections.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/routers/api/1.0/gs_nodes.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/routers/api/1.0/gs_root.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/routers/api/types/create/gs_router.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/include/routers/gs_catch.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/containers/gs_freelist.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/containers/gs_hash.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/containers/gs_hashset.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/containers/gs_list.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/containers/gs_vec.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/frag_printers/gs_console_printer.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/frags/gs_frag_host_vm.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/gs_async.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/gs_attr.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/gs_collection.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/gs_collections.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/gs_dispatcher.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/gs_error.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/gs_event.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/gs_field_type.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/gs_frag.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/gs_frag_printer.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/gs_global.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/gs_grid.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/gs_grid_cursor.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/gs_gridstore.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/gs_hash.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/gs_http.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/gs_interval.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/gs_pred.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/gs_reltype.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/gs_schema.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/gs_shell.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/gs_spinlock.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/gs_system.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/gs_timer.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/gs_tuple.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/gs_tuple_cursor.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/gs_tuple_field.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/gs_tuplet.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/gs_tuplet_field.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/gs_unsafe.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/gs_utils.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/indexes/gs_hindex.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/indexes/gs_vindex.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/indexes/hindexes/gs_lsearch_hindex.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/indexes/vindexes/gs_hash_vindex.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/inet/gs_request.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/inet/gs_response.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/inet/gs_server.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/operators/gs_scan.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/platforms/macos/third-party/fmemopen/fmemopen.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/routers/api/1.0/gs_collections.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/routers/api/1.0/gs_nodes.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/src/routers/api/1.0/gs_root.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/third-party/json-parser/json.c">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/third-party/json-parser/json.h">
+			<Option target="gecko"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/cmake/FindOS.cmake">
+			<Option virtualFolder="CMake Files\cmake\"/>
+		</Unit>
+		<Unit filename="/Users/marcus/git/basement/cmake/FindAPR.cmake">
+			<Option virtualFolder="CMake Files\cmake\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

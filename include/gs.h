@@ -39,17 +39,18 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <utils.h>
+#include <gs_utils.h>
 #include <sys/stat.h>
 
 #include <openssl/md5.h>
 
-#include <platform.h>
-#include <global.h>
-#include <msg.h>
-#include <error.h>
-#include <require.h>
-#include <hash.h>
+#include <gs_platform.h>
+#include <gs_global.h>
+#include <gs_msg.h>
+#include <gs_error.h>
+#include <gs_require.h>
+#include <gs_hash.h>
+#include <gs_error.h>
 #include <zconf.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -64,11 +65,11 @@
 // T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-typedef uint64_t attr_id_t;
+typedef uint64_t gs_attr_id_t;
 
-typedef uint32_t tuplet_id_t;
+typedef uint32_t gs_tuplet_id_t;
 
-typedef uint64_t collection_id_t;
+typedef uint64_t gs_collection_id_t;
 
 #define COLLECTION_ID_NULL UINT64_MAX
 
@@ -80,7 +81,7 @@ typedef uint32_t   u32;
 typedef uint64_t   u64;
 typedef int64_t    s64;
 
-enum tuplet_format {
+enum gs_tuplet_format_e {
     TF_NSM  = 1,
     TF_DSM  = 2,
 };
@@ -98,9 +99,9 @@ typedef struct {
     uint8_t nullable : 1;
     uint8_t autoinc  : 1;
     uint8_t unique   : 1;
-} ATTR_FLAGS;
+} gs_attr_flags_e;
 
-typedef MD5_CTX checksum_context_t;
+typedef MD5_CTX gs_checksum_context_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // M A C R O S
@@ -141,7 +142,7 @@ typedef MD5_CTX checksum_context_t;
     })
 
 #define GS_CONNECT(sig, slot)                                                                                          \
-    error_if((gs_dispatcher_connect(system->dispatcher, sig, slot) != GS_SUCCESS), err_connect_failed);
+    gs_error_if((gs_dispatcher_connect(system->dispatcher, sig, slot) != GS_SUCCESS), err_connect_failed);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N L I N E   F U N C T I O N S
@@ -154,8 +155,8 @@ static inline int gs_comp_func_str(const void *lhs, const void *rhs)
 
 static inline int gs_comp_func_attr_id(const void *lhs, const void *rhs)
 {
-    attr_id_t a = *(attr_id_t *) lhs;
-    attr_id_t b = *(attr_id_t *) rhs;
+    gs_attr_id_t a = *(gs_attr_id_t *) lhs;
+    gs_attr_id_t b = *(gs_attr_id_t *) rhs;
     if (a < b) {
         return -1;
     } else if (a > b) {
@@ -212,22 +213,22 @@ static inline int gs_comp_func_attr_id(const void *lhs, const void *rhs)
 #define STRPTR    char*
 #endif
 #ifndef ATTRID
-#define ATTRID    attr_id_t
+#define ATTRID    gs_attr_id_t
 #endif
 #ifndef GRIDID
-#define GRIDID    grid_id_t
+#define GRIDID    gs_grid_id_t
 #endif
 #ifndef TUPLEID
-#define TUPLEID   tuple_id_t
+#define TUPLEID   gs_tuple_id_t
 #endif
 #ifndef FRAGTYPE
-#define FRAGTYPE  enum frag_impl_type_t
+#define FRAGTYPE  enum gs_frag_impl_type_e
 #endif
 #ifndef SIZE
 #define SIZE      size_t
 #endif
 #ifndef TFORMAT
-#define TFORMAT   enum tuplet_format
+#define TFORMAT   enum gs_tuplet_format_e
 #endif
 #ifndef RELTYPE
 #define RELTYPE   gs_reltype_e

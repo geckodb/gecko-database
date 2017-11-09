@@ -16,8 +16,8 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <inet/gs_server.h>
-#include <debug.h>
-#include <inet/response.h>
+#include <gs_debug.h>
+#include <inet/gs_response.h>
 #include <sys/socket.h>
 #include <poll.h>
 #include <apr_pools.h>
@@ -27,10 +27,10 @@
 #include <apr_hash.h>
 #include <apr_strings.h>
 #include <containers/gs_hash.h>
-#include <schema.h>
-#include <attr.h>
-#include <frag.h>
-#include <tuplet_field.h>
+#include <gs_schema.h>
+#include <gs_attr.h>
+#include <gs_frag.h>
+#include <gs_tuplet_field.h>
 
 typedef struct gs_server_t
 {
@@ -50,7 +50,7 @@ typedef struct gs_server_t
 typedef struct gs_server_pool_t
 {
     gs_server_t         *gateway;
-    vec_t               *servers;
+    gs_vec_t               *servers;
     size_t               next_port_idx;
 } gs_server_pool_t;
 
@@ -251,22 +251,22 @@ int server_handle_connection(void *args)
 {
     server_handle_connection_args_t *server_handle_connection_args = (server_handle_connection_args_t *) args;
 
-    response_t response;
+    gs_response_t response;
     char buffer[131072];
     int client = server_handle_connection_args->client;
     server_loop_args_t *loop_args = server_handle_connection_args->loop_args;
 
     memset (buffer, 0, sizeof(buffer));
     struct pollfd pollfd = { .fd = client, .events = POLLIN };
-    response_create(&response);
+    gs_response_create(&response);
     if (poll(&pollfd, 1, 100000)) {
         gs_request_t *request;
         gs_request_create(&request, client);
 
         if (!gs_request_is_valid(request)) {
             GS_DEBUG2("request rejected");
-            response_content_type_set(&response, MIME_CONTENT_TYPE_TEXT_PLAIN);
-            response_end(&response, HTTP_STATUS_CODE_400_BAD_REQUEST);
+            gs_response_content_type_set(&response, MIME_CONTENT_TYPE_TEXT_PLAIN);
+            gs_response_end(&response, HTTP_STATUS_CODE_400_BAD_REQUEST);
         } else {
             router_t router;
             char *resource;
@@ -286,13 +286,13 @@ int server_handle_connection(void *args)
 
         gs_request_dispose(&request);
     } else {
-        response_end(&response, HTTP_STATUS_CODE_408_REQUEST_TIMEOUT);
+        gs_response_end(&response, HTTP_STATUS_CODE_408_REQUEST_TIMEOUT);
     }
-    char *response_text = response_pack(&response);
+    char *response_text = gs_response_pack(&response);
     GS_DEBUG("RESPONSE TEXT: %s\n", response_text);
     write(client, response_text, strlen(response_text));
     free(response_text);
-    response_dispose(&response);
+    gs_response_dispose(&response);
     close(client);
 
     return EXIT_SUCCESS;
@@ -305,9 +305,9 @@ GS_DECLARE(gs_status_t) gs_server_pool_create(gs_server_pool_t **server_set, gs_
     GS_REQUIRE_NONNULL(dispatcher);
     gs_server_pool_t *result = GS_REQUIRE_MALLOC(sizeof(gs_server_pool_t));
 
-    result->servers = vec_new(sizeof(gs_server_t *), num_servers);
-    vec_resize(result->servers, num_servers);
-    for (gs_server_t **it = vec_begin(result->servers); it != vec_end(result->servers); it++) {
+    result->servers = gs_vec_new(sizeof(gs_server_t *), num_servers);
+    gs_vec_resize(result->servers, num_servers);
+    for (gs_server_t **it = gs_vec_begin(result->servers); it != gs_vec_end(result->servers); it++) {
         gs_server_create(it, 0, dispatcher);
         GS_DEBUG("created server listening to port: %d", gs_server_port(*it));
     }
@@ -328,13 +328,13 @@ GS_DECLARE(gs_status_t) gs_server_pool_dispose(gs_server_pool_t *pool)
     while (gs_server_dispose(pool->gateway) != GS_SUCCESS)
         ;
 
-    for (gs_server_t **it = vec_begin(pool->servers); it != vec_end(pool->servers); it++) {
+    for (gs_server_t **it = gs_vec_begin(pool->servers); it != gs_vec_end(pool->servers); it++) {
         GS_DEBUG("dispose server %p", *it);
         while (gs_server_dispose(*it) != GS_SUCCESS)
             ;
     }
 
-    vec_free(pool->servers);
+    gs_vec_free(pool->servers);
     free (pool);
     return GS_SUCCESS;
 }
@@ -347,7 +347,7 @@ GS_DECLARE(gs_status_t) gs_server_pool_router_add(gs_server_pool_t *pool, const 
 
     gs_status_t status;
 
-    for (gs_server_t **it = vec_begin(pool->servers); it != vec_end(pool->servers); it++) {
+    for (gs_server_t **it = gs_vec_begin(pool->servers); it != gs_vec_end(pool->servers); it++) {
         GS_DEBUG("add router to server %p", *it);
         if ((status = gs_server_router_add(*it, resource, router)) != GS_SUCCESS)
             return status;
@@ -363,7 +363,7 @@ GS_DECLARE(gs_status_t) gs_server_pool_start(gs_server_pool_t *pool, gs_system_t
 
     gs_status_t status;
 
-    for (gs_server_t **it = vec_begin(pool->servers); it != vec_end(pool->servers); it++) {
+    for (gs_server_t **it = gs_vec_begin(pool->servers); it != gs_vec_end(pool->servers); it++) {
         GS_DEBUG("start server %p", *it);
         if ((status = gs_server_start(*it, system, catch)) != GS_SUCCESS)
             return status;
@@ -404,7 +404,7 @@ GS_DECLARE(gs_status_t) gs_server_pool_shutdown(gs_server_pool_t *pool)
     if ((status = gs_server_shutdown(pool->gateway)) != GS_SUCCESS)
         return status;
 
-    for (gs_server_t **it = vec_begin(pool->servers); it != vec_end(pool->servers); it++) {
+    for (gs_server_t **it = gs_vec_begin(pool->servers); it != gs_vec_end(pool->servers); it++) {
         GS_DEBUG("start server %p", *it);
         if ((status = gs_server_shutdown(*it)) != GS_SUCCESS)
             return status;
@@ -420,7 +420,7 @@ GS_DECLARE(unsigned short) gs_server_pool_get_gateway_port(gs_server_pool_t *poo
 
 GS_DECLARE(size_t) gs_server_pool_get_num_of_servers(gs_server_pool_t *pool)
 {
-    return (pool != NULL ? vec_length(pool->servers) : 0);
+    return (pool != NULL ? gs_vec_length(pool->servers) : 0);
 }
 
 GS_DECLARE(gs_status_t) gs_server_pool_cpy_port_list(unsigned short *dst, const gs_server_pool_t *pool)
@@ -428,7 +428,7 @@ GS_DECLARE(gs_status_t) gs_server_pool_cpy_port_list(unsigned short *dst, const 
     GS_REQUIRE_NONNULL(dst);
     GS_REQUIRE_NONNULL(pool);
 
-    for (gs_server_t **it = vec_begin(pool->servers); it != vec_end(pool->servers); it++, dst++) {
+    for (gs_server_t **it = gs_vec_begin(pool->servers); it != gs_vec_end(pool->servers); it++, dst++) {
         *dst = gs_server_port(*it);
     }
 
@@ -437,44 +437,44 @@ GS_DECLARE(gs_status_t) gs_server_pool_cpy_port_list(unsigned short *dst, const 
 
 unsigned short gs_server_pool_next_port(gs_server_pool_t *pool)
 {
-    gs_server_t **server = (vec_at(pool->servers, (pool->next_port_idx++ % vec_length(pool->servers)))); /* round robin */
+    gs_server_t **server = (gs_vec_at(pool->servers, (pool->next_port_idx++ % gs_vec_length(pool->servers)))); /* round robin */
     return gs_server_port(*server);
 }
 
 GS_DECLARE(void) gs_server_pool_print(FILE *file, gs_server_pool_t *pool)
 {
-    schema_t *print_schema = schema_new("ad hoc info");
+    gs_schema_t *print_schema = gs_schema_new("ad hoc info");
     attr_create_uint64("id", print_schema);
     attr_create_string("type", 100, print_schema);
     attr_create_uint16("port", print_schema);
     attr_create_uint64("num_requests", print_schema);
-    size_t num_servers = vec_length(pool->servers) + 1;
-    frag_t *frag = frag_new(print_schema, num_servers, FIT_HOST_NSM_VM);
+    size_t num_servers = gs_vec_length(pool->servers) + 1;
+    gs_frag_t *frag = gs_frag_new(print_schema, num_servers, FIT_HOST_NSM_VM);
 
-    tuplet_t tuplet;
-    frag_insert(&tuplet, frag, num_servers);
+    gs_tuplet_t tuplet;
+    gs_frag_insert(&tuplet, frag, num_servers);
 
     u64 id = 0;
     do {
-        gs_server_t *cursor = (id == 0 ? pool->gateway : *(gs_server_t **) vec_at(pool->servers, (id - 1)));
+        gs_server_t *cursor = (id == 0 ? pool->gateway : *(gs_server_t **) gs_vec_at(pool->servers, (id - 1)));
         const char *type = (id == 0 ? "Gateway" : "Router");
         u16 port = gs_server_port(cursor);
         u64 num_requests = gs_server_num_requests(cursor);
 
-        tuplet_field_t field;
-        tuplet_field_open(&field, &tuplet);
-        tuplet_field_write(&field, &id, true);
-        tuplet_field_write(&field, &type, true);
-        tuplet_field_write(&field, &port, true);
-        tuplet_field_write(&field, &num_requests, false);
+        gs_tuplet_field_t field;
+        gs_tuplet_field_open(&field, &tuplet);
+        gs_tuplet_field_write(&field, &id, true);
+        gs_tuplet_field_write(&field, &type, true);
+        gs_tuplet_field_write(&field, &port, true);
+        gs_tuplet_field_write(&field, &num_requests, false);
 
         id++;
 
-    } while (tuplet_next(&tuplet));
+    } while (gs_tuplet_next(&tuplet));
 
-    frag_print(file, frag, 0, INT_MAX);
+    gs_frag_print(file, frag, 0, INT_MAX);
 
-    frag_delete(frag);
-    schema_delete(print_schema);
+    gs_frag_delete(frag);
+    gs_schema_delete(print_schema);
 }
 

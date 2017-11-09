@@ -1,0 +1,262 @@
+[
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/gecko.c.o   -c /Users/marcus/git/basement/gecko.c",
+  "file": "/Users/marcus/git/basement/gecko.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/gs_async.c.o   -c /Users/marcus/git/basement/src/gs_async.c",
+  "file": "/Users/marcus/git/basement/src/gs_async.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/gs_attr.c.o   -c /Users/marcus/git/basement/src/gs_attr.c",
+  "file": "/Users/marcus/git/basement/src/gs_attr.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/containers/gs_list.c.o   -c /Users/marcus/git/basement/src/containers/gs_list.c",
+  "file": "/Users/marcus/git/basement/src/containers/gs_list.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/containers/gs_vec.c.o   -c /Users/marcus/git/basement/src/containers/gs_vec.c",
+  "file": "/Users/marcus/git/basement/src/containers/gs_vec.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/frags/gs_frag_host_vm.c.o   -c /Users/marcus/git/basement/src/frags/gs_frag_host_vm.c",
+  "file": "/Users/marcus/git/basement/src/frags/gs_frag_host_vm.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/gs_error.c.o   -c /Users/marcus/git/basement/src/gs_error.c",
+  "file": "/Users/marcus/git/basement/src/gs_error.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/gs_tuplet_field.c.o   -c /Users/marcus/git/basement/src/gs_tuplet_field.c",
+  "file": "/Users/marcus/git/basement/src/gs_tuplet_field.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/gs_frag.c.o   -c /Users/marcus/git/basement/src/gs_frag.c",
+  "file": "/Users/marcus/git/basement/src/gs_frag.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/gs_hash.c.o   -c /Users/marcus/git/basement/src/gs_hash.c",
+  "file": "/Users/marcus/git/basement/src/gs_hash.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/gs_pred.c.o   -c /Users/marcus/git/basement/src/gs_pred.c",
+  "file": "/Users/marcus/git/basement/src/gs_pred.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/gs_schema.c.o   -c /Users/marcus/git/basement/src/gs_schema.c",
+  "file": "/Users/marcus/git/basement/src/gs_schema.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/gs_tuplet.c.o   -c /Users/marcus/git/basement/src/gs_tuplet.c",
+  "file": "/Users/marcus/git/basement/src/gs_tuplet.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/operators/gs_scan.c.o   -c /Users/marcus/git/basement/src/operators/gs_scan.c",
+  "file": "/Users/marcus/git/basement/src/operators/gs_scan.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/gs_frag_printer.c.o   -c /Users/marcus/git/basement/src/gs_frag_printer.c",
+  "file": "/Users/marcus/git/basement/src/gs_frag_printer.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/frag_printers/gs_console_printer.c.o   -c /Users/marcus/git/basement/src/frag_printers/gs_console_printer.c",
+  "file": "/Users/marcus/git/basement/src/frag_printers/gs_console_printer.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/gs_unsafe.c.o   -c /Users/marcus/git/basement/src/gs_unsafe.c",
+  "file": "/Users/marcus/git/basement/src/gs_unsafe.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/gs_timer.c.o   -c /Users/marcus/git/basement/src/gs_timer.c",
+  "file": "/Users/marcus/git/basement/src/gs_timer.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/gs_field_type.c.o   -c /Users/marcus/git/basement/src/gs_field_type.c",
+  "file": "/Users/marcus/git/basement/src/gs_field_type.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/gs_tuple.c.o   -c /Users/marcus/git/basement/src/gs_tuple.c",
+  "file": "/Users/marcus/git/basement/src/gs_tuple.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/inet/gs_server.c.o   -c /Users/marcus/git/basement/src/inet/gs_server.c",
+  "file": "/Users/marcus/git/basement/src/inet/gs_server.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/gs_global.c.o   -c /Users/marcus/git/basement/src/gs_global.c",
+  "file": "/Users/marcus/git/basement/src/gs_global.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/inet/gs_response.c.o   -c /Users/marcus/git/basement/src/inet/gs_response.c",
+  "file": "/Users/marcus/git/basement/src/inet/gs_response.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/gs_grid.c.o   -c /Users/marcus/git/basement/src/gs_grid.c",
+  "file": "/Users/marcus/git/basement/src/gs_grid.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/gs_interval.c.o   -c /Users/marcus/git/basement/src/gs_interval.c",
+  "file": "/Users/marcus/git/basement/src/gs_interval.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/gs_tuple_field.c.o   -c /Users/marcus/git/basement/src/gs_tuple_field.c",
+  "file": "/Users/marcus/git/basement/src/gs_tuple_field.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/indexes/gs_vindex.c.o   -c /Users/marcus/git/basement/src/indexes/gs_vindex.c",
+  "file": "/Users/marcus/git/basement/src/indexes/gs_vindex.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/indexes/vindexes/gs_hash_vindex.c.o   -c /Users/marcus/git/basement/src/indexes/vindexes/gs_hash_vindex.c",
+  "file": "/Users/marcus/git/basement/src/indexes/vindexes/gs_hash_vindex.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/containers/gs_freelist.c.o   -c /Users/marcus/git/basement/src/containers/gs_freelist.c",
+  "file": "/Users/marcus/git/basement/src/containers/gs_freelist.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/gs_tuple_cursor.c.o   -c /Users/marcus/git/basement/src/gs_tuple_cursor.c",
+  "file": "/Users/marcus/git/basement/src/gs_tuple_cursor.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/indexes/gs_hindex.c.o   -c /Users/marcus/git/basement/src/indexes/gs_hindex.c",
+  "file": "/Users/marcus/git/basement/src/indexes/gs_hindex.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/indexes/hindexes/gs_lsearch_hindex.c.o   -c /Users/marcus/git/basement/src/indexes/hindexes/gs_lsearch_hindex.c",
+  "file": "/Users/marcus/git/basement/src/indexes/hindexes/gs_lsearch_hindex.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/gs_grid_cursor.c.o   -c /Users/marcus/git/basement/src/gs_grid_cursor.c",
+  "file": "/Users/marcus/git/basement/src/gs_grid_cursor.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/containers/gs_hashset.c.o   -c /Users/marcus/git/basement/src/containers/gs_hashset.c",
+  "file": "/Users/marcus/git/basement/src/containers/gs_hashset.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/gs_utils.c.o   -c /Users/marcus/git/basement/src/gs_utils.c",
+  "file": "/Users/marcus/git/basement/src/gs_utils.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/gs_dispatcher.c.o   -c /Users/marcus/git/basement/src/gs_dispatcher.c",
+  "file": "/Users/marcus/git/basement/src/gs_dispatcher.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/gs_event.c.o   -c /Users/marcus/git/basement/src/gs_event.c",
+  "file": "/Users/marcus/git/basement/src/gs_event.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/gs_gridstore.c.o   -c /Users/marcus/git/basement/src/gs_gridstore.c",
+  "file": "/Users/marcus/git/basement/src/gs_gridstore.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/gs_shell.c.o   -c /Users/marcus/git/basement/src/gs_shell.c",
+  "file": "/Users/marcus/git/basement/src/gs_shell.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/inet/gs_request.c.o   -c /Users/marcus/git/basement/src/inet/gs_request.c",
+  "file": "/Users/marcus/git/basement/src/inet/gs_request.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/gs_spinlock.c.o   -c /Users/marcus/git/basement/src/gs_spinlock.c",
+  "file": "/Users/marcus/git/basement/src/gs_spinlock.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/routers/api/1.0/gs_nodes.c.o   -c /Users/marcus/git/basement/src/routers/api/1.0/gs_nodes.c",
+  "file": "/Users/marcus/git/basement/src/routers/api/1.0/gs_nodes.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/routers/api/1.0/gs_root.c.o   -c /Users/marcus/git/basement/src/routers/api/1.0/gs_root.c",
+  "file": "/Users/marcus/git/basement/src/routers/api/1.0/gs_root.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/gs_http.c.o   -c /Users/marcus/git/basement/src/gs_http.c",
+  "file": "/Users/marcus/git/basement/src/gs_http.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/containers/gs_hash.c.o   -c /Users/marcus/git/basement/src/containers/gs_hash.c",
+  "file": "/Users/marcus/git/basement/src/containers/gs_hash.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/routers/api/1.0/gs_collections.c.o   -c /Users/marcus/git/basement/src/routers/api/1.0/gs_collections.c",
+  "file": "/Users/marcus/git/basement/src/routers/api/1.0/gs_collections.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/gs_collection.c.o   -c /Users/marcus/git/basement/src/gs_collection.c",
+  "file": "/Users/marcus/git/basement/src/gs_collection.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/gs_collections.c.o   -c /Users/marcus/git/basement/src/gs_collections.c",
+  "file": "/Users/marcus/git/basement/src/gs_collections.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/gs_reltype.c.o   -c /Users/marcus/git/basement/src/gs_reltype.c",
+  "file": "/Users/marcus/git/basement/src/gs_reltype.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/gs_system.c.o   -c /Users/marcus/git/basement/src/gs_system.c",
+  "file": "/Users/marcus/git/basement/src/gs_system.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/third-party/json-parser/json.c.o   -c /Users/marcus/git/basement/third-party/json-parser/json.c",
+  "file": "/Users/marcus/git/basement/third-party/json-parser/json.c"
+},
+{
+  "directory": "/Users/marcus/git/basement",
+  "command": "/usr/bin/clang   -I/usr/local/include -I/Users/marcus/git/basement/include -I/Users/marcus/git/basement/third-party -I/usr/include/apr-1   -O3 -std=c11 -Wall -Werror -g   -o CMakeFiles/gecko.dir/src/platforms/macos/third-party/fmemopen/fmemopen.c.o   -c /Users/marcus/git/basement/src/platforms/macos/third-party/fmemopen/fmemopen.c",
+  "file": "/Users/marcus/git/basement/src/platforms/macos/third-party/fmemopen/fmemopen.c"
+}
+]

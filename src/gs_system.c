@@ -3,10 +3,10 @@
 #include <gs_dispatcher.h>
 #include <gs_shell.h>
 #include <inet/gs_server.h>
-#include <routers/api/1.0/root.h>
-#include <routers/api/1.0/nodes.h>
-#include <routers/catch.h>
-#include <routers/api/1.0/collections.h>
+#include <routers/api/1.0/gs_root.h>
+#include <routers/api/1.0/gs_nodes.h>
+#include <routers/gs_catch.h>
+#include <routers/api/1.0/gs_collections.h>
 
 typedef struct gs_system_t
 {
@@ -95,13 +95,13 @@ gs_server_pool_t *gs_system_get_server_pool(const gs_system_t *system)
 
 void setup_core(gs_system_t *system)
 {
-    error_if((apr_initialize() != APR_SUCCESS), err_apr_initfailed);
+    gs_error_if((apr_initialize() != APR_SUCCESS), err_apr_initfailed);
     gs_gridstore_create(&system->gridstore);
 }
 
 void setup_event_loop(gs_system_t *system)
 {
-    error_if((gs_dispatcher_create(&system->dispatcher) != GS_SUCCESS), err_init_failed);
+    gs_error_if((gs_dispatcher_create(&system->dispatcher) != GS_SUCCESS), err_init_failed);
 }
 
 void setup_shell(gs_system_t *system)
@@ -159,7 +159,7 @@ void setup_events(gs_system_t *system)
 {
     gs_status_t dispatcher_shutdown(const gs_event_t *event);
 
-    GS_CONNECT(GS_SIG_SYSEXIT,  system_handle_events);
+    GS_CONNECT(GS_SIG_SYSEXIT, system_handle_events);
 
 
     GS_CONNECT(GS_SIG_SHUTDOWN, dispatcher_shutdown);
@@ -170,8 +170,8 @@ void setup_events(gs_system_t *system)
 
     GS_CONNECT(GS_SIG_SHUTDOWN, gs_server_pool_handle_events);
 
-    GS_CONNECT(GS_SIG_TEST,     gs_gridstore_handle_events);
-    GS_CONNECT(GS_SIG_INVOKE,   gs_gridstore_handle_events);
+    GS_CONNECT(GS_SIG_TEST, gs_gridstore_handle_events);
+    GS_CONNECT(GS_SIG_INVOKE, gs_gridstore_handle_events);
 }
 
 gs_status_t dispatcher_shutdown(const gs_event_t *event) {

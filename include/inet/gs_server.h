@@ -19,7 +19,9 @@
 
 #include <gs.h>
 #include <gs_event.h>
-#include <inet/response.h>
+#include <gs_error.h>
+
+#include <inet/gs_response.h>
 #include <inet/gs_request.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -48,7 +50,7 @@ typedef struct gs_server_t gs_server_t;
 
 typedef struct gs_server_pool_t gs_server_pool_t;
 
-typedef void (*router_t)(gs_system_t *system, const gs_request_t *req, response_t *res);
+typedef void (*router_t)(gs_system_t *system, const gs_request_t *req, gs_response_t *res);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   F U N C T I O N S

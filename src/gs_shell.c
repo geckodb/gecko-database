@@ -123,14 +123,14 @@ GS_DECLARE(gs_status_t) gs_shell_shutdown(gs_shell_t *shell)
     char          buffer[STDIN_BUFFER_SIZE];
     bool          accept_input = true;
 
-    error_if((apr_file_open_stdin(&in, shell->pool) != APR_SUCCESS), err_no_stdin);
-    error_if((apr_file_open_stdout(&out, shell->pool) != APR_SUCCESS), err_no_stdout);
+    gs_error_if((apr_file_open_stdin(&in, shell->pool) != APR_SUCCESS), err_no_stdin);
+    gs_error_if((apr_file_open_stdout(&out, shell->pool) != APR_SUCCESS), err_no_stdout);
 
     GS_DEBUG("shell %p enters main loop", shell);
     apr_file_printf(out, "Type 'help' for hints on usage of this shell.\n\n");
     while (atomic_load(&shell->is_running)) {
         if (accept_input) {
-            apr_file_printf(out, "gs> ");
+            apr_file_printf(out, "gecko$ ");
             apr_file_gets(buffer, STDIN_BUFFER_SIZE, in);
             accept_input = process_input(system, shell, in, out, buffer);
             apr_file_flush(out);

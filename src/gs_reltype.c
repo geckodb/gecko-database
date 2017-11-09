@@ -1,5 +1,5 @@
 #include <gs_reltype.h>
-#include <error.h>
+#include <gs_error.h>
 
 const char *gs_reltype_str(gs_reltype_e reltype)
 {

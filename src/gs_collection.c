@@ -1,31 +1,31 @@
 #include <gs_collection.h>
-#include <grid.h>
+#include <gs_grid.h>
 
 typedef struct gs_collection_t {
     char *name;
-    table_t *documents;
-    table_t *relations;
+    gs_table_t *documents;
+    gs_table_t *relations;
 } gs_collection_t;
 
-void create_core_schema(schema_t *schema);
+void create_core_schema(gs_schema_t *schema);
 
-void create_internal_attr(schema_t *schema, enum field_type type);
+void create_internal_attr(gs_schema_t *schema, enum gs_field_type_e type);
 
-bool is_internal_attr(const attr_t *attr);
+bool is_internal_attr(const gs_attr_t *attr);
 
 GS_DECLARE(gs_status_t) gs_collection_create(gs_collection_t **collection, const char *name)
 {
     gs_collection_t *result = GS_REQUIRE_MALLOC(sizeof(gs_collection_t));
 
-    schema_t *documents_schema = schema_new("collection_records");
-    schema_t *relations_schema = schema_new("collection_relations");
+    gs_schema_t *documents_schema = gs_schema_new("collection_records");
+    gs_schema_t *relations_schema = gs_schema_new("collection_relations");
 
     create_core_schema(documents_schema);
     create_core_schema(relations_schema);
     create_internal_attr(relations_schema, FT_RELTYPE);
 
-    result->documents = table_new(documents_schema, 1);
-    result->relations = table_new(relations_schema, 1);
+    result->documents = gs_table_new(documents_schema, 1);
+    result->relations = gs_table_new(relations_schema, 1);
     result->name = strdup(name);
 
     return GS_SUCCESS;
@@ -34,8 +34,8 @@ GS_DECLARE(gs_status_t) gs_collection_create(gs_collection_t **collection, const
 GS_DECLARE(gs_status_t) gs_collection_dispose(gs_collection_t *collection)
 {
     GS_REQUIRE_NONNULL(collection);
-    table_delete(collection->relations);
-    table_delete(collection->documents);
+    gs_table_delete(collection->relations);
+    gs_table_delete(collection->documents);
     free(collection->name);
     free(collection);
 
@@ -57,7 +57,7 @@ GS_DECLARE(gs_status_t) gs_collection_print(FILE *file, gs_collection_t *collect
     return GS_SUCCESS;
 }
 
-void create_core_schema(schema_t *schema)
+void create_core_schema(gs_schema_t *schema)
 {
     create_internal_attr(schema, FT_BOOL);
     create_internal_attr(schema, FT_UINT8);
@@ -73,16 +73,16 @@ void create_core_schema(schema_t *schema)
     create_internal_attr(schema, FT_STRPTR);
 }
 
-void create_internal_attr(schema_t *schema, enum field_type type)
+void create_internal_attr(gs_schema_t *schema, enum gs_field_type_e type)
 {
     assert(schema);
 
     char buffer[256];
-    sprintf(buffer, ":$%s", field_type_str(type));
-    attr_create(buffer, type, 1, schema);
+    sprintf(buffer, ":$%s", gs_field_type_str(type));
+    gs_attr_create(buffer, type, 1, schema);
 }
 
-bool is_internal_attr(const attr_t *attr)
+bool is_internal_attr(const gs_attr_t *attr)
 {
     assert(attr);
     return (strlen(attr->name) > 2 ? (attr->name[0] == ':' && attr->name[1] == '$') : false);
