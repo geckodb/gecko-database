@@ -1,7 +1,7 @@
 #pragma once
 
-#include <gs.h>
-#include <inet/gs_response.h>
+#include <gecko-commons/gecko-commons.h>
+#include <gecko-http/gs_response.h>
 
  void router_catch(gs_system_t *system, const gs_request_t *request, gs_response_t *response)
 {

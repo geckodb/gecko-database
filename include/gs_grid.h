@@ -17,13 +17,18 @@
 // I N C L U D E S
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <apr_hash.h>
+
+#include <gecko-commons/gs_interval.h>
+#include <gecko-commons/containers/gs_freelist.h>
+
 #include <gs_frag.h>
 #include <gs_tuple.h>
-#include <gs_interval.h>
+#include <gs_tuple_cursor.h>
+
 #include <indexes/gs_vindex.h>
 #include <indexes/gs_hindex.h>
-#include <containers/gs_freelist.h>
-#include <gs_tuple_cursor.h>
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 // D A T A   T Y P E S

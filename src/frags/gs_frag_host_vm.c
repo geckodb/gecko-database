@@ -15,11 +15,12 @@
 // I N C L U D E S
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <gecko-commons/containers/gs_vec.h>
+
 #include <frags/gs_frag_host_vm.h>
 #include <operators/gs_scan.h>
 #include <gs_tuplet_field.h>
 #include <gs_schema.h>
-#include <containers/gs_vec.h>
 #include <gs_attr.h>
 
 // ---------------------------------------------------------------------------------------------------------------------

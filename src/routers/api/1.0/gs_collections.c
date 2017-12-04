@@ -1,6 +1,10 @@
-#include <routers/api/1.0/gs_collections.h>
-#include <gs_collections.h>
 #include <json-parser/json.h>
+
+#include <routers/api/1.0/gs_collections.h>
+#include <gs_platform.h>
+#include <gs_collections.h>
+#include <gs_system.h>
+#include <gs_gridstore.h>
 
 #define API_COLLECTIONS_CREATE_COLLECTION_KEY "collection"
 

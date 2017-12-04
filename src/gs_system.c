@@ -1,8 +1,9 @@
+#include <gecko-http/gs_server.h>
+
 #include <gs_system.h>
 #include <gs_gridstore.h>
 #include <gs_dispatcher.h>
 #include <gs_shell.h>
-#include <inet/gs_server.h>
 #include <routers/api/1.0/gs_root.h>
 #include <routers/api/1.0/gs_nodes.h>
 #include <routers/gs_catch.h>

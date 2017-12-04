@@ -17,36 +17,12 @@
 // I N C L U D E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <gs.h>
+#include <gecko-commons/gecko-commons.h>
 #include <gs_tuple.h>
-
-// ---------------------------------------------------------------------------------------------------------------------
-// M A C R O S
-// ---------------------------------------------------------------------------------------------------------------------
-
-#define INTERVAL_SPAN(interval)                                          \
-    ({                                                                   \
-        (interval->end - interval->begin);                               \
-    })
-
-#define INTERVAL_CONTAINS(interval, elem)                                \
-    ({                                                                   \
-        (elem >= interval->begin && elem < interval->end);               \
-    })
-
-#define INTERVAL_EQUALS(a, b)                                            \
-    ({                                                                   \
-        (a->begin == b->begin && a->end == b->end);                      \
-    })
 
 // ---------------------------------------------------------------------------------------------------------------------
 // D A T A   T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
-
-typedef struct gs_interval_t {
-    size_t begin;
-    size_t end;
-} gs_interval_t;
 
 typedef struct gs_tuple_id_interval_t {
     gs_tuple_id_t begin;

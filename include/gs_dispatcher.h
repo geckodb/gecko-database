@@ -17,8 +17,8 @@
 // I N C L U D E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <gs.h>
-#include <gs_event.h>
+#include <gecko-commons/gecko-commons.h>
+#include <gecko-http/gs_event.h>
 
 #include <apr.h>
 #include <apr_pools.h>

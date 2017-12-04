@@ -18,7 +18,7 @@
 #include <gs_schema.h>
 #include <gs_attr.h>
 #include <gs_tuplet_field.h>
-#include <gs_debug.h>
+#include <gecko-commons/gs_debug.h>
 
 
 // ---------------------------------------------------------------------------------------------------------------------

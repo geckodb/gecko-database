@@ -17,7 +17,8 @@
 // I N C L U D E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <gs.h>
+#include <gecko-commons/gecko-commons.h>
+
 #include <gs_tuple.h>
 #include <gs_tuplet_field.h>
 #include <gs_grid.h>

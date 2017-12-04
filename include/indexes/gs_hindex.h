@@ -17,10 +17,12 @@
 // I N C L U D E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <gs.h>
-#include <gs_interval.h>
+#include <gecko-commons/gecko-commons.h>
+#include <gecko-commons/gs_interval.h>
+
 #include <gs_grid_cursor.h>
 #include <gs_schema.h>
+#include <gs_interval.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 // F O R W A R D   D E C L A R A T I O N S

@@ -1,6 +1,7 @@
 #pragma once
 
-#include <gs.h>
+#include <gecko-commons/stdinc.h>
+#include <gecko-commons/gs_error.h>
 
 typedef struct gs_collection_t gs_collection_t;
 

@@ -1,0 +1,6 @@
+[submodule "libs/gecko-http"]
+	path = libs/gecko-http
+	url = https://github.com/geckodb/gecko-http.git
+[submodule "libs/gecko-commons"]
+	path = libs/gecko-commons
+	url = https://github.com/geckodb/gecko-commons.git

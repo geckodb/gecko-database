@@ -1,6 +1,7 @@
+#include <gecko-commons/containers/gs_vec.h>
+#include <gecko-commons/containers/gs_freelist.h>
+
 #include <gs_collections.h>
-#include <containers/gs_vec.h>
-#include <containers/gs_freelist.h>
 #include <gs_collection.h>
 #include <gs_grid.h>
 

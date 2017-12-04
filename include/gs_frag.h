@@ -17,12 +17,13 @@
 // I N C L U D E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <gs.h>
+#include <gecko-commons/gecko-commons.h>
+#include <gecko-commons/containers/gs_vec.h>
+
 #include <gs_pred.h>
 #include <gs_schema.h>
 #include <gs_tuplet.h>
 #include <gs_frag_printer.h>
-#include <containers/gs_vec.h>
 #include <frags/gs_frag_host_vm.h>
 
 // ---------------------------------------------------------------------------------------------------------------------

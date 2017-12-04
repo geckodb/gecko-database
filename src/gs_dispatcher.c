@@ -15,13 +15,15 @@
 // I N C L U D E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <gs_dispatcher.h>
-#include <gs_error.h>
-#include <gs_spinlock.h>
 #include <apr_hash.h>
-#include <containers/gs_vec.h>
 #include <apr_strings.h>
-#include <containers/gs_hash.h>
+
+#include <gecko-commons/gs_error.h>
+#include <gecko-commons/gs_spinlock.h>
+#include <gecko-commons/containers/gs_vec.h>
+#include <gecko-commons/containers/gs_hash.h>
+
+#include <gs_dispatcher.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 // D A T A T Y P E S

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <gs.h>
+#include <gecko-commons/gecko-commons.h>
 
 #define NUM_SERVERS 400
 

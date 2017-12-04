@@ -1,10 +1,13 @@
-#include <gs_shell.h>
-#include <c11threads.h>
+#include <stdatomic.h>
+
 #include <apr_file_io.h>
 #include <apr_strings.h>
+
+#include <gecko-commons/c11threads.h>
+#include <gecko-http/gs_server.h>
+
+#include <gs_shell.h>
 #include <gs_dispatcher.h>
-#include <stdatomic.h>
-#include <inet/gs_server.h>
 
 typedef struct gs_shell_t {
     gs_system_t         *system;

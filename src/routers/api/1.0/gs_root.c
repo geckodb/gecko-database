@@ -1,6 +1,8 @@
 #include <routers/api/1.0/gs_root.h>
 #include <apr_strings.h>
-#include <inet/gs_server.h>
+
+#include <gs_system.h>
+#include <gecko-http/gs_server.h>
 
 static char *format_port_list(apr_pool_t *pool, gs_server_pool_t *server_pool);
 

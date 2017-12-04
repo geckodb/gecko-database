@@ -15,7 +15,8 @@
 // I N C L U D E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include <gs.h>
+#include <gecko-commons/gecko-commons.h>
+
 #include <gs_info.h>
 #include <gs_system.h>
 

@@ -15,8 +15,9 @@
 // I N C L U D E S
 // ---------------------------------------------------------------------------------------------------------------------
 
+#include <gecko-commons/containers/gs_vec.h>
+
 #include <gs_attr.h>
-#include <containers/gs_vec.h>
 #include <gs_tuplet_field.h>
 #include <gs_frag.h>
 #include <gs_schema.h>
@@ -26,13 +27,13 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #define DEFINE_ATTRIBUTE_CREATE(type_name,internal_type)                                                               \
-gs_attr_id_t attr_create_##type_name(const char *name, gs_schema_t *schema) {                                                \
-    return gs_attr_create(name, internal_type, 1, schema);                                                                \
+gs_attr_id_t attr_create_##type_name(const char *name, gs_schema_t *schema) {                                          \
+    return gs_attr_create(name, internal_type, 1, schema);                                                             \
 }
 
 #define DEFINE_ATTRIBUTE_ARRAY_CREATE(type_name,internal_type)                                                         \
-gs_attr_id_t attr_create_##type_name(const char *name, size_t length, gs_schema_t *schema) {                                 \
-    return gs_attr_create(name, internal_type, length, schema);                                                           \
+gs_attr_id_t attr_create_##type_name(const char *name, size_t length, gs_schema_t *schema) {                           \
+    return gs_attr_create(name, internal_type, length, schema);                                                        \
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

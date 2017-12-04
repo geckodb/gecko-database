@@ -38,9 +38,10 @@
 const struct _json_value json_value_none;
 
 #include <stdio.h>
-#include <gs_utils.h>
 #include <ctype.h>
 #include <math.h>
+
+#include <gecko-commons/gs_utils.h>
 
 typedef unsigned int json_uchar;
 
