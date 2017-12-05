@@ -123,7 +123,7 @@ GS_DECLARE(gs_status_t) gs_collections_print(FILE *file, const gs_collections_t 
     gs_collections_entry_t *begin = gs_vec_begin(collections->collections);
     gs_collections_entry_t *end = gs_vec_end(collections->collections);
 
-    fprintf(file, "{\"collections\"=[");
+    fprintf(file, "{\"collections\": [");
 
     for (gs_collections_entry_t *it = begin; it != end; it++) {
         if (it->in_use) {

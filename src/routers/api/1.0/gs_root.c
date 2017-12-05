@@ -23,9 +23,9 @@ void router_api_1_0_root(gs_system_t *system, const gs_request_t *request, gs_re
         apr_pool_create(&pool, NULL);
 
         const char *message = apr_pstrcat(pool,
-                                          "{ \"result\"=\"OK\", ",
-                                            "\"ports\"=[", format_port_list(pool, server_pool), "], "
-                                            "\"use_port\"=", apr_ltoa(pool, gs_server_pool_next_port(server_pool)),
+                                          "{ \"result\": \"OK\", ",
+                                            "\"ports\": [", format_port_list(pool, server_pool), "], "
+                                            "\"{use-port}\": ", apr_ltoa(pool, gs_server_pool_next_port(server_pool)),
                                           " }\r\n"
                                           "\0", NULL);
 

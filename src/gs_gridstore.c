@@ -18,14 +18,17 @@
 #include <gs_gridstore.h>
 #include <gs_dispatcher.h>
 #include <gs_collections.h>
+#include <gs_database.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 // D A T A T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
 typedef struct gs_gridstore_t {
-    gs_collections_t *collections;
+    gs_vec_t *databases;
 } gs_gridstore_t;
+
+bool free_databases(void *capture, void *begin, void *end);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E  I M P L E M E N T A T I O N
@@ -34,9 +37,7 @@ typedef struct gs_gridstore_t {
 GS_DECLARE(gs_status_t) gs_gridstore_create(gs_gridstore_t **gridstore)
 {
     gs_gridstore_t *result = GS_REQUIRE_MALLOC(sizeof(gs_gridstore_t));
-
-    gs_collections_create(&result->collections);
-
+  //  result->databases = gs_vec_new(sizeof(gs_database_t *), 20);
     *gridstore = result;
     return GS_SUCCESS;
 }
@@ -44,7 +45,7 @@ GS_DECLARE(gs_status_t) gs_gridstore_create(gs_gridstore_t **gridstore)
 GS_DECLARE(gs_status_t) gs_gridstore_dispose(gs_gridstore_t *gridstore)
 {
     GS_REQUIRE_NONNULL(gridstore)
-    gs_collections_dispose(gridstore->collections);
+  //  gs_vec_free_ex(gridstore->databases, NULL, free_databases);
     free(gridstore);
     GS_DEBUG("gridstore %p was disposed", gridstore);
     return GS_SUCCESS;
@@ -79,8 +80,13 @@ GS_DECLARE(gs_status_t) gs_gridstore_handle_events(const gs_event_t *event)
     }
 }
 
-GS_DECLARE(gs_collections_t *) gs_gridstore_get_collections(const gs_gridstore_t *gridstore)
+bool free_databases(void *capture, void *begin, void *end)
 {
-    GS_REQUIRE_NONNULL(gridstore);
-    return (gridstore->collections);
+    gs_database_t **it = begin;
+    gs_database_t **tail = (gs_database_t **) end;
+    while (it < tail) {
+        gs_database_dispose(*it);
+        it++;
+    }
+    return true;
 }

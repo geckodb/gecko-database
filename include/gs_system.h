@@ -2,7 +2,7 @@
 
 #include <gecko-commons/gecko-commons.h>
 
-#define NUM_SERVERS 400
+#define NUM_SERVERS 5
 
 typedef struct gs_gridstore_t gs_gridstore_t; /* forwarded */
 typedef struct gs_dispatcher_t gs_dispatcher_t; /* forwarded */

@@ -15,7 +15,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
 set(RUNTIME_OUTPUT_DIRECTORY ${CMAKE_TEMP_OUTPUT_DIR})
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -std=c11 -Wall -Werror")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -std=c11 -Wall -Werror")
 
 cmake_minimum_required(
     VERSION 3.5
@@ -83,12 +83,10 @@ set(SOURCE_FILES
     include/gs_gridstore.h
     include/gs_info.h
     include/gs_shell.h
-    include/routers/api/1.0/gs_nodes.h
-    include/gs_platform.h
+        include/gs_platform.h
     include/routers/gs_catch.h
-    include/routers/api/1.0/gs_collections.h
-    include/routers/api/1.0/gs_nodes.h
-    include/routers/api/1.0/gs_root.h
+        include/routers/api/1.0/gs_root.h
+    include/routers/api/1.0/gs_databases.h
     include/gs_collection.h
     include/gs_collections.h
     include/gs_reltype.h
@@ -119,9 +117,8 @@ set(SOURCE_FILES
     src/gs_dispatcher.c
     src/gs_gridstore.c
     src/gs_shell.c
-    src/routers/api/1.0/gs_nodes.c
     src/routers/api/1.0/gs_root.c
-    src/routers/api/1.0/gs_collections.c
+    src/routers/api/1.0/gs_databases.c
     src/gs_collection.c
     src/gs_collections.c
     src/gs_reltype.c
@@ -139,7 +136,7 @@ IF (PROJECT_OS_LINUX)
     set (SOURCE_FILES ${SOURCE_FILES} include/platforms/linux/gs_platform.h)
 ELSEIF (PROJECT_OS_OSX)
     MESSAGE (STATUS "Operating system is Apple MacOS X")
-    set (SOURCE_FILES   ${SOURCE_FILES} include/platforms/macos/gs_platform.h src/platforms/macos/third-party/fmemopen/fmemopen.c)
+    set (SOURCE_FILES   ${SOURCE_FILES} include/platforms/macos/gs_platform.h src/platforms/macos/third-party/fmemopen/fmemopen.c include/gs_database.h src/gs_database.c)
 ENDIF (PROJECT_OS_LINUX)
 
 add_executable(

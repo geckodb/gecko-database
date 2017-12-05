@@ -5,9 +5,8 @@
 #include <gs_dispatcher.h>
 #include <gs_shell.h>
 #include <routers/api/1.0/gs_root.h>
-#include <routers/api/1.0/gs_nodes.h>
 #include <routers/gs_catch.h>
-#include <routers/api/1.0/gs_collections.h>
+#include <routers/api/1.0/gs_databases.h>
 
 typedef struct gs_system_t
 {
@@ -118,8 +117,7 @@ void setup_server(gs_system_t *system, unsigned short gateway_port)
                           router_api_1_0_root,
                           NUM_SERVERS);
 
-    gs_server_pool_router_add(system->server_pool, "/api/1.0/nodes", router_api_1_0_nodes);
-    gs_server_pool_router_add(system->server_pool, "/api/1.0/collections", router_api_1_0_collections);
+    gs_server_pool_router_add(system->server_pool, "/api/1.0/databases", router_api_1_0_databases);
 
     gs_server_pool_start(system->server_pool, system, router_catch);
 
