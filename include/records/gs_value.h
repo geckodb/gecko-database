@@ -1,6 +1,19 @@
 #pragma once
 
 #include <gecko-commons/stdinc.h>
+#include <gecko-commons/gs_base_relative_ptr.h>
+
+#define DECLARE_PRIMITIVE_VALUE(type_name)          \
+    typedef struct gs_value_##type_name {           \
+        gs_value_header_t           header;         \
+        type_name                   value;          \
+    } gs_value_##type_name;
+
+#define DECLARE_COMPOSITE_VALUE(type_name)          \
+    typedef struct gs_value_##type_name {           \
+        gs_value_header_t           header;         \
+        gs_base_relative_ptr_t      value_ptr;      \
+    } gs_value_##type_name;
 
 typedef enum gs_value_type_e {
     gs_value_type_u8, gs_value_type_u16, gs_value_type_u32, gs_value_type_u64,
@@ -10,27 +23,38 @@ typedef enum gs_value_type_e {
     gs_value_type_null
 } gs_value_type_e;
 
-typedef struct gs_value_t gs_value_t;
+typedef enum gs_value_parent_type_e {
+    gs_value_parent_type_array,
+    gs_value_parent_type_property
+} gs_value_parent_type_e;
+
+typedef struct gs_value_header_t {
+    gs_base_relative_ptr_t      parent;
+    gs_value_parent_type_e      parent_type;
+    gs_value_type_e             value_type;
+} gs_value_header_t;
+
+DECLARE_PRIMITIVE_VALUE(atomic_u8_t)
+DECLARE_PRIMITIVE_VALUE(u16_t)
+DECLARE_PRIMITIVE_VALUE(u32_t)
+DECLARE_PRIMITIVE_VALUE(u64_t)
+DECLARE_PRIMITIVE_VALUE(s8_t)
+DECLARE_PRIMITIVE_VALUE(s16_t)
+DECLARE_PRIMITIVE_VALUE(s32_t)
+DECLARE_PRIMITIVE_VALUE(s64_t)
+DECLARE_PRIMITIVE_VALUE(float32_t)
+DECLARE_PRIMITIVE_VALUE(float64_t)
+DECLARE_PRIMITIVE_VALUE(boolean_t)
+DECLARE_COMPOSITE_VALUE(string_t)
+DECLARE_COMPOSITE_VALUE(object_t)
+DECLARE_COMPOSITE_VALUE(array_t)
+
+typedef void *(*gs_allocator_t)(size_t size);
 
 __BEGIN_DECLS
 
-GS_DECLARE(gs_status_t) gs_value_new_ex(gs_value_t *value, gs_value_type_e type, const BYTE *data);
-
-GS_DECLARE(gs_status_t) gs_value_new_u8(gs_value_t *value, );
-
-typedef uint8_t     u8_t;
-typedef uint16_t    u16_t;
-typedef uint32_t    u32_t;
-typedef uint64_t    u64_t;
-typedef int8_t      s8_t;
-typedef int16_t     s16_t;
-typedef int32_t     s32_t;
-typedef int64_t     s64_t;
-typedef float       float32_t;
-typedef double      float64_t;
-typedef gs_string_t string_t;
-typedef gs_object_t object_t;
-typedef gs_array_t  array_t;
-typedef bool        boolean_t;
+GS_DECLARE(void *)      gs_value_new(gs_status_t *status, gs_value_type_e type,
+                                     gs_base_relative_ptr_t parent, gs_value_parent_type_e parent_type,
+                                     const void *data, gs_allocator_t allocator);
 
 __END_DECLS
