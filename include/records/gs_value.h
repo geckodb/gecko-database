@@ -18,4 +18,19 @@ GS_DECLARE(gs_status_t) gs_value_new_ex(gs_value_t *value, gs_value_type_e type,
 
 GS_DECLARE(gs_status_t) gs_value_new_u8(gs_value_t *value, );
 
+typedef uint8_t     u8_t;
+typedef uint16_t    u16_t;
+typedef uint32_t    u32_t;
+typedef uint64_t    u64_t;
+typedef int8_t      s8_t;
+typedef int16_t     s16_t;
+typedef int32_t     s32_t;
+typedef int64_t     s64_t;
+typedef float       float32_t;
+typedef double      float64_t;
+typedef gs_string_t string_t;
+typedef gs_object_t object_t;
+typedef gs_array_t  array_t;
+typedef bool        boolean_t;
+
 __END_DECLS
