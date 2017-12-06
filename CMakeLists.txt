@@ -145,12 +145,28 @@ add_executable(
     ${SOURCE_FILES}
 )
 
+add_executable(
+    sample_relative_ptr
+    samples/relative_ptr/main.c
+    ${SOURCE_FILES}
+)
+
 IF (PROJECT_OS_LINUX)
     # add two aditional flags to call posix functions and to use the bsd library
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_XOPEN_SOURCE=700 -D_BSD_SOURCE")
 
     target_link_libraries(
             gecko
+            bsd
+            m
+            ${APR_LIBRARIES}
+            ${APRUTIL_LIBRARIES}
+            ${OPENSSL_LIBRARIES}
+            pthread
+    )
+
+    target_link_libraries(
+            sample_relative_ptr
             bsd
             m
             ${APR_LIBRARIES}
@@ -168,6 +184,16 @@ ELSEIF (PROJECT_OS_OSX)
             ${OPENSSL_LIBRARIES}
             pthread
     )
+
+   target_link_libraries(
+           sample_relative_ptr
+           ${APR_LIBRARIES}
+           ${APRUTIL_LIBRARIES}
+           /usr/local/opt/argp-standalone/lib
+           /usr/local/opt/argp-standalone/lib/libargp.a
+           ${OPENSSL_LIBRARIES}
+           pthread
+   )
 ENDIF (PROJECT_OS_LINUX)
 
 if(DOXYGEN_FOUND)
