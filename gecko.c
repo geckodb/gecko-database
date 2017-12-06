@@ -20,6 +20,8 @@
 #include <gs_info.h>
 #include <gs_system.h>
 
+#include <records/gs_value.h>
+
 // curl -i -G -d "key=val" -d "abs=[1,2,3,4]" http://localhost:36895/api/test
 
 gs_system_t *system_instance;

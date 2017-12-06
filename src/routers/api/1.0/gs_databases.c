@@ -8,9 +8,12 @@
 
 /* curl http://localhost:53975/api/1.0/databases -X PUT */
 
-#define API_DATABASES_CREATE_DATABASE_KEY "create-database"
+#define API_GECKO_OPERATION_KEY "Gecko-Operation"
+#define API_GECKO_OPERATION_VALUE_CREATE_DATABASE "create database"
 
 static void process_modification_request(gs_system_t *system, const gs_request_t *request, gs_response_t *response);
+static void process_create_database(gs_system_t *system, const gs_request_t *request, gs_response_t *response, char *buffer, size_t buffer_length);
+
 static void process_read_request(gs_system_t *system, const gs_request_t *request, gs_response_t *response);
 
 void router_api_1_0_databases(gs_system_t *system, const gs_request_t *request, gs_response_t *response)
@@ -48,21 +51,27 @@ static void process_modification_request(gs_system_t *system, const gs_request_t
 {
     GS_EMPTY_CHAR_BUFFER(buffer, 10240)
 
-    if (!gs_request_has_form(request, API_DATABASES_CREATE_DATABASE_KEY)) {
+    if (!gs_request_has_field(request, API_GECKO_OPERATION_KEY)) {
         gs_response_end(response, HTTP_STATUS_CODE_400_BAD_REQUEST);
     } else {
-        const char *create_database_args;
-        gs_request_form_by_name(&create_database_args, request, API_DATABASES_CREATE_DATABASE_KEY);
-        fprintf(stderr, "%s\n", create_database_args);
+        const char *gecko_operation_type;
+        gs_request_field_by_name(&gecko_operation_type, request, API_GECKO_OPERATION_KEY);
 
-        sprintf(buffer, "OKAY %s", "YEAH");
-
-        gs_response_content_type_set(response, MIME_CONTENT_TYPE_APPLICATION_JSON);
-        gs_response_field_set(response, "Connection", "close");
-        gs_response_body_set(response, buffer);
-        gs_response_end(response, HTTP_STATUS_CODE_200_OK);
+        if (strcmp(gecko_operation_type, API_GECKO_OPERATION_VALUE_CREATE_DATABASE) == 0) {
+            process_create_database(system, request, response, buffer, ARRAY_LEN_OF(buffer));
+        } else {
+            gs_response_end(response, HTTP_STATUS_CODE_405_METHOD_NOT_ALLOWED);
+        }
     }
+}
 
+static void process_create_database(gs_system_t *system, const gs_request_t *request, gs_response_t *response, char *buffer, size_t buffer_length)
+{
+
+    gs_response_content_type_set(response, MIME_CONTENT_TYPE_APPLICATION_JSON);
+    gs_response_field_set(response, "Connection", "close");
+    gs_response_body_set(response, buffer);
+    gs_response_end(response, HTTP_STATUS_CODE_200_OK);
 }
 
 static void process_read_request(gs_system_t *system, const gs_request_t *request, gs_response_t *response)
@@ -84,11 +93,11 @@ static void process_read_request(gs_system_t *system, const gs_request_t *reques
 
 static void process_create_collections(char *buffer, size_t buffer_length, gs_system_t *system, const gs_request_t *request, gs_response_t *response)
 {
-    if (!gs_request_has_form(request, API_DATABASES_CREATE_DATABASE_KEY)) {
+    if (!gs_request_has_form(request, API_GECKO_OPERATION_KEY)) {
         gs_response_end(response, HTTP_STATUS_CODE_400_BAD_REQUEST);
     } else {
         const char *collection_data;
-        gs_request_form_by_name(&collection_data, request, API_DATABASES_CREATE_DATABASE_KEY);
+        gs_request_form_by_name(&collection_data, request, API_GECKO_OPERATION_KEY);
         assert (collection_data);
 
         json_value *value = json_parse(collection_data, strlen(collection_data));

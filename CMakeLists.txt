@@ -136,7 +136,7 @@ IF (PROJECT_OS_LINUX)
     set (SOURCE_FILES ${SOURCE_FILES} include/platforms/linux/gs_platform.h)
 ELSEIF (PROJECT_OS_OSX)
     MESSAGE (STATUS "Operating system is Apple MacOS X")
-    set (SOURCE_FILES   ${SOURCE_FILES} include/platforms/macos/gs_platform.h src/platforms/macos/third-party/fmemopen/fmemopen.c include/gs_database.h src/gs_database.c)
+    set (SOURCE_FILES   ${SOURCE_FILES} include/platforms/macos/gs_platform.h src/platforms/macos/third-party/fmemopen/fmemopen.c include/gs_database.h src/gs_database.c include/records/gs_document.h src/records/gs_document.c include/records/gs_object.h include/records/gs_value.h include/records/gs_array.h src/records/gs_array.c src/records/gs_object.c src/records/gs_value.c include/records/gs_tag.h src/records/gs_tag.c include/gs_string.h src/gs_string.c)
 ENDIF (PROJECT_OS_LINUX)
 
 add_executable(
