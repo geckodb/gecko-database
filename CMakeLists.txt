@@ -37,7 +37,13 @@ include_directories(
     "libs/gecko-commons/include"
     "libs/gecko-http/include"
     "third-party"
+
     ${APR_INCLUDE_DIR}
+    # This is a hack in case APR is not found in macOS High Sierra.
+    # You may install apr and apr-utils from sources and symbolic link these directories
+    "/usr/local/apr/include/apr-1/"
+    "/usr/local/apr/include/apr-utils"
+
     ${OPENSSL_INCLUDE_DIR}
     ${CURSES_INCLUDE_DIR}
 )
@@ -136,7 +142,9 @@ IF (PROJECT_OS_LINUX)
     set (SOURCE_FILES ${SOURCE_FILES} include/platforms/linux/gs_platform.h)
 ELSEIF (PROJECT_OS_OSX)
     MESSAGE (STATUS "Operating system is Apple MacOS X")
-    set (SOURCE_FILES   ${SOURCE_FILES} include/platforms/macos/gs_platform.h src/platforms/macos/third-party/fmemopen/fmemopen.c include/gs_database.h src/gs_database.c include/records/gs_document.h src/records/gs_document.c include/records/gs_object.h include/records/gs_value.h include/records/gs_array.h src/records/gs_array.c src/records/gs_object.c src/records/gs_value.c include/records/gs_tag.h src/records/gs_tag.c include/gs_string.h src/gs_string.c)
+    set (SOURCE_FILES   ${SOURCE_FILES} include/platforms/macos/gs_platform.h src/platforms/macos/third-party/fmemopen/fmemopen.c include/gs_database.h src/gs_database.c
+            #include/records/gs_document.h src/records/gs_document.c include/records/gs_object.h include/records/gs_value.h include/records/gs_array.h src/records/gs_array.c src/records/gs_object.c src/records/gs_value.c include/records/gs_tag.h src/records/gs_tag.c
+            include/gs_string.h src/gs_string.c)
 ENDIF (PROJECT_OS_LINUX)
 
 add_executable(
