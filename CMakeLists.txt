@@ -130,6 +130,13 @@ set(SOURCE_FILES
     src/gs_reltype.c
     src/gs_system.c
 
+        include/storage/database.h
+        src/storage/database.c
+        include/storage/files.h
+        src/storage/files.c
+        include/storage/dirs.h
+        src/storage/dirs.c
+
 )
 
 
@@ -155,6 +162,12 @@ add_executable(
     sample_relative_ptr
     samples/relative_ptr/main.c
     ${SOURCE_FILES}
+)
+
+add_executable(
+        graphstore
+        samples/graphstore/main.c
+        ${SOURCE_FILES}
 )
 
 IF (PROJECT_OS_LINUX)
@@ -190,6 +203,16 @@ ELSEIF (PROJECT_OS_OSX)
             ${OPENSSL_LIBRARIES}
             pthread
     )
+
+   target_link_libraries(
+           graphstore
+           ${APR_LIBRARIES}
+           ${APRUTIL_LIBRARIES}
+           /usr/local/opt/argp-standalone/lib
+           /usr/local/opt/argp-standalone/lib/libargp.a
+           ${OPENSSL_LIBRARIES}
+           pthread
+   )
 
    target_link_libraries(
            sample_relative_ptr

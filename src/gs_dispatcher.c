@@ -154,13 +154,13 @@ GS_DECLARE(gs_status_t) gs_dispatcher_publish(gs_dispatcher_t *dispatcher, gs_ev
 
 GS_DECLARE(gs_status_t) gs_dispatcher_waitfor(gs_dispatcher_t *dispatcher, gs_event_t *event, gs_system_t *system)
 {
-    volatile gs_spinlock_t *lock;
-    gs_spinlock_create(&lock);
-    gs_dispatcher_publish(dispatcher, gs_event_new_blocking(system, lock, event));
+    //gs_spinlock_t lock;
+    //gs_spinlock_create(&lock);
+    gs_dispatcher_publish(dispatcher, gs_event_new_blocking(system, NULL, event));
     GS_DEBUG2("thread is being locked...");
-    gs_spinlock_lock(lock);
+    //gs_spinlock_lock(lock);
     GS_DEBUG2("thread was unlocked...");
-    gs_spinlock_dispose(&lock);
+    //gs_spinlock_dispose(&lock);
     return GS_SUCCESS;
 }
 
