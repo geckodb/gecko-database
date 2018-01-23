@@ -1,4 +1,3 @@
-#include <json-parser/json.h>
 
 #include <routers/api/1.0/gs_databases.h>
 #include <gs_platform.h>
@@ -9,6 +8,8 @@
 /* curl http://localhost:53975/api/1.0/databases -X PUT */
 
 #define API_GECKO_OPERATION_KEY "Gecko-Operation"
+
+
 #define API_GECKO_OPERATION_VALUE_CREATE_DATABASE "create database"
 
 static void process_modification_request(gs_system_t *system, const gs_request_t *request, gs_response_t *response);
@@ -18,18 +19,18 @@ static void process_read_request(gs_system_t *system, const gs_request_t *reques
 
 void router_api_1_0_databases(gs_system_t *system, const gs_request_t *request, gs_response_t *response)
 {
-    bool is_post = gs_request_is_method(request, GS_POST);
-    bool is_get = gs_request_is_method(request, GS_GET);
+//    bool is_post = gs_request_is_method(request, GS_POST);
+  //  bool is_get = gs_request_is_method(request, GS_GET);
 
     char *xxx;
     gs_request_raw(&xxx, request);
     GS_DEBUG("%s", xxx)
 
-    if (is_get || is_post)
+    if (true|| false)
     {
-        if (is_post) {
+        if (true) {
             process_modification_request(system, request, response);
-        } else if (is_get) {
+        } else  {
             process_read_request(system, request, response);
         }
 //        gs_gridstore_t *gridstore = gs_system_get_gridstore(system);
@@ -67,6 +68,12 @@ static void process_modification_request(gs_system_t *system, const gs_request_t
 
 static void process_create_database(gs_system_t *system, const gs_request_t *request, gs_response_t *response, char *buffer, size_t buffer_length)
 {
+
+    const char *ops;
+    gs_request_get_content(&ops, request);
+    printf(">>> %s\n", ops);
+
+  //  json_
 
     gs_response_content_type_set(response, MIME_CONTENT_TYPE_APPLICATION_JSON);
     gs_response_field_set(response, "Connection", "close");

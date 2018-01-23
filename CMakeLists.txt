@@ -130,8 +130,6 @@ set(SOURCE_FILES
     src/gs_reltype.c
     src/gs_system.c
 
-    third-party/json-parser/json.h
-    third-party/json-parser/json.c
 )
 
 

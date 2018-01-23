@@ -7,6 +7,7 @@
 #include <routers/api/1.0/gs_root.h>
 #include <routers/gs_catch.h>
 #include <routers/api/1.0/gs_databases.h>
+#include <gecko-http/gs_http.h>
 
 typedef struct gs_system_t
 {
@@ -113,11 +114,14 @@ void setup_server(gs_system_t *system, unsigned short gateway_port)
 {
     gs_server_pool_create(&system->server_pool, system->dispatcher,
                           gateway_port,
-                          "/api/1.0/",
+                          "/",
                           router_api_1_0_root,
                           NUM_SERVERS);
 
-    gs_server_pool_router_add(system->server_pool, "/api/1.0/databases", router_api_1_0_databases);
+    gs_server_pool_router_add(system->server_pool, GS_HTTP_GET,  "/api/1.0/databases", router_api_1_0_databases);
+
+    gs_server_pool_router_add(system->server_pool, GS_HTTP_GET, "/nodes/create", router_api_1_0_databases);
+
 
     gs_server_pool_start(system->server_pool, system, router_catch);
 

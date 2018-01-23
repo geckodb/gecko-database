@@ -8,11 +8,6 @@ static char *format_port_list(apr_pool_t *pool, gs_server_pool_t *server_pool);
 
 void router_api_1_0_root(gs_system_t *system, const gs_request_t *request, gs_response_t *response)
 {
-    if (!gs_request_is_method(request, GS_GET)) {
-        gs_response_end(response, HTTP_STATUS_CODE_405_METHOD_NOT_ALLOWED);
-    } else {
-
-       // gs_dispatcher_waitfor(dispatcher, gs_event_gridstore_invoke());
 
         gs_server_pool_t *server_pool = gs_system_get_server_pool(system);
 
@@ -34,7 +29,6 @@ void router_api_1_0_root(gs_system_t *system, const gs_request_t *request, gs_re
         gs_response_end(response, HTTP_STATUS_CODE_200_OK);
 
         apr_pool_destroy(pool);
-    }
 }
 
 static char *format_port_list(apr_pool_t *pool, gs_server_pool_t *server_pool)
