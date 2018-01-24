@@ -120,7 +120,7 @@ void setup_server(gs_system_t *system, unsigned short gateway_port)
 
     gs_server_pool_router_add(system->server_pool, GS_HTTP_GET,  "/api/1.0/databases", router_api_1_0_databases);
 
-    gs_server_pool_router_add(system->server_pool, GS_HTTP_GET, "/nodes/create", router_api_1_0_databases);
+    gs_server_pool_router_add(system->server_pool, GS_HTTP_GET, "/node_records/create", router_api_1_0_databases);
 
 
     gs_server_pool_start(system->server_pool, system, router_catch);
