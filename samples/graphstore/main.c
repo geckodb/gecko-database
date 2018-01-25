@@ -3,7 +3,7 @@
 #include <storage/timespan.h>
 
 int main() {
-    int num_new_nodes = 1000000;
+    int num_new_nodes = 10;
 
     database_t *database;
     database_open(&database, "/Users/marcus/temp/db");

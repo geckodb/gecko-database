@@ -4,27 +4,65 @@
 #include <apr_strings.h>
 
 // The file containing node records and the per-node version chain
-#define DB_NODES_FILE           "nodes.records"
+#define DB_NODES_FILE                "nodes.records"
 
 // The file mapping a unique node id to its first version in the node file
-#define DB_NODES_INDEX_FILE     "nodes.index"
+#define DB_NODES_INDEX_FILE          "nodes.heads"
+
+
+// The file containing property records and the per-property version chain
+#define DB_PROPS_FILE                "props.records"
+
+// The file mapping a unique prop id to its first version in the property file
+#define DB_PROPS_INDEX_FILE          "props.heads"
+
+// A file containing lists of props used to attach a set of properties to nodes and edges
+#define DB_PROPS_LIST_FILE           "proplists.records"
+
+// A file mapping a unique prop list id to its offset in the props list file
+#define DB_PROPS_LIST_INDEX_FILE     "proplists.heads"
+
+
+// A file containing variable-length strings
+#define DB_STRINGPOOL_FILE           "strings.records"
+
+// A file mapping a unique string identifier to its offset and legnth in the strings record file
+#define DB_STRINGPOOL_INDEX_FILE     "strings.lookup"
+
 
 #define DB_EDGES_FILE           "edges.records"
-#define DB_STRINGPOOL_FILE      "strings.records"
+
 
 typedef struct database_t
 {
     apr_pool_t         *apr_pool;
     char               *dbpath;
-    FILE               *edge_records,
-                       *node_records,
-                       *node_index,
-                       *string_pool,
-                       *snapshots;
+    FILE               *node_records,
+                       *node_heads,
+
+                       *prop_records,
+                       *prop_heads,
+                       *proplist_records,
+                       *proplist_heads,
+
+                       *string_records,
+                       *string_lookup,
+
+                       *edge_records;
+
+
     const char         *nodes_records_path,
-                       *nodes_index_path,
-                       *edges_db_path,
-                       *string_pool_path;
+                       *nodes_heads_path,
+
+                       *prop_records_path,
+                       *prop_heads_path,
+                       *proplist_records_path,
+                       *proplist_heads_path,
+
+                       *string_records_path,
+                       *string_lookup_path,
+
+                       *edges_db_path;
     gs_spinlock_t       spinlock;
 
 } database_t;
@@ -54,20 +92,6 @@ typedef struct __attribute__((__packed__)) edges_t
     prop_slot_id_t             next_prop;
 } edges_t;
 
-typedef struct __attribute__((__packed__)) pool_header_t
-{
-    size_t              size_byte,
-                        capacity_byte;
-    size_t              slot_num,
-                        slot_capacity;
-} pool_header_t;
-
-typedef struct __attribute__((__packed__)) pool_slot_t
-{
-    size_t              length;
-    size_t              offset;
-} pool_slot_t;
-
 typedef struct __attribute__((__packed__)) node_index_header_t
 {
     node_id_t           node_cursor;
@@ -89,6 +113,13 @@ typedef struct database_node_version_cursor_t
     database_t          *database;
     database_node_t      node;
 } database_node_version_cursor_t;
+
+typedef struct __attribute__((__packed__)) props_header_t
+{
+    prop_id_t                next_props_id;
+    prop_slot_id_t           next_props_slot_id;
+    prop_slot_id_t           capacity;
+} props_header_t;
 
 static inline gs_status_t db_exists(database_t *database);
 static inline gs_status_t db_nodes_autoresize(database_t *db, node_records_header_t *header, size_t num_nodes);
@@ -129,7 +160,7 @@ gs_status_t database_open(database_t **db, const char *dbpath)
                                     database->apr_pool)) != GS_SUCCESS)
         return status;
 
-    if ((status = dirs_add_filename(&database->nodes_index_path, database->dbpath, DB_NODES_INDEX_FILE,
+    if ((status = dirs_add_filename(&database->nodes_heads_path, database->dbpath, DB_NODES_INDEX_FILE,
                                     database->apr_pool)) != GS_SUCCESS)
         return status;
 
@@ -137,7 +168,11 @@ gs_status_t database_open(database_t **db, const char *dbpath)
                                     database->apr_pool)) != GS_SUCCESS)
         return status;
 
-    if ((status = dirs_add_filename(&database->string_pool_path, database->dbpath, DB_STRINGPOOL_FILE,
+    if ((status = dirs_add_filename(&database->string_records_path, database->dbpath, DB_STRINGPOOL_FILE,
+                                    database->apr_pool)) != GS_SUCCESS)
+        return status;
+
+    if ((status = dirs_add_filename(&database->string_lookup_path, database->dbpath, DB_STRINGPOOL_INDEX_FILE,
                                     database->apr_pool)) != GS_SUCCESS)
         return status;
 
@@ -160,7 +195,7 @@ gs_status_t database_open(database_t **db, const char *dbpath)
 
 // Seek to index slot for particular node id
 #define NODE_INDEX_FILE_SEEK(db, node_id)                                                                              \
-    fseek(db->node_index, sizeof(node_index_header_t) + node_id * sizeof(node_index_entry_t), SEEK_SET);
+    fseek(db->node_heads, sizeof(node_index_header_t) + node_id * sizeof(node_index_entry_t), SEEK_SET);
 
 node_id_t *database_nodes_create(gs_status_t *result, database_t *db, size_t num_nodes, const timespan_t *lifetime)
 {
@@ -189,7 +224,7 @@ node_id_t *database_nodes_create(gs_status_t *result, database_t *db, size_t num
     if (db_nodes_autoresize(db, &records_header, num_nodes) != GS_SUCCESS) {
         // Something went wrong during expansion. No changes are written to the database, since the
         // records_header is not updated (although the database file now is grown beyond the size indicated
-        // be the capacity value).
+        // be the capacity_in_byte value).
         database_unlock(db);
         return NULL;
     }
@@ -233,7 +268,7 @@ node_id_t *database_nodes_create(gs_status_t *result, database_t *db, size_t num
 
         // Register first_slot of this node object in the index file such that the unique node id (i.e., the i-th
         // element) in the index file maps to the first_slot of the first node in the storage file.
-        if (fwrite(&first_slot, sizeof(node_index_entry_t), 1, db->node_index) != 1) {
+        if (fwrite(&first_slot, sizeof(node_index_entry_t), 1, db->node_heads) != 1) {
             // In case this write fails, the index to the new first_slot of some added nodes (these before this write fails)
             // were written. However, since the index header is not updated, these changes will be overwritten the next
             // time. Thus, no rollback is needed.
@@ -246,7 +281,7 @@ node_id_t *database_nodes_create(gs_status_t *result, database_t *db, size_t num
 
     // Write down everything which is in the output buffer
     fflush(db->node_records);
-    fflush(db->node_index);
+    fflush(db->node_heads);
 
     // Update both the records header and the index header to register the changes finally.
     unsigned max_retry;
@@ -288,7 +323,7 @@ node_id_t *database_nodes_create(gs_status_t *result, database_t *db, size_t num
 
             if (status_index_update == GS_SUCCESS) {
                 // Rollback successful, flush buffers
-                fflush(db->node_index);
+                fflush(db->node_heads);
                 database_unlock(db);
                 GS_OPTIONAL(result != NULL, *result = GS_WRITE_FAILED)
             } else {
@@ -296,7 +331,7 @@ node_id_t *database_nodes_create(gs_status_t *result, database_t *db, size_t num
                 // index header.
                 // TODO: Rebuild the index file and try to swap the damaged index file with the new one
                 database_unlock(db);
-                panic("Node index file '%s' was corrupted and cannot be repaired.", db->nodes_index_path);
+                panic("Node index file '%s' was corrupted and cannot be repaired.", db->nodes_heads_path);
                 GS_OPTIONAL(result != NULL, *result = GS_CORRUPTED)
             }
         }
@@ -471,28 +506,39 @@ gs_status_t database_node_version_cursor_close(database_node_version_cursor_t *c
     return GS_SUCCESS;
 }
 
-gs_status_t database_nodes_drop(database_t *db, node_id_t *nodes, size_t num_nodes, timestamp_t client_start_time)
+string_id_t *database_string_create(size_t *num_created_strings, database_t *db, const char **strings,
+                                    size_t num_strings, string_create_mode_t mode)
 {
-    // Acquire exclusive access to the database file
-    gs_spinlock_lock(&db->spinlock);
+    string_id_t *result = GS_REQUIRE_MALLOC(num_strings);
+    size_t result_size = 0;
 
-/*    while (num_nodes--) {
-        node_id_t *node = nodes++;
+    database_lock(db);
+
+    while (num_strings--) {
+        //const char *string = strings++;
+
 
     }
-*/
-    // Release exclusive access to the database file
-    gs_spinlock_unlock(&db->spinlock);
 
-    return GS_SUCCESS;
+    database_unlock(db);
+
+    *num_created_strings = result_size;
+    return result;
+}
+
+prop_id_t *database_create_prop(database_t *db, const target_t *target, const char *key, const value_t *value,
+                                const timespan_t *lifetime)
+{
+    return GS_FAILED;
 }
 
 gs_status_t database_close(database_t *db)
 {
     fclose(db->node_records);
-    fclose(db->node_index);
+    fclose(db->node_heads);
     fclose(db->edge_records);
-    fclose(db->string_pool);
+    fclose(db->string_lookup);
+    fclose(db->string_records);
     apr_pool_destroy(db->apr_pool);
     free (db);
     return GS_SUCCESS;
@@ -501,14 +547,15 @@ gs_status_t database_close(database_t *db)
 static inline gs_status_t db_exists(database_t *database)
 {
     return (files_exists(database->edges_db_path) && files_exists(database->nodes_records_path) &&
-            files_exists(database->nodes_index_path) && files_exists(database->string_pool_path)) ?
+            files_exists(database->nodes_heads_path) && files_exists(database->string_lookup_path) &&
+            files_exists(database->string_records_path)) ?
            GS_TRUE : GS_FALSE;
 }
 
 static inline gs_status_t db_nodes_autoresize(database_t *db, node_records_header_t *header, size_t num_nodes)
 {
     if (header->next_node_slot_id + num_nodes > header->capacity) {
-        // The capacity of the records file is too less. Thus, expand file.
+        // The capacity_in_byte of the records file is too less. Thus, expand file.
 
         size_t expand_size = 1.7f * (1 + num_nodes);
         fseek(db->node_records, 0, SEEK_END);
@@ -535,8 +582,8 @@ static inline gs_status_t db_read_node_records_header(node_records_header_t *hea
 
 static inline gs_status_t db_read_node_index_header(node_index_header_t *header, database_t *database)
 {
-    fseek(database->node_index, 0, SEEK_SET);
-    return (fread(header, sizeof(node_index_header_t), 1, database->node_index) == 1 ? GS_SUCCESS : GS_FAILED);
+    fseek(database->node_heads, 0, SEEK_SET);
+    return (fread(header, sizeof(node_index_header_t), 1, database->node_heads) == 1 ? GS_SUCCESS : GS_FAILED);
 }
 
 static inline gs_status_t db_update_node_records_header(database_t *database, const node_records_header_t *header)
@@ -549,9 +596,9 @@ static inline gs_status_t db_update_node_records_header(database_t *database, co
 
 static inline gs_status_t db_update_node_index_header(database_t *database, const node_index_header_t *header)
 {
-    fseek(database->node_index, 0, SEEK_SET);
-    bool result = fwrite(header, sizeof(node_index_header_t), 1, database->node_index) == 1 ? GS_SUCCESS : GS_FAILED;
-    fflush(database->node_index);
+    fseek(database->node_heads, 0, SEEK_SET);
+    bool result = fwrite(header, sizeof(node_index_header_t), 1, database->node_heads) == 1 ? GS_SUCCESS : GS_FAILED;
+    fflush(database->node_heads);
     return result;
 }
 
@@ -560,7 +607,7 @@ static inline node_slot_id_t db_read_node(database_node_t *node, node_id_t node_
     node_index_entry_t node_1st_version_slot;
     // Seek to next index slot in the node index file
     NODE_INDEX_FILE_SEEK(db, node_id);
-    fread(&node_1st_version_slot, sizeof(node_index_entry_t), 1, db->node_index);
+    fread(&node_1st_version_slot, sizeof(node_index_entry_t), 1, db->node_heads);
 
     NODE_RECORDS_FILE_SEEK(db, node_1st_version_slot);
     fread(node, sizeof(database_node_t), 1, db->node_records);
@@ -729,13 +776,13 @@ static inline gs_status_t create_nodes_db(database_t *database)
     }
 
     // Initial node index file
-    if ((database->node_index = fopen(database->nodes_index_path, "wb")) == NULL)
+    if ((database->node_heads = fopen(database->nodes_heads_path, "wb")) == NULL)
         return GS_FAILED;
-    if (fwrite(&index_header, sizeof (node_index_header_t), 1, database->node_index) != 1)
+    if (fwrite(&index_header, sizeof (node_index_header_t), 1, database->node_heads) != 1)
         return GS_FAILED;
 
     fflush(database->node_records);
-    fflush(database->node_index);
+    fflush(database->node_heads);
 
     return GS_SUCCESS;
 }
@@ -766,38 +813,72 @@ static inline gs_status_t create_edges_db(database_t *database)
     return GS_SUCCESS;
 }
 
+typedef struct __attribute__((__packed__)) string_records_header_t
+{
+    string_id_t         next_id;
+    offset_t            capacity_in_byte;
+    offset_t            size_in_byte;
+} string_records_header_t;
+
+typedef struct __attribute__((__packed__)) string_lookup_header_t
+{
+    string_id_t         id_cursor;
+    offset_t            capacity;
+} string_lookup_header_t;
+
+typedef struct __attribute__((__packed__)) string_lookup_entry_t
+{
+    offset_t            string_offset;
+    unsigned            string_length;
+    union {
+        short           in_use : 1;
+    } flags;
+} string_lookup_entry_t;
+
 static inline gs_status_t create_stringpool_db(database_t *database)
 {
-    pool_header_t header = {
-        .size_byte     = 0,
-        .capacity_byte = DB_STRING_POOL_CAPACITY_BYTE,
-        .slot_num      = 0,
-        .slot_capacity = DB_STRING_POOL_SLOT_CAPACITY
+    char empty;
+
+    string_records_header_t records_header = {
+        .capacity_in_byte       = DB_STRING_POOL_CAPACITY_BYTE,
+        .size_in_byte           = 0,
+        .next_id                = 0
     };
 
-    pool_slot_t slot = {
-        .offset        = 0,
-        .length        = 0
-    };
-
-    if ((database->string_pool = fopen(database->string_pool_path, "wb")) == NULL)
+    if ((database->string_records = fopen(database->string_records_path, "wb")) == NULL)
         return GS_FAILED;
 
-    if (fwrite(&header, sizeof (pool_header_t), 1, database->string_pool) != 1)
+    if ((database->string_lookup = fopen(database->string_lookup_path, "wb")) == NULL)
         return GS_FAILED;
 
-    for (int i = 0; i < header.slot_capacity; i++) {
-        if (fwrite(&slot, sizeof(pool_slot_t), 1, database->string_pool) != 1)
+    if (fwrite(&records_header, sizeof (string_records_header_t), 1, database->string_records) != 1)
+        return GS_FAILED;
+
+    fseek(database->string_records, sizeof(string_records_header_t) + records_header.capacity_in_byte, SEEK_SET);
+    if (fwrite(&empty, sizeof(char), 1, database->string_records) != 1) {
             return GS_FAILED;
     }
 
-    for (int i = 0; i < header.capacity_byte; i++) {
-        char empty = 0;
-        if (fwrite(&empty, sizeof(char), 1, database->string_pool) != 1)
+    string_lookup_header_t lookup_header = {
+        .id_cursor   = 0,
+        .capacity    = DB_STRING_POOL_LOOKUP_SLOT_CAPACITY
+    };
+
+    string_lookup_entry_t entry = {
+        .flags.in_use = FALSE
+    };
+
+    if (fwrite(&lookup_header, sizeof(string_lookup_header_t), 1, database->string_lookup) != 1) {
+        return GS_FAILED;
+    }
+
+    for (int i = 0; i < lookup_header.capacity; i++) {
+        if (fwrite(&entry, sizeof(string_lookup_entry_t), 1, database->string_lookup) != 1)
             return GS_FAILED;
     }
 
-    fflush(database->string_pool);
+    fflush(database->string_records);
+    fflush(database->string_lookup);
 
     return GS_SUCCESS;
 }
@@ -820,7 +901,7 @@ static inline gs_status_t open_nodes_db(database_t *database)
 {
     if ((database->node_records = fopen(database->nodes_records_path, "r+b")) == NULL)
         return GS_FAILED;
-    if ((database->node_index = fopen(database->nodes_index_path, "r+b")) == NULL)
+    if ((database->node_heads = fopen(database->nodes_heads_path, "r+b")) == NULL)
         return GS_FAILED;
     return GS_SUCCESS;
 }
@@ -834,7 +915,9 @@ static inline gs_status_t open_edges_db(database_t *database)
 
 static inline gs_status_t open_stringpool_db(database_t *database)
 {
-    if ((database->string_pool = fopen(database->string_pool_path, "r+b")) == NULL)
+    if ((database->string_lookup = fopen(database->string_lookup_path, "r+b")) == NULL)
+        return GS_FAILED;
+    if ((database->string_records = fopen(database->string_records_path, "r+b")) == NULL)
         return GS_FAILED;
     return GS_SUCCESS;
 }
