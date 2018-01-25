@@ -121,20 +121,21 @@ typedef struct __attribute__((__packed__)) props_header_t
     prop_slot_id_t           capacity;
 } props_header_t;
 
-static inline gs_status_t db_exists(database_t *database);
-static inline gs_status_t db_nodes_autoresize(database_t *db, node_records_header_t *header, size_t num_nodes);
-static inline gs_status_t db_read_node_records_header(node_records_header_t *header, database_t *database);
-static inline gs_status_t db_read_node_index_header(node_index_header_t *header, database_t *database);
-static inline gs_status_t db_update_node_records_header(database_t *database, const node_records_header_t *header);
-static inline gs_status_t db_update_node_index_header(database_t *database, const node_index_header_t *header);
-static inline node_slot_id_t  db_read_node(database_node_t *node, node_id_t node_id, database_t *database);
-static inline node_slot_id_t  db_node_last_version(database_node_t *last, const database_node_t *start,
-                                                   node_slot_id_t start_slot, database_t *db);
-static inline gs_status_t db_node_new_version(node_slot_id_t *cpy_slot_id, database_node_t *cpy,
-                                              database_node_t *original, database_t *db,
-                                              size_t approx_num_new_nodes, node_slot_id_t original_slot);
-static inline gs_status_t db_node_adjust_lifetime(database_node_t *node, node_slot_id_t slot_id,
-                                                  database_t *db, const timespan_t *lifetime);
+static inline gs_status_t exists_db(database_t *database);
+
+static inline gs_status_t unsafe_nodes_db_autoresize(database_t *db, node_records_header_t *header, size_t num_nodes);
+static inline gs_status_t unsafe_read_node_records_header(node_records_header_t *header, database_t *database);
+static inline gs_status_t unsafe_read_node_index_header(node_index_header_t *header, database_t *database);
+static inline gs_status_t unsafe_update_node_records_header(database_t *database, const node_records_header_t *header);
+static inline gs_status_t unsafe_update_node_index_header(database_t *database, const node_index_header_t *header);
+static inline node_slot_id_t  unsafe_read_node(database_node_t *node, node_id_t node_id, database_t *database);
+static inline node_slot_id_t  unsafe_node_last_version(database_node_t *last, const database_node_t *start,
+                                                       node_slot_id_t start_slot, database_t *db);
+static inline gs_status_t unsafe_node_new_version(node_slot_id_t *cpy_slot_id, database_node_t *cpy,
+                                                  database_node_t *original, database_t *db,
+                                                  size_t approx_num_new_nodes, node_slot_id_t original_slot);
+static inline gs_status_t unsafe_node_adjust_lifetime(database_node_t *node, node_slot_id_t slot_id,
+                                                      database_t *db, const timespan_t *lifetime);
 
 static inline gs_status_t create_db(database_t *database);
 static inline gs_status_t create_nodes_db(database_t *database);
@@ -176,7 +177,7 @@ gs_status_t database_open(database_t **db, const char *dbpath)
                                     database->apr_pool)) != GS_SUCCESS)
         return status;
 
-    if (db_exists(database) == GS_FALSE) {
+    if (exists_db(database) == GS_FALSE) {
         if (create_db(database) == GS_SUCCESS && database_close(database) == GS_SUCCESS) {
             return database_open(db, dbpath);
         } else return GS_FAILED;
@@ -211,8 +212,8 @@ node_id_t *database_nodes_create(gs_status_t *result, database_t *db, size_t num
 
     database_lock(db);
 
-    db_read_node_records_header(&records_header, db);
-    db_read_node_index_header(&index_header, db);
+    unsafe_read_node_records_header(&records_header, db);
+    unsafe_read_node_index_header(&index_header, db);
 
     // Store old information from the header in case writes to the storage or index fails
     node_record_next_id_backup = records_header.next_node_id;
@@ -221,7 +222,7 @@ node_id_t *database_nodes_create(gs_status_t *result, database_t *db, size_t num
 
     assert(records_header.next_node_id == index_header.node_cursor);
 
-    if (db_nodes_autoresize(db, &records_header, num_nodes) != GS_SUCCESS) {
+    if (unsafe_nodes_db_autoresize(db, &records_header, num_nodes) != GS_SUCCESS) {
         // Something went wrong during expansion. No changes are written to the database, since the
         // records_header is not updated (although the database file now is grown beyond the size indicated
         // be the capacity_in_byte value).
@@ -290,13 +291,13 @@ node_id_t *database_nodes_create(gs_status_t *result, database_t *db, size_t num
     // Update records header in order to store that new node records were written. Give this 100 tries or fails.
     max_retry = 100;
     do {
-        status_store_update = db_update_node_records_header(db, &records_header);
+        status_store_update = unsafe_update_node_records_header(db, &records_header);
     } while (status_store_update != GS_SUCCESS && max_retry--);
 
     // Update index header in order to store that new nod _records were written. Give this 100 tries or fails.
     max_retry = 100;
     do {
-        status_index_update = db_update_node_index_header(db, &index_header);
+        status_index_update = unsafe_update_node_index_header(db, &index_header);
     } while (status_index_update != GS_SUCCESS && max_retry--);
 
     if (status_store_update != GS_SUCCESS) {
@@ -318,7 +319,7 @@ node_id_t *database_nodes_create(gs_status_t *result, database_t *db, size_t num
             // Update index header in order to store that new nod _records were written. Give this 100 tries or fails.
             max_retry = 100;
             do {
-                status_index_update = db_update_node_index_header(db, &index_header);
+                status_index_update = unsafe_update_node_index_header(db, &index_header);
             } while (status_index_update != GS_SUCCESS && max_retry--);
 
             if (status_index_update == GS_SUCCESS) {
@@ -350,7 +351,7 @@ node_id_t *database_nodes_create(gs_status_t *result, database_t *db, size_t num
 
             max_retry = 100;
             do {
-                status_store_update = db_update_node_records_header(db, &records_header);
+                status_store_update = unsafe_update_node_records_header(db, &records_header);
             } while (status_store_update != GS_SUCCESS && max_retry--);
 
             if (status_store_update == GS_SUCCESS) {
@@ -387,16 +388,16 @@ gs_status_t database_nodes_alter_lifetime(database_t *db, node_id_t *nodes, size
 
     while (num_nodes--) {
         node_id = nodes++;
-        first_slot = db_read_node(&node_first, *node_id, db);
-        last_slot  = db_node_last_version(&node_last, &node_first, first_slot, db);
-        if (db_node_new_version(&cpy_slot, &new_node, &node_last, db, num_nodes, last_slot) != GS_SUCCESS) {
+        first_slot = unsafe_read_node(&node_first, *node_id, db);
+        last_slot  = unsafe_node_last_version(&node_last, &node_first, first_slot, db);
+        if (unsafe_node_new_version(&cpy_slot, &new_node, &node_last, db, num_nodes, last_slot) != GS_SUCCESS) {
             // Database file could not be resized although that is required. Thus, this operations fails
             // but eventual changes are overwritten by the next call since the header is not updated.
             // Unlock the database and notify about the failure.
             database_unlock(db);
             return GS_FAILED;
         }
-        if (db_node_adjust_lifetime(&new_node, cpy_slot, db, lifetime) != GS_SUCCESS) {
+        if (unsafe_node_adjust_lifetime(&new_node, cpy_slot, db, lifetime) != GS_SUCCESS) {
             database_unlock(db);
             return GS_FAILED;
         }
@@ -424,7 +425,7 @@ node_id_t database_nodes_last_id(database_t *db)
     node_records_header_t header;
 
     database_lock(db);
-    db_read_node_records_header(&header, db);
+    unsafe_read_node_records_header(&header, db);
     database_unlock(db);
 
     return header.next_node_id;
@@ -462,7 +463,7 @@ gs_status_t database_node_cursor_read(database_node_t *node, const database_node
 {
     bool valid = (node && cursor && cursor->open);
     if (valid) {
-        db_read_node(node, cursor->current_node_id, cursor->database);
+        unsafe_read_node(node, cursor->current_node_id, cursor->database);
     }
     return (valid ? GS_SUCCESS : GS_FAILED);
 }
@@ -544,7 +545,7 @@ gs_status_t database_close(database_t *db)
     return GS_SUCCESS;
 }
 
-static inline gs_status_t db_exists(database_t *database)
+static inline gs_status_t exists_db(database_t *database)
 {
     return (files_exists(database->edges_db_path) && files_exists(database->nodes_records_path) &&
             files_exists(database->nodes_heads_path) && files_exists(database->string_lookup_path) &&
@@ -552,7 +553,7 @@ static inline gs_status_t db_exists(database_t *database)
            GS_TRUE : GS_FALSE;
 }
 
-static inline gs_status_t db_nodes_autoresize(database_t *db, node_records_header_t *header, size_t num_nodes)
+static inline gs_status_t unsafe_nodes_db_autoresize(database_t *db, node_records_header_t *header, size_t num_nodes)
 {
     if (header->next_node_slot_id + num_nodes > header->capacity) {
         // The capacity_in_byte of the records file is too less. Thus, expand file.
@@ -574,19 +575,19 @@ static inline gs_status_t db_nodes_autoresize(database_t *db, node_records_heade
     return GS_SUCCESS;
 }
 
-static inline gs_status_t db_read_node_records_header(node_records_header_t *header, database_t *database)
+static inline gs_status_t unsafe_read_node_records_header(node_records_header_t *header, database_t *database)
 {
     fseek(database->node_records, 0, SEEK_SET);
     return (fread(header, sizeof(node_records_header_t), 1, database->node_records) == 1 ? GS_SUCCESS : GS_FAILED);
 }
 
-static inline gs_status_t db_read_node_index_header(node_index_header_t *header, database_t *database)
+static inline gs_status_t unsafe_read_node_index_header(node_index_header_t *header, database_t *database)
 {
     fseek(database->node_heads, 0, SEEK_SET);
     return (fread(header, sizeof(node_index_header_t), 1, database->node_heads) == 1 ? GS_SUCCESS : GS_FAILED);
 }
 
-static inline gs_status_t db_update_node_records_header(database_t *database, const node_records_header_t *header)
+static inline gs_status_t unsafe_update_node_records_header(database_t *database, const node_records_header_t *header)
 {
     fseek(database->node_records, 0, SEEK_SET);
     bool result = fwrite(header, sizeof(node_records_header_t), 1, database->node_records) == 1 ? GS_SUCCESS : GS_FAILED;
@@ -594,7 +595,7 @@ static inline gs_status_t db_update_node_records_header(database_t *database, co
     return result;
 }
 
-static inline gs_status_t db_update_node_index_header(database_t *database, const node_index_header_t *header)
+static inline gs_status_t unsafe_update_node_index_header(database_t *database, const node_index_header_t *header)
 {
     fseek(database->node_heads, 0, SEEK_SET);
     bool result = fwrite(header, sizeof(node_index_header_t), 1, database->node_heads) == 1 ? GS_SUCCESS : GS_FAILED;
@@ -602,7 +603,7 @@ static inline gs_status_t db_update_node_index_header(database_t *database, cons
     return result;
 }
 
-static inline node_slot_id_t db_read_node(database_node_t *node, node_id_t node_id, database_t *db)
+static inline node_slot_id_t unsafe_read_node(database_node_t *node, node_id_t node_id, database_t *db)
 {
     node_index_entry_t node_1st_version_slot;
     // Seek to next index slot in the node index file
@@ -615,8 +616,8 @@ static inline node_slot_id_t db_read_node(database_node_t *node, node_id_t node_
     return node_1st_version_slot;
 }
 
-static inline node_slot_id_t db_node_last_version(database_node_t *last, const database_node_t *start,
-                                            node_slot_id_t start_slot, database_t *db)
+static inline node_slot_id_t unsafe_node_last_version(database_node_t *last, const database_node_t *start,
+                                                      node_slot_id_t start_slot, database_t *db)
 {
     database_node_t cursor = *start;
     offset_t last_node_slot = start_slot;
@@ -629,18 +630,19 @@ static inline node_slot_id_t db_node_last_version(database_node_t *last, const d
     return last_node_slot;
 }
 
-static inline gs_status_t db_node_new_version(node_slot_id_t *cpy_slot_id, database_node_t *cpy,
-                                              database_node_t *original, database_t *db, size_t approx_num_new_nodes,
-                                              node_slot_id_t original_slot)
+static inline gs_status_t unsafe_node_new_version(node_slot_id_t *cpy_slot_id, database_node_t *cpy,
+                                                  database_node_t *original, database_t *db,
+                                                  size_t approx_num_new_nodes,
+                                                  node_slot_id_t original_slot)
 {
     node_records_header_t records_header;
     gs_status_t           status;
     unsigned              max_retry;
     database_node_t       local_cpy, local_original;
 
-    db_read_node_records_header(&records_header, db);
+    unsafe_read_node_records_header(&records_header, db);
 
-    if (db_nodes_autoresize(db, &records_header, approx_num_new_nodes) != GS_SUCCESS) {
+    if (unsafe_nodes_db_autoresize(db, &records_header, approx_num_new_nodes) != GS_SUCCESS) {
         return GS_FAILED;
     }
 
@@ -690,7 +692,7 @@ static inline gs_status_t db_node_new_version(node_slot_id_t *cpy_slot_id, datab
     // Update records header in order to store that new node records were written. Give this 100 tries or fails.
     max_retry = 100;
     do {
-        status = db_update_node_records_header(db, &records_header);
+        status = unsafe_update_node_records_header(db, &records_header);
     } while (status != GS_SUCCESS && max_retry--);
 
     if (status != GS_SUCCESS) {
@@ -721,8 +723,8 @@ static inline gs_status_t db_node_new_version(node_slot_id_t *cpy_slot_id, datab
     return GS_SUCCESS;
 }
 
-static inline gs_status_t db_node_adjust_lifetime(database_node_t *node, node_slot_id_t slot_id,
-                                                  database_t *db, const timespan_t *lifetime)
+static inline gs_status_t unsafe_node_adjust_lifetime(database_node_t *node, node_slot_id_t slot_id,
+                                                      database_t *db, const timespan_t *lifetime)
 {
     node->lifetime = *lifetime;
     NODE_RECORDS_FILE_SEEK(db, slot_id);
