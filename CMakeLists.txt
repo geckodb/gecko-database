@@ -233,6 +233,16 @@ ELSEIF (PROJECT_OS_OSX)
    )
 
    target_link_libraries(
+           dsm_imp
+           ${APR_LIBRARIES}
+           ${APRUTIL_LIBRARIES}
+           /usr/local/opt/argp-standalone/lib
+           /usr/local/opt/argp-standalone/lib/libargp.a
+           ${OPENSSL_LIBRARIES}
+           pthread
+   )
+
+   target_link_libraries(
            sample_relative_ptr
            ${APR_LIBRARIES}
            ${APRUTIL_LIBRARIES}
