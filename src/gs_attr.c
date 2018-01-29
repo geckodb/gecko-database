@@ -51,6 +51,7 @@ gs_attr_id_t _attr_create(const char *name, enum gs_field_type_e data_type, size
             .type_rep = data_type_rep,
             .flags    = attr_flags,
             .str_format_mlen   = 0,
+            .attr_values = NULL
     };
 
     strcpy(attr.name, name);

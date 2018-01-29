@@ -43,6 +43,7 @@ typedef struct gs_attr_t {
     gs_attr_flags_e flags;
     size_t str_format_mlen;
     unsigned char checksum[MD5_DIGEST_LENGTH];
+    gs_vec_t *attr_values;
 } gs_attr_t;
 
 // ---------------------------------------------------------------------------------------------------------------------

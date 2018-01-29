@@ -1146,7 +1146,7 @@ static inline gs_status_t unsafe_node_new_version(node_slot_id_t *cpy_slot_id, d
         if (fwrite(original, sizeof(database_node_t), 1, db->node_records) != 1) {
             // Rollback failed
             // TODO: Handle the rollback-failed for "new version of copy"
-            panic("Node store corruption: node '%lld' will point to undefined successor version (file '%s')",
+            panic("Node store corruption: node '%zu' will point to undefined successor version (file '%s')",
                    original->unique_id, db->nodes_records_path);
             return GS_FAILED;
         } else {

@@ -85,7 +85,7 @@ bool free_databases(void *capture, void *begin, void *end)
     gs_database_t **it = begin;
     gs_database_t **tail = (gs_database_t **) end;
     while (it < tail) {
-        gs_database_dispose(*it);
+//        gs_database_dispose(*it);
         it++;
     }
     return true;

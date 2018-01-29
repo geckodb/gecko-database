@@ -38,6 +38,7 @@ void gs_schema_delete(gs_schema_t *schema);
 gs_schema_t *gs_schema_subset(gs_schema_t *super, const gs_attr_id_t *indicies, size_t nindicies);
 gs_schema_t *gs_schema_cpy(const gs_schema_t *schema);
 const struct gs_attr_t *gs_schema_attr_by_id(const gs_schema_t *schema, gs_attr_id_t attr_id);
+struct gs_attr_t *gs_schema_none_safe_attr_by_id(const gs_schema_t *schema, gs_attr_id_t attr_id);
 const struct gs_attr_t *gs_schema_attr_by_name(const gs_schema_t *schema, const char *name);
 size_t gs_schema_attr_size_by_id(gs_schema_t *schema, gs_attr_id_t attr_id);
 size_t gs_schema_num_attributes(const gs_schema_t *schema);

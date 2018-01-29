@@ -107,7 +107,7 @@ gs_frag_t *gs_frag_new(gs_schema_t *schema, size_t tuplet_capacity, enum gs_frag
     result->impl_type = type;
 
     panic_if((result->_dispose == NULL), NOTIMPLEMENTED, "gs_frag_t::dispose");
-    panic_if((result->_scan == NULL), NOTIMPLEMENTED, "gs_frag_t::scan");
+//    panic_if((result->_scan == NULL), NOTIMPLEMENTED, "gs_frag_t::scan");
     panic_if((result->_open == NULL), NOTIMPLEMENTED, "gs_frag_t::open");
     panic_if((result->_insert == NULL), NOTIMPLEMENTED, "gs_frag_t::this_query");
     return result;

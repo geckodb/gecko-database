@@ -31,6 +31,12 @@ const struct gs_attr_t *gs_schema_attr_by_id(const gs_schema_t *schema, gs_attr_
     return ((struct gs_attr_t *) gs_vec_at(schema->attr, attr_id));
 }
 
+struct gs_attr_t *gs_schema_none_safe_attr_by_id(const gs_schema_t *schema, gs_attr_id_t attr_id)
+{
+    assert (attr_id < schema->attr->num_elements);
+    return ((struct gs_attr_t *) gs_vec_at(schema->attr, attr_id));
+}
+
 const struct gs_attr_t *gs_schema_attr_by_name(const gs_schema_t *schema, const char *name)
 {
     assert (schema);
@@ -72,6 +78,10 @@ gs_schema_t *gs_schema_subset(gs_schema_t *super, const gs_attr_id_t *indicies, 
 void gs_schema_delete(gs_schema_t *schema)
 {
     assert (schema);
+    for (int i = 0; i < schema->attr->num_elements; ++i) {
+        if (gs_schema_attr_by_id(schema, i)->attr_values)
+            gs_vec_free(gs_schema_attr_by_id(schema, i)->attr_values);
+    }
     gs_vec_free(schema->attr);
     free (schema->frag_name);
     free (schema);

@@ -11,7 +11,7 @@
 #if defined(GS_PLATFORM_MACOS)
     #include <platforms/macos/gs_platform.h>
 #elif defined(GS_PLATFORM_LINUX)
-    #include <platforms/linux/platform.h>
+    #include <platforms/linux/gs_platform.h>
 #else
     #error "Unable to include platform-specific code. Unknown platform"
 #endif

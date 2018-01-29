@@ -15,7 +15,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
 set(RUNTIME_OUTPUT_DIRECTORY ${CMAKE_TEMP_OUTPUT_DIR})
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -std=c11 -Wall -Werror")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -std=c11 -Wall -Werror")
 
 cmake_minimum_required(
     VERSION 3.5
@@ -29,7 +29,7 @@ include(
 find_package(APR     REQUIRED)
 find_package(OpenSSL REQUIRED)
 find_package(Curses  REQUIRED)
-find_package(Doxygen REQUIRED)
+#find_package(Doxygen REQUIRED)
 
 include_directories(
     "/usr/local/include/"
@@ -99,7 +99,7 @@ set(SOURCE_FILES
     include/gs_system.h
 
     src/gs_attr.c
-    src/frags/gs_frag_host_vm.c
+    src/frags/gs_frag_host_vm2.c
     src/gs_tuplet_field.c
     src/gs_frag.c
     src/gs_pred.c
@@ -136,7 +136,10 @@ set(SOURCE_FILES
         src/storage/files.c
         include/storage/dirs.h
         src/storage/dirs.c
-
+    playground_dsm/reference_implementation.h
+    playground_dsm/reference_scan_impl.h
+    playground_dsm/exercice_helper.c
+    playground_dsm/exercice_helper.h
 )
 
 
@@ -159,6 +162,11 @@ add_executable(
 )
 
 add_executable(
+        dsm_imp
+        playground_dsm/play_fragments.c
+        ${SOURCE_FILES}
+)
+add_executable(
     sample_relative_ptr
     samples/relative_ptr/main.c
     ${SOURCE_FILES}
@@ -176,6 +184,16 @@ IF (PROJECT_OS_LINUX)
 
     target_link_libraries(
             gecko
+            bsd
+            m
+            ${APR_LIBRARIES}
+            ${APRUTIL_LIBRARIES}
+            ${OPENSSL_LIBRARIES}
+            pthread
+    )
+
+    target_link_libraries(
+            dsm_imp
             bsd
             m
             ${APR_LIBRARIES}
