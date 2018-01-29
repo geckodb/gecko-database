@@ -47,7 +47,7 @@ int main() {
 
     */
 
-    unsigned num_strings = 25;
+    unsigned num_strings = 10;
     const char **strings = malloc(num_strings * sizeof(char *));
     for (int i = 0; i < num_strings; i++) {
         strings[i] = malloc(sizeof("Hi There!"));
@@ -56,12 +56,15 @@ int main() {
 
     gs_status_t status_add_str;
     size_t num_created_strings;
-    string_id_t *string_ids = database_string_create(&num_created_strings, &status_add_str, database, strings, num_strings, string_create_create_force);
+    database_string_create(&num_created_strings, &status_add_str, database, strings, num_strings, string_create_create_force);
 
-    char **loaded_strings = database_string_read(NULL, database, string_ids, num_strings);
+    size_t num_strings_in_db;
+    string_id_t *all_string_ids = database_string_fullscan(&num_strings_in_db, NULL, database);
 
-    for (int i = 0; i < num_strings; i++) {
-        printf("Load from db: '%lld: %s'\n", string_ids[i], loaded_strings[i]);
+    char **loaded_strings = database_string_read(NULL, database, all_string_ids, num_strings_in_db);
+
+    for (int i = 0; i < num_strings_in_db; i++) {
+        printf("Load from db: '%lld: %s'\n", all_string_ids[i], loaded_strings[i]);
     }
 
 

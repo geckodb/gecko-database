@@ -81,6 +81,12 @@ typedef struct __attribute__((__packed__)) string_records_header_t
     offset_t            write_offset;
 } string_records_header_t;
 
+typedef struct string_record_entry_header_t
+{
+    size_t              string_length;
+} string_record_entry_header_t;
+
+
 typedef struct __attribute__((__packed__)) string_lookup_header_t
 {
     string_id_t         id_cursor;
@@ -90,7 +96,6 @@ typedef struct __attribute__((__packed__)) string_lookup_header_t
 typedef struct __attribute__((__packed__)) string_lookup_entry_t
 {
     offset_t            string_offset;
-    unsigned            string_length;
     union {
         short           in_use : 1;
     } flags;
@@ -622,6 +627,22 @@ string_id_t *database_string_create(size_t *num_created_strings, gs_status_t *st
 
                 // Write string into string string store
                 fseek(db->string_records, records_header.write_offset, SEEK_SET);
+
+                string_record_entry_header_t entry_header = {
+                    .string_length = strlen(string)
+                };
+
+                // First write the header for that entry which contains the string length
+                if (fwrite(&entry_header, sizeof(string_record_entry_header_t), 1, db->string_records) != 1) {
+                    // Writing the last string header into the records file failed. Until this point, some string
+                    // from 'strings' argument may be written. Since the header is not updated, these changes
+                    // will be overwritten next time. Notify caller about failure and release lock.
+                    GS_OPTIONAL(status != NULL, *status = GS_FAILED);
+                    free (result);
+                    database_unlock(db);
+                    return NULL;
+                }
+
                 if (fwrite(string, strlen(string), 1, db->string_records) != 1) {
                     // Writing the last string into the records file failed. Until this point, some string
                     // from 'strings' argument may be written. Since the header is not updated, these changes
@@ -635,7 +656,6 @@ string_id_t *database_string_create(size_t *num_created_strings, gs_status_t *st
                 // Add the newly added string to the string index
                 string_lookup_entry_t entry = {
                     .flags.in_use = TRUE,
-                    .string_length = strlen(string),
                     .string_offset = records_header.write_offset
                 };
 
@@ -652,12 +672,16 @@ string_id_t *database_string_create(size_t *num_created_strings, gs_status_t *st
                     return NULL;
                 }
 
-                // Update write offset such that the position for the next string to write is known
-                records_header.write_offset += strlen(string);
+                // Return the string identifier matching this string. Note that this returns directly the
+                // offset in the storage file such that once one have a string id, no access to the lookup file
+                // is required.
+                result[result_size++] = records_header.write_offset;
 
-                // Store the string identifier for the newly added string to the result set and
-                // update the id cursor for the next input
-                result[result_size++] = lookup_header.id_cursor++;
+                // Update write offset such that the position for the next string to write is known
+                records_header.write_offset += sizeof(string_record_entry_header_t) + strlen(string);
+
+                // Update the id cursor for the next input
+                lookup_header.id_cursor++;
             }
             break;
         case string_create_create_noforce:
@@ -766,6 +790,50 @@ string_id_t *database_string_find(gs_status_t *status, database_t *db, const cha
     return NULL;
 }
 
+string_id_t *database_string_fullscan(size_t *num_strings, gs_status_t *status, database_t *db)
+{
+    string_lookup_header_t  lookup_header;
+    string_id_t            *result;
+    size_t                  result_size = 0;
+
+    database_lock(db);
+
+    if (fseek(db->string_lookup, 0, SEEK_SET) != 0) {
+        // Seeking to header position failed. Cancel operation.
+        GS_OPTIONAL(status != NULL, *status = GS_FAILED);
+        database_unlock(db);
+        return NULL;
+    }
+
+    if (fread(&lookup_header, sizeof(string_lookup_header_t), 1, db->string_lookup) != 1) {
+        // Lookup header read failed. Thus, unable to get maximum number of stored strings. Cancel operation.
+        GS_OPTIONAL(status != NULL, *status = GS_FAILED);
+        database_unlock(db);
+        return NULL;
+    }
+
+    result = GS_REQUIRE_MALLOC(lookup_header.id_cursor * sizeof(string_id_t));
+
+    for (size_t i = 0; i < lookup_header.id_cursor; i++) {
+        string_lookup_entry_t entry;
+        if (fread(&entry, sizeof(string_lookup_entry_t), 1, db->string_lookup) != 1) {
+            // Read of one index entry failed for some reasons. Cancel operation and free resources
+            free (result);
+            GS_OPTIONAL(status != NULL, *status = GS_FAILED);
+            database_unlock(db);
+            return NULL;
+        }
+        if (entry.flags.in_use) {
+            result[result_size++] = entry.string_offset;
+        }
+    }
+
+    GS_OPTIONAL(status != NULL, *status = GS_SUCCESS);
+    *num_strings = result_size;
+    database_unlock(db);
+    return result;
+}
+
 #define FREE_STR_VEC(vec, size)         \
 {                                       \
     for (size_t j = 0; j < size; j++) { \
@@ -778,73 +846,64 @@ string_id_t *database_string_find(gs_status_t *status, database_t *db, const cha
 {                                                               \
     FREE_STR_VEC(vec, size);                                    \
     GS_OPTIONAL(status != NULL, *status = status_val);          \
-    database_unlock(db);                                        \
     return NULL;                                                \
 }
 
 char **database_string_read(gs_status_t *status, database_t *db, const string_id_t *string_ids, size_t num_strings)
 {
-    string_lookup_header_t    lookup_header;
-    string_records_header_t   records_header;
+    size_t                    max_offset;
 
     if (num_strings == 0) {
         GS_OPTIONAL(status != NULL, *status = GS_ILLEGALARG);
         return NULL;
     }
 
-    char                    **result = GS_REQUIRE_MALLOC(num_strings * sizeof(char *));
+    char **result = GS_REQUIRE_MALLOC(num_strings * sizeof(char *));
 
-    database_lock(db);
-
-    if ((unsafe_read_string_records_header(&records_header, db) != GS_SUCCESS) ||
-        unsafe_read_string_lookup_header(&lookup_header, db) != GS_SUCCESS){
-        // No access to string records or lookup header, release lock and return
+    if (fseek(db->string_records, 0L, SEEK_END) != 0) {
+        // Seeking error, unable to receive the size of the file
         GS_OPTIONAL(status != NULL, *status = GS_READ_FAILED);
         free (result);
-        database_unlock(db);
         return NULL;
     };
 
-    if (fseek(db->string_records, sizeof(string_records_header_t), SEEK_SET) != 0 ||
-            fseek(db->string_lookup, sizeof(string_lookup_header_t), SEEK_SET) != 0 ) {
+    max_offset = ftell(db->string_records);
+
+    if (fseek(db->string_records, sizeof(string_records_header_t), SEEK_SET) != 0) {
         // Seeking error, unable to load current header contents
         GS_OPTIONAL(status != NULL, *status = GS_READ_FAILED);
         free (result);
-        database_unlock(db);
         return NULL;
     };
 
     for (size_t i = 0; i < num_strings; i++) {
         string_id_t string_id = string_ids[i];
 
-        // In case the current id is illegal, free up all resources for the result so far and exit that function
-        if (string_id >= lookup_header.id_cursor) {
+        // In case the current id (i.e., the offset) is illegal (i.e., larger than maximum offset),
+        // free up all resources for the result so far and exit that function
+        if (string_id + 1 >= max_offset) {
             EXIT_STRING_READ_FN(db, result, i, status, GS_FAILED);
         }
 
-        // Otherwise, read string entry from index
-        string_lookup_entry_t lookup_entry;
-        if (fread(&lookup_entry, sizeof(string_lookup_entry_t), 1, db->string_lookup) != 1) {
+        // Otherwise, read string without touching the index
+        if (fseek(db->string_records, string_id, SEEK_SET) != 0) {
             EXIT_STRING_READ_FN(db, result, i, status, GS_FAILED);
         }
 
-        if (!lookup_entry.flags.in_use) {
+        string_record_entry_header_t entry_header;
+        if (fread(&entry_header, sizeof(string_record_entry_header_t), 1, db->string_records) != 1) {
             EXIT_STRING_READ_FN(db, result, i, status, GS_FAILED);
         }
 
-        result[i] = GS_REQUIRE_MALLOC(lookup_entry.string_length + 1);
-        result[i][lookup_entry.string_length] = '\0';
+        result[i] = GS_REQUIRE_MALLOC(entry_header.string_length + 1);
+        result[i][entry_header.string_length] = '\0';
 
-        if (fseek(db->string_records, lookup_entry.string_offset, SEEK_SET) != 0) {
-            EXIT_STRING_READ_FN(db, result, i, status, GS_FAILED);
-        }
 
-        if (fread(result[i], lookup_entry.string_length, 1, db->string_records) != 1) {
+        if (fread(result[i], entry_header.string_length, 1, db->string_records) != 1) {
             EXIT_STRING_READ_FN(db, result, i, status, GS_FAILED);
         }
     }
 
-    database_unlock(db);
     GS_OPTIONAL(status != NULL, *status = GS_SUCCESS);
     return result;
 }

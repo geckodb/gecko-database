@@ -12,15 +12,18 @@
 /* forwarding */
 typedef struct pool_t pool_t;
 
+
+
+
+typedef uint64_t offset_t;
+
 typedef uint64_t node_id_t;
 
 typedef uint64_t prop_id_t;
 
 typedef uint64_t edge_id_t;
 
-typedef uint64_t string_id_t;
-
-typedef uint64_t offset_t;
+typedef offset_t string_id_t;
 
 typedef uint64_t node_slot_id_t;
 
@@ -188,6 +191,8 @@ string_id_t *database_string_create(size_t *num_created_strings, gs_status_t *st
                                     size_t num_strings, string_create_mode_t mode);
 
 string_id_t *database_string_find(gs_status_t *status, database_t *db, const char **strings, size_t num_strings);
+
+string_id_t *database_string_fullscan(size_t *num_strings, gs_status_t *status, database_t *db);
 
 char      **database_string_read(gs_status_t *status, database_t *db, const string_id_t *string_ids, size_t num_strings);
 
