@@ -785,9 +785,69 @@ string_id_t *database_string_create(size_t *num_created_strings, gs_status_t *st
     }
 }
 
-string_id_t *database_string_find(gs_status_t *status, database_t *db, const char **strings, size_t num_strings)
+static inline int comp_str(const void *lhs, const void *rhs)
 {
-    return NULL;
+    return strcmp(*(const char **) lhs, *(const char **) rhs);
+}
+
+string_id_t *database_string_find(size_t *num_strings_found, gs_status_t *status, database_t *db, char **strings, size_t num_strings)
+{
+    string_id_t *ids;
+    string_id_t *result;
+    size_t       num_strings_in_db;
+    size_t       result_size;
+
+    if ((ids = database_string_fullscan(&num_strings_in_db, status, db)) && *status != GS_SUCCESS) {
+        GS_OPTIONAL(status != NULL, *status = GS_FAILED);
+        return NULL;
+    }
+
+    qsort(strings, num_strings, sizeof(char **), comp_str);
+    result_size = 0;
+    result = GS_REQUIRE_MALLOC(num_strings * sizeof(string_id_t));
+
+
+    char **db_string_entry = GS_REQUIRE_MALLOC(sizeof(char *));
+
+    for (size_t  i = 0; i < num_strings_in_db; i++) {
+        string_id_t *id_cursor = ids + i;
+        char **value = database_string_read(status, db, id_cursor, 1);
+
+        if (*status != GS_SUCCESS) {
+            free (ids);
+            free (value[0]);
+            free (value);
+            GS_OPTIONAL(status != NULL, *status = GS_FAILED);
+            return NULL;
+        }
+
+        assert (value);
+        assert (*value);
+
+        char *db_string = *value;
+        db_string_entry[0] = db_string;
+
+        // Perform binary search with the database string as needle in the input string list haystack.
+        // Since fetching the database string is a slow operation (i.e., from disk),
+        // the search is performed in the input list list (i.e., in memory). The worse case is that the
+        // entire string database must be loaded one by one into main memory to compute the result.
+        // The theoretical complexity of this search is O(m*log2(n)) where m is the number of reads in the
+        // database file and n is the number of input strings
+
+        if (bsearch(db_string_entry, strings, num_strings, sizeof(char **), comp_str) != NULL) {
+            result[result_size++] = *id_cursor;
+            if (result_size == num_strings) {
+                // Found all string
+                break;
+            }
+        }
+    }
+
+    free(ids);
+    free(db_string_entry);
+    *num_strings_found = result_size;
+    GS_OPTIONAL(status != NULL, *status = GS_SUCCESS);
+    return result;
 }
 
 string_id_t *database_string_fullscan(size_t *num_strings, gs_status_t *status, database_t *db)
