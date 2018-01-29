@@ -545,243 +545,277 @@ gs_status_t database_node_version_cursor_close(database_node_version_cursor_t *c
     return GS_SUCCESS;
 }
 
+// TODO: String create must install UNIQUE strings in the db file
 string_id_t *database_string_create(size_t *num_created_strings, gs_status_t *status, database_t *db,
-                                    const char **strings, size_t num_strings, string_create_mode_t mode)
+                                    const char **strings, size_t num_strings_to_import, string_create_mode_t mode)
 {
     gs_status_t                 status_store_update, status_index_update;
     string_id_t                 backup_in_cursor;
     offset_t                    backup_write_offset;
     string_records_header_t     records_header;
     string_lookup_header_t      lookup_header;
+    char                      **unique_strings_to_import;
     const char                 *string;
-    string_id_t                *result = GS_REQUIRE_MALLOC(num_strings * sizeof(string_id_t));
+    string_id_t                *strings_found_ids;
     size_t                      result_size = 0;
     char                        empty;
     size_t                      required_size = 0;
     unsigned                    max_retry;
 
+    // Deduplicate input strings
+    gs_hashset_t hashset;
+    hashset_create(&hashset, sizeof(char **), num_strings_to_import, gs_comp_func_str);
+    for (size_t i = 0; i < num_strings_to_import; i++) {
+        hashset_add(&hashset, (strings + i), 1, gs_comp_func_str);
+    }
+    const char **begin = (const char **) hashset_begin(&hashset);
+    const char **end   = (const char **) hashset_end(&hashset);
+    num_strings_to_import = (end - begin);
+    unique_strings_to_import = (char **) hashset_begin(&hashset);
 
-    database_lock(db);
-
-    if ((unsafe_read_string_records_header(&records_header, db) != GS_SUCCESS) ||
-            unsafe_read_string_lookup_header(&lookup_header, db) != GS_SUCCESS){
-        // No access to string records or lookup header, release lock and return
-        GS_OPTIONAL(status != NULL, *status = GS_READ_FAILED);
-        free (result);
-        database_unlock(db);
-        return NULL;
-    };
-
-    // Backup header information for eventually rollback
-    backup_in_cursor = lookup_header.id_cursor;
-    backup_write_offset = records_header.write_offset;
-
-    // Calculate required space to store all strings in the file. Note that strings in the string storage file
-    // are not null-terminated but their length is defined in the lookup file
-    for (size_t i = 0; i < num_strings; i++) {
-        required_size += strlen(*(strings + i));
+    // Determine new strings that are not already stored in the database
+    size_t num_strings_found;
+    size_t num_new_strings;
+    char **new_strings = NULL;
+    if (database_string_find(&num_strings_found, &strings_found_ids, &new_strings, db, unique_strings_to_import,
+                             num_strings_to_import)
+        != GS_SUCCESS) {
+        return GS_FAILED;
     }
 
-    // Eventually resize the lookup file
-    if (lookup_header.id_cursor + num_strings > lookup_header.capacity) {
-        lookup_header.capacity = 1.7 * (lookup_header.capacity + num_strings);
-        fseek(db->string_lookup,
-              sizeof(string_lookup_header_t) + lookup_header.id_cursor * sizeof(string_lookup_entry_t), SEEK_SET);
+    num_new_strings = num_strings_to_import - num_strings_found;
+    if (num_new_strings > 0)
+    {
+        // At least one string from the input is unknown in the database. Register only new strings in the database
 
-        string_lookup_entry_t empty_entry = {
-                .flags.in_use = FALSE
+        strings_found_ids = GS_REQUIRE_MALLOC(num_strings_to_import * sizeof(string_id_t));
+
+        database_lock(db);
+
+        if ((unsafe_read_string_records_header(&records_header, db) != GS_SUCCESS) ||
+            unsafe_read_string_lookup_header(&lookup_header, db) != GS_SUCCESS) {
+            // No access to string records or lookup header, release lock and return
+            GS_OPTIONAL(status != NULL, *status = GS_READ_FAILED);
+            free(strings_found_ids);
+            database_unlock(db);
+            return NULL;
         };
 
-        for (int i = 0; i < num_strings; i++) {
-            if (fwrite(&empty_entry, sizeof(string_lookup_entry_t), 1, db->string_lookup) != 1) {
-                // Expanding the lookup file failed. Notify caller about that failure and release lock
+        // Backup header information for eventually rollback
+        backup_in_cursor = lookup_header.id_cursor;
+        backup_write_offset = records_header.write_offset;
+
+        // Calculate required space to store all strings in the file. Note that strings in the string storage file
+        // are not null-terminated but their length is defined in the lookup file
+        for (size_t i = 0; i < num_strings_to_import; i++) {
+            required_size += strlen(*(unique_strings_to_import + i));
+        }
+
+        // Eventually resize the lookup file
+        if (lookup_header.id_cursor + num_strings_to_import > lookup_header.capacity) {
+            lookup_header.capacity = 1.7 * (lookup_header.capacity + num_strings_to_import);
+            fseek(db->string_lookup,
+                  sizeof(string_lookup_header_t) + lookup_header.id_cursor * sizeof(string_lookup_entry_t), SEEK_SET);
+
+            string_lookup_entry_t empty_entry = {
+                    .flags.in_use = FALSE
+            };
+
+            for (int i = 0; i < num_strings_to_import; i++) {
+                if (fwrite(&empty_entry, sizeof(string_lookup_entry_t), 1, db->string_lookup) != 1) {
+                    // Expanding the lookup file failed. Notify caller about that failure and release lock
+                    GS_OPTIONAL(status != NULL, *status = GS_FAILED);
+                    free(strings_found_ids);
+                    database_unlock(db);
+                    return NULL;
+                }
+            }
+        }
+
+        // Eventually resize the file
+        records_header.size_in_byte += required_size;
+        if (records_header.size_in_byte > records_header.capacity_in_byte) {
+            records_header.capacity_in_byte = 1.7f * records_header.size_in_byte;
+            fseek(db->string_records, sizeof(string_records_header_t) + records_header.capacity_in_byte, SEEK_SET);
+            if (fwrite(&empty, sizeof(char), 1, db->string_records) != 1) {
+                // String records file cannot be resized to the required size. Notify caller about failure
+                // and release look.
                 GS_OPTIONAL(status != NULL, *status = GS_FAILED);
-                free (result);
+                free(strings_found_ids);
                 database_unlock(db);
                 return NULL;
             }
-        }
-    }
 
-    // Eventually resize the file
-    records_header.size_in_byte += required_size;
-    if (records_header.size_in_byte > records_header.capacity_in_byte) {
-        records_header.capacity_in_byte = 1.7f * records_header.size_in_byte;
-        fseek(db->string_records, sizeof(string_records_header_t) + records_header.capacity_in_byte, SEEK_SET);
-        if (fwrite(&empty, sizeof(char), 1, db->string_records) != 1) {
-            // String records file cannot be resized to the required size. Notify caller about failure
-            // and release look.
-            GS_OPTIONAL(status != NULL, *status = GS_FAILED);
-            free (result);
-            database_unlock(db);
-            return NULL;
+            fflush(db->string_records);
+        }
+
+        switch (mode) {
+            case string_create_create_force:
+                while (num_strings_to_import--) {
+                    string = *unique_strings_to_import++;
+
+                    // Write string into string string store
+                    fseek(db->string_records, records_header.write_offset, SEEK_SET);
+
+                    string_record_entry_header_t entry_header = {
+                            .string_length = strlen(string)
+                    };
+
+                    // First write the header for that entry which contains the string length
+                    if (fwrite(&entry_header, sizeof(string_record_entry_header_t), 1, db->string_records) != 1) {
+                        // Writing the last string header into the records file failed. Until this point, some string
+                        // from 'unique_strings_to_import' argument may be written. Since the header is not updated, these changes
+                        // will be overwritten next time. Notify caller about failure and release lock.
+                        GS_OPTIONAL(status != NULL, *status = GS_FAILED);
+                        free(strings_found_ids);
+                        database_unlock(db);
+                        return NULL;
+                    }
+
+                    if (fwrite(string, strlen(string), 1, db->string_records) != 1) {
+                        // Writing the last string into the records file failed. Until this point, some string
+                        // from 'unique_strings_to_import' argument may be written. Since the header is not updated, these changes
+                        // will be overwritten next time. Notify caller about failure and release lock.
+                        GS_OPTIONAL(status != NULL, *status = GS_FAILED);
+                        free(strings_found_ids);
+                        database_unlock(db);
+                        return NULL;
+                    }
+
+                    // Add the newly added string to the string index
+                    string_lookup_entry_t entry = {
+                            .flags.in_use = TRUE,
+                            .string_offset = records_header.write_offset
+                    };
+
+                    fseek(db->string_lookup, sizeof(string_lookup_header_t) +
+                                             lookup_header.id_cursor * sizeof(string_lookup_entry_t), SEEK_SET);
+
+                    if (fwrite(&entry, sizeof(string_lookup_entry_t), 1, db->string_lookup) != 1) {
+                        // Write into index failed. Until here, the string is actually written to the store
+                        // but since neither the header of the store nor the index header are updated, no
+                        // data corruption will occur. Release lock and notify caller about failure.
+                        GS_OPTIONAL(status != NULL, *status = GS_FAILED);
+                        free(strings_found_ids);
+                        database_unlock(db);
+                        return NULL;
+                    }
+
+                    // Return the string identifier matching this string. Note that this returns directly the
+                    // offset in the storage file such that once one have a string id, no access to the lookup file
+                    // is required.
+                    strings_found_ids[result_size++] = records_header.write_offset;
+
+                    // Update write offset such that the position for the next string to write is known
+                    records_header.write_offset += sizeof(string_record_entry_header_t) + strlen(string);
+
+                    // Update the id cursor for the next input
+                    lookup_header.id_cursor++;
+                }
+                break;
+            case string_create_create_noforce: panic("Not implemented '%d'", mode);
+                break;
+            default: panic("Unknown string mode '%d'", mode);
         }
 
         fflush(db->string_records);
-    }
+        fflush(db->string_lookup);
 
-    switch (mode) {
-        case string_create_create_force:
-            while (num_strings--) {
-                string = *strings++;
+        // Both the strings as well as the index entries are written. Now store these changes into the storage
+        // resp. index file
 
-                // Write string into string string store
-                fseek(db->string_records, records_header.write_offset, SEEK_SET);
+        // Update records header in order to store that new node records were written. Give this 100 tries or fails.
+        max_retry = 100;
+        do {
+            status_store_update = unsafe_update_string_records_header(db, &records_header);
+        } while (status_store_update != GS_SUCCESS && max_retry--);
 
-                string_record_entry_header_t entry_header = {
-                    .string_length = strlen(string)
-                };
+        // Update index header in order add the new string into the index. Give this 100 tries or fails.
+        max_retry = 100;
+        do {
+            status_index_update = unsafe_update_string_index_header(db, &lookup_header);
+        } while (status_index_update != GS_SUCCESS && max_retry--);
 
-                // First write the header for that entry which contains the string length
-                if (fwrite(&entry_header, sizeof(string_record_entry_header_t), 1, db->string_records) != 1) {
-                    // Writing the last string header into the records file failed. Until this point, some string
-                    // from 'strings' argument may be written. Since the header is not updated, these changes
-                    // will be overwritten next time. Notify caller about failure and release lock.
-                    GS_OPTIONAL(status != NULL, *status = GS_FAILED);
-                    free (result);
-                    database_unlock(db);
-                    return NULL;
-                }
-
-                if (fwrite(string, strlen(string), 1, db->string_records) != 1) {
-                    // Writing the last string into the records file failed. Until this point, some string
-                    // from 'strings' argument may be written. Since the header is not updated, these changes
-                    // will be overwritten next time. Notify caller about failure and release lock.
-                    GS_OPTIONAL(status != NULL, *status = GS_FAILED);
-                    free (result);
-                    database_unlock(db);
-                    return NULL;
-                }
-
-                // Add the newly added string to the string index
-                string_lookup_entry_t entry = {
-                    .flags.in_use = TRUE,
-                    .string_offset = records_header.write_offset
-                };
-
-                fseek(db->string_lookup, sizeof(string_lookup_header_t) +
-                        lookup_header.id_cursor * sizeof(string_lookup_entry_t), SEEK_SET);
-
-                if (fwrite(&entry, sizeof(string_lookup_entry_t), 1, db->string_lookup) != 1) {
-                    // Write into index failed. Until here, the string is actually written to the store
-                    // but since neither the header of the store nor the index header are updated, no
-                    // data corruption will occur. Release lock and notify caller about failure.
-                    GS_OPTIONAL(status != NULL, *status = GS_FAILED);
-                    free (result);
-                    database_unlock(db);
-                    return NULL;
-                }
-
-                // Return the string identifier matching this string. Note that this returns directly the
-                // offset in the storage file such that once one have a string id, no access to the lookup file
-                // is required.
-                result[result_size++] = records_header.write_offset;
-
-                // Update write offset such that the position for the next string to write is known
-                records_header.write_offset += sizeof(string_record_entry_header_t) + strlen(string);
-
-                // Update the id cursor for the next input
-                lookup_header.id_cursor++;
-            }
-            break;
-        case string_create_create_noforce:
-            panic("Not implemented '%d'", mode);
-            break;
-        default: panic("Unknown string mode '%d'", mode);
-    }
-
-    fflush(db->string_records);
-    fflush(db->string_lookup);
-
-    // Both the strings as well as the index entries are written. Now store these changes into the storage
-    // resp. index file
-
-    // Update records header in order to store that new node records were written. Give this 100 tries or fails.
-    max_retry = 100;
-    do {
-        status_store_update = unsafe_update_string_records_header(db, &records_header);
-    } while (status_store_update != GS_SUCCESS && max_retry--);
-
-    // Update index header in order add the new string into the index. Give this 100 tries or fails.
-    max_retry = 100;
-    do {
-        status_index_update = unsafe_update_string_index_header(db, &lookup_header);
-    } while (status_index_update != GS_SUCCESS && max_retry--);
-
-    // Handle file write statuses
-    if (status_store_update != GS_SUCCESS) {
-        // Updating the store header failed. Depending on the outcome of the index update, this might
-        // leader to problems.
-        if (status_index_update != GS_SUCCESS) {
-            // Both updates fail. Since neither the store nor the index header is updated, the stored strings so far
-            // will be overwritten by the next call of that function. Notify the caller about this reject and
-            // release lock.
-            GS_OPTIONAL(status != NULL, *status = GS_WRITE_FAILED);
-        } else {
-            // In this case, the index was updated but the store was not. Without repair, the index now will
-            // point to offsets in the store file which are invalid. Solution is rollback of the index update.
-
-            // Try rollback to index update. Give this 100 tries or fails.
-            max_retry = 100;
-            lookup_header.id_cursor = backup_in_cursor;
-            do {
-                status_index_update = unsafe_update_string_index_header(db, &lookup_header);
-            } while (status_index_update != GS_SUCCESS && max_retry--);
-
-            if (status_index_update == GS_SUCCESS) {
-                // Rollback successful, flush buffers
-                fflush(db->string_lookup);
-                GS_OPTIONAL(status != NULL, *status = GS_WRITE_FAILED)
+        // Handle file write statuses
+        if (status_store_update != GS_SUCCESS) {
+            // Updating the store header failed. Depending on the outcome of the index update, this might
+            // leader to problems.
+            if (status_index_update != GS_SUCCESS) {
+                // Both updates fail. Since neither the store nor the index header is updated, the stored strings so far
+                // will be overwritten by the next call of that function. Notify the caller about this reject and
+                // release lock.
+                GS_OPTIONAL(status != NULL, *status = GS_WRITE_FAILED);
             } else {
-                // Rollback failed which means that the index is damaged and not repairable by only resetting the
-                // storage header.
-                // TODO: Handling this failure case to avoid corruption of database
-                panic("String lookup index file '%s' was corrupted and cannot be repaired.", db->string_lookup_path);
-                GS_OPTIONAL(status != NULL, *status = GS_CORRUPTED)
-            }
-        }
+                // In this case, the index was updated but the store was not. Without repair, the index now will
+                // point to offsets in the store file which are invalid. Solution is rollback of the index update.
 
-        // In this case, at least one write fails. Cleanup result, release lock and return to caller
-        free (result);
-        database_unlock(db);
-        return NULL;
-    } else {
-        // Sring store update was successful
-        if (status_index_update != GS_SUCCESS) {
-            // Index update was not successful. The string store now contains strings that are not reachable by the
-            // index. Solution is rollback of changes to the store
+                // Try rollback to index update. Give this 100 tries or fails.
+                max_retry = 100;
+                lookup_header.id_cursor = backup_in_cursor;
+                do {
+                    status_index_update = unsafe_update_string_index_header(db, &lookup_header);
+                } while (status_index_update != GS_SUCCESS && max_retry--);
 
-            // Try rollback
-            records_header.write_offset = backup_write_offset;
-
-            // Update index header in order add the new string into the index. Give this 100 tries or fails.
-            max_retry = 100;
-            do {
-                status_index_update = unsafe_update_string_index_header(db, &lookup_header);
-            } while (status_index_update != GS_SUCCESS && max_retry--);
-
-            if (status_index_update == GS_SUCCESS) {
-                // Rollback was successful
-                fflush(db->string_records);
-                GS_OPTIONAL(status != NULL, *status = GS_FAILED)
-            } else {
-                // Rollback was not successful. In this case data was written to the store and is not reachable
-                // by the index. However, there is no data corruption but storage waste. Notify the caller about this.
-                GS_OPTIONAL(status != NULL, *status = GS_WASTE)
+                if (status_index_update == GS_SUCCESS) {
+                    // Rollback successful, flush buffers
+                    fflush(db->string_lookup);
+                    GS_OPTIONAL(status != NULL, *status = GS_WRITE_FAILED)
+                } else {
+                    // Rollback failed which means that the index is damaged and not repairable by only resetting the
+                    // storage header.
+                    // TODO: Handling this failure case to avoid corruption of database
+                    panic("String lookup index file '%s' was corrupted and cannot be repaired.",
+                          db->string_lookup_path);
+                    GS_OPTIONAL(status != NULL, *status = GS_CORRUPTED)
+                }
             }
 
-            // Cleanup and return a failure to the caller
-            free (result);
+            // In this case, at least one write fails. Cleanup result, release lock and return to caller
+            free(strings_found_ids);
             database_unlock(db);
             return NULL;
-
         } else {
-            // Both updates were performed successfully. Release the lock and notify about this success.
-            GS_OPTIONAL(status != NULL, *status = GS_SUCCESS)
-            *num_created_strings = result_size;
-            database_unlock(db);
-            return result;
+            // Sring store update was successful
+            if (status_index_update != GS_SUCCESS) {
+                // Index update was not successful. The string store now contains strings that are not reachable by the
+                // index. Solution is rollback of changes to the store
+
+                // Try rollback
+                records_header.write_offset = backup_write_offset;
+
+                // Update index header in order add the new string into the index. Give this 100 tries or fails.
+                max_retry = 100;
+                do {
+                    status_index_update = unsafe_update_string_index_header(db, &lookup_header);
+                } while (status_index_update != GS_SUCCESS && max_retry--);
+
+                if (status_index_update == GS_SUCCESS) {
+                    // Rollback was successful
+                    fflush(db->string_records);
+                    GS_OPTIONAL(status != NULL, *status = GS_FAILED)
+                } else {
+                    // Rollback was not successful. In this case data was written to the store and is not reachable
+                    // by the index. However, there is no data corruption but storage waste. Notify the caller about this.
+                    GS_OPTIONAL(status != NULL, *status = GS_WASTE)
+                }
+
+                // Cleanup and return a failure to the caller
+                free(strings_found_ids);
+                database_unlock(db);
+                return NULL;
+
+            } else {
+                // Both updates were performed successfully. Release the lock and notify about this success.
+                GS_OPTIONAL(status != NULL, *status = GS_SUCCESS)
+                *num_created_strings = result_size;
+                database_unlock(db);
+                return strings_found_ids;
+            }
         }
+    } else {
+        // All strings to be created were already present in the database
+        *num_created_strings = num_strings_to_import;
+        return strings_found_ids;
     }
 }
 
@@ -790,35 +824,44 @@ static inline int comp_str(const void *lhs, const void *rhs)
     return strcmp(*(const char **) lhs, *(const char **) rhs);
 }
 
-string_id_t *database_string_find(size_t *num_strings_found, gs_status_t *status, database_t *db, char **strings, size_t num_strings)
+gs_status_t database_string_find(size_t *num_strings_found, string_id_t **strings_found, char ***strings_not_found,
+                                 database_t *db, char **strings, size_t num_strings)
 {
-    string_id_t *ids;
-    string_id_t *result;
+    gs_status_t status;
+    string_id_t *db_string_ids;
+    string_id_t *db_strings_match_ids;
     size_t       num_strings_in_db;
     size_t       result_size;
+    char       **strings_found_result;
+    char       **strings_not_found_result;
 
-    if ((ids = database_string_fullscan(&num_strings_in_db, status, db)) && *status != GS_SUCCESS) {
-        GS_OPTIONAL(status != NULL, *status = GS_FAILED);
-        return NULL;
+    if ((db_string_ids = database_string_fullscan(&num_strings_in_db, &status, db)) && status != GS_SUCCESS) {
+        return GS_FAILED;
     }
 
     qsort(strings, num_strings, sizeof(char **), comp_str);
     result_size = 0;
-    result = GS_REQUIRE_MALLOC(num_strings * sizeof(string_id_t));
+
+    if (strings_found) {
+        db_strings_match_ids = GS_REQUIRE_MALLOC(num_strings * sizeof(string_id_t));
+    }
+
+    if (strings_not_found) {
+        strings_found_result = GS_REQUIRE_MALLOC(num_strings * sizeof(char *));
+    }
 
 
     char **db_string_entry = GS_REQUIRE_MALLOC(sizeof(char *));
 
     for (size_t  i = 0; i < num_strings_in_db; i++) {
-        string_id_t *id_cursor = ids + i;
-        char **value = database_string_read(status, db, id_cursor, 1);
+        string_id_t *id_cursor = db_string_ids + i;
+        char **value = database_string_read(&status, db, id_cursor, 1);
 
-        if (*status != GS_SUCCESS) {
-            free (ids);
+        if (status != GS_SUCCESS) {
+            free (db_string_ids);
             free (value[0]);
             free (value);
-            GS_OPTIONAL(status != NULL, *status = GS_FAILED);
-            return NULL;
+            return GS_FAILED;
         }
 
         assert (value);
@@ -835,19 +878,43 @@ string_id_t *database_string_find(size_t *num_strings_found, gs_status_t *status
         // database file and n is the number of input strings
 
         if (bsearch(db_string_entry, strings, num_strings, sizeof(char **), comp_str) != NULL) {
-            result[result_size++] = *id_cursor;
-            if (result_size == num_strings) {
+            if (strings_found) {
+                db_strings_match_ids[result_size] = *id_cursor;
+            }
+            if (strings_not_found) {
+                strings_found_result[result_size] = *db_string_entry;
+
+            }
+            if (++result_size == num_strings) {
                 // Found all string
                 break;
             }
         }
     }
 
-    free(ids);
+    if (strings_found) {
+        *strings_found = db_strings_match_ids;
+    }
+
+    if (strings_not_found) {
+        size_t num_not_found = num_strings - result_size;
+        char **needle = GS_REQUIRE_MALLOC(sizeof(char *));
+        strings_not_found_result = GS_REQUIRE_MALLOC(num_not_found * sizeof(char *));
+        int j = 0;
+        for (int i = 0; i < num_strings; i++) {
+            needle[0] = strings[i];
+            if (bsearch(needle, strings_found_result, result_size, sizeof(char **), comp_str) == NULL) {
+                strings_not_found_result[j++] = *needle;
+            }
+        }
+        free (needle);
+        *strings_not_found = strings_not_found_result;
+    }
+
+    free(db_string_ids);
     free(db_string_entry);
     *num_strings_found = result_size;
-    GS_OPTIONAL(status != NULL, *status = GS_SUCCESS);
-    return result;
+    return GS_SUCCESS;
 }
 
 string_id_t *database_string_fullscan(size_t *num_strings, gs_status_t *status, database_t *db)

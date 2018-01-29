@@ -2,13 +2,6 @@
 #include <storage/database.h>
 #include <storage/timespan.h>
 
-long long now_ms(void) {
-    struct timeval tv;
-
-    gettimeofday(&tv,NULL);
-    return (((long long)tv.tv_sec)*1000)+(tv.tv_usec/1000);
-}
-
 int main() {
     int num_new_nodes = 1;
 
@@ -54,26 +47,31 @@ int main() {
 
     */
 
-    unsigned num_strings = 10000;
+    unsigned num_strings = 5;
     const char **strings = malloc(num_strings * sizeof(char *));
     for (int i = 0; i < num_strings; i++) {
-        strings[i] = malloc(sizeof("Hi There!") + 1);
-        strings[i] = "Hi There!";
+        strings[i] = malloc(sizeof("Hr There!") + 1);
+        strings[i] = "Hr There!";
     }
 
     gs_status_t status_add_str;
     size_t num_created_strings;
-    database_string_create(&num_created_strings, &status_add_str, database, strings, num_strings, string_create_create_force);
+    string_id_t *strings_added = database_string_create(&num_created_strings, &status_add_str, database, strings, num_strings, string_create_create_force);
+
+    char **strings_added_strs = database_string_read(NULL, database, strings_added, num_created_strings);
+    for (int i = 0; i < num_created_strings; i++) {
+             printf("Created in db: '%lld: %s'\n", strings_added[i], strings_added_strs[i]);
+    }
 
     size_t num_strings_in_db;
     string_id_t *all_string_ids = database_string_fullscan(&num_strings_in_db, NULL, database);
 
     /*char **loaded_strings = */database_string_read(NULL, database, all_string_ids, num_strings_in_db);
-/*
-    for (int i = 0; i < num_strings_in_db; i++) {
-        printf("Load from db: '%lld: %s'\n", all_string_ids[i], loaded_strings[i]);
-    }
-*/
+
+   // for (int i = 0; i < num_strings_in_db; i++) {
+   //     printf("Load from db: '%lld: %s'\n", all_string_ids[i], loaded_strings[i]);
+   // }
+
     size_t num_strings_found = 0;
     char **needles = malloc (3 * sizeof(char **));
     needles[0] = malloc(strlen("Mouse") + 1);
@@ -84,7 +82,8 @@ int main() {
     strcpy(needles[2], "Dog");
 
     long begin = now_ms();
-    string_id_t *found_str_ids = database_string_find(&num_strings_found, &status, database, needles, 3);
+    string_id_t *found_str_ids;
+    database_string_find(&num_strings_found, &found_str_ids, NULL, database, needles, 3);
     long end = now_ms();
 
    /* char **strings_found =*/ database_string_read(NULL, database, found_str_ids, num_strings_found);

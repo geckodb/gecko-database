@@ -188,7 +188,7 @@ typedef enum string_create_mode_t
 } string_create_mode_t;
 
 string_id_t *database_string_create(size_t *num_created_strings, gs_status_t *status, database_t *db, const char **strings,
-                                    size_t num_strings, string_create_mode_t mode);
+                                    size_t num_strings_to_import, string_create_mode_t mode);
 
 /**
  * Side effects: parameter 'strings' might get sorted
@@ -199,7 +199,8 @@ string_id_t *database_string_create(size_t *num_created_strings, gs_status_t *st
  * @param num_strings
  * @return
  */
-string_id_t *database_string_find(size_t *num_strings_found, gs_status_t *status, database_t *db, char **strings, size_t num_strings);
+gs_status_t database_string_find(size_t *num_strings_found, string_id_t **strings_found, char ***strings_not_found,
+                                 database_t *db, char **strings, size_t num_strings);
 
 string_id_t *database_string_fullscan(size_t *num_strings, gs_status_t *status, database_t *db);
 
