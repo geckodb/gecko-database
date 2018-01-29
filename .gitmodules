@@ -7,3 +7,6 @@
 [submodule "gecko-commons"]
 	path = gecko-commons
 	url = https://github.com/geckodb/gecko-commons.git
+[submodule "gecko-http"]
+	path = gecko-http
+	url = https://github.com/geckodb/gecko-http.git
