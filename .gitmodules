@@ -4,3 +4,6 @@
 [submodule "libs/gecko-commons"]
 	path = libs/gecko-commons
 	url = https://github.com/geckodb/gecko-commons.git
+[submodule "gecko-commons"]
+	path = gecko-commons
+	url = https://github.com/geckodb/gecko-commons.git
