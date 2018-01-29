@@ -74,6 +74,28 @@ typedef struct __attribute__((__packed__)) nodes_header_t
     node_slot_id_t           capacity;
 } node_records_header_t;
 
+typedef struct __attribute__((__packed__)) string_records_header_t
+{
+    offset_t            capacity_in_byte,
+                        size_in_byte;
+    offset_t            write_offset;
+} string_records_header_t;
+
+typedef struct __attribute__((__packed__)) string_lookup_header_t
+{
+    string_id_t         id_cursor;
+    size_t              capacity;
+} string_lookup_header_t;
+
+typedef struct __attribute__((__packed__)) string_lookup_entry_t
+{
+    offset_t            string_offset;
+    unsigned            string_length;
+    union {
+        short           in_use : 1;
+    } flags;
+} string_lookup_entry_t;
+
 typedef struct __attribute__((__packed__)) edges_header_t
 {
     edge_slot_id_t           next_edge_id;
@@ -136,6 +158,11 @@ static inline gs_status_t unsafe_node_new_version(node_slot_id_t *cpy_slot_id, d
                                                   size_t approx_num_new_nodes, node_slot_id_t original_slot);
 static inline gs_status_t unsafe_node_adjust_lifetime(database_node_t *node, node_slot_id_t slot_id,
                                                       database_t *db, const timespan_t *lifetime);
+static inline gs_status_t unsafe_read_string_records_header(string_records_header_t *header, database_t *db);
+static inline gs_status_t unsafe_read_string_lookup_header(string_lookup_header_t *header, database_t *db);
+static inline gs_status_t unsafe_update_string_records_header(database_t *database, const string_records_header_t *header);
+static inline gs_status_t unsafe_update_string_index_header(database_t *database,
+                                                            const string_lookup_header_t *header);
 
 static inline gs_status_t create_db(database_t *database);
 static inline gs_status_t create_nodes_db(database_t *database);
@@ -212,8 +239,12 @@ node_id_t *database_nodes_create(gs_status_t *result, database_t *db, size_t num
 
     database_lock(db);
 
-    unsafe_read_node_records_header(&records_header, db);
-    unsafe_read_node_index_header(&index_header, db);
+    if (unsafe_read_node_records_header(&records_header, db) != GS_SUCCESS ||
+            unsafe_read_node_index_header(&index_header, db) != GS_SUCCESS) {
+        GS_OPTIONAL(result != NULL, *result = GS_LOAD_FAILED)
+        free (retval);
+        return NULL;
+    }
 
     // Store old information from the header in case writes to the storage or index fails
     node_record_next_id_backup = records_header.next_node_id;
@@ -264,6 +295,8 @@ node_id_t *database_nodes_create(gs_status_t *result, database_t *db, size_t num
             // Something went wront during write. Reset these changes by not updating the records_header (i.e., changes writen
             // so far are overwritten next time), release lock and notify about failure
             database_unlock(db);
+            GS_OPTIONAL(result != NULL, *result = GS_WRITE_FAILED)
+            free (retval);
             return NULL;
         };
 
@@ -274,6 +307,8 @@ node_id_t *database_nodes_create(gs_status_t *result, database_t *db, size_t num
             // were written. However, since the index header is not updated, these changes will be overwritten the next
             // time. Thus, no rollback is needed.
             database_unlock(db);
+            GS_OPTIONAL(result != NULL, *result = GS_WRITE_FAILED)
+            free (retval);
             return NULL;
         };
         retval[i] = records_header.next_node_id++;
@@ -309,7 +344,7 @@ node_id_t *database_nodes_create(gs_status_t *result, database_t *db, size_t num
             // time. To sum up, this case is an database insert failure without side effects.
 
             // Nothing to do but to release the lock and notify about failure.
-            database_unlock(db);
+
             GS_OPTIONAL(result != NULL, *result = GS_WRITE_FAILED)
         } else {
             // The index is updated and now points to nodes that are not stored in the store. Try to rollback the
@@ -325,18 +360,17 @@ node_id_t *database_nodes_create(gs_status_t *result, database_t *db, size_t num
             if (status_index_update == GS_SUCCESS) {
                 // Rollback successful, flush buffers
                 fflush(db->node_heads);
-                database_unlock(db);
                 GS_OPTIONAL(result != NULL, *result = GS_WRITE_FAILED)
             } else {
                 // Rollback failed which means that the index is damaged and not repairable by only resetting the
                 // index header.
                 // TODO: Rebuild the index file and try to swap the damaged index file with the new one
-                database_unlock(db);
                 panic("Node index file '%s' was corrupted and cannot be repaired.", db->nodes_heads_path);
                 GS_OPTIONAL(result != NULL, *result = GS_CORRUPTED)
             }
         }
         free (retval);
+        database_unlock(db);
         return NULL;
     } else {
         // Updating the store header was successful. Depending on the index write outcome, there is maybe another issue
@@ -357,17 +391,16 @@ node_id_t *database_nodes_create(gs_status_t *result, database_t *db, size_t num
             if (status_store_update == GS_SUCCESS) {
                 // Rollback was successful
                 fflush(db->node_records);
-                database_unlock(db);
                 GS_OPTIONAL(result != NULL, *result = GS_WRITE_FAILED)
             } else {
                 // Rollback failed which means that the storage is damaged and not repairable by only resetting the
                 // storage header.
                 // TODO: Handling this failure case to avoid corruption of database
-                database_unlock(db);
                 panic("Node storage file '%s' was corrupted and cannot be repaired.", db->nodes_records_path);
                 GS_OPTIONAL(result != NULL, *result = GS_CORRUPTED)
             }
             free (retval);
+            database_unlock(db);
             return NULL;
         } else {
             // Both updates were performed successfully. Release the lock and notify about this success.
@@ -507,23 +540,312 @@ gs_status_t database_node_version_cursor_close(database_node_version_cursor_t *c
     return GS_SUCCESS;
 }
 
-string_id_t *database_string_create(size_t *num_created_strings, database_t *db, const char **strings,
-                                    size_t num_strings, string_create_mode_t mode)
+string_id_t *database_string_create(size_t *num_created_strings, gs_status_t *status, database_t *db,
+                                    const char **strings, size_t num_strings, string_create_mode_t mode)
 {
-    string_id_t *result = GS_REQUIRE_MALLOC(num_strings);
-    size_t result_size = 0;
+    gs_status_t                 status_store_update, status_index_update;
+    string_id_t                 backup_in_cursor;
+    offset_t                    backup_write_offset;
+    string_records_header_t     records_header;
+    string_lookup_header_t      lookup_header;
+    const char                 *string;
+    string_id_t                *result = GS_REQUIRE_MALLOC(num_strings * sizeof(string_id_t));
+    size_t                      result_size = 0;
+    char                        empty;
+    size_t                      required_size = 0;
+    unsigned                    max_retry;
+
 
     database_lock(db);
 
-    while (num_strings--) {
-        //const char *string = strings++;
+    if ((unsafe_read_string_records_header(&records_header, db) != GS_SUCCESS) ||
+            unsafe_read_string_lookup_header(&lookup_header, db) != GS_SUCCESS){
+        // No access to string records or lookup header, release lock and return
+        GS_OPTIONAL(status != NULL, *status = GS_READ_FAILED);
+        free (result);
+        database_unlock(db);
+        return NULL;
+    };
 
+    // Backup header information for eventually rollback
+    backup_in_cursor = lookup_header.id_cursor;
+    backup_write_offset = records_header.write_offset;
 
+    // Calculate required space to store all strings in the file. Note that strings in the string storage file
+    // are not null-terminated but their length is defined in the lookup file
+    for (size_t i = 0; i < num_strings; i++) {
+        required_size += strlen(*(strings + i));
+    }
+
+    // Eventually resize the lookup file
+    if (lookup_header.id_cursor + num_strings > lookup_header.capacity) {
+        lookup_header.capacity = 1.7 * (lookup_header.capacity + num_strings);
+        fseek(db->string_lookup,
+              sizeof(string_lookup_header_t) + lookup_header.id_cursor * sizeof(string_lookup_entry_t), SEEK_SET);
+
+        string_lookup_entry_t empty_entry = {
+                .flags.in_use = FALSE
+        };
+
+        for (int i = 0; i < num_strings; i++) {
+            if (fwrite(&empty_entry, sizeof(string_lookup_entry_t), 1, db->string_lookup) != 1) {
+                // Expanding the lookup file failed. Notify caller about that failure and release lock
+                GS_OPTIONAL(status != NULL, *status = GS_FAILED);
+                free (result);
+                database_unlock(db);
+                return NULL;
+            }
+        }
+    }
+
+    // Eventually resize the file
+    records_header.size_in_byte += required_size;
+    if (records_header.size_in_byte > records_header.capacity_in_byte) {
+        records_header.capacity_in_byte = 1.7f * records_header.size_in_byte;
+        fseek(db->string_records, sizeof(string_records_header_t) + records_header.capacity_in_byte, SEEK_SET);
+        if (fwrite(&empty, sizeof(char), 1, db->string_records) != 1) {
+            // String records file cannot be resized to the required size. Notify caller about failure
+            // and release look.
+            GS_OPTIONAL(status != NULL, *status = GS_FAILED);
+            free (result);
+            database_unlock(db);
+            return NULL;
+        }
+
+        fflush(db->string_records);
+    }
+
+    switch (mode) {
+        case string_create_create_force:
+            while (num_strings--) {
+                string = *strings++;
+
+                // Write string into string string store
+                fseek(db->string_records, records_header.write_offset, SEEK_SET);
+                if (fwrite(string, strlen(string), 1, db->string_records) != 1) {
+                    // Writing the last string into the records file failed. Until this point, some string
+                    // from 'strings' argument may be written. Since the header is not updated, these changes
+                    // will be overwritten next time. Notify caller about failure and release lock.
+                    GS_OPTIONAL(status != NULL, *status = GS_FAILED);
+                    free (result);
+                    database_unlock(db);
+                    return NULL;
+                }
+
+                // Add the newly added string to the string index
+                string_lookup_entry_t entry = {
+                    .flags.in_use = TRUE,
+                    .string_length = strlen(string),
+                    .string_offset = records_header.write_offset
+                };
+
+                fseek(db->string_lookup, sizeof(string_lookup_header_t) +
+                        lookup_header.id_cursor * sizeof(string_lookup_entry_t), SEEK_SET);
+
+                if (fwrite(&entry, sizeof(string_lookup_entry_t), 1, db->string_lookup) != 1) {
+                    // Write into index failed. Until here, the string is actually written to the store
+                    // but since neither the header of the store nor the index header are updated, no
+                    // data corruption will occur. Release lock and notify caller about failure.
+                    GS_OPTIONAL(status != NULL, *status = GS_FAILED);
+                    free (result);
+                    database_unlock(db);
+                    return NULL;
+                }
+
+                // Update write offset such that the position for the next string to write is known
+                records_header.write_offset += strlen(string);
+
+                // Store the string identifier for the newly added string to the result set and
+                // update the id cursor for the next input
+                result[result_size++] = lookup_header.id_cursor++;
+            }
+            break;
+        case string_create_create_noforce:
+            panic("Not implemented '%d'", mode);
+            break;
+        default: panic("Unknown string mode '%d'", mode);
+    }
+
+    fflush(db->string_records);
+    fflush(db->string_lookup);
+
+    // Both the strings as well as the index entries are written. Now store these changes into the storage
+    // resp. index file
+
+    // Update records header in order to store that new node records were written. Give this 100 tries or fails.
+    max_retry = 100;
+    do {
+        status_store_update = unsafe_update_string_records_header(db, &records_header);
+    } while (status_store_update != GS_SUCCESS && max_retry--);
+
+    // Update index header in order add the new string into the index. Give this 100 tries or fails.
+    max_retry = 100;
+    do {
+        status_index_update = unsafe_update_string_index_header(db, &lookup_header);
+    } while (status_index_update != GS_SUCCESS && max_retry--);
+
+    // Handle file write statuses
+    if (status_store_update != GS_SUCCESS) {
+        // Updating the store header failed. Depending on the outcome of the index update, this might
+        // leader to problems.
+        if (status_index_update != GS_SUCCESS) {
+            // Both updates fail. Since neither the store nor the index header is updated, the stored strings so far
+            // will be overwritten by the next call of that function. Notify the caller about this reject and
+            // release lock.
+            GS_OPTIONAL(status != NULL, *status = GS_WRITE_FAILED);
+        } else {
+            // In this case, the index was updated but the store was not. Without repair, the index now will
+            // point to offsets in the store file which are invalid. Solution is rollback of the index update.
+
+            // Try rollback to index update. Give this 100 tries or fails.
+            max_retry = 100;
+            lookup_header.id_cursor = backup_in_cursor;
+            do {
+                status_index_update = unsafe_update_string_index_header(db, &lookup_header);
+            } while (status_index_update != GS_SUCCESS && max_retry--);
+
+            if (status_index_update == GS_SUCCESS) {
+                // Rollback successful, flush buffers
+                fflush(db->string_lookup);
+                GS_OPTIONAL(status != NULL, *status = GS_WRITE_FAILED)
+            } else {
+                // Rollback failed which means that the index is damaged and not repairable by only resetting the
+                // storage header.
+                // TODO: Handling this failure case to avoid corruption of database
+                panic("String lookup index file '%s' was corrupted and cannot be repaired.", db->string_lookup_path);
+                GS_OPTIONAL(status != NULL, *status = GS_CORRUPTED)
+            }
+        }
+
+        // In this case, at least one write fails. Cleanup result, release lock and return to caller
+        free (result);
+        database_unlock(db);
+        return NULL;
+    } else {
+        // Sring store update was successful
+        if (status_index_update != GS_SUCCESS) {
+            // Index update was not successful. The string store now contains strings that are not reachable by the
+            // index. Solution is rollback of changes to the store
+
+            // Try rollback
+            records_header.write_offset = backup_write_offset;
+
+            // Update index header in order add the new string into the index. Give this 100 tries or fails.
+            max_retry = 100;
+            do {
+                status_index_update = unsafe_update_string_index_header(db, &lookup_header);
+            } while (status_index_update != GS_SUCCESS && max_retry--);
+
+            if (status_index_update == GS_SUCCESS) {
+                // Rollback was successful
+                fflush(db->string_records);
+                GS_OPTIONAL(status != NULL, *status = GS_FAILED)
+            } else {
+                // Rollback was not successful. In this case data was written to the store and is not reachable
+                // by the index. However, there is no data corruption but storage waste. Notify the caller about this.
+                GS_OPTIONAL(status != NULL, *status = GS_WASTE)
+            }
+
+            // Cleanup and return a failure to the caller
+            free (result);
+            database_unlock(db);
+            return NULL;
+
+        } else {
+            // Both updates were performed successfully. Release the lock and notify about this success.
+            GS_OPTIONAL(status != NULL, *status = GS_SUCCESS)
+            *num_created_strings = result_size;
+            database_unlock(db);
+            return result;
+        }
+    }
+}
+
+string_id_t *database_string_find(gs_status_t *status, database_t *db, const char **strings, size_t num_strings)
+{
+    return NULL;
+}
+
+#define FREE_STR_VEC(vec, size)         \
+{                                       \
+    for (size_t j = 0; j < size; j++) { \
+        free (vec[j]);                  \
+    }                                   \
+    free (vec);                         \
+}
+
+#define EXIT_STRING_READ_FN(db, vec, size, status, status_val)  \
+{                                                               \
+    FREE_STR_VEC(vec, size);                                    \
+    GS_OPTIONAL(status != NULL, *status = status_val);          \
+    database_unlock(db);                                        \
+    return NULL;                                                \
+}
+
+char **database_string_read(gs_status_t *status, database_t *db, const string_id_t *string_ids, size_t num_strings)
+{
+    string_lookup_header_t    lookup_header;
+    string_records_header_t   records_header;
+
+    if (num_strings == 0) {
+        GS_OPTIONAL(status != NULL, *status = GS_ILLEGALARG);
+        return NULL;
+    }
+
+    char                    **result = GS_REQUIRE_MALLOC(num_strings * sizeof(char *));
+
+    database_lock(db);
+
+    if ((unsafe_read_string_records_header(&records_header, db) != GS_SUCCESS) ||
+        unsafe_read_string_lookup_header(&lookup_header, db) != GS_SUCCESS){
+        // No access to string records or lookup header, release lock and return
+        GS_OPTIONAL(status != NULL, *status = GS_READ_FAILED);
+        free (result);
+        database_unlock(db);
+        return NULL;
+    };
+
+    if (fseek(db->string_records, sizeof(string_records_header_t), SEEK_SET) != 0 ||
+            fseek(db->string_lookup, sizeof(string_lookup_header_t), SEEK_SET) != 0 ) {
+        // Seeking error, unable to load current header contents
+        GS_OPTIONAL(status != NULL, *status = GS_READ_FAILED);
+        free (result);
+        database_unlock(db);
+        return NULL;
+    };
+
+    for (size_t i = 0; i < num_strings; i++) {
+        string_id_t string_id = string_ids[i];
+
+        // In case the current id is illegal, free up all resources for the result so far and exit that function
+        if (string_id >= lookup_header.id_cursor) {
+            EXIT_STRING_READ_FN(db, result, i, status, GS_FAILED);
+        }
+
+        // Otherwise, read string entry from index
+        string_lookup_entry_t lookup_entry;
+        if (fread(&lookup_entry, sizeof(string_lookup_entry_t), 1, db->string_lookup) != 1) {
+            EXIT_STRING_READ_FN(db, result, i, status, GS_FAILED);
+        }
+
+        if (!lookup_entry.flags.in_use) {
+            EXIT_STRING_READ_FN(db, result, i, status, GS_FAILED);
+        }
+
+        result[i] = GS_REQUIRE_MALLOC(lookup_entry.string_length + 1);
+        result[i][lookup_entry.string_length] = '\0';
+
+        if (fseek(db->string_records, lookup_entry.string_offset, SEEK_SET) != 0) {
+            EXIT_STRING_READ_FN(db, result, i, status, GS_FAILED);
+        }
+
+        if (fread(result[i], lookup_entry.string_length, 1, db->string_records) != 1) {
+            EXIT_STRING_READ_FN(db, result, i, status, GS_FAILED);
+        }
     }
 
     database_unlock(db);
-
-    *num_created_strings = result_size;
+    GS_OPTIONAL(status != NULL, *status = GS_SUCCESS);
     return result;
 }
 
@@ -590,7 +912,7 @@ static inline gs_status_t unsafe_read_node_index_header(node_index_header_t *hea
 static inline gs_status_t unsafe_update_node_records_header(database_t *database, const node_records_header_t *header)
 {
     fseek(database->node_records, 0, SEEK_SET);
-    bool result = fwrite(header, sizeof(node_records_header_t), 1, database->node_records) == 1 ? GS_SUCCESS : GS_FAILED;
+    gs_status_t result = fwrite(header, sizeof(node_records_header_t), 1, database->node_records) == 1 ? GS_SUCCESS : GS_FAILED;
     fflush(database->node_records);
     return result;
 }
@@ -598,7 +920,7 @@ static inline gs_status_t unsafe_update_node_records_header(database_t *database
 static inline gs_status_t unsafe_update_node_index_header(database_t *database, const node_index_header_t *header)
 {
     fseek(database->node_heads, 0, SEEK_SET);
-    bool result = fwrite(header, sizeof(node_index_header_t), 1, database->node_heads) == 1 ? GS_SUCCESS : GS_FAILED;
+    gs_status_t result = fwrite(header, sizeof(node_index_header_t), 1, database->node_heads) == 1 ? GS_SUCCESS : GS_FAILED;
     fflush(database->node_heads);
     return result;
 }
@@ -736,6 +1058,38 @@ static inline gs_status_t unsafe_node_adjust_lifetime(database_node_t *node, nod
     }
 }
 
+static inline gs_status_t unsafe_read_string_records_header(string_records_header_t *header, database_t *db)
+{
+    fseek(db->string_records, 0, SEEK_SET);
+    return (fread(header, sizeof(string_records_header_t), 1, db->string_records) == 1 ? GS_SUCCESS : GS_FAILED);
+}
+
+static inline gs_status_t unsafe_read_string_lookup_header(string_lookup_header_t *header, database_t *db)
+{
+    fseek(db->string_lookup, 0, SEEK_SET);
+    return (fread(header, sizeof(string_lookup_header_t), 1, db->string_lookup) == 1 ? GS_SUCCESS : GS_FAILED);
+}
+
+static inline gs_status_t unsafe_update_string_records_header(database_t *database,
+                                                              const string_records_header_t *header)
+{
+    fseek(database->string_records, 0, SEEK_SET);
+    gs_status_t result = (fwrite(header, sizeof(string_records_header_t), 1, database->string_records) == 1 ?
+                          GS_SUCCESS : GS_FAILED);
+    fflush(database->string_records);
+    return result;
+}
+
+static inline gs_status_t unsafe_update_string_index_header(database_t *database,
+                                                            const string_lookup_header_t *header)
+{
+    fseek(database->string_lookup, 0, SEEK_SET);
+    gs_status_t result = (fwrite(header, sizeof(string_lookup_header_t), 1, database->string_lookup) == 1 ?
+                          GS_SUCCESS : GS_FAILED);
+    fflush(database->string_lookup);
+    return result;
+}
+
 static inline gs_status_t create_db(database_t *database)
 {
     if (create_nodes_db(database) != GS_SUCCESS)
@@ -815,36 +1169,14 @@ static inline gs_status_t create_edges_db(database_t *database)
     return GS_SUCCESS;
 }
 
-typedef struct __attribute__((__packed__)) string_records_header_t
-{
-    string_id_t         next_id;
-    offset_t            capacity_in_byte;
-    offset_t            size_in_byte;
-} string_records_header_t;
-
-typedef struct __attribute__((__packed__)) string_lookup_header_t
-{
-    string_id_t         id_cursor;
-    offset_t            capacity;
-} string_lookup_header_t;
-
-typedef struct __attribute__((__packed__)) string_lookup_entry_t
-{
-    offset_t            string_offset;
-    unsigned            string_length;
-    union {
-        short           in_use : 1;
-    } flags;
-} string_lookup_entry_t;
-
 static inline gs_status_t create_stringpool_db(database_t *database)
 {
     char empty;
 
     string_records_header_t records_header = {
-        .capacity_in_byte       = DB_STRING_POOL_CAPACITY_BYTE,
         .size_in_byte           = 0,
-        .next_id                = 0
+        .capacity_in_byte       = DB_STRING_POOL_CAPACITY_BYTE,
+        .write_offset           = sizeof(string_records_header_t)
     };
 
     if ((database->string_records = fopen(database->string_records_path, "wb")) == NULL)

@@ -6,7 +6,7 @@
 
 #define DB_NODE_DEFAULT_CAPACITY                  100
 #define DB_EDGE_DEFAULT_CAPACITY                 1000
-#define DB_STRING_POOL_CAPACITY_BYTE         10485760
+#define DB_STRING_POOL_CAPACITY_BYTE         1024
 #define DB_STRING_POOL_LOOKUP_SLOT_CAPACITY       100
 
 /* forwarding */
@@ -184,8 +184,12 @@ typedef enum string_create_mode_t
     string_create_create_force, string_create_create_noforce
 } string_create_mode_t;
 
-string_id_t *database_string_create(size_t *num_created_strings, database_t *db, const char **strings,
+string_id_t *database_string_create(size_t *num_created_strings, gs_status_t *status, database_t *db, const char **strings,
                                     size_t num_strings, string_create_mode_t mode);
+
+string_id_t *database_string_find(gs_status_t *status, database_t *db, const char **strings, size_t num_strings);
+
+char      **database_string_read(gs_status_t *status, database_t *db, const string_id_t *string_ids, size_t num_strings);
 
 prop_id_t  *database_create_prop(database_t *db, const target_t *target, const char *key, const value_t *value,
                                  const timespan_t *lifetime);

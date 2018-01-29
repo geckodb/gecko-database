@@ -3,15 +3,15 @@
 #include <storage/timespan.h>
 
 int main() {
-    int num_new_nodes = 10;
+    int num_new_nodes = 1;
 
     database_t *database;
     database_open(&database, "/Users/marcus/temp/db");
     gs_status_t status;
     timespan_t lifetime = { .begin = 0, .end = 200};
-    node_id_t *node_records = database_nodes_create(&status, database, num_new_nodes, &lifetime);
+    /*node_id_t *node_records =*/ database_nodes_create(&status, database, num_new_nodes, &lifetime);
 
-    database_node_cursor_t *cursor;
+   /* database_node_cursor_t *cursor;
     database_nodes_fullscan(&cursor, database);
     database_node_cursor_open(cursor);
 
@@ -43,6 +43,25 @@ int main() {
         lifetime.begin = 10 + i;
         lifetime.end = 300 + i;
         database_nodes_alter_lifetime(database, node_records, num_new_nodes, &lifetime)  ;
+    }
+
+    */
+
+    unsigned num_strings = 25;
+    const char **strings = malloc(num_strings * sizeof(char *));
+    for (int i = 0; i < num_strings; i++) {
+        strings[i] = malloc(sizeof("Hi There!"));
+        strings[i] = "Hi There!";
+    }
+
+    gs_status_t status_add_str;
+    size_t num_created_strings;
+    string_id_t *string_ids = database_string_create(&num_created_strings, &status_add_str, database, strings, num_strings, string_create_create_force);
+
+    char **loaded_strings = database_string_read(NULL, database, string_ids, num_strings);
+
+    for (int i = 0; i < num_strings; i++) {
+        printf("Load from db: '%lld: %s'\n", string_ids[i], loaded_strings[i]);
     }
 
 
