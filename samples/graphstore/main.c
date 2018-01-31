@@ -55,15 +55,17 @@ int main() {
     unsigned num_strings = 500;
     const char **strings = malloc(num_strings * sizeof(char *));
     for (int i = 0; i < num_strings; i++) {
-        strings[i] = malloc(sizeof("Hzz There!") + 1);
-        strings[i] = "Hzz There!";
+        strings[i] = malloc(sizeof("Hzzr There!") + 1);
+        strings[i] = "Hzzr There!";
     }
 
     gs_status_t status_add_str;
     size_t num_created_strings;
 
     gs_timer_start(&timer_strings_created);
-    string_id_t *strings_added = database_string_create(&num_created_strings, &status_add_str, database, strings, num_strings, string_create_create_force);
+    /* Each string is intended to be stored in the cache due to 'buffer_alloc_fetch' */
+    string_id_t *strings_added = database_string_create(&num_created_strings, &status_add_str, database, strings,
+                                                        num_strings, memorization_policy_keep_in_cache);
     gs_timer_stop(&timer_strings_created);
 
     gs_timer_start(&timer_strings_read);

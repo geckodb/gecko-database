@@ -3,6 +3,7 @@
 
 #include <gecko-commons/gecko-commons.h>
 #include <storage/timespan.h>
+#include <storage/buffer.h>
 
 #define DB_NODE_DEFAULT_CAPACITY                  100
 #define DB_EDGE_DEFAULT_CAPACITY                 1000
@@ -183,13 +184,14 @@ gs_status_t database_node_version_cursor_next(database_node_version_cursor_t *cu
 gs_status_t database_node_version_cursor_read(database_node_t *node, database_node_version_cursor_t *cursor);
 gs_status_t database_node_version_cursor_close(database_node_version_cursor_t *cursor);
 
-typedef enum string_create_mode_t
+
+typedef enum memorization_policy_e
 {
-    string_create_create_force, string_create_create_noforce
-} string_create_mode_t;
+    memorization_policy_keep_in_cache, memorization_policy_dont_keep_in_cache
+} memorization_policy_e;
 
 string_id_t *database_string_create(size_t *num_created_strings, gs_status_t *status, database_t *db, const char **strings,
-                                    size_t num_strings_to_import, string_create_mode_t mode);
+                                    size_t num_strings_to_import, memorization_policy_e policy);
 
 /**
  * Side effects: parameter 'strings' might get sorted
