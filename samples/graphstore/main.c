@@ -55,8 +55,8 @@ int main() {
     unsigned num_strings = 500;
     const char **strings = malloc(num_strings * sizeof(char *));
     for (int i = 0; i < num_strings; i++) {
-        strings[i] = malloc(sizeof("Ht There!") + 1);
-        strings[i] = "Ht There!";
+        strings[i] = malloc(sizeof("Hzz There!") + 1);
+        strings[i] = "Hzz There!";
     }
 
     gs_status_t status_add_str;
