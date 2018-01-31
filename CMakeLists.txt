@@ -137,6 +137,8 @@ set(SOURCE_FILES
         include/storage/dirs.h
         src/storage/dirs.c
 
+        include/storage/buffer.h
+        src/storage/buffer.c
 )
 
 

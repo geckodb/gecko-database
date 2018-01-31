@@ -1,7 +1,10 @@
 #include <storage/database.h>
 #include <storage/files.h>
 #include <storage/dirs.h>
+#include <storage/buffer.h>
+
 #include <apr_strings.h>
+
 
 // The file containing node records and the per-node version chain
 #define DB_NODES_FILE                "nodes.records"
@@ -49,6 +52,8 @@ typedef struct database_t
                        *string_lookup,
 
                        *edge_records;
+
+    buffer_t            *string_records_cache;
 
 
     const char         *nodes_records_path,
@@ -178,6 +183,33 @@ static inline gs_status_t open_nodes_db(database_t *database);
 static inline gs_status_t open_edges_db(database_t *database);
 static inline gs_status_t open_stringpool_db(database_t *database);
 
+static inline gs_status_t cache_string_records_find(void **values, const void *keys, size_t num_keys);
+
+static inline gs_status_t buffer_string_store_string_bulk_comp(int *result, const void *needle, const slot_t *haystack, size_t nhaystack)
+{
+    const char *string_needle = *(const char **) needle;
+    while (nhaystack--) {
+        *result = haystack->flags.in_use ? strcmp(string_needle, (*(const char **) haystack->key)) : 1;
+        haystack++;
+        result++;
+    }
+    return GS_SUCCESS;
+}
+
+static inline gs_status_t buffer_string_store_write_func(const void *keys, const void *values, size_t num_elements)
+{
+    const char **str_keys = (const char **) keys;
+    const char **str_values = (const char **) values;
+
+    while (num_elements--) {
+        const char *key = *(str_keys++);
+        const char *value = *(str_values++);
+        printf(">> WRITING: (%s, %s)\n", key, value);
+    }
+
+    return GS_SUCCESS;
+}
+
 gs_status_t database_open(database_t **db, const char *dbpath)
 {
     gs_status_t status;
@@ -188,6 +220,13 @@ gs_status_t database_open(database_t **db, const char *dbpath)
     apr_pool_create(&database->apr_pool, NULL);
     database->dbpath = apr_pstrdup(database->apr_pool, dbpath);
     gs_spinlock_create(&database->spinlock);
+
+    if (buffer_create(&database->string_records_cache, sizeof(char *), buffer_string_store_string_bulk_comp,
+                      sizeof(string_id_t), DB_STRING_POOL_CACHE_SIZE,
+                      cache_string_records_find, buffer_string_store_write_func,
+                      buffer_replacement_lru, buffer_write_back, buffer_alloc_fetch) != GS_SUCCESS) {
+        return GS_FAILED;
+    }
 
     if ((status = dirs_add_filename(&database->nodes_records_path, database->dbpath, DB_NODES_FILE,
                                     database->apr_pool)) != GS_SUCCESS)
@@ -549,6 +588,11 @@ gs_status_t database_node_version_cursor_close(database_node_version_cursor_t *c
 string_id_t *database_string_create(size_t *num_created_strings, gs_status_t *status, database_t *db,
                                     const char **strings, size_t num_strings_to_import, string_create_mode_t mode)
 {
+
+    buffer_put(db->string_records_cache, NULL, strings, strings, num_strings_to_import);
+    buffer_get(NULL, )
+
+
     gs_status_t                 status_store_update, status_index_update;
     string_id_t                 backup_in_cursor;
     offset_t                    backup_write_offset;
@@ -577,6 +621,7 @@ string_id_t *database_string_create(size_t *num_created_strings, gs_status_t *st
     size_t num_strings_found;
     size_t num_new_strings;
     char **new_strings = NULL;
+
     if (database_string_find(&num_strings_found, &strings_found_ids, &new_strings, db, unique_strings_to_import,
                              num_strings_to_import)
         != GS_SUCCESS) {
@@ -822,6 +867,15 @@ string_id_t *database_string_create(size_t *num_created_strings, gs_status_t *st
 static inline int comp_str(const void *lhs, const void *rhs)
 {
     return strcmp(*(const char **) lhs, *(const char **) rhs);
+}
+
+static inline gs_status_t cache_string_records_find(void **values, const void *keys, size_t num_keys)
+{
+    while (num_keys--) {
+        char *key = *((char **) keys++);
+        printf("looking for %s\n", key);
+    }
+    return GS_SUCCESS;
 }
 
 gs_status_t database_string_find(size_t *num_strings_found, string_id_t **strings_found, char ***strings_not_found,

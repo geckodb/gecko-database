@@ -6,8 +6,9 @@
 
 #define DB_NODE_DEFAULT_CAPACITY                  100
 #define DB_EDGE_DEFAULT_CAPACITY                 1000
-#define DB_STRING_POOL_CAPACITY_BYTE         1024
+#define DB_STRING_POOL_CAPACITY_BYTE             1024
 #define DB_STRING_POOL_LOOKUP_SLOT_CAPACITY       100
+#define DB_STRING_POOL_CACHE_SIZE                   5
 
 /* forwarding */
 typedef struct pool_t pool_t;

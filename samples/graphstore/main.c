@@ -52,11 +52,11 @@ int main() {
 
 
 
-    unsigned num_strings = 5;
+    unsigned num_strings = 500;
     const char **strings = malloc(num_strings * sizeof(char *));
     for (int i = 0; i < num_strings; i++) {
-        strings[i] = malloc(sizeof("Hr There!") + 1);
-        strings[i] = "Hr There!";
+        strings[i] = malloc(sizeof("Ht There!") + 1);
+        strings[i] = "Ht There!";
     }
 
     gs_status_t status_add_str;
@@ -68,7 +68,7 @@ int main() {
 
     gs_timer_start(&timer_strings_read);
     char **strings_added_strs = database_string_read(NULL, database, strings_added, num_created_strings);
-    gs_timer_start(&timer_strings_read);
+    gs_timer_stop(&timer_strings_read);
 
     for (int i = 0; i < num_created_strings; i++) {
              printf("Created in db: '%lld: %s'\n", strings_added[i], strings_added_strs[i]);
@@ -77,11 +77,11 @@ int main() {
     size_t num_strings_in_db;
     gs_timer_start(&timer_strings_fullscan);
     string_id_t *all_string_ids = database_string_fullscan(&num_strings_in_db, NULL, database);
-    gs_timer_start(&timer_strings_fullscan);
+    gs_timer_stop(&timer_strings_fullscan);
 
     gs_timer_start(&timer_strings_fullscan_read);
     char **loaded_strings = database_string_read(NULL, database, all_string_ids, num_strings_in_db);
-    gs_timer_start(&timer_strings_fullscan_read);
+    gs_timer_stop(&timer_strings_fullscan_read);
 
     for (int i = 0; i < num_strings_in_db; i++) {
         printf("Load from db: '%lld: %s'\n", all_string_ids[i], loaded_strings[i]);
@@ -99,7 +99,7 @@ int main() {
     gs_timer_start(&timer_strings_find);
     string_id_t *found_str_ids;
     database_string_find(&num_strings_found, &found_str_ids, NULL, database, needles, 3);
-    gs_timer_start(&timer_strings_find);
+    gs_timer_stop(&timer_strings_find);
 
     char **strings_found = database_string_read(NULL, database, found_str_ids, num_strings_found);
 
@@ -115,15 +115,22 @@ int main() {
            "timer_strings_fullscan_read:\t%lldmsec\n"
            "timer_strings_find:\t%lldmsec\n",
             gs_timer_diff_ms(&timer_nodes_created),
-           gs_timer_diff_ms(&timer_strings_created),
-           gs_timer_diff_ms(&timer_strings_read),
-           gs_timer_diff_ms(&timer_strings_fullscan),
-           gs_timer_diff_ms(&timer_strings_fullscan_read),
-           gs_timer_diff_ms(&timer_strings_find));
+            gs_timer_diff_ms(&timer_strings_created),
+            gs_timer_diff_ms(&timer_strings_read),
+            gs_timer_diff_ms(&timer_strings_fullscan),
+            gs_timer_diff_ms(&timer_strings_fullscan_read),
+            gs_timer_diff_ms(&timer_strings_find));
 
 
-
-
+    free (node_records);
+    free (strings);
+    free (strings_added);
+    free (strings_added_strs);
+    free (all_string_ids);
+    free (loaded_strings);
+    free (needles);
+    free (found_str_ids);
+    free (strings_found);
 
     return 0;
 }
