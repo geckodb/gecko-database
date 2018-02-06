@@ -64,7 +64,8 @@ size_t gs_tuplet_size(gs_tuplet_t *tuplet)
 {
     GS_REQUIRE_NONNULL(tuplet);
     GS_REQUIRE_NONNULL(tuplet->fragment);
-    return tuplet->fragment->tuplet_size;
+    return ((gs_frag_fat_extras *) tuplet->fragment->extras)
+            ->tuplet_size;
 }
 
 void *gs_tuplet_update(void *dst, gs_schema_t *frag, gs_attr_id_t attr_id, void *src)

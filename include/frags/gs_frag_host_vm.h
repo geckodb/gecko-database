@@ -32,3 +32,4 @@ struct gs_frag_t;
 
 struct gs_frag_t *gs_frag_host_vm_nsm_new(gs_schema_t *schema, size_t tuplet_capacity);
 struct gs_frag_t *gs_frag_host_vm_dsm_new(gs_schema_t *schema, size_t tuplet_capacity);
+struct gs_frag_t *gs_frag_host_vm_thin_dsm_new(gs_schema_t *schema, size_t tuplet_capacity);

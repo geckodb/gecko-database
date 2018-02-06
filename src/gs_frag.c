@@ -101,13 +101,15 @@ enum gs_field_type_e gs_frag_field_type(const gs_frag_t *frag, gs_attr_id_t id)
 
 gs_frag_t *gs_frag_new(gs_schema_t *schema, size_t tuplet_capacity, enum gs_frag_impl_type_e type)
 {
+    panic_if(type != FIT_HOST_DSM_VM && type != FIT_HOST_NSM_VM && type != FIT_HOST_DSM_THIN_VM,
+             NOTIMPLEMENTED, "type");
     REQUIRE((tuplet_capacity > 0), "capacity of tuplets must be non zero");
 
     gs_frag_t *result = frag_type_pool[find_type_match(type)]._create(schema, tuplet_capacity);
     result->impl_type = type;
 
     panic_if((result->_dispose == NULL), NOTIMPLEMENTED, "gs_frag_t::dispose");
-//    panic_if((result->_scan == NULL), NOTIMPLEMENTED, "gs_frag_t::scan");
+    panic_if((result->_scan == NULL), NOTIMPLEMENTED, "gs_frag_t::scan");
     panic_if((result->_open == NULL), NOTIMPLEMENTED, "gs_frag_t::open");
     panic_if((result->_insert == NULL), NOTIMPLEMENTED, "gs_frag_t::this_query");
     return result;
@@ -122,7 +124,7 @@ void gs_frag_insert(struct gs_tuplet_t *out, gs_frag_t *frag, size_t ntuplets)
     gs_tuplet_t tmp;
     frag->_insert(&tmp, frag, ntuplets);
     GS_REQUIRE_NONNULL(tmp.fragment)
-    GS_REQUIRE_NONNULL(tmp.attr_base)
+ //   GS_REQUIRE_NONNULL(tmp.attr_base)
 
     if (out != NULL) {
         *out = tmp;

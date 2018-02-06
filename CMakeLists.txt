@@ -41,8 +41,9 @@ include_directories(
     ${APR_INCLUDE_DIR}
     # This is a hack in case APR is not found in macOS High Sierra.
     # You may install apr and apr-utils from sources and symbolic link these directories
-    "/usr/local/apr/include/apr-1/"
+#    "/usr/local/apr/include/apr-1/"
     "/usr/local/apr/include/apr-utils"
+    "/usr/include/apr-1"
 
     ${OPENSSL_INCLUDE_DIR}
     ${CURSES_INCLUDE_DIR}
@@ -99,7 +100,8 @@ set(SOURCE_FILES
     include/gs_system.h
 
     src/gs_attr.c
-    src/frags/gs_frag_host_vm2.c
+    src/frags/gs_frag_host_fat_vm.c
+    src/frags/gs_frag_host_thin_vm.c
     src/gs_tuplet_field.c
     src/gs_frag.c
     src/gs_pred.c
@@ -163,7 +165,7 @@ add_executable(
 
 add_executable(
         dsm_imp
-        playground_dsm/play_fragments.c
+        playground_dsm/play_fragments2.c
         ${SOURCE_FILES}
 )
 add_executable(

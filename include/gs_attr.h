@@ -43,7 +43,6 @@ typedef struct gs_attr_t {
     gs_attr_flags_e flags;
     size_t str_format_mlen;
     unsigned char checksum[MD5_DIGEST_LENGTH];
-    gs_vec_t *attr_values;
 } gs_attr_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -82,6 +81,5 @@ DECLARE_ATTRIBUTE_CREATE(size, FT_SIZE)
 DECLARE_ATTRIBUTE_CREATE(tformat, FT_TFORMAT)
 DECLARE_ATTRIBUTE_CREATE(rectype, FT_RECTYPE)
 DECLARE_ATTRIBUTE_CREATE(reltype, FT_RELTYPE)
-
 
 

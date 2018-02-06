@@ -24,6 +24,15 @@
 #include <gs_attr.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
+// D A T A T Y P E S
+// ---------------------------------------------------------------------------------------------------------------------
+
+//typedef struct gs_frag_fat_extras {
+//    void *tuplet_data; /*!< data inside this fragment; the record format (e.g., NSM/DSM) is implementation-specific */
+//    size_t tuplet_size; /*!< size in byte of a single tuplet */
+//} gs_frag_fat_extras;
+
+// ---------------------------------------------------------------------------------------------------------------------
 // M A C R O S
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -34,31 +43,31 @@
 // H E L P E R   P R O T O T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
- gs_frag_t *frag_create(gs_schema_t *schema, size_t tuplet_capacity, enum gs_tuplet_format_e format);
+ static gs_frag_t *frag_create(gs_schema_t *schema, size_t tuplet_capacity, enum gs_tuplet_format_e format);
 
- void frag_open(gs_tuplet_t *dst, gs_frag_t *self, gs_tuplet_id_t tuplet_id);
- void frag_add(gs_tuplet_t *dst, struct gs_frag_t *self, size_t ntuplets);
- void frag_dipose(gs_frag_t *self);
+ static void frag_open(gs_tuplet_t *dst, gs_frag_t *self, gs_tuplet_id_t tuplet_id);
+ static void frag_add(gs_tuplet_t *dst, struct gs_frag_t *self, size_t ntuplets);
+ static void frag_dipose(gs_frag_t *self);
 
- void tuplet_rebase(gs_tuplet_t *tuplet, gs_frag_t *frag, gs_tuplet_id_t tuplet_id);
- bool tuplet_step(gs_tuplet_t *self);
- void frag_open_internal(gs_tuplet_t *out, gs_frag_t *self, size_t pos);
- void tuplet_bind(gs_tuplet_field_t *dst, gs_tuplet_t *self);
- void tuplet_set_value(gs_tuplet_t *self, const void *data);
- void tuplet_set_null2(gs_tuplet_t *self);
- void tuplet_delete(gs_tuplet_t *self);
- bool tuplet_is_null2(gs_tuplet_t *self);
+ static void tuplet_rebase(gs_tuplet_t *tuplet, gs_frag_t *frag, gs_tuplet_id_t tuplet_id);
+ static bool tuplet_step(gs_tuplet_t *self);
+ static void frag_open_internal(gs_tuplet_t *out, gs_frag_t *self, size_t pos);
+ static void tuplet_bind(gs_tuplet_field_t *dst, gs_tuplet_t *self);
+ static void tuplet_set_value(gs_tuplet_t *self, const void *data);
+ static void tuplet_set_null2(gs_tuplet_t *self);
+ static void tuplet_delete(gs_tuplet_t *self);
+ static bool tuplet_is_null2(gs_tuplet_t *self);
 
- void field_rebase(gs_tuplet_field_t *field);
- void field_movebase(gs_tuplet_field_t *field);
- size_t field_nsm_jmp_size(gs_tuplet_field_t *field);
- size_t field_dsm_jmp_size(gs_tuplet_field_t *field, size_t dst_tuplet_slot_id, size_t dst_attr_id);
- bool field_next(gs_tuplet_field_t *field, bool auto_next);
- bool field_seek(gs_tuplet_field_t *field, gs_attr_id_t attr_id);
- const void *field_read(gs_tuplet_field_t *field);
- void field_update(gs_tuplet_field_t *field, const void *data);
- void field_set_null(gs_tuplet_field_t *field);
- bool field_is_null(gs_tuplet_field_t *field);
+ static void field_rebase(gs_tuplet_field_t *field);
+ static void field_movebase(gs_tuplet_field_t *field);
+ static size_t field_nsm_jmp_size(gs_tuplet_field_t *field);
+ static size_t field_dsm_jmp_size(gs_tuplet_field_t *field, size_t dst_tuplet_slot_id, size_t dst_attr_id);
+ static bool field_next(gs_tuplet_field_t *field, bool auto_next);
+ static bool field_seek(gs_tuplet_field_t *field, gs_attr_id_t attr_id);
+ static const void *field_read(gs_tuplet_field_t *field);
+ static void field_update(gs_tuplet_field_t *field, const void *data);
+ static void field_set_null(gs_tuplet_field_t *field);
+ static bool field_is_null(gs_tuplet_field_t *field);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // I N T E R F A C E   I M P L E M E N T A T I O N
@@ -82,19 +91,23 @@ struct gs_frag_t *gs_frag_host_vm_dsm_new(gs_schema_t *schema, size_t tuplet_cap
 {
     gs_frag_t *fragment = GS_REQUIRE_MALLOC(sizeof(gs_frag_t));
     size_t tuplet_size   = gs_tuplet_size_by_schema(schema);
+    gs_frag_fat_extras fat_extras;
     size_t required_size = tuplet_size * tuplet_capacity;
     *fragment = (gs_frag_t) {
             .schema = gs_schema_cpy(schema),
             .format = format,
             .ntuplets = 0,
             .ncapacity = tuplet_capacity,
-            .tuplet_data = GS_REQUIRE_MALLOC (required_size),
-            .tuplet_size = tuplet_size,
+            .extras = &fat_extras,
             ._scan = gs_scan_mediator,
             ._dispose = frag_dipose,
             ._open = frag_open,
             ._insert = frag_add
     };
+
+    ((gs_frag_fat_extras *) fragment->extras)->tuplet_data = GS_REQUIRE_MALLOC (required_size);
+    ((gs_frag_fat_extras *) fragment->extras)->tuplet_size = tuplet_size;
+
     return fragment;
 }
 
@@ -106,7 +119,7 @@ struct gs_frag_t *gs_frag_host_vm_dsm_new(gs_schema_t *schema, size_t tuplet_cap
 
 void frag_dipose(gs_frag_t *self)
 {
-    free (self->tuplet_data);
+    free (((gs_frag_fat_extras *) self->extras)->tuplet_data);
     gs_schema_delete(self->schema);
     free (self);
 }
@@ -121,10 +134,10 @@ void frag_dipose(gs_frag_t *self)
     tuplet->fragment = frag;
 
     size_t offset = tuplet_id * (frag->format == TF_NSM ?
-                               (frag->tuplet_size) :
+                               (((gs_frag_fat_extras *) frag->extras)->tuplet_size) :
                                  gs_attr_total_size(gs_schema_attr_by_id(frag->schema, 0)));
 
-    tuplet->attr_base = frag->tuplet_data + offset;
+    tuplet->attr_base = (((gs_frag_fat_extras *) frag->extras)->tuplet_data) + offset;
 }
 
  void frag_open_internal(gs_tuplet_t *out, gs_frag_t *self, size_t pos)
@@ -159,7 +172,9 @@ void frag_open(gs_tuplet_t *dst, gs_frag_t *self, gs_tuplet_id_t tuplet_id)
         while (new_capacity < new_size) {
             new_capacity = max(1, ceil(new_capacity * 1.7f));
         }
-        self->tuplet_data = realloc(self->tuplet_data, new_capacity * self->tuplet_size);
+        ((gs_frag_fat_extras *) self->extras)->tuplet_data = realloc(((gs_frag_fat_extras *) self->extras)->tuplet_data,
+                                                                     new_capacity * ((gs_frag_fat_extras *) self->extras)
+                                                                                            ->tuplet_size);
         self->ncapacity = new_capacity;
     }
     self->ntuplets += ntuplets;
@@ -195,8 +210,8 @@ void frag_open(gs_tuplet_t *dst, gs_frag_t *self, gs_tuplet_id_t tuplet_id)
                         field_nsm_jmp_size(field) :
                         field_dsm_jmp_size(field, field->tuplet->tuplet_id, (field->attr_id + 1)));
 
-    field->attr_value_ptr = (format == TF_NSM ? field->attr_value_ptr : field->tuplet->fragment->tuplet_data) +
-                           skip_size;
+    field->attr_value_ptr = (format == TF_NSM ? field->attr_value_ptr : ((gs_frag_fat_extras *) field->tuplet->fragment
+            ->extras)->tuplet_data) + skip_size;
 
     field->attr_id++;
 }
@@ -224,7 +239,7 @@ void frag_open(gs_tuplet_t *dst, gs_frag_t *self, gs_tuplet_id_t tuplet_id)
 {
     assert (self);
     assert (data);
-    memcpy(self->attr_base, data, self->fragment->tuplet_size);
+    memcpy(self->attr_base, data, ((gs_frag_fat_extras *) self->fragment->extras)->tuplet_size);
 }
 
  void tuplet_set_null2(gs_tuplet_t *self)

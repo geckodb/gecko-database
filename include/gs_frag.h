@@ -19,6 +19,7 @@
 
 #include <gecko-commons/gecko-commons.h>
 #include <gecko-commons/containers/gs_vec.h>
+#include <gecko-commons/containers/gs_hash.h>
 
 #include <gs_pred.h>
 #include <gs_schema.h>
@@ -39,18 +40,28 @@ struct gs_tuplet_t;
 
 enum gs_frag_impl_type_e {
     FIT_HOST_NSM_VM,
-    FIT_HOST_DSM_VM
+    FIT_HOST_DSM_VM,
+    FIT_HOST_DSM_THIN_VM
 } gs_frag_impl_type_e;
+
+typedef struct gs_frag_fat_extras {
+    void *tuplet_data; /*!< data inside this fragment; the record format (e.g., NSM/DSM) is implementation-specific */
+    size_t tuplet_size; /*!< size in byte of a single tuplet */
+} gs_frag_fat_extras;
+
+typedef struct gs_frag_thin_extras {
+    gs_hash_t *gs_hash_t;
+} gs_frag_thin_extras;
 
 typedef struct gs_frag_t {
     gs_schema_t *schema; /*!< schema of this fragment */
-    void *tuplet_data; /*!< data inside this fragment; the record format (e.g., NSM/DSM) is implementation-specific */
+//    void *tuplet_data; /*!< data inside this fragment; the record format (e.g., NSM/DSM) is implementation-specific */
     size_t ntuplets; /*!< number of tuplets stored in this fragment */
     size_t ncapacity; /*!< number of tuplets that can be stored in this fragment, before a resize-opp is required */
-    size_t tuplet_size; /*!< size in byte of a single tuplet */
+//    size_t tuplet_size; /*!< size in byte of a single tuplet */
     enum gs_tuplet_format_e format; /*!< the tuplet format that defined whether NSM or DSM is used*/
     enum gs_frag_impl_type_e impl_type; /*!< the implementation type of the data fragment*/
-
+    void *extras; /*!< a pointer to the corresponding extras fields*/
     /* operations */
     struct gs_frag_t *(*_scan)(struct gs_frag_t *self, const gs_pred_tree_t *pred, size_t batch_size, size_t nthreads);
     void (*_dispose)(struct gs_frag_t *self);
@@ -70,6 +81,7 @@ static struct frag_type_pool_t {
 } frag_type_pool[] = {
     { FIT_HOST_NSM_VM, gs_frag_host_vm_nsm_new },
     { FIT_HOST_DSM_VM, gs_frag_host_vm_dsm_new },
+    { FIT_HOST_DSM_THIN_VM, gs_frag_host_vm_thin_dsm_new }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

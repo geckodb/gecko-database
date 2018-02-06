@@ -301,8 +301,8 @@ void gs_table_gs_grid_list_print(FILE *file, const gs_table_t *table, size_t row
             gs_tuplet_field_write(&field, &grid->frag->impl_type, true);
             gs_tuplet_field_write(&field, &grid->frag->ntuplets, true);
             gs_tuplet_field_write(&field, &grid->frag->ncapacity, true);
-            gs_tuplet_field_write(&field, &grid->frag->tuplet_size, true);
-            size_t total_size = (grid->frag->tuplet_size * grid->frag->ncapacity);
+            gs_tuplet_field_write(&field, &((gs_frag_fat_extras *) grid->frag->extras)->tuplet_size, true);
+            size_t total_size = (((gs_frag_fat_extras *) grid->frag->extras)->tuplet_size * grid->frag->ncapacity);
             gs_tuplet_field_write(&field, &total_size, true);
         }
     } while (gs_tuplet_next(&tuplet));
