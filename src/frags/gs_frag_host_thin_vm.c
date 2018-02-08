@@ -83,13 +83,13 @@ struct gs_frag_t *gs_frag_host_vm_thin_dsm_new(gs_schema_t *schema, size_t tuple
  gs_frag_t *frag_create(gs_schema_t *schema, size_t tuplet_capacity, enum gs_tuplet_format_e format)
 {
     gs_frag_t *fragment = GS_REQUIRE_MALLOC(sizeof(gs_frag_t));
-    gs_frag_thin_extras thin_extras;
+    gs_frag_thin_extras *thin_extras = GS_REQUIRE_MALLOC(sizeof(gs_frag_thin_extras));;
     *fragment = (gs_frag_t) {
             .schema = gs_schema_cpy(schema),
             .format = format,
             .ntuplets = 0,
             .ncapacity = tuplet_capacity,
-            .extras = &thin_extras,
+            .extras = thin_extras,
             ._scan = gs_scan_mediator,
             ._dispose = frag_dipose,
             ._open = frag_open,
@@ -128,6 +128,7 @@ void frag_dipose(gs_frag_t *self)
         gs_vec_dispose(attr_vals);
     }
     gs_hash_dispose((((gs_frag_thin_extras *) self->extras))->gs_hash_t);
+    free((((gs_frag_thin_extras *) self->extras)));
     gs_schema_delete(self->schema);
     free (self);
 }

@@ -142,6 +142,7 @@ set(SOURCE_FILES
     playground_dsm/reference_scan_impl.h
     playground_dsm/exercice_helper.c
     playground_dsm/exercice_helper.h
+
 )
 
 
@@ -165,7 +166,7 @@ add_executable(
 
 add_executable(
         dsm_imp
-        playground_dsm/play_fragments2.c
+        playground_dsm/play_fragments.c
         ${SOURCE_FILES}
 )
 add_executable(
@@ -179,6 +180,8 @@ add_executable(
         samples/graphstore/main.c
         ${SOURCE_FILES}
 )
+
+
 
 IF (PROJECT_OS_LINUX)
     # add two aditional flags to call posix functions and to use the bsd library
@@ -196,6 +199,16 @@ IF (PROJECT_OS_LINUX)
 
     target_link_libraries(
             dsm_imp
+            bsd
+            m
+            ${APR_LIBRARIES}
+            ${APRUTIL_LIBRARIES}
+            ${OPENSSL_LIBRARIES}
+            pthread
+    )
+
+    target_link_libraries(
+            vectorized_thin_dsm
             bsd
             m
             ${APR_LIBRARIES}

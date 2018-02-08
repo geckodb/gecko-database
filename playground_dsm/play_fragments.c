@@ -8,7 +8,7 @@
 #include "reference_implementation.h"
 
 int main() {
-    FILE *result_file = fopen("/home/pegasus/results7.txt", "a+");
+    FILE *result_file = fopen("results00.txt", "a+");
 
     if (result_file == NULL)
     {
@@ -18,14 +18,14 @@ int main() {
     apr_initialize();
 
     char *formats_str[2] ={"DSM", "NSM"};
-    enum gs_frag_impl_type_e formats[] = {FIT_HOST_DSM_VM, FIT_HOST_NSM_VM};
+    enum gs_frag_impl_type_e formats[] = {FIT_HOST_DSM_THIN_VM, FIT_HOST_NSM_VM};
     size_t num_fields = 1000;
     size_t fields_conf[] = {1, 100, 1000};
     size_t num_tuplets = 10000;
 
-    for (int f = 0; f < 2; ++f) {
+    for (int f = 0; f < 1; ++f) {
 
-        for (size_t n_tuplets = 1000; n_tuplets <= num_tuplets; n_tuplets+=1000 ) {
+        for (size_t n_tuplets = 7000; n_tuplets <= 7000; n_tuplets+=1000 ) {
             gs_frag_t *lineitem = help_create_lineitem_table(num_tuplets, num_fields, formats[f]);
             help_fill_lineitem_table(lineitem, num_tuplets);
 

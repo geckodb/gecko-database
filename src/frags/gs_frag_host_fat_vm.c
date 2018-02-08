@@ -90,15 +90,15 @@ struct gs_frag_t *gs_frag_host_vm_dsm_new(gs_schema_t *schema, size_t tuplet_cap
  gs_frag_t *frag_create(gs_schema_t *schema, size_t tuplet_capacity, enum gs_tuplet_format_e format)
 {
     gs_frag_t *fragment = GS_REQUIRE_MALLOC(sizeof(gs_frag_t));
-    size_t tuplet_size   = gs_tuplet_size_by_schema(schema);
-    gs_frag_fat_extras fat_extras;
+    size_t tuplet_size = gs_tuplet_size_by_schema(schema);
+    gs_frag_fat_extras *fat_extras = GS_REQUIRE_MALLOC(sizeof(gs_frag_fat_extras));;
     size_t required_size = tuplet_size * tuplet_capacity;
     *fragment = (gs_frag_t) {
             .schema = gs_schema_cpy(schema),
             .format = format,
             .ntuplets = 0,
             .ncapacity = tuplet_capacity,
-            .extras = &fat_extras,
+            .extras = fat_extras,
             ._scan = gs_scan_mediator,
             ._dispose = frag_dipose,
             ._open = frag_open,
@@ -120,6 +120,7 @@ struct gs_frag_t *gs_frag_host_vm_dsm_new(gs_schema_t *schema, size_t tuplet_cap
 void frag_dipose(gs_frag_t *self)
 {
     free (((gs_frag_fat_extras *) self->extras)->tuplet_data);
+    free(((gs_frag_fat_extras *) self->extras));
     gs_schema_delete(self->schema);
     free (self);
 }
