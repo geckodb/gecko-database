@@ -16,7 +16,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include <gecko-commons/containers/gs_vec.h>
-
+#include <gecko-commons/stdinc.h>
 #include <frags/gs_frag_host_vm.h>
 #include <operators/gs_scan.h>
 #include <gs_tuplet_field.h>
@@ -37,7 +37,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 #define REQUIRE_VALID_TUPLET_FORMAT(format)                                                                            \
-    REQUIRE((format == TF_NSM || format == TF_DSM), "unknown tuplet serialization format")
+    REQUIRE(format == TF_DSM, "unknown tuplet serialization format")
 
 // ---------------------------------------------------------------------------------------------------------------------
 // H E L P E R   P R O T O T Y P E S
@@ -48,6 +48,8 @@
  static void frag_open(gs_tuplet_t *dst, gs_frag_t *self, gs_tuplet_id_t tuplet_id);
  static void frag_add(gs_tuplet_t *dst, struct gs_frag_t *self, size_t ntuplets);
  static void frag_dipose(gs_frag_t *self);
+ static void frag_raw_scan(const struct gs_frag_t *self, gs_vec_t *match_ids, enum gs_comp_type_e comp_type, gs_attr_id_t attr_id,
+    const void *comp_val);
 
  static void tuplet_rebase(gs_tuplet_t *tuplet, gs_frag_t *frag, gs_tuplet_id_t tuplet_id);
  static bool tuplet_step(gs_tuplet_t *self);
@@ -91,6 +93,7 @@ struct gs_frag_t *gs_frag_host_vm_thin_dsm_new(gs_schema_t *schema, size_t tuple
             .ncapacity = tuplet_capacity,
             .extras = thin_extras,
             ._scan = gs_scan_mediator,
+            ._raw_scan = frag_raw_scan,
             ._dispose = frag_dipose,
             ._open = frag_open,
             ._insert = frag_add
@@ -98,12 +101,12 @@ struct gs_frag_t *gs_frag_host_vm_thin_dsm_new(gs_schema_t *schema, size_t tuple
 
     // create the dictionary to match attribute ids to vectors
     // loop to the number of attributes initiate the attributes once.
-    gs_hash_create(&(((gs_frag_thin_extras *) fragment->extras)->gs_hash_t)
+    gs_hash_create(&(((gs_frag_thin_extras *) fragment->extras)->attr_vals_map)
             , 10, gs_comp_func_attr);
     for (size_t attr_id = 0; attr_id < fragment->schema->attr->num_elements; ++attr_id) {
         const gs_attr_t *attr = gs_schema_attr_by_id(fragment->schema, attr_id);
         size_t attr_total_size = gs_attr_total_size(attr);
-        gs_hash_set((((gs_frag_thin_extras *) fragment->extras))->gs_hash_t,
+        gs_hash_set((((gs_frag_thin_extras *) fragment->extras))->attr_vals_map,
                     attr, attr_total_size,
                     gs_vec_new(attr_total_size, tuplet_capacity));
     }
@@ -123,11 +126,11 @@ void frag_dipose(gs_frag_t *self)
     for (size_t attr_id = 0; attr_id < self->schema->attr->num_elements; ++attr_id) {
         const gs_attr_t *attr = gs_schema_attr_by_id(self->schema, attr_id);
         size_t attr_total_size = gs_attr_total_size(attr);
-        gs_vec_t *attr_vals = gs_hash_get((((gs_frag_thin_extras *) self->extras))->gs_hash_t,
+        gs_vec_t *attr_vals = gs_hash_get((((gs_frag_thin_extras *) self->extras))->attr_vals_map,
                                           attr, attr_total_size);
         gs_vec_dispose(attr_vals);
     }
-    gs_hash_dispose((((gs_frag_thin_extras *) self->extras))->gs_hash_t);
+    gs_hash_dispose((((gs_frag_thin_extras *) self->extras))->attr_vals_map);
     free((((gs_frag_thin_extras *) self->extras)));
     gs_schema_delete(self->schema);
     free (self);
@@ -163,14 +166,66 @@ void frag_open(gs_tuplet_t *dst, gs_frag_t *self, gs_tuplet_id_t tuplet_id)
  void frag_add(gs_tuplet_t *dst, struct gs_frag_t *self, size_t ntuplets)
 {
     assert (self);
-    assert (ntuplets > 0);
+    assert ((ntuplets > 0));
     assert (self);
-    assert (ntuplets > 0);
+    assert ((ntuplets > 0));
     size_t return_tuplet_id = self->ntuplets;
     self->ntuplets += ntuplets;
     frag_open_internal(dst, self, return_tuplet_id);
 
 }
+    // operator at a time
+ void frag_raw_scan(const struct gs_frag_t *self, gs_vec_t *match_ids, enum gs_comp_type_e comp_type, gs_attr_id_t attr_id,
+                                     const void *comp_val)
+{
+    assert(self);
+    assert(match_ids);
+    assert((attr_id >= 0));
+    assert(comp_val);
+
+    const gs_attr_t *attr = gs_schema_attr_by_id(self->schema, attr_id);
+    size_t attr_total_size = gs_attr_total_size(attr);
+    gs_vec_t *attr_vals = gs_hash_get((((gs_frag_thin_extras *) self->extras))->attr_vals_map,
+                                      attr, attr_total_size);
+    size_t attr_vals_size = gs_vec_length(attr_vals);
+
+    gs_comp_func_t cmp_func;
+
+    switch (attr->type) {
+        case FT_INT32:
+            cmp_func = gs_cmp_int32;
+            break;
+        case FT_UINT32:
+            cmp_func = gs_cmp_uint32;
+            break;
+        case FT_UINT64:
+            cmp_func = gs_cmp_uint64;
+            break;
+        case FT_FLOAT32:
+            cmp_func = gs_cmp_float32;
+            break;
+        case FT_CHAR:
+            cmp_func = gs_cmp_char;
+            break;
+        default: panic("not implemented '%d'", attr->type);
+    }
+
+    for (gs_tuplet_id_t tuplet_id = 0; tuplet_id < attr_vals_size; ++tuplet_id) {
+            // compare the values and also according to specific function
+        const void *field_data = gs_vec_at(attr_vals, tuplet_id);
+        int compare = cmp_func(field_data, comp_val);
+        bool match = ((comp_type == CT_LESS && compare < 0) ||
+                  (comp_type == CT_GREATER && compare > 0) ||
+                  (comp_type == CT_EQUALS && compare == 0) ||
+                  (comp_type == CT_LESSEQ && compare <= 0) ||
+                  (comp_type == CT_GREATEREQ && compare >= 0) ||
+                  (comp_type == CT_NOTEQUALS && compare != 0));
+        if (match) {
+            gs_vec_pushback(match_ids, 1, &tuplet_id);
+        }
+    }
+}
+
 
 // - T U P L E T   I M P L E M E N T A T I O N -------------------------------------------------------------------------
 
@@ -274,7 +329,7 @@ bool field_next(gs_tuplet_field_t *field, bool auto_next)
 
     size_t attr_total_size = gs_attr_total_size(attr);
 
-    gs_vec_t *attr_vals = gs_hash_get((((gs_frag_thin_extras *) field->tuplet->fragment->extras))->gs_hash_t,
+    gs_vec_t *attr_vals = gs_hash_get((((gs_frag_thin_extras *) field->tuplet->fragment->extras))->attr_vals_map,
                                       attr, attr_total_size);
     return gs_vec_at(attr_vals, field->tuplet->tuplet_id);
 }
@@ -284,7 +339,7 @@ bool field_next(gs_tuplet_field_t *field, bool auto_next)
     assert (field && data);
     const gs_attr_t *attr = gs_schema_attr_by_id(field->tuplet->fragment->schema, field->attr_id);
     size_t attr_total_size = gs_attr_total_size(attr);
-    gs_vec_t *attr_vals = gs_hash_get((((gs_frag_thin_extras *) field->tuplet->fragment->extras))->gs_hash_t,
+    gs_vec_t *attr_vals = gs_hash_get((((gs_frag_thin_extras *) field->tuplet->fragment->extras))->attr_vals_map,
                                       attr, attr_total_size);
     if (gs_attr_isstring(attr)) {
         const char *str = *(const char **) data;

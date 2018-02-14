@@ -39,8 +39,8 @@ struct gs_tuplet_t;
 // ---------------------------------------------------------------------------------------------------------------------
 
 enum gs_frag_impl_type_e {
-    FIT_HOST_NSM_VM,
-    FIT_HOST_DSM_VM,
+    FIT_HOST_NSM_FAT_VM,
+    FIT_HOST_DSM_FAT_VM,
     FIT_HOST_DSM_THIN_VM
 } gs_frag_impl_type_e;
 
@@ -50,7 +50,7 @@ typedef struct gs_frag_fat_extras {
 } gs_frag_fat_extras;
 
 typedef struct gs_frag_thin_extras {
-    gs_hash_t *gs_hash_t;
+    gs_hash_t *attr_vals_map;
 } gs_frag_thin_extras;
 
 typedef struct gs_frag_t {
@@ -64,6 +64,8 @@ typedef struct gs_frag_t {
     void *extras; /*!< a pointer to the corresponding extras fields*/
     /* operations */
     struct gs_frag_t *(*_scan)(struct gs_frag_t *self, const gs_pred_tree_t *pred, size_t batch_size, size_t nthreads);
+    void (*_raw_scan)(const struct gs_frag_t *self, gs_vec_t *match_ids, enum gs_comp_type_e comp_type, gs_attr_id_t attr_id,
+                                 const void *cmp_val);
     void (*_dispose)(struct gs_frag_t *self);
 
     /*!< factory function to create impl-specific tuplet */
@@ -79,8 +81,8 @@ static struct frag_type_pool_t {
     enum gs_frag_impl_type_e binding;
     gs_frag_t *(*_create)(gs_schema_t *schema, size_t tuplet_capacity);
 } frag_type_pool[] = {
-    { FIT_HOST_NSM_VM, gs_frag_host_vm_nsm_new },
-    { FIT_HOST_DSM_VM, gs_frag_host_vm_dsm_new },
+    { FIT_HOST_NSM_FAT_VM, gs_frag_host_vm_nsm_new },
+    { FIT_HOST_DSM_FAT_VM, gs_frag_host_vm_dsm_new },
     { FIT_HOST_DSM_THIN_VM, gs_frag_host_vm_thin_dsm_new }
 };
 
@@ -93,6 +95,8 @@ __BEGIN_DECLS
 gs_frag_t *gs_frag_new(gs_schema_t *schema, size_t tuplet_capacity, enum gs_frag_impl_type_e type);
 void gs_frag_delete(gs_frag_t *frag);
 
+void gs_frag_raw_scan(const gs_frag_t *frag, size_t num_boolean_operators, enum gs_boolean_operator_e *boolean_operators,
+                      enum gs_comp_type_e *comp_type, gs_attr_id_t *attr_ids, const void *comp_vals);
 void gs_frag_insert(struct gs_tuplet_t *out, gs_frag_t *frag, size_t ntuplets);
 void gs_frag_print(FILE *file, gs_frag_t *frag, size_t row_offset, size_t limit);
 void gs_frag_print_ex(FILE *file, enum gs_frag_printer_type_tag_e printer_type, gs_frag_t *frag, size_t row_offset,

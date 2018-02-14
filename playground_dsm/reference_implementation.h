@@ -9,7 +9,7 @@
 
 static inline size_t reference_implementation(size_t num_tuples, size_t limit)
 {
-    gs_frag_t *lineitem = help_create_lineitem_table(num_tuples, 2,FIT_HOST_NSM_VM);
+    gs_frag_t *lineitem = help_create_lineitem_table(num_tuples, 2,FIT_HOST_NSM_FAT_VM);
     help_fill_lineitem_table(lineitem,num_tuples);
 
     printf("$ SELECT * FROM lineitem LIMIT 10;\n");

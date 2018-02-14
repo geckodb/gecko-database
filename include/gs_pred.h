@@ -24,7 +24,11 @@
 // ---------------------------------------------------------------------------------------------------------------------
 
 enum gs_comp_type_e {
-    CT_LESS, CT_LESSEQ, CT_EQUALS, CT_GREATEREQ, CT_GREATER
+    CT_LESS, CT_LESSEQ, CT_EQUALS, CT_GREATEREQ, CT_GREATER, CT_NOTEQUALS
+};
+
+enum gs_boolean_operator_e {
+    BO_AND, BO_OR
 };
 
 typedef struct gs_expr_not_t_e {
@@ -74,4 +78,3 @@ void pred_expr_bind(gs_expr_t *expr, const void *value);
 void pred_expr_bind2(gs_expr_t *expr, const void *value_lhs, const void *value_rhs);
 bool pred_eval(gs_expr_t *expr);
 gs_expr_t *pred_expr_create_not(gs_expr_t *other);
-

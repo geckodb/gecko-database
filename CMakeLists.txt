@@ -166,7 +166,7 @@ add_executable(
 
 add_executable(
         dsm_imp
-        playground_dsm/play_fragments.c
+        playground_dsm/play_fragments3.c
         ${SOURCE_FILES}
 )
 add_executable(

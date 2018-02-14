@@ -48,7 +48,12 @@
  static void frag_open(gs_tuplet_t *dst, gs_frag_t *self, gs_tuplet_id_t tuplet_id);
  static void frag_add(gs_tuplet_t *dst, struct gs_frag_t *self, size_t ntuplets);
  static void frag_dipose(gs_frag_t *self);
-
+ static void frag_raw_scan(const struct gs_frag_t *self, gs_vec_t *match_ids, enum gs_comp_type_e comp_type, gs_attr_id_t attr_id,
+                                     const void *cmp_val);
+static void frag_raw_scan_dsm(const struct gs_frag_t *self, gs_vec_t *match_ids, enum gs_comp_type_e comp_type, gs_attr_id_t attr_id,
+                          const void *cmp_val);
+static void frag_raw_scan_nsm(const struct gs_frag_t *self, gs_vec_t *match_ids, enum gs_comp_type_e comp_type, gs_attr_id_t attr_id,
+                              const void *cmp_val);
  static void tuplet_rebase(gs_tuplet_t *tuplet, gs_frag_t *frag, gs_tuplet_id_t tuplet_id);
  static bool tuplet_step(gs_tuplet_t *self);
  static void frag_open_internal(gs_tuplet_t *out, gs_frag_t *self, size_t pos);
@@ -100,6 +105,7 @@ struct gs_frag_t *gs_frag_host_vm_dsm_new(gs_schema_t *schema, size_t tuplet_cap
             .ncapacity = tuplet_capacity,
             .extras = fat_extras,
             ._scan = gs_scan_mediator,
+            ._raw_scan = frag_raw_scan,
             ._dispose = frag_dipose,
             ._open = frag_open,
             ._insert = frag_add
@@ -180,6 +186,80 @@ void frag_open(gs_tuplet_t *dst, gs_frag_t *self, gs_tuplet_id_t tuplet_id)
     }
     self->ntuplets += ntuplets;
     frag_open_internal(dst, self, return_tuplet_id);
+}
+
+ void frag_raw_scan(const struct gs_frag_t *self, gs_vec_t *match_ids, enum gs_comp_type_e comp_type, gs_attr_id_t attr_id,
+                              const void *cmp_val)
+{
+    assert(self);
+    assert(match_ids);
+    assert((attr_id >= 0));
+    assert(cmp_val);
+
+
+    if (self->format == TF_NSM) {
+        frag_raw_scan_nsm(self, match_ids, comp_type, attr_id, cmp_val);
+    } else if (self->format ==TF_DSM) {
+        frag_raw_scan_dsm(self, match_ids, comp_type, attr_id, cmp_val);
+    } else {
+        panic(NOTIMPLEMENTED, "Current Raw scan implementation works only with NSM and DSM formats");
+    }
+}
+
+static void frag_raw_scan_nsm(const struct gs_frag_t *self, gs_vec_t *match_ids, enum gs_comp_type_e comp_type, gs_attr_id_t attr_id,
+                              const void *cmp_val) {
+
+    size_t current_attr_offset = 0;
+    size_t current_tuplet_offset = 0;
+    // calculate the field corresponding index
+    for (gs_attr_id_t i = 0; i < attr_id; ++i) {
+        const gs_attr_t *attr = gs_schema_attr_by_id(self->schema, i);
+        current_attr_offset += gs_attr_total_size(attr);
+    }
+    const gs_attr_t *attr = gs_schema_attr_by_id(self->schema, attr_id);
+    gs_comp_func_t cmp_func;
+
+    switch (attr->type) {
+        case FT_INT32:
+            cmp_func = gs_cmp_int32;
+            break;
+        case FT_UINT32:
+            cmp_func = gs_cmp_uint32;
+            break;
+        case FT_UINT64:
+            cmp_func = gs_cmp_uint64;
+            break;
+        case FT_FLOAT32:
+            cmp_func = gs_cmp_float32;
+            break;
+        case FT_CHAR:
+            cmp_func = gs_cmp_char;
+            break;
+        default: panic("not implemented '%d'", attr->type);
+    }
+
+    for (size_t tuplet_id = 0; tuplet_id < self->ntuplets; ++tuplet_id) {
+        current_tuplet_offset = tuplet_id * ((gs_frag_fat_extras *) self->extras)->tuplet_size;
+        const void *field_data = ((gs_frag_fat_extras *) self->extras)->tuplet_data + current_attr_offset
+                                 + current_tuplet_offset;
+        int compare = cmp_func(field_data, cmp_val);
+        bool match = ((comp_type == CT_LESS && compare < 0) ||
+                      (comp_type == CT_GREATER && compare > 0) ||
+                      (comp_type == CT_EQUALS && compare == 0) ||
+                      (comp_type == CT_LESSEQ && compare <= 0) ||
+                      (comp_type == CT_GREATEREQ && compare >= 0) ||
+                      (comp_type == CT_NOTEQUALS && compare != 0));
+        if (match) {
+            gs_vec_pushback(match_ids, 1, &tuplet_id);
+        }
+    }
+}
+
+static void frag_raw_scan_dsm(const struct gs_frag_t *self, gs_vec_t *match_ids, enum gs_comp_type_e comp_type, gs_attr_id_t attr_id,
+                              const void *cmp_val) {
+
+    panic(NOTIMPLEMENTED, "Raw scan for Fat DSM isn't yet implemented");
+
 }
 
 // - T U P L E T   I M P L E M E N T A T I O N -------------------------------------------------------------------------

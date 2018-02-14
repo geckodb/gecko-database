@@ -117,7 +117,7 @@ void gs_schema_print(FILE *file, gs_schema_t *schema)
     attr_create_bool("nullable", print_schema);
     attr_create_bool("autoinc", print_schema);
     attr_create_bool("unique", print_schema);
-    gs_frag_t *frag = gs_frag_new(print_schema, 1, FIT_HOST_NSM_VM);
+    gs_frag_t *frag = gs_frag_new(print_schema, 1, FIT_HOST_NSM_FAT_VM);
     size_t num_attr = gs_schema_num_attributes(schema);
     gs_tuplet_t tuplet;
     gs_frag_insert(&tuplet, frag, num_attr);

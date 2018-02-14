@@ -91,7 +91,7 @@ void gs_vindex_print(FILE *file, gs_vindex_t *index)
     gs_schema_t *print_schema = gs_schema_new("ad hoc info");
     attr_create_strptr("attribute", print_schema);
     attr_create_gridid("grid id", print_schema);
-    gs_frag_t *frag = gs_frag_new(print_schema, 1, FIT_HOST_NSM_VM);
+    gs_frag_t *frag = gs_frag_new(print_schema, 1, FIT_HOST_NSM_FAT_VM);
     gs_tuplet_t tuplet;
     gs_tuplet_field_t field;
 

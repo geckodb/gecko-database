@@ -105,7 +105,7 @@ void gs_hindex_print(FILE *file, const gs_hindex_t *index)
     attr_create_tupleid("begin", print_schema);
     attr_create_tupleid("end", print_schema);
     attr_create_gridid("grid id", print_schema);
-    gs_frag_t *frag = gs_frag_new(print_schema, 1, FIT_HOST_NSM_VM);
+    gs_frag_t *frag = gs_frag_new(print_schema, 1, FIT_HOST_NSM_FAT_VM);
     size_t dist = index->bounds.end - index->bounds.begin;
     gs_tuple_id_t *ids = GS_REQUIRE_MALLOC(dist * sizeof(gs_tuple_id_t));
     for (gs_tuple_id_t i = index->bounds.begin; i < index->bounds.end; i++) {

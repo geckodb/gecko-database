@@ -33,7 +33,7 @@ static inline gs_frag_t *reference_scan_impl(gs_frag_t *table, const char *attr_
         default: panic("not implemented '%d'", attribute->type);
     }
     // need to change for the DSM
-    gs_frag_t *result = gs_frag_new(table->schema, table->ntuplets, FIT_HOST_NSM_VM);
+    gs_frag_t *result = gs_frag_new(table->schema, table->ntuplets, FIT_HOST_NSM_FAT_VM);
 
     do {
         gs_tuplet_field_open(&input_field, &input_tuplet);

@@ -288,7 +288,7 @@ void gs_table_gs_grid_list_print(FILE *file, const gs_table_t *table, size_t row
     attr_create_size("total size", print_schema);
 
     size_t num_tuples = gs_table_num_of_grids(table);
-    gs_frag_t *frag = gs_frag_new(print_schema, num_tuples, FIT_HOST_NSM_VM);
+    gs_frag_t *frag = gs_frag_new(print_schema, num_tuples, FIT_HOST_NSM_FAT_VM);
     gs_frag_insert(&tuplet, frag, num_tuples);
 
     do {
@@ -323,7 +323,7 @@ void gs_table_print(FILE *file, const gs_table_t *table, size_t row_offset, size
     for (size_t i = 0; i < table->num_tuples; tuple_ids[i] = i, i++);
     for (size_t i = 0; i < gs_table_num_of_attributes(table); attr_ids[i] = i, i++);
 
-    gs_table_t *molten_table = gs_table_melt(FIT_HOST_NSM_VM, table, tuple_ids, table->num_tuples, attr_ids,
+    gs_table_t *molten_table = gs_table_melt(FIT_HOST_NSM_FAT_VM, table, tuple_ids, table->num_tuples, attr_ids,
                                        gs_table_num_of_attributes(table));
 
     gs_frag_print(file, gs_grid_by_id(molten_table, 0)->frag, row_offset, limit);
@@ -353,7 +353,7 @@ void gs_table_structure_print(FILE *file, const gs_table_t *table, size_t row_of
         attr_create_gridid(gs_table_attr_name_by_id(table, attr_idx), write_schema);
     }
 
-    write_frag   = gs_frag_new(write_schema, num_tuples, FIT_HOST_NSM_VM);
+    write_frag   = gs_frag_new(write_schema, num_tuples, FIT_HOST_NSM_FAT_VM);
     gs_frag_insert(&write_tuplet, write_frag, num_tuples);
 
     /* For each field in the input grid table, find the grid object that contains this field. The search is done via

@@ -30,7 +30,7 @@ void help_fill_lineitem_table(gs_frag_t *frag, size_t num_tuples) {
         gs_tuplet_field_open(&field, &tuplet);
         gs_tuplet_field_write(&field, &col_0, true);
         for (int j = 1; j < gs_schema_num_attributes(frag->schema); ++j) {
-            uint32_t col_j = random() % UINT32_MAX;
+            uint32_t col_j = num_tuples - i;
             gs_tuplet_field_write(&field, &col_j, true);
         }
     }
