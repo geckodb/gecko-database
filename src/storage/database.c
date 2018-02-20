@@ -53,7 +53,8 @@ typedef struct database_t
 
                        *edge_records;
 
-    read_cache_t            *string_records_cache;
+    read_cache_t       *string_records_cache;
+    read_cache_counters_t string_records_cache_counters;
 
 
     const char         *nodes_records_path,
@@ -173,6 +174,8 @@ static inline gs_status_t unsafe_read_string_lookup_header(string_lookup_header_
 static inline gs_status_t unsafe_update_string_records_header(database_t *database, const string_records_header_t *header);
 static inline gs_status_t unsafe_update_string_index_header(database_t *database,
                                                             const string_lookup_header_t *header);
+static inline gs_status_t string_store_bulk_fetch(bool *all_contained, bool *in_storage_mask, void **values,
+                                                  const void *keys, size_t num_keys, void *args);
 
 static inline gs_status_t create_db(database_t *database);
 static inline gs_status_t create_nodes_db(database_t *database);
@@ -183,16 +186,23 @@ static inline gs_status_t open_nodes_db(database_t *database);
 static inline gs_status_t open_edges_db(database_t *database);
 static inline gs_status_t open_stringpool_db(database_t *database);
 
-static inline gs_status_t buffer_string_store_string_bulk_comp(int *result, const void *needle, const slot_t *haystack, size_t nhaystack)
+static inline gs_status_t buffer_string_store_string_bulk_comp(int *result, const void *needle, slot_t **haystack, size_t nhaystack)
 {
     const char *string_needle = *(const char **) needle;
     while (nhaystack--) {
-        *result = haystack->flags.in_use ? strcmp(string_needle, (*(const char **) haystack->key)) : 1;
+        // TODO: test whether prefetching hint helps here
+        const slot_t *slot = *haystack;
+        *result = slot->flags.in_use ? strcmp(string_needle, (*(const char **) slot->key)) : 1;
         haystack++;
         result++;
     }
     return GS_SUCCESS;
 }
+
+typedef struct string_store_cache_args_t
+{
+    database_t          *db;
+} string_store_cache_args_t;
 
 gs_status_t database_open(database_t **db, const char *dbpath)
 {
@@ -205,8 +215,12 @@ gs_status_t database_open(database_t **db, const char *dbpath)
     database->dbpath = apr_pstrdup(database->apr_pool, dbpath);
     gs_spinlock_create(&database->spinlock);
 
+    string_store_cache_args_t *string_cache_args = GS_REQUIRE_MALLOC(sizeof(string_store_cache_args_t));
+    string_cache_args->db = database;
+
     if (read_cache_create(&database->string_records_cache, sizeof(char *), buffer_string_store_string_bulk_comp,
-                          sizeof(string_id_t), DB_STRING_POOL_CACHE_SIZE, NULL, replacement_policy_lru) != GS_SUCCESS) {
+                          sizeof(string_id_t), DB_STRING_POOL_CACHE_SIZE, string_store_bulk_fetch,
+                          replacement_policy_lru, string_cache_args) != GS_SUCCESS) {
         return GS_FAILED;
     }
 
@@ -652,7 +666,7 @@ static inline string_id_t *write_strings_to_store(size_t num_strings_to_import,
         fseek(db->string_records, records_header.write_offset, SEEK_SET);
 
         string_record_entry_header_t entry_header = {
-                .string_length = strlen(string)
+                .string_length = strlen(string),
         };
 
         // First write the header for that entry which contains the string length
@@ -804,8 +818,8 @@ static inline string_id_t *write_strings_to_store(size_t num_strings_to_import,
                  * modifications where the strings just added are directly used afterwards. It is not reasonable
                  * for bulk load operations since this trashes the cache unnecessarily. */
 
-                read_cache_put(db->string_records_cache, NULL, strings_to_cache, strings_found_ids,
-                               num_strings_to_import);
+                read_cache_put(db->string_records_cache, &db->string_records_cache_counters, strings_to_cache,
+                               strings_found_ids, num_strings_to_import);
             }
 
             return strings_found_ids;
@@ -825,7 +839,8 @@ string_id_t *database_string_create(size_t *num_created_strings, gs_status_t *st
     gs_hashset_t hashset;
     hashset_create(&hashset, sizeof(char **), num_strings_to_import, gs_comp_func_str);
     for (size_t i = 0; i < num_strings_to_import; i++) {
-        hashset_add(&hashset, (strings + i), 1, gs_comp_func_str);
+        char *string_import = strdup(*(strings + i));
+        hashset_add(&hashset, &string_import, 1, gs_comp_func_str);
     }
     const char **begin = (const char **) hashset_begin(&hashset);
     const char **end   = (const char **) hashset_end(&hashset);
@@ -854,6 +869,11 @@ string_id_t *database_string_create(size_t *num_created_strings, gs_status_t *st
         *num_created_strings = num_strings_to_import;
         return strings_found_ids;
     }
+}
+
+static inline int comp_str(const void *lhs, const void *rhs)
+{
+    return strcmp(*(const char **) lhs, *(const char **) rhs);
 }
 
 /*
@@ -944,19 +964,11 @@ void xxx_find_strings_in_file()
 gs_status_t database_string_find(size_t *num_strings_found, string_id_t **strings_found, char ***strings_not_found,
                                  database_t *db, char **strings, size_t num_strings)
 {
-   /* gs_status_t       status;
-    string_id_t      *db_string_ids;
-    string_id_t      *db_strings_match_ids;
-    size_t            num_strings_in_db;
-    size_t            result_size;
-    char            **strings_found_result;
-    char            **strings_not_found_result;*/
-
     bool all_found_in_storage;
     size_t num_not_in_storage;
-    bool *in_storage_mask = GS_REQUIRE_MALLOC(num_strings * sizeof(bool));
-    read_cache_get(db->string_records_cache, NULL, &all_found_in_storage, &num_not_in_storage, in_storage_mask,
-                   (void **) strings_found, strings, num_strings);
+    bool *in_storage_mask;
+    read_cache_get(db->string_records_cache, &db->string_records_cache_counters, &all_found_in_storage,
+                   &num_not_in_storage, &in_storage_mask, (void **) strings_found, strings, num_strings);
 
     *num_strings_found = num_strings - num_not_in_storage;
 
@@ -966,17 +978,17 @@ gs_status_t database_string_find(size_t *num_strings_found, string_id_t **string
     } else if (strings_not_found)
     {
         size_t idx = 0;
-        char **strings_found_result = GS_REQUIRE_MALLOC(num_not_in_storage * sizeof(char *));
+        char **strings_not_found_result = GS_REQUIRE_MALLOC(num_not_in_storage * sizeof(char *));
 
         for (size_t i = 0; i < num_strings; i++) {
             if (!in_storage_mask[i]) {
                 // The string at position i is neither stored in the cache nor in the backing storage. Thus
                 // add this string to the list of strings that are not contained in the database.
-                strings_found_result[idx++] = strdup(strings[i]);
+                strings_not_found_result[idx++] = strdup(strings[i]);
             }
         }
 
-        *strings_not_found = strings_found_result;
+        *strings_not_found = strings_not_found_result;
     }
 
     free (in_storage_mask);
@@ -1030,7 +1042,7 @@ string_id_t *database_string_fullscan(size_t *num_strings, gs_status_t *status, 
 #define FREE_STR_VEC(vec, size)         \
 {                                       \
     for (size_t j = 0; j < size; j++) { \
-        free (vec[j]);                  \
+        free (vec[j].string);           \
     }                                   \
     free (vec);                         \
 }
@@ -1042,7 +1054,7 @@ string_id_t *database_string_fullscan(size_t *num_strings, gs_status_t *status, 
     return NULL;                                                \
 }
 
-char **database_string_read(gs_status_t *status, database_t *db, const string_id_t *string_ids, size_t num_strings)
+database_string_t *database_string_read(gs_status_t *status, database_t *db, const string_id_t *string_ids, size_t num_strings)
 {
     size_t                    max_offset;
 
@@ -1051,7 +1063,7 @@ char **database_string_read(gs_status_t *status, database_t *db, const string_id
         return NULL;
     }
 
-    char **result = GS_REQUIRE_MALLOC(num_strings * sizeof(char *));
+    database_string_t *result = GS_REQUIRE_MALLOC(num_strings * sizeof(database_string_t));
 
     if (fseek(db->string_records, 0L, SEEK_END) != 0) {
         // Seeking error, unable to receive the size of the file
@@ -1088,11 +1100,12 @@ char **database_string_read(gs_status_t *status, database_t *db, const string_id
             EXIT_STRING_READ_FN(db, result, i, status, GS_FAILED);
         }
 
-        result[i] = GS_REQUIRE_MALLOC(entry_header.string_length + 1);
-        result[i][entry_header.string_length] = '\0';
+        result[i].string = GS_REQUIRE_MALLOC(entry_header.string_length + 1);
+        result[i].string[entry_header.string_length] = '\0';
+        result[i].store_offset = string_id;
 
 
-        if (fread(result[i], entry_header.string_length, 1, db->string_records) != 1) {
+        if (fread(result[i].string, entry_header.string_length, 1, db->string_records) != 1) {
             EXIT_STRING_READ_FN(db, result, i, status, GS_FAILED);
         }
     }
@@ -1255,8 +1268,6 @@ static inline gs_status_t unsafe_node_new_version(node_slot_id_t *cpy_slot_id, d
         // here is just a reject of the request to create a new node.
         return GS_FAILED;
     }
-
-
 
     // TODO: cpy all properties and all edges!
 
@@ -1505,5 +1516,89 @@ static inline gs_status_t open_stringpool_db(database_t *database)
         return GS_FAILED;
     if ((database->string_records = fopen(database->string_records_path, "r+b")) == NULL)
         return GS_FAILED;
+    return GS_SUCCESS;
+}
+
+static inline gs_status_t string_store_bulk_fetch(bool *all_contained, bool *in_storage_mask, void **values,
+                                                  const void *keys, size_t num_keys, void *args)
+{
+    gs_status_t                status;
+    string_id_t               *db_string_ids;
+    size_t                     num_strings_in_db;
+    size_t                     result_size;
+
+    string_store_cache_args_t *cache_args  = (string_store_cache_args_t *) args;
+    database_t                *db          = cache_args->db;
+    char                     **strings     = (char **) keys;
+    size_t                     num_strings = num_keys;
+    void                      *values_local = GS_REQUIRE_MALLOC(num_keys * sizeof(char *));
+
+    for (size_t i = 0; i < num_keys; i++)
+    {
+        in_storage_mask[i] = FALSE;
+    }
+
+
+    if ((db_string_ids = database_string_fullscan(&num_strings_in_db, &status, db)) && status != GS_SUCCESS) {
+        return GS_FAILED;
+    }
+
+    qsort(strings, num_strings, sizeof(char **), comp_str);
+    result_size = 0;
+
+    char **db_string_entry = GS_REQUIRE_MALLOC(sizeof(char *));
+
+    for (size_t  i = 0; i < num_strings_in_db; i++) {
+        string_id_t *id_cursor = db_string_ids + i;
+        database_string_t *value = database_string_read(&status, db, id_cursor, 1);
+
+        if (status != GS_SUCCESS) {
+            free (db_string_ids);
+            free (value[0].string);
+            free (value);
+            return GS_FAILED;
+        }
+
+        assert (value->string);
+        assert (*value->string);
+
+        char *db_string = value->string;
+        db_string_entry[0] = db_string;
+
+        // Perform binary search with the database string as needle in the input string list haystack.
+        // Since fetching the database string is a slow operation (i.e., from disk),
+        // the search is performed in the input list list (i.e., in memory). The worse case is that the
+        // entire string database must be loaded one by one into main memory to compute the result.
+        // The theoretical complexity of this search is O(m*log2(n)) where m is the number of reads in the
+        // database file and n is the number of input strings
+
+        void *it = NULL;
+        if ((it = bsearch(db_string_entry, strings, num_strings, sizeof(char **), comp_str)) != NULL)
+        {
+            /* The string stored in the database file matches a certain string in input string list*/
+
+            /* Determine index of match */
+            size_t matched_str_idx = (it - (void *) strings);
+
+            in_storage_mask[matched_str_idx] = TRUE;
+
+            memcpy(values_local + matched_str_idx * sizeof(string_id_t), &value->store_offset, sizeof(string_id_t));
+
+            result_size++;
+
+            if (result_size == num_keys)
+            {
+                break;
+            }
+
+        }
+    }
+
+    *all_contained = (result_size == num_strings);
+    *values = values_local;
+
+    free(db_string_ids);
+    free(db_string_entry);
+
     return GS_SUCCESS;
 }

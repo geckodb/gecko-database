@@ -9,7 +9,7 @@
 #define DB_EDGE_DEFAULT_CAPACITY                 1000
 #define DB_STRING_POOL_CAPACITY_BYTE             1024
 #define DB_STRING_POOL_LOOKUP_SLOT_CAPACITY       100
-#define DB_STRING_POOL_CACHE_SIZE                   5
+#define DB_STRING_POOL_CACHE_SIZE                100
 
 /* forwarding */
 typedef struct pool_t pool_t;
@@ -162,6 +162,12 @@ typedef struct database_node_cursor_t database_node_cursor_t;
 
 typedef struct database_node_version_cursor_t database_node_version_cursor_t;
 
+typedef struct database_string_t
+{
+    string_id_t         store_offset;
+    char               *string;
+} database_string_t;
+
 gs_status_t database_open(database_t **db, const char *dbpath);
 void        database_lock(database_t *db);
 void        database_unlock(database_t *db);
@@ -207,7 +213,7 @@ gs_status_t database_string_find(size_t *num_strings_found, string_id_t **string
 
 string_id_t *database_string_fullscan(size_t *num_strings, gs_status_t *status, database_t *db);
 
-char      **database_string_read(gs_status_t *status, database_t *db, const string_id_t *string_ids, size_t num_strings);
+database_string_t *database_string_read(gs_status_t *status, database_t *db, const string_id_t *string_ids, size_t num_strings);
 
 prop_id_t  *database_create_prop(database_t *db, const target_t *target, const char *key, const value_t *value,
                                  const timespan_t *lifetime);
