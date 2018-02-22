@@ -63,7 +63,8 @@ file(GLOB_RECURSE COMMONS_SOURCE_FILES "libs/gecko-commons/src/*.c")
 set(SOURCE_FILES
     ${HTTP_SOURCE_FILES}
     ${COMMONS_SOURCE_FILES}
-
+    include/consumers/gs_batch_consumer_inter.h
+    include/gs_batch_consumer.h
     include/gs_attr.h
     include/gs_interval.h
     include/gs_tuplet_field.h
@@ -102,6 +103,9 @@ set(SOURCE_FILES
     src/gs_attr.c
     src/frags/gs_frag_host_fat_vm.c
     src/frags/gs_frag_host_thin_vm.c
+    src/consumers/gs_batch_consumer_raw.c
+    src/consumers/gs_batch_consumer_printer.c
+    src/gs_batch_consumer.c
     src/gs_tuplet_field.c
     src/gs_frag.c
     src/gs_pred.c
@@ -166,7 +170,13 @@ add_executable(
 
 add_executable(
         dsm_imp
-        playground_dsm/play_fragments3.c
+        playground_dsm/scan_nsm_dsm_v.c
+        ${SOURCE_FILES}
+)
+
+add_executable(
+        scan_dsm_imp
+        playground_dsm/scan_nsm_dsm_extream.c
         ${SOURCE_FILES}
 )
 add_executable(
@@ -249,6 +259,16 @@ ELSEIF (PROJECT_OS_OSX)
 
    target_link_libraries(
            dsm_imp
+           ${APR_LIBRARIES}
+           ${APRUTIL_LIBRARIES}
+           /usr/local/opt/argp-standalone/lib
+           /usr/local/opt/argp-standalone/lib/libargp.a
+           ${OPENSSL_LIBRARIES}
+           pthread
+   )
+
+   target_link_libraries(
+           scan_dsm_imp
            ${APR_LIBRARIES}
            ${APRUTIL_LIBRARIES}
            /usr/local/opt/argp-standalone/lib

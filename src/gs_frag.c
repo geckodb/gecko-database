@@ -142,9 +142,9 @@ void gs_frag_insert(struct gs_tuplet_t *out, gs_frag_t *frag, size_t ntuplets)
 // https://www.geeksforgeeks.org/find-union-and-intersection-of-two-unsorted-arrays/
 // the union and intersection shall take
 // min(mLogm + nLogm, mLogn + nLogn)
-// TODO: add a hint about the expected selectivity factors of the predicates
-
-void gs_frag_raw_scan(const gs_frag_t *frag, size_t num_boolean_operators, enum gs_boolean_operator_e *boolean_operators,
+// TODO: add a hint about the expected selectivity factors of the predicates.
+// TODO : add something to represent the effect of the scan ( return something)
+void gs_frag_raw_scan(gs_frag_t *frag, size_t num_boolean_operators, enum gs_boolean_operator_e *boolean_operators,
                       enum gs_comp_type_e *comp_type, gs_attr_id_t *attr_ids, const void *comp_vals)
 {
     assert(frag);
@@ -155,11 +155,12 @@ void gs_frag_raw_scan(const gs_frag_t *frag, size_t num_boolean_operators, enum 
     assert((num_boolean_operators >= 0));
     gs_vec_t *match_ids = gs_vec_new(sizeof(gs_attr_id_t), frag->ntuplets);
     frag->_raw_scan(frag, match_ids, *comp_type, *attr_ids, comp_vals);
-            // dumy print to see if it is working or not
+
     for (size_t i = 0; i < num_boolean_operators; ++i) {
         enum gs_boolean_operator_e current_operator = *(boolean_operators + i);
         gs_vec_t *current_match_ids = gs_vec_new(sizeof(gs_attr_id_t), frag->ntuplets);
-        frag->_raw_scan(frag, current_match_ids, *comp_type, *(attr_ids + 1 + i), comp_vals);
+        frag->_raw_scan(frag, current_match_ids, *comp_type, *(attr_ids + 1 + i), comp_vals +
+                gs_field_type_sizeof (gs_schema_attr_type (frag->schema, *(attr_ids + 1 + i))));
         if (current_operator == BO_AND) {
                 match_ids = set_interect(match_ids, current_match_ids, gs_cmp_uint32);
             } else if (current_operator == BO_OR) {
@@ -168,14 +169,47 @@ void gs_frag_raw_scan(const gs_frag_t *frag, size_t num_boolean_operators, enum 
                 panic(NOTIMPLEMENTED, "unsupported boolean operation");
             }
                 gs_vec_dispose(current_match_ids);
-            }
-    size_t match_ids_length = gs_vec_length(match_ids);
+           }
+    gs_vec_dispose(match_ids);
+}
 
-    for (size_t j = 0; j < match_ids_length; ++j) {
-        gs_tuplet_id_t *atuplet_id = gs_vec_at(match_ids, j);
-        printf("found match {%u}\n", *atuplet_id);
+
+void gs_frag_raw_vectorized_scan(gs_frag_t *frag, gs_batch_consumer_t *consumer,size_t num_boolean_operators,
+                                 enum gs_boolean_operator_e *boolean_operators, enum gs_comp_type_e *comp_type,
+                                 gs_attr_id_t *attr_ids, const void *comp_vals, size_t batch_size,
+                                 bool enable_multithreading)
+{
+    assert(frag);
+    assert(boolean_operators);
+    assert(comp_type);
+    assert(attr_ids);
+    assert(comp_vals);
+    assert((num_boolean_operators >= 0));
+    assert((batch_size >= 1));
+
+    gs_vec_t *match_ids = gs_vec_new(sizeof(gs_attr_id_t), frag->ntuplets);
+    frag->_raw_vectorized_scan(frag, consumer, match_ids, *comp_type, *attr_ids, comp_vals, batch_size,
+                               enable_multithreading);
+
+    for (size_t i = 0; i < num_boolean_operators; ++i) {
+        enum gs_boolean_operator_e current_operator = *(boolean_operators + i);
+        gs_vec_t *current_match_ids = gs_vec_new(sizeof(gs_attr_id_t), frag->ntuplets);
+        frag->_raw_vectorized_scan(frag, consumer, current_match_ids, *comp_type, *(attr_ids + 1 + i), comp_vals +
+                                                                                  gs_field_type_sizeof(
+                                                                                          gs_schema_attr_type(
+                                                                                                  frag->schema,
+                                                                                                  *(attr_ids + 1 + i))),
+                                   batch_size, enable_multithreading);
+        if (current_operator == BO_AND) {
+            match_ids = set_interect(match_ids, current_match_ids, gs_cmp_uint32);
+        } else if (current_operator == BO_OR) {
+            match_ids = set_union(match_ids, current_match_ids, gs_cmp_uint32);
+        } else {
+            panic(NOTIMPLEMENTED, "unsupported boolean operation");
+        }
+        gs_vec_dispose(current_match_ids);
     }
-            gs_vec_dispose(match_ids);
+    gs_vec_dispose(match_ids);
 }
 
 void gs_frag_print(FILE *file, gs_frag_t *frag, size_t row_offset, size_t limit)

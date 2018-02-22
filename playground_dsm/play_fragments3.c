@@ -27,19 +27,22 @@ int main() {
     *and_ors = BO_OR;
     *cmp_types = CT_GREATEREQ;
     *(cmp_types + 1) = CT_GREATEREQ;
-    *attr_ids = 1;
-    *(attr_ids + 1) = 0;
+    *attr_ids = 0;
+    *(attr_ids + 1) = 1;
     *cmp_vals = 5;
-    *(cmp_vals + 1) = 5;
+    *(cmp_vals + 1) = 2;
+    gs_frag_print(stdout, lineitem, 0, 15);
 
-   gs_frag_raw_scan(lineitem, 1, and_ors, cmp_types, attr_ids, cmp_vals);
-//   gs_frag_print(stdout, lineitem, 0, num_tuplets);
+    gs_batch_consumer_t *console_printer_consumer = gs_batch_consumer_create(CONSUMER_PRINTER);
+ //   gs_frag_raw_scan(lineitem, 1, and_ors, cmp_types, attr_ids, cmp_vals);
+    gs_frag_raw_vectorized_scan(lineitem, console_printer_consumer, 1, and_ors, cmp_types, attr_ids, cmp_vals, 10,
+                               false);
     free(and_ors);
     free(cmp_types);
     free(attr_ids);
     free(cmp_vals);
     gs_frag_delete(lineitem);
-
+    gs_batch_consumer_dispose(console_printer_consumer);
 //    gs_vec_t *set1;
 //    gs_vec_t *set2;
 //    gs_vec_t *set1_2_intersection;

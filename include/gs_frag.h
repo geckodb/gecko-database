@@ -26,13 +26,14 @@
 #include <gs_tuplet.h>
 #include <gs_frag_printer.h>
 #include <frags/gs_frag_host_vm.h>
-
+#include <gs_batch_consumer.h>
 // ---------------------------------------------------------------------------------------------------------------------
 // F O R W A R D   D E C L A R A T I O N S
 // ---------------------------------------------------------------------------------------------------------------------
 
 enum gs_frag_printer_type_tag_e;
 struct gs_tuplet_t;
+struct gs_batch_consumer_t;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // D A T A T Y P E S
@@ -64,8 +65,12 @@ typedef struct gs_frag_t {
     void *extras; /*!< a pointer to the corresponding extras fields*/
     /* operations */
     struct gs_frag_t *(*_scan)(struct gs_frag_t *self, const gs_pred_tree_t *pred, size_t batch_size, size_t nthreads);
-    void (*_raw_scan)(const struct gs_frag_t *self, gs_vec_t *match_ids, enum gs_comp_type_e comp_type, gs_attr_id_t attr_id,
-                                 const void *cmp_val);
+    void (*_raw_scan)(struct gs_frag_t *self, gs_vec_t *match_ids, enum gs_comp_type_e comp_type,
+                      gs_attr_id_t attr_id, const void *cmp_val);
+    void (*_raw_vectorized_scan)(struct gs_frag_t *self, struct gs_batch_consumer_t *consumer,gs_vec_t *match_ids,
+                                 enum gs_comp_type_e comp_type, gs_attr_id_t attr_id, const void *cmp_val,
+                                 size_t batch_size, bool enable_multithreading);
+
     void (*_dispose)(struct gs_frag_t *self);
 
     /*!< factory function to create impl-specific tuplet */
@@ -95,8 +100,13 @@ __BEGIN_DECLS
 gs_frag_t *gs_frag_new(gs_schema_t *schema, size_t tuplet_capacity, enum gs_frag_impl_type_e type);
 void gs_frag_delete(gs_frag_t *frag);
 
-void gs_frag_raw_scan(const gs_frag_t *frag, size_t num_boolean_operators, enum gs_boolean_operator_e *boolean_operators,
+void gs_frag_raw_scan(gs_frag_t *frag, size_t num_boolean_operators, enum gs_boolean_operator_e *boolean_operators,
                       enum gs_comp_type_e *comp_type, gs_attr_id_t *attr_ids, const void *comp_vals);
+
+void gs_frag_raw_vectorized_scan(gs_frag_t *frag, struct gs_batch_consumer_t *consumer,size_t num_boolean_operators,
+                                 enum gs_boolean_operator_e *boolean_operators, enum gs_comp_type_e *comp_type,
+                                 gs_attr_id_t *attr_ids, const void *comp_vals, size_t batch_size, bool enable_ml);
+
 void gs_frag_insert(struct gs_tuplet_t *out, gs_frag_t *frag, size_t ntuplets);
 void gs_frag_print(FILE *file, gs_frag_t *frag, size_t row_offset, size_t limit);
 void gs_frag_print_ex(FILE *file, enum gs_frag_printer_type_tag_e printer_type, gs_frag_t *frag, size_t row_offset,

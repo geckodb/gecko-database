@@ -27,10 +27,6 @@
 // D A T A T Y P E S
 // ---------------------------------------------------------------------------------------------------------------------
 
-//typedef struct gs_frag_fat_extras {
-//    void *tuplet_data; /*!< data inside this fragment; the record format (e.g., NSM/DSM) is implementation-specific */
-//    size_t tuplet_size; /*!< size in byte of a single tuplet */
-//} gs_frag_fat_extras;
 
 // ---------------------------------------------------------------------------------------------------------------------
 // M A C R O S
@@ -48,13 +44,34 @@
  static void frag_open(gs_tuplet_t *dst, gs_frag_t *self, gs_tuplet_id_t tuplet_id);
  static void frag_add(gs_tuplet_t *dst, struct gs_frag_t *self, size_t ntuplets);
  static void frag_dipose(gs_frag_t *self);
- static void frag_raw_scan(const struct gs_frag_t *self, gs_vec_t *match_ids, enum gs_comp_type_e comp_type, gs_attr_id_t attr_id,
+ static void frag_raw_scan(struct gs_frag_t *self, gs_vec_t *match_ids, enum gs_comp_type_e comp_type,
+                           gs_attr_id_t attr_id,
                                      const void *cmp_val);
-static void frag_raw_scan_dsm(const struct gs_frag_t *self, gs_vec_t *match_ids, enum gs_comp_type_e comp_type, gs_attr_id_t attr_id,
+static void frag_raw_scan_vectorized(struct gs_frag_t *self, gs_batch_consumer_t *consumer,gs_vec_t *match_ids,
+enum gs_comp_type_e comp_type, gs_attr_id_t attr_id, const void *cmp_val,
+        size_t batch_size, bool enable_multithreading);
+static void frag_raw_scan_dsm(struct gs_frag_t *self, gs_vec_t *match_ids, enum gs_comp_type_e comp_type,
+                              gs_attr_id_t attr_id,
                           const void *cmp_val);
-static void frag_raw_scan_nsm(const struct gs_frag_t *self, gs_vec_t *match_ids, enum gs_comp_type_e comp_type, gs_attr_id_t attr_id,
+static void frag_raw_scan_nsm(struct gs_frag_t *self, gs_vec_t *match_ids, enum gs_comp_type_e comp_type,
+                              gs_attr_id_t attr_id,
                               const void *cmp_val);
- static void tuplet_rebase(gs_tuplet_t *tuplet, gs_frag_t *frag, gs_tuplet_id_t tuplet_id);
+static void frag_raw_scan_nsm_vectorized(struct gs_frag_t *self,  gs_batch_consumer_t *consumer,
+                                         gs_vec_t *match_ids, enum gs_comp_type_e comp_type, gs_attr_id_t attr_id,
+                              const void *cmp_val, size_t batch_size);
+static void frag_raw_scan_nsm_vectorized_ml(struct gs_frag_t *self, gs_batch_consumer_t *consumer,
+                                            gs_vec_t *match_ids, enum gs_comp_type_e comp_type, gs_attr_id_t attr_id,
+                                         const void *cmp_val, size_t batch_size);
+static void frag_raw_scan_dsm_vectorized(struct gs_frag_t *self, gs_batch_consumer_t *consumer,
+                                         gs_vec_t *match_ids, enum gs_comp_type_e comp_type, gs_attr_id_t attr_id,
+                                         const void *cmp_val, size_t batch_size);
+static void frag_raw_scan_dsm_vectorized_ml(struct gs_frag_t *self, gs_batch_consumer_t *consumer,
+                                            gs_vec_t *match_ids, enum gs_comp_type_e comp_type, gs_attr_id_t attr_id,
+                                            const void *cmp_val, size_t batch_size);
+
+
+
+static void tuplet_rebase(gs_tuplet_t *tuplet, gs_frag_t *frag, gs_tuplet_id_t tuplet_id);
  static bool tuplet_step(gs_tuplet_t *self);
  static void frag_open_internal(gs_tuplet_t *out, gs_frag_t *self, size_t pos);
  static void tuplet_bind(gs_tuplet_field_t *dst, gs_tuplet_t *self);
@@ -96,7 +113,7 @@ struct gs_frag_t *gs_frag_host_vm_dsm_new(gs_schema_t *schema, size_t tuplet_cap
 {
     gs_frag_t *fragment = GS_REQUIRE_MALLOC(sizeof(gs_frag_t));
     size_t tuplet_size = gs_tuplet_size_by_schema(schema);
-    gs_frag_fat_extras *fat_extras = GS_REQUIRE_MALLOC(sizeof(gs_frag_fat_extras));;
+    gs_frag_fat_extras *fat_extras = GS_REQUIRE_MALLOC(sizeof(gs_frag_fat_extras));
     size_t required_size = tuplet_size * tuplet_capacity;
     *fragment = (gs_frag_t) {
             .schema = gs_schema_cpy(schema),
@@ -106,6 +123,7 @@ struct gs_frag_t *gs_frag_host_vm_dsm_new(gs_schema_t *schema, size_t tuplet_cap
             .extras = fat_extras,
             ._scan = gs_scan_mediator,
             ._raw_scan = frag_raw_scan,
+            ._raw_vectorized_scan = frag_raw_scan_vectorized,
             ._dispose = frag_dipose,
             ._open = frag_open,
             ._insert = frag_add
@@ -188,7 +206,7 @@ void frag_open(gs_tuplet_t *dst, gs_frag_t *self, gs_tuplet_id_t tuplet_id)
     frag_open_internal(dst, self, return_tuplet_id);
 }
 
- void frag_raw_scan(const struct gs_frag_t *self, gs_vec_t *match_ids, enum gs_comp_type_e comp_type, gs_attr_id_t attr_id,
+ void frag_raw_scan(struct gs_frag_t *self, gs_vec_t *match_ids, enum gs_comp_type_e comp_type, gs_attr_id_t attr_id,
                               const void *cmp_val)
 {
     assert(self);
@@ -206,8 +224,34 @@ void frag_open(gs_tuplet_t *dst, gs_frag_t *self, gs_tuplet_id_t tuplet_id)
     }
 }
 
-static void frag_raw_scan_nsm(const struct gs_frag_t *self, gs_vec_t *match_ids, enum gs_comp_type_e comp_type, gs_attr_id_t attr_id,
-                              const void *cmp_val) {
+static void frag_raw_scan_vectorized(struct gs_frag_t *self, gs_batch_consumer_t *consumer,gs_vec_t *match_ids,
+                                     enum gs_comp_type_e comp_type, gs_attr_id_t attr_id, const void *cmp_val,
+                                     size_t batch_size, bool enable_multithreading)
+{
+    assert(self);
+    assert(match_ids);
+    assert((attr_id >= 0));
+    assert(cmp_val);
+    assert((batch_size >= 1));
+
+    if (self->format == TF_NSM) {
+        if (enable_multithreading) {
+            frag_raw_scan_nsm_vectorized_ml(self, consumer, match_ids, comp_type, attr_id, cmp_val, batch_size);
+        } else {
+            frag_raw_scan_nsm_vectorized(self, consumer, match_ids, comp_type, attr_id, cmp_val, batch_size);
+        }
+    } else if (self->format ==TF_DSM) {
+        if (enable_multithreading) {
+            frag_raw_scan_dsm_vectorized_ml(self, consumer, match_ids, comp_type, attr_id, cmp_val, batch_size);
+        } else {
+            frag_raw_scan_dsm_vectorized(self, consumer, match_ids, comp_type, attr_id, cmp_val, batch_size);
+        }
+    } else {
+        panic(NOTIMPLEMENTED, "Current Raw scan implementation works only with NSM and DSM formats");
+    }
+}
+static void frag_raw_scan_nsm(struct gs_frag_t *self, gs_vec_t *match_ids, enum gs_comp_type_e comp_type,
+                              gs_attr_id_t attr_id, const void *cmp_val) {
 
     size_t current_attr_offset = 0;
     size_t current_tuplet_offset = 0;
@@ -255,11 +299,164 @@ static void frag_raw_scan_nsm(const struct gs_frag_t *self, gs_vec_t *match_ids,
     }
 }
 
-static void frag_raw_scan_dsm(const struct gs_frag_t *self, gs_vec_t *match_ids, enum gs_comp_type_e comp_type, gs_attr_id_t attr_id,
-                              const void *cmp_val) {
-
+static void frag_raw_scan_dsm(struct gs_frag_t *self, gs_vec_t *match_ids, enum gs_comp_type_e comp_type,
+                              gs_attr_id_t attr_id, const void *cmp_val)
+{
     panic(NOTIMPLEMENTED, "Raw scan for Fat DSM isn't yet implemented");
+}
+static int gs_cmp_uint32_batch(const void *batch, const void *rhs, size_t batch_size, size_t offset_size, size_t attr_skip,
+                               short *result)
+{
+    for (size_t i = 0; i < batch_size; i++) {
+        uint32_t* value = (void*)batch + i * offset_size + attr_skip;
+        //printf(" %d ", *value);
+        if (*value > *(uint32_t *)rhs) result[i] = 1;
+        else if (*value < *(uint32_t *)rhs) result[i] = -1;
+        else result[i] = 0;
 
+    }
+    return 1;
+}
+
+static int gs_cmp_int32_batch(const void *batch, const void *rhs, size_t batch_size, size_t offset_size, size_t attr_skip,
+                              short *result)
+{
+    for (size_t i = 0; i < batch_size; i++) {
+        int32_t* value = (void*)batch + i * offset_size + attr_skip;
+        //printf(" %d ", *value);
+        if (*value > *(int32_t *)rhs) result[i] = 1;
+        else if (*value < *(int32_t *)rhs) result[i] = -1;
+        else result[i] = 0;
+
+    }
+    return 1;
+}
+
+static int gs_cmp_uint64_batch(const void *batch, const void *rhs, size_t batch_size, size_t offset_size, size_t attr_skip,
+                               short *result)
+{
+    for (size_t i = 0; i < batch_size; i++) {
+        uint64_t * value = (void*)batch + i * offset_size + attr_skip;
+        //printf(" %d ", *value);
+        if (*value > *(uint64_t *)rhs) result[i] = 1;
+        else if (*value < *(uint64_t *)rhs) result[i] = -1;
+        else result[i] = 0;
+
+    }
+    return 1;
+}
+
+//TODO: good way to implement comparing two floats in the scenario of batchs
+static int gs_cmp_float32_batch(const void *batch, const void *rhs, size_t batch_size, size_t offset_size, size_t attr_skip,
+                         short *result)
+{
+    //   panic(NOTIMPLEMENTED, "need to implement a function to compare floats");
+    return 1;
+}
+
+//TODO: good way to implement comparing two chars in the scenario of batchs
+static int gs_cmp_char_batch(const void *batch, const void *rhs, size_t batch_size, size_t offset_size, size_t attr_skip,
+                      short *result)
+{
+    //   panic(NOTIMPLEMENTED, "need to implement a function to compare two chars");
+    return 1;
+}
+static void frag_raw_scan_nsm_vectorized(struct gs_frag_t *self, gs_batch_consumer_t *consumer,
+                                         gs_vec_t *match_ids, enum gs_comp_type_e comp_type, gs_attr_id_t attr_id,
+                                         const void *cmp_val , size_t batch_size)
+{
+    assert(self);
+    assert(match_ids);
+    assert((attr_id >= 0));
+    assert(cmp_val);
+    consumer->new_fragment = true;
+    size_t remaining_num_tuplets = self->ntuplets;
+    size_t num_batchs = (size_t)ceil(remaining_num_tuplets / (float)(batch_size));
+    size_t current_attr_offset = 0;
+    size_t current_batch_offset = 0;
+    // calculate the field corresponding index
+    for (gs_attr_id_t i = 0; i < attr_id; ++i) {
+        const gs_attr_t *attr = gs_schema_attr_by_id(self->schema, i);
+        current_attr_offset += gs_attr_total_size(attr);
+    }
+    const gs_attr_t *attr = gs_schema_attr_by_id(self->schema, attr_id);
+//    size_t attr_total_size = gs_attr_total_size(attr);
+
+    gs_comp_func_batch_t cmp_func;
+
+    switch (attr->type) {
+        case FT_INT32:
+            cmp_func = gs_cmp_int32_batch;
+            break;
+        case FT_UINT32:
+            cmp_func = gs_cmp_uint32_batch;
+            break;
+        case FT_UINT64:
+            cmp_func = gs_cmp_uint64_batch;
+            break;
+        case FT_FLOAT32:
+            cmp_func = gs_cmp_float32_batch;
+            break;
+        case FT_CHAR:
+            cmp_func = gs_cmp_char_batch;
+            break;
+        default: panic("not implemented '%d'", attr->type);
+    }
+
+    for (size_t i = 0; i < num_batchs; i++) {
+        size_t proper_batch_size = (remaining_num_tuplets > batch_size)?
+                                   batch_size : remaining_num_tuplets;
+        short *cmp_return = (short*) malloc(sizeof(short) * proper_batch_size);
+        remaining_num_tuplets -= proper_batch_size;
+        gs_attr_id_t *result = malloc(proper_batch_size * sizeof(gs_attr_id_t));
+        const void *batch_data = ((gs_frag_fat_extras *) self->extras)->tuplet_data + current_batch_offset;
+        cmp_func(batch_data, cmp_val, proper_batch_size,
+                 ((gs_frag_fat_extras *) self->extras)->tuplet_size, current_attr_offset, cmp_return);
+        size_t match_counter = 0;
+        for (gs_tuplet_id_t j = 0; j < proper_batch_size; ++j) {
+            bool match = ((comp_type == CT_LESS && cmp_return[j] < 0) ||
+                          (comp_type == CT_GREATER && cmp_return[j] > 0) ||
+                          (comp_type == CT_EQUALS && cmp_return[j] == 0) ||
+                          (comp_type == CT_LESSEQ && cmp_return[j] <= 0) ||
+                          (comp_type == CT_GREATEREQ && cmp_return[j] >= 0) ||
+                          (comp_type == CT_NOTEQUALS && cmp_return[j] != 0));
+            if (match) {
+                gs_attr_id_t current_id = current_batch_offset + j;
+                gs_vec_pushback(match_ids, 1, &(current_id));
+                result[match_counter++] = current_id;
+            }
+        }
+        current_batch_offset += proper_batch_size * ((gs_frag_fat_extras *) self->extras)->tuplet_size;
+
+        gs_batch_consumer_consume(consumer, result, self, 0,
+                                  match_counter);
+        free(result);
+        free(cmp_return);
+    }
+
+}
+
+static void frag_raw_scan_dsm_vectorized(struct gs_frag_t *self, gs_batch_consumer_t *consumer, gs_vec_t *match_ids,
+                                         enum gs_comp_type_e comp_type, gs_attr_id_t attr_id, const void *cmp_val,
+                                         size_t batch_size)
+{
+    panic(NOTIMPLEMENTED, "Vectorized scan for Fat DSM isn't yet implemented");
+}
+
+static void frag_raw_scan_nsm_vectorized_ml(struct gs_frag_t *self, gs_batch_consumer_t *consumer, gs_vec_t *match_ids,
+                                            enum gs_comp_type_e comp_type, gs_attr_id_t attr_id, const void *cmp_val,
+                                            size_t batch_size)
+{
+    panic(NOTIMPLEMENTED, "Vectorized multithreaded"
+             "scan for Fat NSM isn't yet implemented");
+}
+
+static void frag_raw_scan_dsm_vectorized_ml(struct gs_frag_t *self, gs_batch_consumer_t *consumer, gs_vec_t *match_ids,
+                                            enum gs_comp_type_e comp_type, gs_attr_id_t attr_id, const void *cmp_val,
+                                            size_t batch_size)
+{
+    panic(NOTIMPLEMENTED, "Vectorized multithreaded"
+            " scan for Fat DSM isn't yet implemented");
 }
 
 // - T U P L E T   I M P L E M E N T A T I O N -------------------------------------------------------------------------
